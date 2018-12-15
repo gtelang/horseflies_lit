@@ -1,0 +1,34 @@
+\documentclass[12pt]{report}
+\input{standard_settings.tex}
+\usepackage{hyperref}
+\author{Gaurish Telang}
+\begin{document}
+
+\begin{titlepage}
+	\centering
+        {\Huge Experimental Analyses of Heuristics for Horsefly-type Problems\\}
+        \vspace{20mm}
+        {\Large Gaurish Telang}
+\end{titlepage}
+% This gives the titlepage the page number of 1, 
+% making it easier to navigate with a pdfviewer
+% such as zathura, which seems to only be able 
+% to understand page-numbers beginning from 1. 
+\setcounter{page}{2} 
+
+% For global table of contents
+\setcounter{tocdepth}{1}
+\tableofcontents
+\addtocontents{toc}{~\hfill\textbf{Page}\par}
+
+\part{Overview}
+@i descriptions-of-problems.web
+@i installation-and-use.web
+@i overview-of-code-base.web
+\part{Programs}
+@i problem-classic-horsefly.web
+@i problem-segment-horsefly.web
+@i problem-fixed-route-horsefly.web
+@i problem-one-horse-two-flies.web
+@i problem-reverse-horsefly.web
+\end{document}

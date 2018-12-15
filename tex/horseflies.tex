@@ -1,0 +1,287 @@
+\newcommand{\NWtarget}[2]{\hypertarget{#1}{#2}}
+\newcommand{\NWlink}[2]{\hyperlink{#1}{#2}}
+\newcommand{\NWtxtMacroDefBy}{Fragment defined by}
+\newcommand{\NWtxtMacroRefIn}{Fragment referenced in}
+\newcommand{\NWtxtMacroNoRef}{Fragment never referenced}
+\newcommand{\NWtxtDefBy}{Defined by}
+\newcommand{\NWtxtRefIn}{Referenced in}
+\newcommand{\NWtxtNoRef}{Not referenced}
+\newcommand{\NWtxtFileDefBy}{File defined by}
+\newcommand{\NWtxtIdentsUsed}{Uses:}
+\newcommand{\NWtxtIdentsNotUsed}{Never used}
+\newcommand{\NWtxtIdentsDefed}{Defines:}
+\newcommand{\NWsep}{${\diamond}$}
+\newcommand{\NWnotglobal}{(not defined globally)}
+\newcommand{\NWuseHyperlinks}{}
+\documentclass[12pt]{report}
+\input{standard_settings.tex}
+\usepackage{hyperref}
+\author{Gaurish Telang}
+\begin{document}
+
+\begin{titlepage}
+	\centering
+        {\Huge Experimental Analyses of Heuristics for Horsefly-type Problems\\}
+        \vspace{20mm}
+        {\Large Gaurish Telang}
+\end{titlepage}
+% This gives the titlepage the page number of 1, 
+% making it easier to navigate with a pdfviewer
+% such as zathura, which seems to only be able 
+% to understand page-numbers beginning from 1. 
+\setcounter{page}{2} 
+
+% For global table of contents
+\setcounter{tocdepth}{1}
+\tableofcontents
+\addtocontents{toc}{~\hfill\textbf{Page}\par}
+
+\part{Overview}
+\chapter{Description of Problems}
+
+
+
+\begin{figure}[H]
+   \centering
+
+    \includegraphics[width=8cm]{../webs/docs/prelim_example_phi5.png}
+    \caption{An Example of a classic Horsefly tour with $\varphi=5$. The red dot
+    indicates the initial position of the horse and fly, given as part of 
+    the input. The ordering of sites shown has been computed with a greedy 
+    algorithm which will be described later}
+    \label{fig:prelim-example}
+\end{figure}
+
+
+The Horsefly problem is a generalization of the well-known Euclidean Traveling Salesman Problem.
+In the most basic version of the Horsefly problem (which we call \textbf{``Classic Horsefly''}), we are given a set of sites, the
+initial position of a truck(horse) with a drone(fly) mounted on top, and the speed of the
+drone-speed $\varphi$. \footnote{ The speed of the truck is always assumed to be 1 in any of the problem 
+variations we will be considering in this report.} \footnote{ $\varphi$ is also called the ``speed ratio''.}. 
+
+The goal is to compute a tour for both the truck and the drone to deliver package to sites
+as quickly as possible. For delivery, a drone must pick up a package from the
+truck, fly to the site and come back to the truck to pick up the next package for
+delivery to another site. \footnote{ The drone is assumed to be able to carry at most one package at a time }
+Both the truck and drone must coordinate their motions to minimize the time it takes for
+all the sites to get their packages. Figure \ref{fig:prelim-example} gives an example of such a tour
+computed using a greedy heuristic for $\varphi=5$.
+
+
+This suite of programs implement several experimental heuristics, to solve the above NP-hard
+problem and some of its variations approximately. In this short chapter, we give a description 
+of the problem variations that we will be tackling. Each of the problems, has a corresponding chapter 
+in Part 2, where these heuristics are described and implemented. We also give comparative analyses of 
+their experimental performance on various problem instances. 
+
+\vspace{0.5cm}
+
+\begin{description}
+\item[Classic Horsefly] This problem has already described in the introduction.
+
+\item[Segment Horsefly] In this variation, the path of the truck is restricted to that of a segment, 
+which we can consider without loss of generality to be $[0,1]$. All sites, without loss of generality 
+lie in the upper-half plane $\RR^2_{+}$. 
+
+\item[Fixed Route Horsefly] This is the obvious generalization of Segment Horsefly, where the path
+which the truck is restricted to travel is a piece-wise linear polygonal path. 
+\footnote{More generally, the truck will be restricted to travelling on a road network, which would 
+typically be modelled as a graph embedded in the plane.} Both the initial 
+position of the truck and the drone are given. The sites to be serviced are allowed to lie anywhere in $\RR^2$. 
+Two further variations are possible in this setting, one in which the truck is allowed reversals
+and the other in which it is not. 
+
+\item[One Horse, Two Flies] The truck is now equipped with two drones. Otherwise the setting, is exactly 
+the same as in classic horsefly. Each drone can carry only one package at a time. The drones must fly back
+and forth between the truck and the sites to deliver the packages. We allow the possibility that 
+both the drones can land at the same time and place on the truck to pick up their next package. \footnote{In reality, 
+one of the drones will have to wait for a small amount of time while the other is retrieving its package. 
+In a more realisting model, we would need to take into account this ``waiting time'' too.}
+
+\item[Reverse Horsefly] In this model, each site (not the truck!) is equipped with a drone, which fly 
+\textit{towards} the truck to pick up their packages. We need to coordinate the motion of the truck 
+and drone so that the time it takes for the last drone to pick up its package (the ``makespan'') is 
+minimized. 
+
+\item[Bounded Distance Horsefly] In most real-world scenarios, the drone will not be able to (or allowed to) go more than
+a certain distance $R$ from the truck. Thus with the same settings as the classic horsefly, but with the added 
+constraint of the drone and the truck never being more than a distance $R$ from the truck, how would one 
+compute the truck and drone paths to minimize the makespan of the deliveries? 
+
+\end{description}
+
+\chapter{Installation and Use}
+
+To run these programs: 
+
+\begin{alphalist}
+\item \crunchy{Get Docker} Docker is open-source containerization software that is easily installable on 
+  Windows\footnote{You might need to turn on virtualization explicitly in your BIOS, as I needed to when installing Docker on Windows. 
+  Here is a snapshot of an image when turning on Intel's virtualization technology through the BIOS: 
+\url{https://images.techhive.com/images/article/2015/09/virtualbox_vt-x_amd-v_error04_phoenix-100612961-large.idge.jpg}}, Mac, and almost any 
+  GNU/Linux distribution. For a quick minute introduction to Docker containerization, please watch the first couple of minutes of 
+  \url{https://youtu.be/_dfLOzuIg2o}
+  
+  For installation instrutions watch
+  \begin{description}
+    \item[On GNU/Linux]  \url{https://youtu.be/KCckWweNSrM}
+    \item[On Windows]    \url{https://youtu.be/ymlWt1MqURY}
+    \item[On MacOS]      \url{https://youtu.be/MU8HUVlJTEY}
+  \end{description}
+
+\item \crunchy{Download customized Ubuntu image} Download a customized Ubuntu Docker image that 
+  I've created with \verb| docker pull gtelang/Ubuntu_customized|. The customized Ubuntu image is approximately
+  7 GB which contains all the libraries (e.g. CGAL, VTK, numpy, and matplotlib) that I typically use to run 
+  my research codes portably. \footnote{ On my home internet connection downloading this Ubuntu-image typically takes about 5 minutes.}
+\item \crunchy{Clone repository} \verb|git clone gtelang/horseflies.git|
+\item \crunchy{Build the downloaded Ubuntu image} Open up your favorite terminal emulator, like say xterm on GNU/Linux, 
+  iTerm on macOS or Powershell on Windows 10 and type \\ 
+  \verb|cd horseflies ; docker build .| \footnote{ Note the period at the end! This has to be typed in too!}
+\item \crunchy{Run all experiments again} If you want to run all the experiments as described in the paper again to reproduce
+  the reported results on your machine \footnote{ Allowing, of course,  for differences between 
+  your machine's CPU and mine when it comes to reporting absolute running time}, 
+  type in \verb|docker run|
+\item \crunchy{Interactive mode}  Else if you want to test the algorithms in interactive mode (where you get to select the problem-type, 
+  mouse-in the sites on a canvas, set the initial position of the truck and drone and set $\varphi$) 
+  you will need  to set up an X-connection between the Docker container and your host OS.
+ 
+\begin{itemize}
+\item On the Ubuntu 16.04 partition of my Thinkpad laptop, I had to follow the instructions given in this short video: \url{https://youtu.be/RDg6TRwiPtg}
+\item On the Windows 10 partition of the same laptop, I had to follow the instructions in 
+\url{https://dev.to/darksmile92/run-gui-app-in-linux-Docker-container-on-windows-host-4kde}
+
+\end{itemize}
+
+\end{alphalist}
+
+
+If you want to delete the Ubuntu image, (it is 7GB afterall!) please watch this short video 
+\url{https://youtu.be/ySMAXT384bs}.
+
+The nice thing about Docker is that it makes it easy to run softwares on different OS'es portably, while 
+also allowing to get rid of the problem of dependency hell \url{https://en.wikipedia.org/wiki/Dependency_hell}. 
+
+The headache of installing different software dependencies correctly on different machines running different OS'es, 
+is replaced \textbf{only} by having to learn how to install Docker on your particular machine, and to know how 
+set up an X-connection between the host OS and an instantiated container. \chapter{Overview of the Code Base}
+\part{Programs}
+\chapter{Classic Horsefly}
+\label{chap:classic-horsefly}
+
+\newchunk \blindtext
+
+\begin{flushleft} \small\label{scrap1}\raggedright\small
+\NWtarget{nuweb11}{} \verb@"../src/lib/test.py"@\nobreak\ {\footnotesize {11}}$\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@@\hbox{$\langle\,${\itshape Imports}\nobreak\ {\footnotesize \NWlink{nuweb12a}{12a}, \ldots\ }$\,\rangle$}\verb@@\\
+\mbox{}\verb@# Fixing random state for reproducibility@\\
+\mbox{}\verb@np.random.seed(19680801)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@dt = 0.01@\\
+\mbox{}\verb@t = np.arange(0, 10, dt)@\\
+\mbox{}\verb@nse = np.random.randn(len(t))@\\
+\mbox{}\verb@r = np.exp(-t / 0.05)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@cnse = np.convolve(nse, r) * dt@\\
+\mbox{}\verb@cnse = cnse[:len(t)]@\\
+\mbox{}\verb@s = 0.1 * np.sin(2 * np.pi * t) + cnse@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@plt.subplot(211)@\\
+\mbox{}\verb@plt.plot(t, s)@\\
+\mbox{}\verb@plt.subplot(212)@\\
+\mbox{}\verb@plt.psd(s, 512, 1 / dt)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@plt.show()@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtFileDefBy\ \NWlink{nuweb11}{11}\NWlink{nuweb12b}{, 12b}.
+
+\item{}
+\end{list}
+\vspace{4ex}
+\end{flushleft}
+\newchunk 
+
+\begin{flushleft} \small
+\begin{minipage}{\linewidth}\label{scrap2}\raggedright\small
+\NWtarget{nuweb12a}{} $\langle\,${\itshape Imports}\nobreak\ {\footnotesize {12a}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@import matplotlib.pyplot as plt@\\
+\mbox{}\verb@import numpy as np@\\
+\mbox{}\verb@import matplotlib.mlab as mlab@\\
+\mbox{}\verb@import matplotlib.gridspec as gridspec@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroDefBy\ \NWlink{nuweb12a}{12a}\NWlink{nuweb13}{, 13}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb11}{11}.
+
+\item{}
+\end{list}
+\end{minipage}\vspace{4ex}
+\end{flushleft}
+\newchunk \blindtext
+
+\begin{flushleft} \small
+\begin{minipage}{\linewidth}\label{scrap3}\raggedright\small
+\NWtarget{nuweb12b}{} \verb@"../src/lib/test.py"@\nobreak\ {\footnotesize {12b}}$\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@import numpy as np@\\
+\mbox{}\verb@import matplotlib.pyplot as plt@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@y = np.sin(np.arange(10.0) / 20.0 * np.pi) + 1@\\
+\mbox{}\verb@plt.errorbar(x, y, yerr=0.1, uplims=True)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@y = np.sin(np.arange(10.0) / 20.0 * np.pi) + 2@\\
+\mbox{}\verb@plt.errorbar(x, y, yerr=0.1, uplims=upperlimits, lolims=lowerlimits)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@plt.xlim(-1, 10)@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtFileDefBy\ \NWlink{nuweb11}{11}\NWlink{nuweb12b}{, 12b}.
+
+\item{}
+\end{list}
+\end{minipage}\vspace{4ex}
+\end{flushleft}
+\newchunk \blindtext
+
+\begin{flushleft} \small
+\begin{minipage}{\linewidth}\label{scrap4}\raggedright\small
+\NWtarget{nuweb13}{} $\langle\,${\itshape Imports}\nobreak\ {\footnotesize {13}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@import matplotlib.pyplot as plt@\\
+\mbox{}\verb@import numpy as np@\\
+\mbox{}\verb@import matplotlib.mlab as mlab@\\
+\mbox{}\verb@import matplotlib.gridspec as gridspec@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroDefBy\ \NWlink{nuweb12a}{12a}\NWlink{nuweb13}{, 13}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb11}{11}.
+
+\item{}
+\end{list}
+\end{minipage}\vspace{4ex}
+\end{flushleft}
+\newchunk \blindtext
+\newchunk \blindtext
+\chapter{Segment Horsefly}\chapter{Fixed Route Horsefly}
+\chapter{One Horse, Two Flies}
+\chapter{Reverse Horsefly}
+\end{document}
