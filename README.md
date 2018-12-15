@@ -1,4 +1,4 @@
-![Preliminary Example](./webs/docs/prelim_example_phi5.png)
+![Preliminary Example](./webs/docs/prelim_example_phi5.png){#id .class width=30 height=20px}
 
 The Horsefly problem is a generalization of the well-known Euclidean
 Traveling Salesman Problem. In the most basic version of the Horsefly
