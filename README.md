@@ -4,8 +4,7 @@ The Horsefly problem is a generalization of the well-known Euclidean
 Traveling Salesman Problem. In the most basic version of the Horsefly
 problem, which we call the "classic" horsefly, we are given a set of
 sites in the Euclidean plane, the initial position of a truck (horse)
-with a drone (fly) mounted on top, and the speed of the drone
-\$\\varphi\$. [^1] [^2]
+with a drone (fly) mounted on top, and the speed of the drone. [^1] [^2]
 
 The goal is to compute a tour for both the truck and the drone to
 deliver package to sites as quickly as possible. For delivery, a drone
@@ -25,7 +24,7 @@ Horsefly and the correponding programs for solving them written in a
 
 [^1]: The speed of the truck is always assumed to be 1.
 
-[^2]: \$\\varphi\$ is also called the speed ratio.
+[^2]: The speed of the drone is also called the speed ratio.
 
 [^3]: The specific software that I used to write these literate programs
     was [Nuweb](http://nuweb.sourceforge.net/nuweb.pdf)
