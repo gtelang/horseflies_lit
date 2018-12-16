@@ -1,6 +1,10 @@
 \documentclass[12pt]{report}
 \input{standard_settings.tex}
+\usepackage{tocloft}
+\renewcommand{\cftpartfont}{\LARGE\itshape} % Part title in Huge Italic font
 \usepackage{hyperref}
+\usepackage{etoolbox}
+
 \author{Gaurish Telang}
 \begin{document}
 
@@ -31,4 +35,5 @@
 @i problem-fixed-route-horsefly.web
 @i problem-one-horse-two-flies.web
 @i problem-reverse-horsefly.web
+@i problem-watchman-horsefly.web
 \end{document}

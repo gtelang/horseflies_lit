@@ -3,11 +3,12 @@
 To run these programs: 
 
 \begin{alphalist}
-\item \crunchy{Get Docker} Docker is open-source containerization software that is easily installable on 
-  Windows\footnote{You might need to turn on virtualization explicitly in your BIOS, as I needed to when installing Docker on Windows. 
-  Here is a snapshot of an image when turning on Intel's virtualization technology through the BIOS: 
+\item \crunchy{Get Docker} Docker is an open-source containerization program that is easily installable on 
+  Windows\footnote{You might need to turn on virtualization explicitly in your BIOS, after installing Docker 
+  as I needed to while setting Docker up on Windows. Here is a snapshot of an image when turning on Intel's 
+  virtualization technology through the BIOS: 
 \url{https://images.techhive.com/images/article/2015/09/virtualbox_vt-x_amd-v_error04_phoenix-100612961-large.idge.jpg}}, Mac, and almost any 
-  GNU/Linux distribution. For a quick minute introduction to Docker containerization, please watch the first couple of minutes of 
+  GNU/Linux distribution. For a quick introduction to Docker containerization, watch the first two minutes of 
   \url{https://youtu.be/_dfLOzuIg2o}
   
   For installation instrutions watch
@@ -29,15 +30,16 @@ To run these programs:
   the reported results on your machine \footnote{ Allowing, of course,  for differences between 
   your machine's CPU and mine when it comes to reporting absolute running time}, 
   type in \verb|docker run|
-\item \crunchy{Interactive mode}  Else if you want to test the algorithms in interactive mode (where you get to select the problem-type, 
-  mouse-in the sites on a canvas, set the initial position of the truck and drone and set $\varphi$) 
-  you will need  to set up an X-connection between the Docker container and your host OS.
+\item \crunchy{Run algorithms interactively}  Else if you want to test the algorithms in interactive mode 
+  (where you get to select the problem-type, mouse-in the sites on a canvas, set the initial position of 
+  the truck and drone and set $\varphi$) you will need  to set up an X-connection between the Docker container 
+  and your host OS.
  
 \begin{itemize}
-\item On the Ubuntu 16.04 partition of my Thinkpad laptop, I had to follow the instructions given in this short video: \url{https://youtu.be/RDg6TRwiPtg}
+\item On the Ubuntu 16.04 partition of my Thinkpad laptop, I had to follow the instructions 
+      given in this short video: \url{https://youtu.be/RDg6TRwiPtg}
 \item On the Windows 10 partition of the same laptop, I had to follow the instructions in 
-\url{https://dev.to/darksmile92/run-gui-app-in-linux-Docker-container-on-windows-host-4kde}
-
+      \url{https://dev.to/darksmile92/run-gui-app-in-linux-Docker-container-on-windows-host-4kde}
 \end{itemize}
 
 \end{alphalist}
@@ -46,9 +48,9 @@ To run these programs:
 If you want to delete the Ubuntu image, (it is 7GB afterall!) please watch this short video 
 \url{https://youtu.be/ySMAXT384bs}.
 
-The nice thing about Docker is that it makes it easy to run softwares on different OS'es portably, while 
-also allowing to get rid of the problem of dependency hell \url{https://en.wikipedia.org/wiki/Dependency_hell}. 
+The nice thing about Docker is that it makes it easy to run softwares on different OS'es portably and neatly side-steps the 
+dependency hell problem (\url{https://en.wikipedia.org/wiki/Dependency_hell}.)
 
-The headache of installing different software dependencies correctly on different machines running different OS'es, 
+The headache of installing different library dependencies correctly on different machines running different OS'es, 
 is replaced \textbf{only} by having to learn how to install Docker on your particular machine, and to know how 
 set up an X-connection between the host OS and an instantiated container. 
