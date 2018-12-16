@@ -155,7 +155,7 @@ install Docker and to set up an X-windows connection between the host OS and an 
 \item \crunchy{Clone repository} \verb|git clone gtelang/horseflies_literate.git|
 \item \crunchy{Mount and Launch} 
 \begin{description}
-\item[For GNU/Linux] Open up your favorite terminal emulator, like say xterm on GNU/Linux,or Powershell on Windows 10. 
+\item[For GNU/Linux] Open up your favorite terminal emulator, such xterm and then
 {\small
 \begin{itemize}
    \item Copy to clipboard the output of \verb|xauth list|
@@ -201,23 +201,66 @@ If you want to delete the Ubuntu image and any associated containers run the com
 That's it! Happy horseflying!
 \part{Programs}
 \chapter{Overview of the Code Base}
-\footnote{The style of presentation in this chapter has been borrowed from 
-the Nuweb reference manual \url{http://nuweb.sourceforge.net/nuweb.pdf}}
-\section{Files}
+NOTE: {\footnotesize The style of presentation in this chapter has been adapted from 
+Chapter 2 of the Nuweb reference manual \url{http://nuweb.sourceforge.net/nuweb.pdf}}
 
-\subsection{The Main Files}
- The main files consist of $x$ main files (introduced here) and $y$ support 
- files (introduced) in the next section. The file \verb|main.py| will contain 
- the driver for the whole program. 
+Almost all of the code has been written in Python 2.7 and tested using the standard CPython
+implementation of the language. In some cases, calls will be made to external C\texttt{++} libraries (mostly CGAL and VTK) 
+using SWIG (\url{http://www.swig.org/}). This is either for speeding up a slow 
+routine or to use a function that is not available in any existing Python package.
 
- Except for \verb|main.py| each of the main files contain implmentations 
- of algorithms for one specific problem. Thus \texttt{problem-classic-horsefly.py}
- contains algorithms for computing approximations of classic horsefly tours. 
+There are three principal directories 
+\begin{itemize}
+ \item[\texttt{webs/}] This contains the source code for the entire project written in the nuweb format along with documents (mostly images)
+                       needed during the compilation of the \LaTeX{} files which will be extracted from the \texttt{.web} files. 
+ \item[\texttt{src/}] This contains the source code for the entire project ``tangled'' (i.e. extracted) from the \texttt{.web} files. 
+ \item[\texttt{tex/}] This contains the monolithic \texttt{horseflies.tex} extracted from the \texttt{.web} files and a bunch 
+of other supporing \LaTeX{} files. It also contains the final compiled \texttt{horseflies.pdf} (the current document) which contains the 
+documentation of the project, interwoven with code-chunks and cross-references between them along with the experimental results.  
+\end{itemize}  
 
-\subsection{Support Files}
- These files contain common utility functions that will be useful for manipulating
+The files in \texttt{src} and \texttt{tex} should not be touched. Any editing required should 
+be done to the \texttt{.web} files, which should then be weaved and tangled using the
+script \texttt{weave-tangle.sh} in the \texttt{webs} directory. 
+
+\section{The Main Files} 
+
+\newchunk The file \verb|main.py| is the entry-point for running code. This file takes
+ care of reading command-line arguments and accordingly executing the interactive
+ or experimental sections of the code for the appropriate problem. This file is in the 
+ top-level folder. 
+
+
+\newchunk Each of the files with prefix \texttt{algos-*}  contain implmentations of 
+ algorithms for one specific problem. Thus \texttt{algos-watchman-horsefly.py} 
+ contains algorithms for approximately solving the Watchman Horsefly problem. 
+
+ All such files are in the directory \texttt{src/lib/}
+
+\newchunk Similarly, each of the files with prefix \texttt{expt-*} contain code
+ for testing hypotheses regarding a problem, generating counter-examples or 
+ comparing the experimental performance of the algorithm implementations 
+ for each of the problems. Thus \texttt{expt-watchman-horsefly.py} contains 
+ code for performing experiments related to the Watchman Horsefly problem. 
+
+ All such files are in the directory \texttt{src/expt/}
+
+\section{Support Files}
+\newchunk These files contain common utility functions that will be useful for manipulating
  data-structures, common plotting and graphics routines for all horsefly-type 
- problems. \chapter{Classic Horsefly}
+ problems. All such files have the prefix \texttt{utils-*}
+
+ All such files are in the directory \texttt{src/lib/}
+
+\newchunk To automate testing of code during implementations, tests for various 
+ routines across the entire code-base have been written in files with prefix
+ \texttt{test-*}.  
+
+ Each of the main files have a corresponding test file. Tests for functions in the 
+ support files and experimental files have all been implemented in the files 
+ \texttt{test-utilities.py} and \texttt{test-experiments.py} respectively.  
+
+ All such files are in the directory \texttt{src/test/}\chapter{Classic Horsefly}
 \label{chap:classic-horsefly}
 
 
@@ -240,6 +283,7 @@ None.
 
 \chapter{Index of Identifiers}
  
+\chapter{Man-page for \texttt{main.py}}
 \end{appendices}
 
 \end{document}

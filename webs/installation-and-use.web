@@ -27,7 +27,7 @@ install Docker and to set up an X-windows connection between the host OS and an 
 \item \crunchy{Clone repository} \verb|git clone gtelang/horseflies_literate.git|
 \item \crunchy{Mount and Launch} 
 \begin{description}
-\item[For GNU/Linux] Open up your favorite terminal emulator, like say xterm on GNU/Linux,or Powershell on Windows 10. 
+\item[For GNU/Linux] Open up your favorite terminal emulator, such xterm and then
 {\small
 \begin{itemize}
    \item Copy to clipboard the output of \verb|xauth list|
