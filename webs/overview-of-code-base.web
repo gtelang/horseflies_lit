@@ -7,6 +7,9 @@ implementation of the language. In some cases, calls will be made to external C\
 using SWIG (\url{http://www.swig.org/}). This is either for speeding up a slow 
 routine or to use a function that is not available in any existing Python package.
 
+\section{Source Tree}
+\input{directory-tree.tex}
+
 There are three principal directories 
 \begin{itemize}
  \item[\texttt{webs/}] This contains the source code for the entire project written in the nuweb format along with documents (mostly images)

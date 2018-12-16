@@ -4,11 +4,18 @@
 \renewcommand{\cftpartfont}{\LARGE\itshape} % Part title in Huge Italic font
 \usepackage{hyperref}
 \usepackage{etoolbox}
+
+% Better formatting of backticks in 
+% verbatim environment. 
 \usepackage{upquote}
 
-\author{Gaurish Telang}
-\begin{document}
+% page numbering at top right
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[R]{\thepage}
 
+\begin{document}
 \begin{titlepage}
 	\centering
         {\Huge Experimental Analyses of Heuristics for Horsefly-type Problems\\}
@@ -19,6 +26,7 @@
 % making it easier to navigate with a pdfviewer
 % such as zathura, which seems to only be able 
 % to understand page-numbers beginning from 1. 
+\pagenumbering{arabic}
 \setcounter{page}{2} 
 
 % For global table of contents
