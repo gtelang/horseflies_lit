@@ -1,1 +1,1 @@
-rm -r *.aux *.log *.out *.pre *.tox _minted*
+rm -r *.aux *.log *.out *.pre  _minted*

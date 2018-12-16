@@ -1,1 +1,18 @@
 \chapter{Overview of the Code Base}
+\footnote{The style of presentation in this chapter has been borrowed from 
+the Nuweb reference manual \url{http://nuweb.sourceforge.net/nuweb.pdf}}
+\section{Files}
+
+\subsection{The Main Files}
+ The main files consist of $x$ main files (introduced here) and $y$ support 
+ files (introduced) in the next section. The file \verb|main.py| will contain 
+ the driver for the whole program. 
+
+ Except for \verb|main.py| each of the main files contain implmentations 
+ of algorithms for one specific problem. Thus \texttt{problem-classic-horsefly.py}
+ contains algorithms for computing approximations of classic horsefly tours. 
+
+\subsection{Support Files}
+ These files contain common utility functions that will be useful for manipulating
+ data-structures, common plotting and graphics routines for all horsefly-type 
+ problems. 

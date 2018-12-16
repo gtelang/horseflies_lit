@@ -4,6 +4,7 @@
 \renewcommand{\cftpartfont}{\LARGE\itshape} % Part title in Huge Italic font
 \usepackage{hyperref}
 \usepackage{etoolbox}
+\usepackage{upquote}
 
 \author{Gaurish Telang}
 \begin{document}
@@ -28,12 +29,25 @@
 \part{Overview}
 @i descriptions-of-problems.web
 @i installation-and-use.web
-@i overview-of-code-base.web
 \part{Programs}
+@i overview-of-code-base.web
 @i problem-classic-horsefly.web
 @i problem-segment-horsefly.web
 @i problem-fixed-route-horsefly.web
 @i problem-one-horse-two-flies.web
 @i problem-reverse-horsefly.web
 @i problem-watchman-horsefly.web
+
+
+
+
+\begin{appendices}
+\chapter{Index of Files}
+@f
+\chapter{Index of Fragments}
+@m
+\chapter{Index of Identifiers}
+@u 
+\end{appendices}
+
 \end{document}

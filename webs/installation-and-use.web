@@ -1,56 +1,73 @@
 \chapter{Installation and Use}
 
-To run these programs: 
-
-\begin{alphalist}
-\item \crunchy{Get Docker} Docker is an open-source containerization program that is easily installable on 
-  Windows\footnote{You might need to turn on virtualization explicitly in your BIOS, after installing Docker 
+To run these programs you will need to install Docker, an open-source containerization program that is easily installable on 
+  Windows 10\footnote{You might need to turn on virtualization explicitly in your BIOS, after installing Docker 
   as I needed to while setting Docker up on Windows. Here is a snapshot of an image when turning on Intel's 
   virtualization technology through the BIOS: 
-\url{https://images.techhive.com/images/article/2015/09/virtualbox_vt-x_amd-v_error04_phoenix-100612961-large.idge.jpg}}, Mac, and almost any 
-  GNU/Linux distribution. For a quick introduction to Docker containerization, watch the first two minutes of 
+\url{https://images.techhive.com/images/article/2015/09/virtualbox_vt-x_amd-v_error04_phoenix-100612961-large.idge.jpg}}, MacOS, and almost any 
+  GNU/Linux distribution. For a quick introduction to containerization, watch the first two minutes of 
   \url{https://youtu.be/_dfLOzuIg2o}
-  
-  For installation instrutions watch
-  \begin{description}
-    \item[On GNU/Linux]  \url{https://youtu.be/KCckWweNSrM}
-    \item[On Windows]    \url{https://youtu.be/ymlWt1MqURY}
-    \item[On MacOS]      \url{https://youtu.be/MU8HUVlJTEY}
-  \end{description}
-
-\item \crunchy{Download customized Ubuntu image} Download a customized Ubuntu Docker image that 
-  I've created with \verb| docker pull gtelang/Ubuntu_customized|. The customized Ubuntu image is approximately
-  7 GB which contains all the libraries (e.g. CGAL, VTK, numpy, and matplotlib) that I typically use to run 
-  my research codes portably. \footnote{ On my home internet connection downloading this Ubuntu-image typically takes about 5 minutes.}
-\item \crunchy{Clone repository} \verb|git clone gtelang/horseflies.git|
-\item \crunchy{Build the downloaded Ubuntu image} Open up your favorite terminal emulator, like say xterm on GNU/Linux, 
-  iTerm on macOS or Powershell on Windows 10 and type \\ 
-  \verb|cd horseflies ; docker build .| \footnote{ Note the period at the end! This has to be typed in too!}
-\item \crunchy{Run all experiments again} If you want to run all the experiments as described in the paper again to reproduce
-  the reported results on your machine \footnote{ Allowing, of course,  for differences between 
-  your machine's CPU and mine when it comes to reporting absolute running time}, 
-  type in \verb|docker run|
-\item \crunchy{Run algorithms interactively}  Else if you want to test the algorithms in interactive mode 
-  (where you get to select the problem-type, mouse-in the sites on a canvas, set the initial position of 
-  the truck and drone and set $\varphi$) you will need  to set up an X-connection between the Docker container 
-  and your host OS.
- 
-\begin{itemize}
-\item On the Ubuntu 16.04 partition of my Thinkpad laptop, I had to follow the instructions 
-      given in this short video: \url{https://youtu.be/RDg6TRwiPtg}
-\item On the Windows 10 partition of the same laptop, I had to follow the instructions in 
-      \url{https://dev.to/darksmile92/run-gui-app-in-linux-Docker-container-on-windows-host-4kde}
-\end{itemize}
-
-\end{alphalist}
-
-
-If you want to delete the Ubuntu image, (it is 7GB afterall!) please watch this short video 
-\url{https://youtu.be/ySMAXT384bs}.
 
 The nice thing about Docker is that it makes it easy to run softwares on different OS'es portably and neatly side-steps the 
-dependency hell problem (\url{https://en.wikipedia.org/wiki/Dependency_hell}.)
+dependency hell problem (\url{https://en.wikipedia.org/wiki/Dependency_hell}.) The headache of installing different library 
+dependencies correctly on different machines running different OS'es, is replaced \textbf{only} by learning how to 
+install Docker and to set up an X-windows connection between the host OS and an instantiated container running GNU/Linux. 
 
-The headache of installing different library dependencies correctly on different machines running different OS'es, 
-is replaced \textbf{only} by having to learn how to install Docker on your particular machine, and to know how 
-set up an X-connection between the host OS and an instantiated container. 
+\begin{alphalist}
+\item \crunchy{Get Docker} For installation instrutions watch
+  \begin{description}
+    \item[GNU/Linux]  \url{https://youtu.be/KCckWweNSrM}
+    \item[Windows]    \url{https://youtu.be/ymlWt1MqURY}
+    \item[MacOS]      \url{https://youtu.be/MU8HUVlJTEY}
+  \end{description}
+
+\item \crunchy{Download customized Ubuntu image} \verb| docker pull gtelang/ubuntu_customized| \footnote{The customized Ubuntu image is approximately
+  7 GB which contains all the libraries (e.g. CGAL, VTK, numpy, and matplotlib) that I typically use to run 
+  my research codes portably.On my home internet connection downloading this Ubuntu-image typically takes about 5 minutes. }
+\item \crunchy{Clone repository} \verb|git clone gtelang/horseflies_literate.git|
+\item \crunchy{Mount and Launch} 
+\begin{description}
+\item[For GNU/Linux] Open up your favorite terminal emulator, like say xterm on GNU/Linux,or Powershell on Windows 10. 
+{\small
+\begin{itemize}
+   \item Copy to clipboard the output of \verb|xauth list|
+   \item \verb|cd horseflies_literate|
+   \item \verb|docker run -it --name horsefly_container --net=host -e DISPLAY -v /tmp/.X11-unix -v `pwd`:/horseflies_mnt gtelang/ubuntu_customized|
+   \item \verb|cd horseflies_mnt| 
+   \item \verb|xauth add | \textit{<paste-from-clipboard>}
+\end{itemize}}
+\item[For Windows] I had to follow the instructions in 
+      \url{https://dev.to/darksmile92/run-gui-app-in-linux-Docker-container-on-windows-host-4kde} to be 
+      able to run graphical user applications
+\end{description}
+
+\item \crunchy{Run experiments} If you want to run all the experiments as described in 
+  the paper again to reproduce the reported results on your machine, then run \footnote{ Allowing, of course,
+  for differences between your machine's CPU and mine when it comes to reporting absolute running time}, \\
+  \verb|python main.py --run-all-experiments|. 
+
+  If you want to run a specific experiment, then run \\ \verb|python main.py --run-experiment <experiment-name>|. 
+
+  See Index for a list of all the experiments. 
+
+\item \crunchy{Test algorithms interactively}  If you want to test the algorithms in interactive mode 
+  (where you get to select the problem-type, mouse-in the sites on a canvas, set the initial position of 
+  the truck and drone and set $\varphi$), run \verb|python main.py --<problem-name>|. The
+  list of problems are the same as that given in the previous chapter. The problem name consists
+  of all lower-case letters with spaces replaced by hyphens. 
+
+  Thus for instance ``Watchman Horsefly'' becomes \verb|watchman-horsefly| and ``One Horse Two Flies''
+  becomes \verb|one-horse-two-flies|. 
+
+  To interactively experiment with different algorithms for, say, the Watchman Horsefly problem , 
+  type at the terminal \verb|python main.py --watchman-horsefly|
+\end{alphalist}
+
+\vspace{1cm}
+
+If you want to delete the Ubuntu image and any associated containers run the command \footnote{the ubuntu image is 7GB afterall!}
+\begin{verbatim}
+ docker rm -f horsefly_container; docker rmi -f ubuntu_customized
+\end{verbatim}
+
+That's it! Happy horseflying!
