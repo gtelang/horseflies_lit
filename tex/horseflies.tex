@@ -1189,8 +1189,9 @@ are collected at the end of this chapter.
 \mbox{}\verb@            else:@\\
 \mbox{}\verb@                  # For reference see this link on how nn queries are performed. @\\
 \mbox{}\verb@                  # https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.KDTree.query.html@\\
-\mbox{}\verb@                  # Warning this is inefficient!!! I am rebuilding the kd-tree at each step. @\\
-\mbox{}\verb@                  # Right now, I am only doing this for convenience.@\\
+\mbox{}\verb@                  # Warning this is inefficient!!! I am rebuilding the @\\
+\mbox{}\verb@                  # kd-tree at each step. Right now, I am only doing @\\
+\mbox{}\verb@                  # this for convenience.@\\
 \mbox{}\verb@                  from scipy import spatial@\\
 \mbox{}\verb@                  tree = spatial.KDTree(remaining_sites)@\\
 \mbox{}\verb@@\\
@@ -1228,16 +1229,16 @@ are collected at the end of this chapter.
 \end{list}
 \vspace{4ex}
 \end{flushleft}
+\newchunk 
+
 \begin{flushleft} \small\label{scrap20}\raggedright\small
 \NWtarget{nuweb32}{} $\langle\,${\itshape Algorithms for classic horsefly}\nobreak\ {\footnotesize {32}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
-\mbox{}\verb@#################################################################################@\\
-\mbox{}\verb@## ALGORITHMS FOR SINGLE HORSE SINGLE FLY SERVICING THE SITES IN THE GIVEN ORDER@\\
-\mbox{}\verb@#################################################################################@\\
+\mbox{}\verb@# ALGORITHMS FOR SINGLE HORSE SINGLE FLY SERVICING THE SITES IN THE GIVEN ORDER@\\
 \mbox{}\verb@def algo_exact_given_specific_ordering (sites, horseflyinit, phi):@\\
-\mbox{}\verb@    """ Use the given ordering of sites to compute a good tour @\\
+\mbox{}\verb@    """ Use the *given* ordering of sites to compute a good tour @\\
 \mbox{}\verb@    for the horse.@\\
 \mbox{}\verb@    """@\\
 \mbox{}\verb@    def ith_leg_constraint(i, horseflyinit, phi, sites):@\\
@@ -1306,7 +1307,8 @@ are collected at the end of this chapter.
 \mbox{}\verb@    assert(len(x0) == 2*len(sites))@\\
 \mbox{}\verb@    x0 = np.array(x0)@\\
 \mbox{}\verb@    @\\
-\mbox{}\verb@    sol = minimize(tour_length(horseflyinit), x0, method= 'SLSQP', constraints=cons, options={'maxiter':500})@\\
+\mbox{}\verb@    sol = minimize(tour_length(horseflyinit), x0, method= 'SLSQP', \@\\
+\mbox{}\verb@                               constraints=cons, options={'maxiter':500})@\\
 \mbox{}\verb@    @\\
 \mbox{}\verb@    tour_points = utils_algo.pointify_vector(sol.x)@\\
 \mbox{}\verb@@\\
@@ -1332,7 +1334,11 @@ are collected at the end of this chapter.
 \mbox{}\verb@    return {'tour_points'                : tour_points,@\\
 \mbox{}\verb@            'horse_waiting_times'        : horse_waiting_times, @\\
 \mbox{}\verb@            'site_ordering'              : sites,@\\
-\mbox{}\verb@            'tour_length_with_waiting_time_included': tour_length_with_waiting_time_included(tour_points, horse_waiting_times, horseflyinit)}@\\
+\mbox{}\verb@            'tour_length_with_waiting_time_included': \@\\
+\mbox{}\verb@                                       tour_length_with_waiting_time_included(\@\\
+\mbox{}\verb@                                                    tour_points, \@\\
+\mbox{}\verb@                                                    horse_waiting_times, @\\
+\mbox{}\verb@                                                    horseflyinit)}@\\
 \mbox{}\verb@   @\\
 \mbox{}\verb@@{\NWsep}
 \end{list}

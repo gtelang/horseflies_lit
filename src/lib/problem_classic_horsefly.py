@@ -293,8 +293,9 @@ def algo_greedy(sites, inithorseposn, phi, post_optimizer):
             else:
                   # For reference see this link on how nn queries are performed. 
                   # https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.KDTree.query.html
-                  # Warning this is inefficient!!! I am rebuilding the kd-tree at each step. 
-                  # Right now, I am only doing this for convenience.
+                  # Warning this is inefficient!!! I am rebuilding the 
+                  # kd-tree at each step. Right now, I am only doing 
+                  # this for convenience.
                   from scipy import spatial
                   tree = spatial.KDTree(remaining_sites)
 
@@ -321,11 +322,9 @@ def algo_greedy(sites, inithorseposn, phi, post_optimizer):
       answer = post_optimizer(sites_ordered_by_greedy, inithorseposn, phi)
       return answer
 
-#################################################################################
-## ALGORITHMS FOR SINGLE HORSE SINGLE FLY SERVICING THE SITES IN THE GIVEN ORDER
-#################################################################################
+# ALGORITHMS FOR SINGLE HORSE SINGLE FLY SERVICING THE SITES IN THE GIVEN ORDER
 def algo_exact_given_specific_ordering (sites, horseflyinit, phi):
-    """ Use the given ordering of sites to compute a good tour 
+    """ Use the *given* ordering of sites to compute a good tour 
     for the horse.
     """
     def ith_leg_constraint(i, horseflyinit, phi, sites):
@@ -394,7 +393,8 @@ def algo_exact_given_specific_ordering (sites, horseflyinit, phi):
     assert(len(x0) == 2*len(sites))
     x0 = np.array(x0)
     
-    sol = minimize(tour_length(horseflyinit), x0, method= 'SLSQP', constraints=cons, options={'maxiter':500})
+    sol = minimize(tour_length(horseflyinit), x0, method= 'SLSQP', \
+                               constraints=cons, options={'maxiter':500})
     
     tour_points = utils_algo.pointify_vector(sol.x)
 
@@ -420,7 +420,11 @@ def algo_exact_given_specific_ordering (sites, horseflyinit, phi):
     return {'tour_points'                : tour_points,
             'horse_waiting_times'        : horse_waiting_times, 
             'site_ordering'              : sites,
-            'tour_length_with_waiting_time_included': tour_length_with_waiting_time_included(tour_points, horse_waiting_times, horseflyinit)}
+            'tour_length_with_waiting_time_included': \
+                                       tour_length_with_waiting_time_included(\
+                                                    tour_points, \
+                                                    horse_waiting_times, 
+                                                    horseflyinit)}
    
 
 # Plotting routines for classic horsefly
