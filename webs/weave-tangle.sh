@@ -2,7 +2,7 @@
 set -e
 cd ../tex
 echo "\begin{verbatim}"  > directory-tree.tex
-tree -I '*.log|*.adoc|*.out|*.pre|*.toc|*.aux|_minted*|*~|docs' --charset=ascii ..  >> directory-tree.tex
+tree -I '*.log|README.md|clean.sh|*.out|*.pre|*.toc|*.aux|_minted*|*~|docs' --charset=ascii ..  >> directory-tree.tex
 echo "\end{verbatim}"   >> directory-tree.tex
 
 main_web_file="../webs/horseflies.web"
@@ -15,11 +15,14 @@ if [ $# -eq 0 ]; then
 	lualatex -interaction=nonstopmode -halt-on-error  -shell-escape $main_tex_file  
 	bibtex $main_tex_file                 
 	asy *.asy                              
+	lualatex -interaction=nonstopmode -halt-on-error  -shell-escape $main_tex_file  
 	nuweb -r -v $main_web_file            
 	lualatex -interaction=nonstopmode -halt-on-error  -shell-escape $main_tex_file  
 	lualatex -interaction=nonstopmode -halt-on-error  -shell-escape $main_tex_file  
-	lualatex -interaction=nonstopmode -halt-on-error  -shell-escape $main_tex_file  
-	touch ../horseflies.pdf # update time-stamp on symbolic link
+
+	# Compile the source code. This will only be useful if I will be using 
+	# C++/Haskell for writing some performance sensitive routines. 
+	# EMPTY------------------------------- for now
 
 elif [ $1=="--tangle-only" ] ; then 
         # Only extract the source code

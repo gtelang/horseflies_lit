@@ -236,14 +236,9 @@ script \texttt{weave-tangle.sh} in the \texttt{webs} directory.
 
 \section{The Main Files} 
 
-\newchunk The file \verb|main.py| is the entry-point for running code. This file takes
- care of reading command-line arguments and accordingly executing the interactive
- or experimental sections of the code for the appropriate problem. This file is in the 
- top-level folder. 
 
-
-\newchunk Each of the files with prefix \texttt{algos-*}  contain implmentations of 
- algorithms for one specific problem. Thus \texttt{algos-watchman-horsefly.py} 
+\newchunk Each of the files with prefix \texttt{problem-*}  contain implmentations of 
+ algorithms for one specific problem. Thus \texttt{problem-watchman-horsefly.py} 
  contains algorithms for approximately solving the Watchman Horsefly problem. 
 
  All such files are in the directory \texttt{src/lib/}
@@ -256,6 +251,54 @@ script \texttt{weave-tangle.sh} in the \texttt{webs} directory.
 
  All such files are in the directory \texttt{src/expt/}
 
+\newchunk The file \verb|main.py| in the top-level folder is the \textit{entry-point} for running code. 
+Its only job is to parse the command-line arguments and pass relevant information to the handler 
+functions for each problem and experiment. 
+
+Each problem or experiment has a handler routine 
+that effectively acts as a kind of ``main'' function for that module that does some house-keeping duties by 
+parsing the command-line arguments passed  by main, setting up the canvas by calling the appropriate
+graphics routines and calling the algorithms on the input specified through the canvas. 
+
+\begin{flushleft} \small
+\begin{minipage}{\linewidth}\label{scrap1}\raggedright\small
+\NWtarget{nuweb13}{} \verb@"../main.py"@\nobreak\ {\footnotesize {13}}$\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@@\\
+\mbox{}\verb@import sys@\\
+\mbox{}\verb@import problem_classic_horsefly as chf@\\
+\mbox{}\verb@import problem_segment_horsefly as shf@\\
+\mbox{}\verb@import problem_one_horse_two_flies as oh2f@\\
+\mbox{}\verb@   @\\
+\mbox{}\verb@if __name__=="__main__":@\\
+\mbox{}\verb@     # Select algorithm or experiment @\\
+\mbox{}\verb@     if (len(sys.argv)==1):@\\
+\mbox{}\verb@          print "Specify the problem or experiment you want to run"@\\
+\mbox{}\verb@          sys.exit()@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@     elif sys.argv[1] == "--problem-classic-horsefly":@\\
+\mbox{}\verb@          chf.run_handler()@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@     elif sys.argv[1] == "--problem-segment-horsefly":@\\
+\mbox{}\verb@          shf.run_handler()@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@     elif sys.argv[1] == "--problem-one-horse-two-flies":@\\
+\mbox{}\verb@          oh2f.run_handler()@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@     else:@\\
+\mbox{}\verb@          print "Option not recognized"@\\
+\mbox{}\verb@          sys.exit()@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+
+\item{}
+\end{list}
+\end{minipage}\vspace{4ex}
+\end{flushleft}
 \section{Support Files}
 \newchunk These files contain common utility functions that will be useful for manipulating
  data-structures, common plotting and graphics routines for all horsefly-type 
@@ -270,11 +313,387 @@ script \texttt{weave-tangle.sh} in the \texttt{webs} directory.
  Each of the main files have a corresponding test file. Tests for functions in the 
  support files and experimental files have all been implemented in the files 
  \texttt{test-utilities.py} and \texttt{test-experiments.py} respectively.  
-
- All such files are in the directory \texttt{src/test/}\chapter{Classic Horsefly}
+       
+ All such files are in the directory \texttt{src/test/}
+ \chapter{Classic Horsefly}
 \label{chap:classic-horsefly}
 
 
+\section{Module Overview}
+
+\newchunk 
+All algorithms to solve the classic horsefly problems have been implemented in 
+the file \verb|problem_classic_horsefly.py|. Here is a high-level view of the 
+module. The \verb|run_handler| function acts as a kind of main function for this
+module. This function is called from \verb|main.py| which then processes the 
+command-line arguments and runs the experimental or interactive sections of
+the code. 
+
+\begin{flushleft} \small
+\begin{minipage}{\linewidth}\label{scrap2}\raggedright\small
+\NWtarget{nuweb15a}{} \verb@"../src/lib/problem_classic_horsefly.py"@\nobreak\ {\footnotesize {15a}}$\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@    @\\
+\mbox{}\verb@@\hbox{$\langle\,${\itshape Relevant imports for classic horsefly}\nobreak\ {\footnotesize \NWlink{nuweb15b}{15b}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@def run_handler():@\\
+\mbox{}\verb@    @\hbox{$\langle\,${\itshape Define key-press handler}\nobreak\ {\footnotesize \NWlink{nuweb16a}{16a}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@    @\hbox{$\langle\,${\itshape Set up interactive canvas}\nobreak\ {\footnotesize \NWlink{nuweb20}{20}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@@\hbox{$\langle\,${\itshape Algorithms for classic horsefly}\nobreak\ {\footnotesize \NWlink{nuweb21a}{21a}, \ldots\ }$\,\rangle$}\verb@@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+
+\item{}
+\end{list}
+\end{minipage}\vspace{4ex}
+\end{flushleft}
+\section{Module Details}
+
+\newchunk 
+\begin{flushleft} \small\label{scrap3}\raggedright\small
+\NWtarget{nuweb15b}{} $\langle\,${\itshape Relevant imports for classic horsefly}\nobreak\ {\footnotesize {15b}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@import sys@\\
+\mbox{}\verb@import argparse@\\
+\mbox{}\verb@import pprint as pp@\\
+\mbox{}\verb@import matplotlib.pyplot as plt@\\
+\mbox{}\verb@import matplotlib as mpl@\\
+\mbox{}\verb@from   matplotlib import rc@\\
+\mbox{}\verb@from colorama import Fore@\\
+\mbox{}\verb@from colorama import Style@\\
+\mbox{}\verb@import os@\\
+\mbox{}\verb@import randomcolor @\\
+\mbox{}\verb@import numpy as np@\\
+\mbox{}\verb@import classic_horsefly as chf@\\
+\mbox{}\verb@import algo_utils@\\
+\mbox{}\verb@import graphics_utils@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb15a}{15a}.
+
+\item{}
+\end{list}
+\vspace{4ex}
+\end{flushleft}
+\newchunk The key-press handler function detects the keys pressed by the user when the canvas
+is in active focus. This function allows you to set some of the input parameters like 
+speed ratio $\varphi$, or selecting an algorithm interactively at the command-line, 
+generating a bunch of uniform or non-uniformly distributed points on the canvas, 
+or just plain clearing the canvas for inserting a fresh input set of points. 
+
+
+\begin{flushleft} \small
+\begin{minipage}{\linewidth}\label{scrap4}\raggedright\small
+\NWtarget{nuweb16a}{} $\langle\,${\itshape Define key-press handler}\nobreak\ {\footnotesize {16a}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@   @\\
+\mbox{}\verb@# The key-stack argument is mutable! I am using this hack to my advantage.@\\
+\mbox{}\verb@def wrapperkeyPressHandler(fig,ax, run): @\\
+\mbox{}\verb@       def _keyPressHandler(event):@\\
+\mbox{}\verb@           if event.key in ['i', 'I']:  @\\
+\mbox{}\verb@                @\hbox{$\langle\,${\itshape Start entering input from the command-line}\nobreak\ {\footnotesize \NWlink{nuweb16b}{16b}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@           elif event.key in ['n', 'N', 'u', 'U']: @\\
+\mbox{}\verb@                @\hbox{$\langle\,${\itshape Generate a bunch of uniform or non-uniform random points on the canvas}\nobreak\ {\footnotesize \NWlink{nuweb18}{18}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@           elif event.key in ['c', 'C']: @\\
+\mbox{}\verb@                @\hbox{$\langle\,${\itshape Clear canvas and states of all objects}\nobreak\ {\footnotesize \NWlink{nuweb19}{19}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb15a}{15a}.
+
+\item{}
+\end{list}
+\end{minipage}\vspace{4ex}
+\end{flushleft}
+\newchunk 
+\begin{flushleft} \small\label{scrap5}\raggedright\small
+\NWtarget{nuweb16b}{} $\langle\,${\itshape Start entering input from the command-line}\nobreak\ {\footnotesize {16b}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@phi_str = raw_input(Fore.YELLOW + \@\\
+\mbox{}\verb@          "Enter speed of fly (should be >1): " +\@\\
+\mbox{}\verb@           Style.RESET_ALL)@\\
+\mbox{}\verb@phi = float(phi_str)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@algo_str = raw_input(Fore.YELLOW + \@\\
+\mbox{}\verb@          "Enter algorithm to be used to compute the tour:\n Options are:\n" +\@\\
+\mbox{}\verb@        "  (e)   Exact \n"                                   +\@\\
+\mbox{}\verb@        "  (t)   TSP   \n"                                   +\@\\
+\mbox{}\verb@        "  (tl)  TSP   (using approximate L1 ordering)\n"    +\@\\
+\mbox{}\verb@        "  (k)   k2-center   \n"                             +\@\\
+\mbox{}\verb@        "  (kl)  k2-center (using approximate L1 ordering)\n"  +\@\\
+\mbox{}\verb@        "  (g)   Greedy\n"                                   +\@\\
+\mbox{}\verb@        "  (gl) Greedy (using approximate L1 ordering])  "  +\@\\
+\mbox{}\verb@        Style.RESET_ALL)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@algo_str = algo_str.lstrip()@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@# Incase there are patches present from the previous clustering, just clear them@\\
+\mbox{}\verb@clearAxPolygonPatches(ax)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@if   algo_str == 'e':@\\
+\mbox{}\verb@      horseflytour = @\\
+\mbox{}\verb@             run.getTour( chf.algo_dumb,@\\
+\mbox{}\verb@                          phi )@\\
+\mbox{}\verb@elif algo_str == 'k': @\\
+\mbox{}\verb@      horseflytour = @\\
+\mbox{}\verb@             run.getTour( chf.algo_kmeans,@\\
+\mbox{}\verb@                          phi,@\\
+\mbox{}\verb@                          k=2,@\\
+\mbox{}\verb@                          post_optimizer=chf.algo_exact_given_specific_ordering)@\\
+\mbox{}\verb@      print " "@\\
+\mbox{}\verb@      print Fore.GREEN, answer['tour_points'], Style.RESET_ALL@\\
+\mbox{}\verb@elif algo_str == 'kl':@\\
+\mbox{}\verb@      horseflytour = @\\
+\mbox{}\verb@             run.getTour( chf.algo_kmeans,@\\
+\mbox{}\verb@                          phi,@\\
+\mbox{}\verb@                          k=2,@\\
+\mbox{}\verb@                          post_optimizer=chf.algo_approximate_L1_given_specific_ordering)@\\
+\mbox{}\verb@elif algo_str == 't':@\\
+\mbox{}\verb@      horseflytour = @\\
+\mbox{}\verb@             run.getTour( chf.algo_tsp_ordering,@\\
+\mbox{}\verb@                          phi,@\\
+\mbox{}\verb@                          post_optimizer=chf.algo_exact_given_specific_ordering)@\\
+\mbox{}\verb@elif algo_str == 'tl':@\\
+\mbox{}\verb@      horseflytour = @\\
+\mbox{}\verb@             run.getTour( chf.algo_tsp_ordering,@\\
+\mbox{}\verb@                          phi,@\\
+\mbox{}\verb@                          post_optimizer= chf.algo_approximate_L1_given_specific_ordering)@\\
+\mbox{}\verb@ elif algo_str == 'g':@\\
+\mbox{}\verb@      horseflytour = @\\
+\mbox{}\verb@             run.getTour( chf.algo_greedy,@\\
+\mbox{}\verb@                          phi,@\\
+\mbox{}\verb@                          post_optimizer= chf.algo_exact_given_specific_ordering)@\\
+\mbox{}\verb@elif algo_str == 'gl':@\\
+\mbox{}\verb@      horseflytour = @\\
+\mbox{}\verb@             run.getTour( chf.algo_greedy,@\\
+\mbox{}\verb@                          phi,@\\
+\mbox{}\verb@                          post_optimizer= chf.algo_approximate_L1_given_specific_ordering)@\\
+\mbox{}\verb@else:@\\
+\mbox{}\verb@      print "Unknown option. No horsefly for you! ;-D "@\\
+\mbox{}\verb@      sys.exit()@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@#print horseflytour['tour_points']@\\
+\mbox{}\verb@chf.plotTour(ax,horseflytour, run.inithorseposn, phi, algo_str)@\\
+\mbox{}\verb@applyAxCorrection(ax)@\\
+\mbox{}\verb@fig.canvas.draw()@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb16a}{16a}.
+
+\item{}
+\end{list}
+\vspace{4ex}
+\end{flushleft}
+\newchunk This chunk generates points uniformly or non-uniformly distributed in the 
+unit square $[0,1]^2$ in the Matplotlib canvas. I will document the schemes used for generating the non-uniformly
+distributed points later. These schemes are important to test the effectiveness of 
+the horsefly algorithms. Uniform point clouds do no highlight the weaknesses of 
+sequencing algorithms as David Johnson implies in his article on how to write 
+experimental algorithm papers when he talks about algorithms for the TSP. 
+
+\begin{flushleft} \small\label{scrap6}\raggedright\small
+\NWtarget{nuweb18}{} $\langle\,${\itshape Generate a bunch of uniform or non-uniform random points on the canvas}\nobreak\ {\footnotesize {18}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@numpts = int(sys.argv[1]) @\\
+\mbox{}\verb@run.clearAllStates()@\\
+\mbox{}\verb@ax.cla()@\\
+\mbox{}\verb@               @\\
+\mbox{}\verb@applyAxCorrection(ax)@\\
+\mbox{}\verb@ax.set_xticks([])@\\
+\mbox{}\verb@ax.set_yticks([])@\\
+\mbox{}\verb@                @\\
+\mbox{}\verb@fig.texts = []@\\
+\mbox{}\verb@                 @\\
+\mbox{}\verb@import scipy@\\
+\mbox{}\verb@if event.key in ['n', 'N']: # Non-uniform random points@\\
+\mbox{}\verb@        run.sites = algo_utils.bunch_of_random_points(numpts)@\\
+\mbox{}\verb@else : # Uniform random points@\\
+\mbox{}\verb@        run.sites = scipy.rand(numpts,2).tolist()@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@patchSize  = (xlim[1]-xlim[0])/140.0@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@for site in run.sites:      @\\
+\mbox{}\verb@    ax.add_patch(mpl.patches.Circle(site, radius = patchSize, \@\\
+\mbox{}\verb@                 facecolor='blue',edgecolor='black' ))@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@ax.set_title('Points : ' + str(len(run.sites)), fontdict={'fontsize':40})@\\
+\mbox{}\verb@fig.canvas.draw()@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb16a}{16a}.
+
+\item{}
+\end{list}
+\vspace{4ex}
+\end{flushleft}
+\newchunk 
+
+\begin{flushleft} \small
+\begin{minipage}{\linewidth}\label{scrap7}\raggedright\small
+\NWtarget{nuweb19}{} $\langle\,${\itshape Clear canvas and states of all objects}\nobreak\ {\footnotesize {19}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@run.clearAllStates()@\\
+\mbox{}\verb@ax.cla()@\\
+\mbox{}\verb@              @\\
+\mbox{}\verb@applyAxCorrection(ax)@\\
+\mbox{}\verb@ax.set_xticks([])@\\
+\mbox{}\verb@ax.set_yticks([])@\\
+\mbox{}\verb@                 @\\
+\mbox{}\verb@fig.texts = []@\\
+\mbox{}\verb@fig.canvas.draw()@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb16a}{16a}.
+
+\item{}
+\end{list}
+\end{minipage}\vspace{4ex}
+\end{flushleft}
+\newchunk 
+\begin{flushleft} \small
+\begin{minipage}{\linewidth}\label{scrap8}\raggedright\small
+\NWtarget{nuweb20}{} $\langle\,${\itshape Set up interactive canvas}\nobreak\ {\footnotesize {20}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@fig, ax =  plt.subplots()@\\
+\mbox{}\verb@run = chf.HorseFlyInput()@\\
+\mbox{}\verb@#print run@\\
+\mbox{}\verb@    @\\
+\mbox{}\verb@ax.set_xlim([xlim[0], xlim[1]])@\\
+\mbox{}\verb@ax.set_ylim([ylim[0], ylim[1]])@\\
+\mbox{}\verb@ax.set_aspect(1.0)@\\
+\mbox{}\verb@ax.set_xticks([])@\\
+\mbox{}\verb@ax.set_yticks([])@\\
+\mbox{}\verb@      @\\
+\mbox{}\verb@mouseClick   = wrapperEnterRunPoints (fig,ax, run)@\\
+\mbox{}\verb@fig.canvas.mpl_connect('button_press_event' , mouseClick )@\\
+\mbox{}\verb@      @\\
+\mbox{}\verb@keyPress     = wrapperkeyPressHandler(fig,ax, run)@\\
+\mbox{}\verb@fig.canvas.mpl_connect('key_press_event', keyPress   )@\\
+\mbox{}\verb@plt.show()@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb15a}{15a}.
+
+\item{}
+\end{list}
+\end{minipage}\vspace{4ex}
+\end{flushleft}
+Now that all the boring boiler-plate and handler codes have been 
+written, its finally time for algorithmic ideas and implementations! 
+Every algorithm is given an algorithmic overview followed by the 
+detailed steps woven together with the source code. 
+
+\newpage
+
+\section{Algorithm: Dumb Exact} 
+
+\subsection{Overview} 
+\blindtext
+
+\subsection{Algorithmic Details}
+
+\begin{flushleft} \small
+\begin{minipage}{\linewidth}\label{scrap9}\raggedright\small
+\NWtarget{nuweb21a}{} $\langle\,${\itshape Algorithms for classic horsefly}\nobreak\ {\footnotesize {21a}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@   @\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroDefBy\ \NWlink{nuweb21a}{21a}\NWlink{nuweb21b}{b}\NWlink{nuweb22a}{, 22a}\NWlink{nuweb22b}{b}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb15a}{15a}.
+
+\item{}
+\end{list}
+\end{minipage}\vspace{4ex}
+\end{flushleft}
+\section{Algorithm: Greedy - Nearest Neighbor}  \blindtext
+
+\begin{flushleft} \small
+\begin{minipage}{\linewidth}\label{scrap10}\raggedright\small
+\NWtarget{nuweb21b}{} $\langle\,${\itshape Algorithms for classic horsefly}\nobreak\ {\footnotesize {21b}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@   @\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroDefBy\ \NWlink{nuweb21a}{21a}\NWlink{nuweb21b}{b}\NWlink{nuweb22a}{, 22a}\NWlink{nuweb22b}{b}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb15a}{15a}.
+
+\item{}
+\end{list}
+\end{minipage}\vspace{4ex}
+\end{flushleft}
+\section{\sf{Algorithm:} K2means} \blindtext 
+\begin{flushleft} \small
+\begin{minipage}{\linewidth}\label{scrap11}\raggedright\small
+\NWtarget{nuweb22a}{} $\langle\,${\itshape Algorithms for classic horsefly}\nobreak\ {\footnotesize {22a}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@   @\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroDefBy\ \NWlink{nuweb21a}{21a}\NWlink{nuweb21b}{b}\NWlink{nuweb22a}{, 22a}\NWlink{nuweb22b}{b}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb15a}{15a}.
+
+\item{}
+\end{list}
+\end{minipage}\vspace{4ex}
+\end{flushleft}
+\section{Algorithm: Greedy - Incremental Insertion} \blindtext 
+\begin{flushleft} \small
+\begin{minipage}{\linewidth}\label{scrap12}\raggedright\small
+\NWtarget{nuweb22b}{} $\langle\,${\itshape Algorithms for classic horsefly}\nobreak\ {\footnotesize {22b}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@   @\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroDefBy\ \NWlink{nuweb21a}{21a}\NWlink{nuweb21b}{b}\NWlink{nuweb22a}{, 22a}\NWlink{nuweb22b}{b}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb15a}{15a}.
+
+\item{}
+\end{list}
+\end{minipage}\vspace{4ex}
+\end{flushleft}
 \chapter{Segment Horsefly}
 \label{chap:segment-horsefly}\chapter{Fixed Route Horsefly}
 \label{chap:fixed-route-horsefly}\chapter{One Horse, Two Flies}
@@ -289,9 +708,21 @@ script \texttt{weave-tangle.sh} in the \texttt{webs} directory.
 \begin{appendices}
 \chapter{Index of Files}
 
+{\small\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \verb@"../main.py"@ {\footnotesize {\NWtxtDefBy} \NWlink{nuweb13}{13}.}
+\item \verb@"../src/lib/problem_classic_horsefly.py"@ {\footnotesize {\NWtxtDefBy} \NWlink{nuweb15a}{15a}.}
+\end{list}}
 \chapter{Index of Fragments}
-None.
 
+{\small\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item $\langle\,$Algorithms for classic horsefly\nobreak\ {\footnotesize \NWlink{nuweb21a}{21a}\NWlink{nuweb21b}{b}\NWlink{nuweb22a}{, 22a}\NWlink{nuweb22b}{b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb15a}{15a}.}
+\item $\langle\,$Clear canvas and states of all objects\nobreak\ {\footnotesize \NWlink{nuweb19}{19}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb16a}{16a}.}
+\item $\langle\,$Define key-press handler\nobreak\ {\footnotesize \NWlink{nuweb16a}{16a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb15a}{15a}.}
+\item $\langle\,$Generate a bunch of uniform or non-uniform random points on the canvas\nobreak\ {\footnotesize \NWlink{nuweb18}{18}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb16a}{16a}.}
+\item $\langle\,$Relevant imports for classic horsefly\nobreak\ {\footnotesize \NWlink{nuweb15b}{15b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb15a}{15a}.}
+\item $\langle\,$Set up interactive canvas\nobreak\ {\footnotesize \NWlink{nuweb20}{20}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb15a}{15a}.}
+\item $\langle\,$Start entering input from the command-line\nobreak\ {\footnotesize \NWlink{nuweb16b}{16b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb16a}{16a}.}
+\end{list}}
 \chapter{Index of Identifiers}
  
 \chapter{Man-page for \texttt{main.py}}

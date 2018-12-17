@@ -26,14 +26,9 @@ script \texttt{weave-tangle.sh} in the \texttt{webs} directory.
 
 \section{The Main Files} 
 
-\newchunk The file \verb|main.py| is the entry-point for running code. This file takes
- care of reading command-line arguments and accordingly executing the interactive
- or experimental sections of the code for the appropriate problem. This file is in the 
- top-level folder. 
 
-
-\newchunk Each of the files with prefix \texttt{algos-*}  contain implmentations of 
- algorithms for one specific problem. Thus \texttt{algos-watchman-horsefly.py} 
+\newchunk Each of the files with prefix \texttt{problem-*}  contain implmentations of 
+ algorithms for one specific problem. Thus \texttt{problem-watchman-horsefly.py} 
  contains algorithms for approximately solving the Watchman Horsefly problem. 
 
  All such files are in the directory \texttt{src/lib/}
@@ -45,6 +40,44 @@ script \texttt{weave-tangle.sh} in the \texttt{webs} directory.
  code for performing experiments related to the Watchman Horsefly problem. 
 
  All such files are in the directory \texttt{src/expt/}
+
+\newchunk The file \verb|main.py| in the top-level folder is the \textit{entry-point} for running code. 
+Its only job is to parse the command-line arguments and pass relevant information to the handler 
+functions for each problem and experiment. 
+
+Each problem or experiment has a handler routine 
+that effectively acts as a kind of ``main'' function for that module that does some house-keeping duties by 
+parsing the command-line arguments passed  by main, setting up the canvas by calling the appropriate
+graphics routines and calling the algorithms on the input specified through the canvas. 
+
+@o ../main.py -cp 
+@{
+import sys
+import problem_classic_horsefly as chf
+import problem_segment_horsefly as shf
+import problem_one_horse_two_flies as oh2f
+   
+if __name__=="__main__":
+     # Select algorithm or experiment 
+     if (len(sys.argv)==1):
+          print "Specify the problem or experiment you want to run"
+          sys.exit()
+
+     elif sys.argv[1] == "--problem-classic-horsefly":
+          chf.run_handler()
+
+     elif sys.argv[1] == "--problem-segment-horsefly":
+          shf.run_handler()
+
+     elif sys.argv[1] == "--problem-one-horse-two-flies":
+          oh2f.run_handler()
+
+     else:
+          print "Option not recognized"
+          sys.exit()
+@| @}
+
+
 
 \section{Support Files}
 \newchunk These files contain common utility functions that will be useful for manipulating
@@ -60,5 +93,6 @@ script \texttt{weave-tangle.sh} in the \texttt{webs} directory.
  Each of the main files have a corresponding test file. Tests for functions in the 
  support files and experimental files have all been implemented in the files 
  \texttt{test-utilities.py} and \texttt{test-experiments.py} respectively.  
-
+       
  All such files are in the directory \texttt{src/test/}
+ 
