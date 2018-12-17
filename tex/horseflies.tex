@@ -786,9 +786,9 @@ the code.
 \mbox{}\verb@    @\hbox{$\langle\,${\itshape Set up interactive canvas}\nobreak\ {\footnotesize \NWlink{nuweb28b}{28b}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@@\hbox{$\langle\,${\itshape Local data-structures for classic horsefly}\nobreak\ {\footnotesize \NWlink{nuweb29}{29}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@@\hbox{$\langle\,${\itshape Local utility functions for classic horsefly}\nobreak\ {\footnotesize \NWlink{nuweb35a}{35a}, \ldots\ }$\,\rangle$}\verb@@\\
+\mbox{}\verb@@\hbox{$\langle\,${\itshape Local utility functions for classic horsefly}\nobreak\ {\footnotesize \NWlink{nuweb36a}{36a}, \ldots\ }$\,\rangle$}\verb@@\\
 \mbox{}\verb@@\hbox{$\langle\,${\itshape Algorithms for classic horsefly}\nobreak\ {\footnotesize \NWlink{nuweb31}{31}, \ldots\ }$\,\rangle$}\verb@@\\
-\mbox{}\verb@@\hbox{$\langle\,${\itshape Plotting routines for classic horsefly}\nobreak\ {\footnotesize \NWlink{nuweb36}{36}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@@\hbox{$\langle\,${\itshape Plotting routines for classic horsefly}\nobreak\ {\footnotesize \NWlink{nuweb37}{37}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
@@ -1222,7 +1222,7 @@ are collected at the end of this chapter.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroDefBy\ \NWlink{nuweb31}{31}\NWlink{nuweb32}{, 32}.
+\item \NWtxtMacroDefBy\ \NWlink{nuweb31}{31}\NWlink{nuweb32}{, 32}\NWlink{nuweb35}{, 35}.
 \item \NWtxtMacroRefIn\ \NWlink{nuweb24a}{24a}.
 
 \item{}
@@ -1345,12 +1345,65 @@ are collected at the end of this chapter.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroDefBy\ \NWlink{nuweb31}{31}\NWlink{nuweb32}{, 32}.
+\item \NWtxtMacroDefBy\ \NWlink{nuweb31}{31}\NWlink{nuweb32}{, 32}\NWlink{nuweb35}{, 35}.
 \item \NWtxtMacroRefIn\ \NWlink{nuweb24a}{24a}.
 
 \item{}
 \end{list}
 \vspace{4ex}
+\end{flushleft}
+\section{Algorithm: Dumb Brute force}
+
+\subsection{Algorithmic Overview}
+
+\subsection{Algorithmic Details}
+
+\begin{flushleft} \small
+\begin{minipage}{\linewidth}\label{scrap21}\raggedright\small
+\NWtarget{nuweb35}{} $\langle\,${\itshape Algorithms for classic horsefly}\nobreak\ {\footnotesize {35}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@   @\\
+\mbox{}\verb@def algo_dumb(sites, horseflyinit, phi):@\\
+\mbox{}\verb@    """ For each of the n factorial ordering of sites@\\
+\mbox{}\verb@    find the ordering which gives the smallest horsefly @\\
+\mbox{}\verb@    tour length@\\
+\mbox{}\verb@    """@\\
+\mbox{}\verb@    @\\
+\mbox{}\verb@    tour_length_fn = tour_length(horseflyinit)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    best_tour = algo_exact_given_specific_ordering(sites, horseflyinit, phi)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    i = 0@\\
+\mbox{}\verb@    for sites_perm in list(itertools.permutations(sites)):@\\
+\mbox{}\verb@        print "Testing a new permutation ", i, " of the sites"; i = i + 1@\\
+\mbox{}\verb@          @\\
+\mbox{}\verb@        #tour_for_current_perm = algo_exact_given_specific_ordering (sites_perm, \@\\
+\mbox{}\verb@                                                                     horseflyinit, phi) @\\
+\mbox{}\verb@        tour_for_current_perm = algo_exact_given_specific_ordering (sites_perm, \@\\
+\mbox{}\verb@                                                                    horseflyinit, phi) @\\
+\mbox{}\verb@        if tour_length_fn(algo_utils.flatten_list_of_lists(tour_for_current_perm ['tour_points']) ) \@\\
+\mbox{}\verb@         < tour_length_fn(algo_utils.flatten_list_of_lists(            best_tour ['tour_points']) ):@\\
+\mbox{}\verb@                best_tour = tour_for_current_perm@\\
+\mbox{}\verb@                @\\
+\mbox{}\verb@                print Fore.RED + "Found better tour!" + Style.RESET_ALL@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    #print Fore.RED + "\nHorse Waiting times are ",\ @\\
+\mbox{}\verb@    #       best_tour['horse_waiting_times'] , \@\\
+\mbox{}\verb@    #       Style.RESET_ALL@\\
+\mbox{}\verb@    return best_tour@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroDefBy\ \NWlink{nuweb31}{31}\NWlink{nuweb32}{, 32}\NWlink{nuweb35}{, 35}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb24a}{24a}.
+
+\item{}
+\end{list}
+\end{minipage}\vspace{4ex}
 \end{flushleft}
 \section{Local Utility Functions}
 
@@ -1364,8 +1417,8 @@ are collected at the end of this chapter.
 
    This is in other words the objective function. 
 
-\begin{flushleft} \small\label{scrap21}\raggedright\small
-\NWtarget{nuweb35a}{} $\langle\,${\itshape Local utility functions for classic horsefly}\nobreak\ {\footnotesize {35a}}$\,\rangle\equiv$
+\begin{flushleft} \small\label{scrap22}\raggedright\small
+\NWtarget{nuweb36a}{} $\langle\,${\itshape Local utility functions for classic horsefly}\nobreak\ {\footnotesize {36a}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@   @\\
@@ -1391,7 +1444,7 @@ are collected at the end of this chapter.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroDefBy\ \NWlink{nuweb35a}{35a}\NWlink{nuweb35b}{b}.
+\item \NWtxtMacroDefBy\ \NWlink{nuweb36a}{36a}\NWlink{nuweb36b}{b}.
 \item \NWtxtMacroRefIn\ \NWlink{nuweb24a}{24a}.
 
 \item{}
@@ -1404,8 +1457,8 @@ are collected at the end of this chapter.
       each link of the tour. Again note that because 
       speed of horse = 1, we can add ``time'' to ``distance''. 
 
-\begin{flushleft} \small\label{scrap22}\raggedright\small
-\NWtarget{nuweb35b}{} $\langle\,${\itshape Local utility functions for classic horsefly}\nobreak\ {\footnotesize {35b}}$\,\rangle\equiv$
+\begin{flushleft} \small\label{scrap23}\raggedright\small
+\NWtarget{nuweb36b}{} $\langle\,${\itshape Local utility functions for classic horsefly}\nobreak\ {\footnotesize {36b}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@   @\\
@@ -1436,7 +1489,7 @@ are collected at the end of this chapter.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroDefBy\ \NWlink{nuweb35a}{35a}\NWlink{nuweb35b}{b}.
+\item \NWtxtMacroDefBy\ \NWlink{nuweb36a}{36a}\NWlink{nuweb36b}{b}.
 \item \NWtxtMacroRefIn\ \NWlink{nuweb24a}{24a}.
 
 \item{}
@@ -1446,8 +1499,8 @@ are collected at the end of this chapter.
 \section{Plotting Routines}
 \newchunk 
 
-\begin{flushleft} \small\label{scrap23}\raggedright\small
-\NWtarget{nuweb36}{} $\langle\,${\itshape Plotting routines for classic horsefly}\nobreak\ {\footnotesize {36}}$\,\rangle\equiv$
+\begin{flushleft} \small\label{scrap24}\raggedright\small
+\NWtarget{nuweb37}{} $\langle\,${\itshape Plotting routines for classic horsefly}\nobreak\ {\footnotesize {37}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@ @\\
@@ -1556,13 +1609,13 @@ are collected at the end of this chapter.
 \chapter{Index of Fragments}
 
 {\small\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item $\langle\,$Algorithms for classic horsefly\nobreak\ {\footnotesize \NWlink{nuweb31}{31}\NWlink{nuweb32}{, 32}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb24a}{24a}.}
+\item $\langle\,$Algorithms for classic horsefly\nobreak\ {\footnotesize \NWlink{nuweb31}{31}\NWlink{nuweb32}{, 32}\NWlink{nuweb35}{, 35}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb24a}{24a}.}
 \item $\langle\,$Clear canvas and states of all objects\nobreak\ {\footnotesize \NWlink{nuweb28a}{28a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb25}{25}.}
 \item $\langle\,$Define key-press handler\nobreak\ {\footnotesize \NWlink{nuweb25}{25}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb24a}{24a}.}
 \item $\langle\,$Generate a bunch of uniform or non-uniform random points on the canvas\nobreak\ {\footnotesize \NWlink{nuweb27}{27}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb25}{25}.}
 \item $\langle\,$Local data-structures for classic horsefly\nobreak\ {\footnotesize \NWlink{nuweb29}{29}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb24a}{24a}.}
-\item $\langle\,$Local utility functions for classic horsefly\nobreak\ {\footnotesize \NWlink{nuweb35a}{35a}\NWlink{nuweb35b}{b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb24a}{24a}.}
-\item $\langle\,$Plotting routines for classic horsefly\nobreak\ {\footnotesize \NWlink{nuweb36}{36}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb24a}{24a}.}
+\item $\langle\,$Local utility functions for classic horsefly\nobreak\ {\footnotesize \NWlink{nuweb36a}{36a}\NWlink{nuweb36b}{b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb24a}{24a}.}
+\item $\langle\,$Plotting routines for classic horsefly\nobreak\ {\footnotesize \NWlink{nuweb37}{37}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb24a}{24a}.}
 \item $\langle\,$Relevant imports for classic horsefly\nobreak\ {\footnotesize \NWlink{nuweb24b}{24b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb24a}{24a}.}
 \item $\langle\,$Set up interactive canvas\nobreak\ {\footnotesize \NWlink{nuweb28b}{28b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb24a}{24a}.}
 \item $\langle\,$Start entering input from the command-line\nobreak\ {\footnotesize \NWlink{nuweb26}{26}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb25}{25}.}
