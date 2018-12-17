@@ -16,6 +16,7 @@ if [ $# -eq 0 ]; then
 	bibtex $main_tex_file                 
 	asy *.asy                              
 	lualatex -interaction=nonstopmode -halt-on-error  -shell-escape $main_tex_file  
+	lualatex -interaction=nonstopmode -halt-on-error  -shell-escape $main_tex_file  
 	nuweb -r -v $main_web_file            
 	lualatex -interaction=nonstopmode -halt-on-error  -shell-escape $main_tex_file  
 	lualatex -interaction=nonstopmode -halt-on-error  -shell-escape $main_tex_file  

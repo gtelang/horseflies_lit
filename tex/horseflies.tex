@@ -1379,11 +1379,11 @@ are collected at the end of this chapter.
 \mbox{}\verb@        print "Testing a new permutation ", i, " of the sites"; i = i + 1@\\
 \mbox{}\verb@          @\\
 \mbox{}\verb@        #tour_for_current_perm = algo_exact_given_specific_ordering (sites_perm, \@\\
-\mbox{}\verb@                                                                     horseflyinit, phi) @\\
+\mbox{}\verb@        #                                                             horseflyinit, phi) @\\
 \mbox{}\verb@        tour_for_current_perm = algo_exact_given_specific_ordering (sites_perm, \@\\
 \mbox{}\verb@                                                                    horseflyinit, phi) @\\
-\mbox{}\verb@        if tour_length_fn(algo_utils.flatten_list_of_lists(tour_for_current_perm ['tour_points']) ) \@\\
-\mbox{}\verb@         < tour_length_fn(algo_utils.flatten_list_of_lists(            best_tour ['tour_points']) ):@\\
+\mbox{}\verb@        if tour_length_fn(utils_algo.flatten_list_of_lists(tour_for_current_perm ['tour_points']) ) \@\\
+\mbox{}\verb@         < tour_length_fn(utils_algo.flatten_list_of_lists(            best_tour ['tour_points']) ):@\\
 \mbox{}\verb@                best_tour = tour_for_current_perm@\\
 \mbox{}\verb@                @\\
 \mbox{}\verb@                print Fore.RED + "Found better tour!" + Style.RESET_ALL@\\

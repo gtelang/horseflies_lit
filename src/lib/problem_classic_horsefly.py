@@ -442,11 +442,11 @@ def algo_dumb(sites, horseflyinit, phi):
         print "Testing a new permutation ", i, " of the sites"; i = i + 1
           
         #tour_for_current_perm = algo_exact_given_specific_ordering (sites_perm, \
-                                                                     horseflyinit, phi) 
+        #                                                             horseflyinit, phi) 
         tour_for_current_perm = algo_exact_given_specific_ordering (sites_perm, \
                                                                     horseflyinit, phi) 
-        if tour_length_fn(algo_utils.flatten_list_of_lists(tour_for_current_perm ['tour_points']) ) \
-         < tour_length_fn(algo_utils.flatten_list_of_lists(            best_tour ['tour_points']) ):
+        if tour_length_fn(utils_algo.flatten_list_of_lists(tour_for_current_perm ['tour_points']) ) \
+         < tour_length_fn(utils_algo.flatten_list_of_lists(            best_tour ['tour_points']) ):
                 best_tour = tour_for_current_perm
                 
                 print Fore.RED + "Found better tour!" + Style.RESET_ALL
