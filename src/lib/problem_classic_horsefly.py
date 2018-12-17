@@ -47,7 +47,7 @@ def run_handler():
                     algo_str = algo_str.lstrip()
 
                     # Incase there are patches present from the previous clustering, just clear them
-                    clearAxPolygonPatches(ax)
+                    utils_graphics.clearAxPolygonPatches(ax)
 
                     if   algo_str == 'e':
                           horseflytour = \
@@ -93,7 +93,7 @@ def run_handler():
 
                     #print horseflytour['tour_points']
                     plotTour(ax,horseflytour, run.inithorseposn, phi, algo_str)
-                    applyAxCorrection(ax)
+                    utils_graphics.applyAxCorrection(ax)
                     fig.canvas.draw()
                     
                elif event.key in ['n', 'N', 'u', 'U']: 
@@ -102,7 +102,7 @@ def run_handler():
                     run.clearAllStates()
                     ax.cla()
                                    
-                    applyAxCorrection(ax)
+                    utils_graphics.applyAxCorrection(ax)
                     ax.set_xticks([])
                     ax.set_yticks([])
                                     
@@ -114,7 +114,7 @@ def run_handler():
                     else : # Uniform random points
                             run.sites = scipy.rand(numpts,2).tolist()
 
-                    patchSize  = (xlim[1]-xlim[0])/140.0
+                    patchSize  = (utils_graphics.xlim[1]-utils_graphics.xlim[0])/140.0
 
                     for site in run.sites:      
                         ax.add_patch(mpl.patches.Circle(site, radius = patchSize, \
@@ -128,26 +128,27 @@ def run_handler():
                     run.clearAllStates()
                     ax.cla()
                                   
-                    applyAxCorrection(ax)
+                    utils_graphics.applyAxCorrection(ax)
                     ax.set_xticks([])
                     ax.set_yticks([])
                                      
                     fig.texts = []
                     fig.canvas.draw()
                     
+           return _keyPressHandler
     
     # Set up interactive canvas
     fig, ax =  plt.subplots()
     run = HorseFlyInput()
     #print run
         
-    ax.set_xlim([xlim[0], xlim[1]])
-    ax.set_ylim([ylim[0], ylim[1]])
+    ax.set_xlim([utils_graphics.xlim[0], utils_graphics.xlim[1]])
+    ax.set_ylim([utils_graphics.ylim[0], utils_graphics.ylim[1]])
     ax.set_aspect(1.0)
     ax.set_xticks([])
     ax.set_yticks([])
           
-    mouseClick   = wrapperEnterRunPoints (fig,ax, run)
+    mouseClick   = utils_graphics.wrapperEnterRunPoints (fig,ax, run)
     fig.canvas.mpl_connect('button_press_event' , mouseClick )
           
     keyPress     = wrapperkeyPressHandler(fig,ax, run)
@@ -319,6 +320,108 @@ def algo_greedy(sites, inithorseposn, phi, post_optimizer):
       # Use exact solver for the post optimizer step
       answer = post_optimizer(sites_ordered_by_greedy, inithorseposn, phi)
       return answer
+
+#################################################################################
+## ALGORITHMS FOR SINGLE HORSE SINGLE FLY SERVICING THE SITES IN THE GIVEN ORDER
+#################################################################################
+def algo_exact_given_specific_ordering (sites, horseflyinit, phi):
+    """ Use the given ordering of sites to compute a good tour 
+    for the horse.
+    """
+    def ith_leg_constraint(i, horseflyinit, phi, sites):
+        """ For the ith segment of the horsefly tour
+        this function returns a constraint function which 
+        models the fact that the time taken by the fly 
+        is equal to the time taken by the horse along 
+        that particular segment.
+        """
+        if i == 0 :
+            def _constraint_function(x):
+            
+                #print "Constraint  ", i
+                start = np.array (horseflyinit)
+                site  = np.array (sites[0])
+                stop  = np.array ([x[0],x[1]])
+            
+                horsetime = np.linalg.norm( stop - start )
+            
+                flytime_to_site   = 1/phi * np.linalg.norm( site - start )
+                flytime_from_site = 1/phi * np.linalg.norm( stop - site  )
+                flytime           = flytime_to_site + flytime_from_site
+                return horsetime-flytime
+
+            return _constraint_function
+        else :
+          
+            def _constraint_function(x):
+
+               #print "Constraint  ", i
+               start = np.array (  [x[2*i-2], x[2*i-1]]  ) 
+               site  = np.array (  sites[i])
+               stop  = np.array (  [x[2*i]  , x[2*i+1]]  )
+            
+               horsetime = np.linalg.norm( stop - start )
+           
+               flytime_to_site   = 1/phi * np.linalg.norm( site - start )
+               flytime_from_site = 1/phi * np.linalg.norm( stop - site  )
+               flytime           = flytime_to_site + flytime_from_site
+               return horsetime-flytime
+
+            return _constraint_function
+
+
+    def generate_constraints(horseflyinit, phi, sites):
+        """ Given input data, of the problem generate the 
+        constraint list for each leg of the tour. The number
+        of legs is equal to the number of sites for the case 
+        of single horse, single drone
+        """
+        cons = []
+        for i in range(len(sites)):
+            cons.append( { 'type':'eq',
+                            'fun': ith_leg_constraint(i,horseflyinit,phi, sites) } )
+        return cons
+
+
+    
+    cons = generate_constraints(horseflyinit, phi, sites)
+    # Since the horsely tour lies inside the square,
+    # the bounds for each coordinate is 0 and 1
+    #x0 = np.empty(2*len(sites))
+    #x0.fill(0.5) # choice of filling vector with 0.5 is arbitrary
+
+    x0 = utils_algo.flatten_list_of_lists(sites) # the initial choice is just the sites
+    assert(len(x0) == 2*len(sites))
+    x0 = np.array(x0)
+    
+    sol = minimize(tour_length(horseflyinit), x0, method= 'SLSQP', constraints=cons, options={'maxiter':500})
+    
+    tour_points = utils_algo.pointify_vector(sol.x)
+
+    # return the waiting times for the horse
+    numsites            = len(sites)
+    alpha               = horseflyinit[0]
+    beta                = horseflyinit[1]
+    s                   = utils_algo.flatten_list_of_lists(sites)
+    horse_waiting_times = np.zeros(numsites)
+    ps                  = sol.x
+    for i in range(numsites):
+        if i == 0 :
+            horse_time         = np.sqrt((ps[0]-alpha)**2 + (ps[1]-beta)**2)
+            fly_time_to_site   = 1.0/phi * np.sqrt((s[0]-alpha)**2 + (s[1]-beta)**2 )
+            fly_time_from_site = 1.0/phi * np.sqrt((s[0]-ps[1])**2 + (s[1]-ps[1])**2)
+        else:
+            horse_time         = np.sqrt((ps[2*i]-ps[2*i-2])**2 + (ps[2*i+1]-ps[2*i-1])**2)
+            fly_time_to_site   = 1.0/phi * np.sqrt(( (s[2*i]-ps[2*i-2])**2 + (s[2*i+1]-ps[2*i-1])**2 )) 
+            fly_time_from_site = 1.0/phi * np.sqrt(( (s[2*i]-ps[2*i])**2   + (s[2*i+1]-ps[2*i+1])**2 )) 
+
+        horse_waiting_times[i] = horse_time - (fly_time_to_site + fly_time_from_site)
+    
+    return {'tour_points'                : tour_points,
+            'horse_waiting_times'        : horse_waiting_times, 
+            'site_ordering'              : sites,
+            'tour_length_with_waiting_time_included': tour_length_with_waiting_time_included(tour_points, horse_waiting_times, horseflyinit)}
+   
 
 # Plotting routines for classic horsefly
  

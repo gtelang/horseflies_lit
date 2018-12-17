@@ -68,6 +68,7 @@ def wrapperkeyPressHandler(fig,ax, run):
                 @< Generate a bunch of uniform or non-uniform random points on the canvas @>
            elif event.key in ['c', 'C']: 
                 @< Clear canvas and states of all objects @>
+       return _keyPressHandler
 @| @}
 
 \newchunk 
@@ -91,7 +92,7 @@ algo_str = raw_input(Fore.YELLOW + \
 algo_str = algo_str.lstrip()
 
 # Incase there are patches present from the previous clustering, just clear them
-clearAxPolygonPatches(ax)
+utils_graphics.clearAxPolygonPatches(ax)
 
 if   algo_str == 'e':
       horseflytour = \
@@ -137,7 +138,7 @@ else:
 
 #print horseflytour['tour_points']
 plotTour(ax,horseflytour, run.inithorseposn, phi, algo_str)
-applyAxCorrection(ax)
+utils_graphics.applyAxCorrection(ax)
 fig.canvas.draw()
 @| @}
 
@@ -153,7 +154,7 @@ experimental algorithm papers when he talks about algorithms for the TSP.
 run.clearAllStates()
 ax.cla()
                
-applyAxCorrection(ax)
+utils_graphics.applyAxCorrection(ax)
 ax.set_xticks([])
 ax.set_yticks([])
                 
@@ -165,7 +166,7 @@ if event.key in ['n', 'N']: # Non-uniform random points
 else : # Uniform random points
         run.sites = scipy.rand(numpts,2).tolist()
 
-patchSize  = (xlim[1]-xlim[0])/140.0
+patchSize  = (utils_graphics.xlim[1]-utils_graphics.xlim[0])/140.0
 
 for site in run.sites:      
     ax.add_patch(mpl.patches.Circle(site, radius = patchSize, \
@@ -181,7 +182,7 @@ fig.canvas.draw()
 @{run.clearAllStates()
 ax.cla()
               
-applyAxCorrection(ax)
+utils_graphics.applyAxCorrection(ax)
 ax.set_xticks([])
 ax.set_yticks([])
                  
@@ -195,13 +196,13 @@ fig.canvas.draw()
 run = HorseFlyInput()
 #print run
     
-ax.set_xlim([xlim[0], xlim[1]])
-ax.set_ylim([ylim[0], ylim[1]])
+ax.set_xlim([utils_graphics.xlim[0], utils_graphics.xlim[1]])
+ax.set_ylim([utils_graphics.ylim[0], utils_graphics.ylim[1]])
 ax.set_aspect(1.0)
 ax.set_xticks([])
 ax.set_yticks([])
       
-mouseClick   = wrapperEnterRunPoints (fig,ax, run)
+mouseClick   = utils_graphics.wrapperEnterRunPoints (fig,ax, run)
 fig.canvas.mpl_connect('button_press_event' , mouseClick )
       
 keyPress     = wrapperkeyPressHandler(fig,ax, run)
@@ -278,6 +279,10 @@ Now that all the boring boiler-plate and handler codes have been
 written, its finally time for algorithmic ideas and implementations! 
 Every algorithm is given an algorithmic overview followed by the 
 detailed steps woven together with the source code. 
+
+Any local utility functions, needed for algorithmic or graphing purposes 
+are collected at the end of this chapter. 
+
 \newpage
 
 @i algo-greedy-nn-classic-horsefly.web

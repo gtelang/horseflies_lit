@@ -1,4 +1,22 @@
 
+
+from matplotlib import rc
+from colorama import Fore
+from colorama import Style
+from scipy.optimize import minimize
+from sklearn.cluster import KMeans
+import argparse
+import itertools
+import math
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+import numpy as np
+import os
+import pprint as pp
+import randomcolor 
+import sys
+import time
+
 xlim, ylim = [0,1], [0,1]
 
 def applyAxCorrection(ax):

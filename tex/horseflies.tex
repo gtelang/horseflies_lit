@@ -355,6 +355,24 @@ axes are adjusted according to the data to be plotted.
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@from matplotlib import rc@\\
+\mbox{}\verb@from colorama import Fore@\\
+\mbox{}\verb@from colorama import Style@\\
+\mbox{}\verb@from scipy.optimize import minimize@\\
+\mbox{}\verb@from sklearn.cluster import KMeans@\\
+\mbox{}\verb@import argparse@\\
+\mbox{}\verb@import itertools@\\
+\mbox{}\verb@import math@\\
+\mbox{}\verb@import matplotlib as mpl@\\
+\mbox{}\verb@import matplotlib.pyplot as plt@\\
+\mbox{}\verb@import numpy as np@\\
+\mbox{}\verb@import os@\\
+\mbox{}\verb@import pprint as pp@\\
+\mbox{}\verb@import randomcolor @\\
+\mbox{}\verb@import sys@\\
+\mbox{}\verb@import time@\\
+\mbox{}\verb@@\\
 \mbox{}\verb@xlim, ylim = [0,1], [0,1]@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@def applyAxCorrection(ax):@\\
@@ -366,7 +384,7 @@ axes are adjusted according to the data to be plotted.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtFileDefBy\ \NWlink{nuweb15}{15}\NWlink{nuweb16a}{, 16a}\NWlink{nuweb16b}{b}\NWlink{nuweb17}{, 17}.
+\item \NWtxtFileDefBy\ \NWlink{nuweb15}{15}\NWlink{nuweb16}{, 16}\NWlink{nuweb17a}{, 17a}\NWlink{nuweb17b}{b}.
 
 \item{}
 \end{list}
@@ -376,7 +394,7 @@ axes are adjusted according to the data to be plotted.
 to delete and remove all the graphical objects drawn on it. 
 
 \begin{flushleft} \small\label{scrap3}\raggedright\small
-\NWtarget{nuweb16a}{} \verb@"../src/lib/utils_graphics.py"@\nobreak\ {\footnotesize {16a}}$\equiv$
+\NWtarget{nuweb16}{} \verb@"../src/lib/utils_graphics.py"@\nobreak\ {\footnotesize {16}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
@@ -399,7 +417,7 @@ to delete and remove all the graphical objects drawn on it.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtFileDefBy\ \NWlink{nuweb15}{15}\NWlink{nuweb16a}{, 16a}\NWlink{nuweb16b}{b}\NWlink{nuweb17}{, 17}.
+\item \NWtxtFileDefBy\ \NWlink{nuweb15}{15}\NWlink{nuweb16}{, 16}\NWlink{nuweb17a}{, 17a}\NWlink{nuweb17b}{b}.
 
 \item{}
 \end{list}
@@ -411,7 +429,7 @@ to delete and remove all the graphical objects drawn on it.
     connected.I presume, this behavioue can be achieved by sub-classing.
 
 \begin{flushleft} \small\label{scrap4}\raggedright\small
-\NWtarget{nuweb16b}{} \verb@"../src/lib/utils_graphics.py"@\nobreak\ {\footnotesize {16b}}$\equiv$
+\NWtarget{nuweb17a}{} \verb@"../src/lib/utils_graphics.py"@\nobreak\ {\footnotesize {17a}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
@@ -437,7 +455,7 @@ to delete and remove all the graphical objects drawn on it.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtFileDefBy\ \NWlink{nuweb15}{15}\NWlink{nuweb16a}{, 16a}\NWlink{nuweb16b}{b}\NWlink{nuweb17}{, 17}.
+\item \NWtxtFileDefBy\ \NWlink{nuweb15}{15}\NWlink{nuweb16}{, 16}\NWlink{nuweb17a}{, 17a}\NWlink{nuweb17b}{b}.
 
 \item{}
 \end{list}
@@ -451,7 +469,7 @@ Note that the left mouse-button corresponds to button 1 and right mouse button
 to button 3 in the code-fragment below. 
 
 \begin{flushleft} \small\label{scrap5}\raggedright\small
-\NWtarget{nuweb17}{} \verb@"../src/lib/utils_graphics.py"@\nobreak\ {\footnotesize {17}}$\equiv$
+\NWtarget{nuweb17b}{} \verb@"../src/lib/utils_graphics.py"@\nobreak\ {\footnotesize {17b}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
@@ -513,7 +531,7 @@ to button 3 in the code-fragment below.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtFileDefBy\ \NWlink{nuweb15}{15}\NWlink{nuweb16a}{, 16a}\NWlink{nuweb16b}{b}\NWlink{nuweb17}{, 17}.
+\item \NWtxtFileDefBy\ \NWlink{nuweb15}{15}\NWlink{nuweb16}{, 16}\NWlink{nuweb17a}{, 17a}\NWlink{nuweb17b}{b}.
 
 \item{}
 \end{list}
@@ -527,7 +545,7 @@ to button 3 in the code-fragment below.
     Points should be lists or tuples of length 2
 
 \begin{flushleft} \small\label{scrap6}\raggedright\small
-\NWtarget{nuweb18}{} \verb@"../src/lib/utils_algo.py"@\nobreak\ {\footnotesize {18}}$\equiv$
+\NWtarget{nuweb19}{} \verb@"../src/lib/utils_algo.py"@\nobreak\ {\footnotesize {19}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
@@ -556,7 +574,7 @@ to button 3 in the code-fragment below.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtFileDefBy\ \NWlink{nuweb18}{18}\NWlink{nuweb19}{, 19}\NWlink{nuweb20a}{, 20a}\NWlink{nuweb20b}{b}\NWlink{nuweb21}{, 21}.
+\item \NWtxtFileDefBy\ \NWlink{nuweb19}{19}\NWlink{nuweb20a}{, 20a}\NWlink{nuweb20b}{b}\NWlink{nuweb21a}{, 21a}\NWlink{nuweb21b}{b}.
 
 \item{}
 \end{list}
@@ -566,7 +584,7 @@ to button 3 in the code-fragment below.
 its length. Typically used for computing the length of the horse's and fly's tours. 
 
 \begin{flushleft} \small\label{scrap7}\raggedright\small
-\NWtarget{nuweb19}{} \verb@"../src/lib/utils_algo.py"@\nobreak\ {\footnotesize {19}}$\equiv$
+\NWtarget{nuweb20a}{} \verb@"../src/lib/utils_algo.py"@\nobreak\ {\footnotesize {20a}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
@@ -590,7 +608,7 @@ its length. Typically used for computing the length of the horse's and fly's tou
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtFileDefBy\ \NWlink{nuweb18}{18}\NWlink{nuweb19}{, 19}\NWlink{nuweb20a}{, 20a}\NWlink{nuweb20b}{b}\NWlink{nuweb21}{, 21}.
+\item \NWtxtFileDefBy\ \NWlink{nuweb19}{19}\NWlink{nuweb20a}{, 20a}\NWlink{nuweb20b}{b}\NWlink{nuweb21a}{, 21a}\NWlink{nuweb21b}{b}.
 
 \item{}
 \end{list}
@@ -602,7 +620,7 @@ form. The following routines are needed to convert such a ``flattened'' list int
 a list of points and vice versa. 
 
 \begin{flushleft} \small\label{scrap8}\raggedright\small
-\NWtarget{nuweb20a}{} \verb@"../src/lib/utils_algo.py"@\nobreak\ {\footnotesize {20a}}$\equiv$
+\NWtarget{nuweb20b}{} \verb@"../src/lib/utils_algo.py"@\nobreak\ {\footnotesize {20b}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
@@ -630,7 +648,7 @@ a list of points and vice versa.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtFileDefBy\ \NWlink{nuweb18}{18}\NWlink{nuweb19}{, 19}\NWlink{nuweb20a}{, 20a}\NWlink{nuweb20b}{b}\NWlink{nuweb21}{, 21}.
+\item \NWtxtFileDefBy\ \NWlink{nuweb19}{19}\NWlink{nuweb20a}{, 20a}\NWlink{nuweb20b}{b}\NWlink{nuweb21a}{, 21a}\NWlink{nuweb21b}{b}.
 
 \item{}
 \end{list}
@@ -640,7 +658,7 @@ a list of points and vice versa.
 debugging purposes,  it helps to print a list with one item per line. 
 
 \begin{flushleft} \small\label{scrap9}\raggedright\small
-\NWtarget{nuweb20b}{} \verb@"../src/lib/utils_algo.py"@\nobreak\ {\footnotesize {20b}}$\equiv$
+\NWtarget{nuweb21a}{} \verb@"../src/lib/utils_algo.py"@\nobreak\ {\footnotesize {21a}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
@@ -654,7 +672,7 @@ debugging purposes,  it helps to print a list with one item per line.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtFileDefBy\ \NWlink{nuweb18}{18}\NWlink{nuweb19}{, 19}\NWlink{nuweb20a}{, 20a}\NWlink{nuweb20b}{b}\NWlink{nuweb21}{, 21}.
+\item \NWtxtFileDefBy\ \NWlink{nuweb19}{19}\NWlink{nuweb20a}{, 20a}\NWlink{nuweb20b}{b}\NWlink{nuweb21a}{, 21a}\NWlink{nuweb21b}{b}.
 
 \item{}
 \end{list}
@@ -663,7 +681,7 @@ debugging purposes,  it helps to print a list with one item per line.
 \newchunk The following routines are self-explanatory and are hence gathered into one chunk. 
 
 \begin{flushleft} \small\label{scrap10}\raggedright\small
-\NWtarget{nuweb21}{} \verb@"../src/lib/utils_algo.py"@\nobreak\ {\footnotesize {21}}$\equiv$
+\NWtarget{nuweb21b}{} \verb@"../src/lib/utils_algo.py"@\nobreak\ {\footnotesize {21b}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
@@ -738,7 +756,7 @@ debugging purposes,  it helps to print a list with one item per line.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtFileDefBy\ \NWlink{nuweb18}{18}\NWlink{nuweb19}{, 19}\NWlink{nuweb20a}{, 20a}\NWlink{nuweb20b}{b}\NWlink{nuweb21}{, 21}.
+\item \NWtxtFileDefBy\ \NWlink{nuweb19}{19}\NWlink{nuweb20a}{, 20a}\NWlink{nuweb20b}{b}\NWlink{nuweb21a}{, 21a}\NWlink{nuweb21b}{b}.
 
 \item{}
 \end{list}
@@ -758,19 +776,19 @@ command-line arguments and runs the experimental or interactive sections of
 the code. 
 
 \begin{flushleft} \small\label{scrap11}\raggedright\small
-\NWtarget{nuweb23a}{} \verb@"../src/lib/problem_classic_horsefly.py"@\nobreak\ {\footnotesize {23a}}$\equiv$
+\NWtarget{nuweb24a}{} \verb@"../src/lib/problem_classic_horsefly.py"@\nobreak\ {\footnotesize {24a}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@    @\\
-\mbox{}\verb@@\hbox{$\langle\,${\itshape Relevant imports for classic horsefly}\nobreak\ {\footnotesize \NWlink{nuweb23b}{23b}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@@\hbox{$\langle\,${\itshape Relevant imports for classic horsefly}\nobreak\ {\footnotesize \NWlink{nuweb24b}{24b}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@def run_handler():@\\
-\mbox{}\verb@    @\hbox{$\langle\,${\itshape Define key-press handler}\nobreak\ {\footnotesize \NWlink{nuweb24a}{24a}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@    @\hbox{$\langle\,${\itshape Set up interactive canvas}\nobreak\ {\footnotesize \NWlink{nuweb27b}{27b}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@    @\hbox{$\langle\,${\itshape Define key-press handler}\nobreak\ {\footnotesize \NWlink{nuweb25}{25}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@    @\hbox{$\langle\,${\itshape Set up interactive canvas}\nobreak\ {\footnotesize \NWlink{nuweb28b}{28b}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@@\hbox{$\langle\,${\itshape Local data-structures for classic horsefly}\nobreak\ {\footnotesize \NWlink{nuweb28}{28}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@@\hbox{$\langle\,${\itshape Local utility functions for classic horsefly}\nobreak\ {\footnotesize \NWlink{nuweb31}{31}, \ldots\ }$\,\rangle$}\verb@@\\
-\mbox{}\verb@@\hbox{$\langle\,${\itshape Algorithms for classic horsefly}\nobreak\ {\footnotesize \NWlink{nuweb30}{30}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@@\hbox{$\langle\,${\itshape Plotting routines for classic horsefly}\nobreak\ {\footnotesize \NWlink{nuweb33}{33}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@@\hbox{$\langle\,${\itshape Local data-structures for classic horsefly}\nobreak\ {\footnotesize \NWlink{nuweb29}{29}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@@\hbox{$\langle\,${\itshape Local utility functions for classic horsefly}\nobreak\ {\footnotesize \NWlink{nuweb35a}{35a}, \ldots\ }$\,\rangle$}\verb@@\\
+\mbox{}\verb@@\hbox{$\langle\,${\itshape Algorithms for classic horsefly}\nobreak\ {\footnotesize \NWlink{nuweb31}{31}, \ldots\ }$\,\rangle$}\verb@@\\
+\mbox{}\verb@@\hbox{$\langle\,${\itshape Plotting routines for classic horsefly}\nobreak\ {\footnotesize \NWlink{nuweb36}{36}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
@@ -785,7 +803,7 @@ the code.
 
 \newchunk 
 \begin{flushleft} \small\label{scrap12}\raggedright\small
-\NWtarget{nuweb23b}{} $\langle\,${\itshape Relevant imports for classic horsefly}\nobreak\ {\footnotesize {23b}}$\,\rangle\equiv$
+\NWtarget{nuweb24b}{} $\langle\,${\itshape Relevant imports for classic horsefly}\nobreak\ {\footnotesize {24b}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
@@ -812,7 +830,7 @@ the code.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb23a}{23a}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb24a}{24a}.
 
 \item{}
 \end{list}
@@ -827,7 +845,7 @@ or just plain clearing the canvas for inserting a fresh input set of points.
 
 \begin{flushleft} \small
 \begin{minipage}{\linewidth}\label{scrap13}\raggedright\small
-\NWtarget{nuweb24a}{} $\langle\,${\itshape Define key-press handler}\nobreak\ {\footnotesize {24a}}$\,\rangle\equiv$
+\NWtarget{nuweb25}{} $\langle\,${\itshape Define key-press handler}\nobreak\ {\footnotesize {25}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@   @\\
@@ -835,17 +853,18 @@ or just plain clearing the canvas for inserting a fresh input set of points.
 \mbox{}\verb@def wrapperkeyPressHandler(fig,ax, run): @\\
 \mbox{}\verb@       def _keyPressHandler(event):@\\
 \mbox{}\verb@           if event.key in ['i', 'I']:  @\\
-\mbox{}\verb@                @\hbox{$\langle\,${\itshape Start entering input from the command-line}\nobreak\ {\footnotesize \NWlink{nuweb24b}{24b}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@                @\hbox{$\langle\,${\itshape Start entering input from the command-line}\nobreak\ {\footnotesize \NWlink{nuweb26}{26}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@           elif event.key in ['n', 'N', 'u', 'U']: @\\
-\mbox{}\verb@                @\hbox{$\langle\,${\itshape Generate a bunch of uniform or non-uniform random points on the canvas}\nobreak\ {\footnotesize \NWlink{nuweb26}{26}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@                @\hbox{$\langle\,${\itshape Generate a bunch of uniform or non-uniform random points on the canvas}\nobreak\ {\footnotesize \NWlink{nuweb27}{27}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@           elif event.key in ['c', 'C']: @\\
-\mbox{}\verb@                @\hbox{$\langle\,${\itshape Clear canvas and states of all objects}\nobreak\ {\footnotesize \NWlink{nuweb27a}{27a}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@                @\hbox{$\langle\,${\itshape Clear canvas and states of all objects}\nobreak\ {\footnotesize \NWlink{nuweb28a}{28a}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@       return _keyPressHandler@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb23a}{23a}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb24a}{24a}.
 
 \item{}
 \end{list}
@@ -853,7 +872,7 @@ or just plain clearing the canvas for inserting a fresh input set of points.
 \end{flushleft}
 \newchunk 
 \begin{flushleft} \small\label{scrap14}\raggedright\small
-\NWtarget{nuweb24b}{} $\langle\,${\itshape Start entering input from the command-line}\nobreak\ {\footnotesize {24b}}$\,\rangle\equiv$
+\NWtarget{nuweb26}{} $\langle\,${\itshape Start entering input from the command-line}\nobreak\ {\footnotesize {26}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@phi_str = raw_input(Fore.YELLOW + \@\\
@@ -875,7 +894,7 @@ or just plain clearing the canvas for inserting a fresh input set of points.
 \mbox{}\verb@algo_str = algo_str.lstrip()@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@# Incase there are patches present from the previous clustering, just clear them@\\
-\mbox{}\verb@clearAxPolygonPatches(ax)@\\
+\mbox{}\verb@utils_graphics.clearAxPolygonPatches(ax)@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@if   algo_str == 'e':@\\
 \mbox{}\verb@      horseflytour = \@\\
@@ -921,14 +940,14 @@ or just plain clearing the canvas for inserting a fresh input set of points.
 \mbox{}\verb@@\\
 \mbox{}\verb@#print horseflytour['tour_points']@\\
 \mbox{}\verb@plotTour(ax,horseflytour, run.inithorseposn, phi, algo_str)@\\
-\mbox{}\verb@applyAxCorrection(ax)@\\
+\mbox{}\verb@utils_graphics.applyAxCorrection(ax)@\\
 \mbox{}\verb@fig.canvas.draw()@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb24a}{24a}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb25}{25}.
 
 \item{}
 \end{list}
@@ -942,14 +961,14 @@ sequencing algorithms as David Johnson implies in his article on how to write
 experimental algorithm papers when he talks about algorithms for the TSP. 
 
 \begin{flushleft} \small\label{scrap15}\raggedright\small
-\NWtarget{nuweb26}{} $\langle\,${\itshape Generate a bunch of uniform or non-uniform random points on the canvas}\nobreak\ {\footnotesize {26}}$\,\rangle\equiv$
+\NWtarget{nuweb27}{} $\langle\,${\itshape Generate a bunch of uniform or non-uniform random points on the canvas}\nobreak\ {\footnotesize {27}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@numpts = int(sys.argv[1]) @\\
 \mbox{}\verb@run.clearAllStates()@\\
 \mbox{}\verb@ax.cla()@\\
 \mbox{}\verb@               @\\
-\mbox{}\verb@applyAxCorrection(ax)@\\
+\mbox{}\verb@utils_graphics.applyAxCorrection(ax)@\\
 \mbox{}\verb@ax.set_xticks([])@\\
 \mbox{}\verb@ax.set_yticks([])@\\
 \mbox{}\verb@                @\\
@@ -961,7 +980,7 @@ experimental algorithm papers when he talks about algorithms for the TSP.
 \mbox{}\verb@else : # Uniform random points@\\
 \mbox{}\verb@        run.sites = scipy.rand(numpts,2).tolist()@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@patchSize  = (xlim[1]-xlim[0])/140.0@\\
+\mbox{}\verb@patchSize  = (utils_graphics.xlim[1]-utils_graphics.xlim[0])/140.0@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@for site in run.sites:      @\\
 \mbox{}\verb@    ax.add_patch(mpl.patches.Circle(site, radius = patchSize, \@\\
@@ -974,7 +993,7 @@ experimental algorithm papers when he talks about algorithms for the TSP.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb24a}{24a}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb25}{25}.
 
 \item{}
 \end{list}
@@ -983,13 +1002,13 @@ experimental algorithm papers when he talks about algorithms for the TSP.
 \newchunk 
 
 \begin{flushleft} \small\label{scrap16}\raggedright\small
-\NWtarget{nuweb27a}{} $\langle\,${\itshape Clear canvas and states of all objects}\nobreak\ {\footnotesize {27a}}$\,\rangle\equiv$
+\NWtarget{nuweb28a}{} $\langle\,${\itshape Clear canvas and states of all objects}\nobreak\ {\footnotesize {28a}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@run.clearAllStates()@\\
 \mbox{}\verb@ax.cla()@\\
 \mbox{}\verb@              @\\
-\mbox{}\verb@applyAxCorrection(ax)@\\
+\mbox{}\verb@utils_graphics.applyAxCorrection(ax)@\\
 \mbox{}\verb@ax.set_xticks([])@\\
 \mbox{}\verb@ax.set_yticks([])@\\
 \mbox{}\verb@                 @\\
@@ -1000,7 +1019,7 @@ experimental algorithm papers when he talks about algorithms for the TSP.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb24a}{24a}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb25}{25}.
 
 \item{}
 \end{list}
@@ -1008,20 +1027,20 @@ experimental algorithm papers when he talks about algorithms for the TSP.
 \end{flushleft}
 \newchunk 
 \begin{flushleft} \small\label{scrap17}\raggedright\small
-\NWtarget{nuweb27b}{} $\langle\,${\itshape Set up interactive canvas}\nobreak\ {\footnotesize {27b}}$\,\rangle\equiv$
+\NWtarget{nuweb28b}{} $\langle\,${\itshape Set up interactive canvas}\nobreak\ {\footnotesize {28b}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@fig, ax =  plt.subplots()@\\
 \mbox{}\verb@run = HorseFlyInput()@\\
 \mbox{}\verb@#print run@\\
 \mbox{}\verb@    @\\
-\mbox{}\verb@ax.set_xlim([xlim[0], xlim[1]])@\\
-\mbox{}\verb@ax.set_ylim([ylim[0], ylim[1]])@\\
+\mbox{}\verb@ax.set_xlim([utils_graphics.xlim[0], utils_graphics.xlim[1]])@\\
+\mbox{}\verb@ax.set_ylim([utils_graphics.ylim[0], utils_graphics.ylim[1]])@\\
 \mbox{}\verb@ax.set_aspect(1.0)@\\
 \mbox{}\verb@ax.set_xticks([])@\\
 \mbox{}\verb@ax.set_yticks([])@\\
 \mbox{}\verb@      @\\
-\mbox{}\verb@mouseClick   = wrapperEnterRunPoints (fig,ax, run)@\\
+\mbox{}\verb@mouseClick   = utils_graphics.wrapperEnterRunPoints (fig,ax, run)@\\
 \mbox{}\verb@fig.canvas.mpl_connect('button_press_event' , mouseClick )@\\
 \mbox{}\verb@      @\\
 \mbox{}\verb@keyPress     = wrapperkeyPressHandler(fig,ax, run)@\\
@@ -1032,7 +1051,7 @@ experimental algorithm papers when he talks about algorithms for the TSP.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb23a}{23a}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb24a}{24a}.
 
 \item{}
 \end{list}
@@ -1045,7 +1064,7 @@ experimental algorithm papers when he talks about algorithms for the TSP.
 calling various horsefly algorithms. 
 
 \begin{flushleft} \small\label{scrap18}\raggedright\small
-\NWtarget{nuweb28}{} $\langle\,${\itshape Local data-structures for classic horsefly}\nobreak\ {\footnotesize {28}}$\,\rangle\equiv$
+\NWtarget{nuweb29}{} $\langle\,${\itshape Local data-structures for classic horsefly}\nobreak\ {\footnotesize {29}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@class HorseFlyInput:@\\
@@ -1106,7 +1125,7 @@ calling various horsefly algorithms.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb23a}{23a}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb24a}{24a}.
 
 \item{}
 \end{list}
@@ -1116,6 +1135,10 @@ Now that all the boring boiler-plate and handler codes have been
 written, its finally time for algorithmic ideas and implementations! 
 Every algorithm is given an algorithmic overview followed by the 
 detailed steps woven together with the source code. 
+
+Any local utility functions, needed for algorithmic or graphing purposes 
+are collected at the end of this chapter. 
+
 \newpage
 
 
@@ -1125,7 +1148,7 @@ detailed steps woven together with the source code.
 
 \subsection{Algorithmic Details}
 \begin{flushleft} \small\label{scrap19}\raggedright\small
-\NWtarget{nuweb30}{} $\langle\,${\itshape Algorithms for classic horsefly}\nobreak\ {\footnotesize {30}}$\,\rangle\equiv$
+\NWtarget{nuweb31}{} $\langle\,${\itshape Algorithms for classic horsefly}\nobreak\ {\footnotesize {31}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@   @\\
@@ -1198,7 +1221,126 @@ detailed steps woven together with the source code.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb23a}{23a}.
+\item \NWtxtMacroDefBy\ \NWlink{nuweb31}{31}\NWlink{nuweb32}{, 32}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb24a}{24a}.
+
+\item{}
+\end{list}
+\vspace{4ex}
+\end{flushleft}
+\begin{flushleft} \small\label{scrap20}\raggedright\small
+\NWtarget{nuweb32}{} $\langle\,${\itshape Algorithms for classic horsefly}\nobreak\ {\footnotesize {32}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@@\\
+\mbox{}\verb@#################################################################################@\\
+\mbox{}\verb@## ALGORITHMS FOR SINGLE HORSE SINGLE FLY SERVICING THE SITES IN THE GIVEN ORDER@\\
+\mbox{}\verb@#################################################################################@\\
+\mbox{}\verb@def algo_exact_given_specific_ordering (sites, horseflyinit, phi):@\\
+\mbox{}\verb@    """ Use the given ordering of sites to compute a good tour @\\
+\mbox{}\verb@    for the horse.@\\
+\mbox{}\verb@    """@\\
+\mbox{}\verb@    def ith_leg_constraint(i, horseflyinit, phi, sites):@\\
+\mbox{}\verb@        """ For the ith segment of the horsefly tour@\\
+\mbox{}\verb@        this function returns a constraint function which @\\
+\mbox{}\verb@        models the fact that the time taken by the fly @\\
+\mbox{}\verb@        is equal to the time taken by the horse along @\\
+\mbox{}\verb@        that particular segment.@\\
+\mbox{}\verb@        """@\\
+\mbox{}\verb@        if i == 0 :@\\
+\mbox{}\verb@            def _constraint_function(x):@\\
+\mbox{}\verb@            @\\
+\mbox{}\verb@                #print "Constraint  ", i@\\
+\mbox{}\verb@                start = np.array (horseflyinit)@\\
+\mbox{}\verb@                site  = np.array (sites[0])@\\
+\mbox{}\verb@                stop  = np.array ([x[0],x[1]])@\\
+\mbox{}\verb@            @\\
+\mbox{}\verb@                horsetime = np.linalg.norm( stop - start )@\\
+\mbox{}\verb@            @\\
+\mbox{}\verb@                flytime_to_site   = 1/phi * np.linalg.norm( site - start )@\\
+\mbox{}\verb@                flytime_from_site = 1/phi * np.linalg.norm( stop - site  )@\\
+\mbox{}\verb@                flytime           = flytime_to_site + flytime_from_site@\\
+\mbox{}\verb@                return horsetime-flytime@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@            return _constraint_function@\\
+\mbox{}\verb@        else :@\\
+\mbox{}\verb@          @\\
+\mbox{}\verb@            def _constraint_function(x):@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@               #print "Constraint  ", i@\\
+\mbox{}\verb@               start = np.array (  [x[2*i-2], x[2*i-1]]  ) @\\
+\mbox{}\verb@               site  = np.array (  sites[i])@\\
+\mbox{}\verb@               stop  = np.array (  [x[2*i]  , x[2*i+1]]  )@\\
+\mbox{}\verb@            @\\
+\mbox{}\verb@               horsetime = np.linalg.norm( stop - start )@\\
+\mbox{}\verb@           @\\
+\mbox{}\verb@               flytime_to_site   = 1/phi * np.linalg.norm( site - start )@\\
+\mbox{}\verb@               flytime_from_site = 1/phi * np.linalg.norm( stop - site  )@\\
+\mbox{}\verb@               flytime           = flytime_to_site + flytime_from_site@\\
+\mbox{}\verb@               return horsetime-flytime@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@            return _constraint_function@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    def generate_constraints(horseflyinit, phi, sites):@\\
+\mbox{}\verb@        """ Given input data, of the problem generate the @\\
+\mbox{}\verb@        constraint list for each leg of the tour. The number@\\
+\mbox{}\verb@        of legs is equal to the number of sites for the case @\\
+\mbox{}\verb@        of single horse, single drone@\\
+\mbox{}\verb@        """@\\
+\mbox{}\verb@        cons = []@\\
+\mbox{}\verb@        for i in range(len(sites)):@\\
+\mbox{}\verb@            cons.append( { 'type':'eq',@\\
+\mbox{}\verb@                            'fun': ith_leg_constraint(i,horseflyinit,phi, sites) } )@\\
+\mbox{}\verb@        return cons@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    @\\
+\mbox{}\verb@    cons = generate_constraints(horseflyinit, phi, sites)@\\
+\mbox{}\verb@    # Since the horsely tour lies inside the square,@\\
+\mbox{}\verb@    # the bounds for each coordinate is 0 and 1@\\
+\mbox{}\verb@    #x0 = np.empty(2*len(sites))@\\
+\mbox{}\verb@    #x0.fill(0.5) # choice of filling vector with 0.5 is arbitrary@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    x0 = utils_algo.flatten_list_of_lists(sites) # the initial choice is just the sites@\\
+\mbox{}\verb@    assert(len(x0) == 2*len(sites))@\\
+\mbox{}\verb@    x0 = np.array(x0)@\\
+\mbox{}\verb@    @\\
+\mbox{}\verb@    sol = minimize(tour_length(horseflyinit), x0, method= 'SLSQP', constraints=cons, options={'maxiter':500})@\\
+\mbox{}\verb@    @\\
+\mbox{}\verb@    tour_points = utils_algo.pointify_vector(sol.x)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    # return the waiting times for the horse@\\
+\mbox{}\verb@    numsites            = len(sites)@\\
+\mbox{}\verb@    alpha               = horseflyinit[0]@\\
+\mbox{}\verb@    beta                = horseflyinit[1]@\\
+\mbox{}\verb@    s                   = utils_algo.flatten_list_of_lists(sites)@\\
+\mbox{}\verb@    horse_waiting_times = np.zeros(numsites)@\\
+\mbox{}\verb@    ps                  = sol.x@\\
+\mbox{}\verb@    for i in range(numsites):@\\
+\mbox{}\verb@        if i == 0 :@\\
+\mbox{}\verb@            horse_time         = np.sqrt((ps[0]-alpha)**2 + (ps[1]-beta)**2)@\\
+\mbox{}\verb@            fly_time_to_site   = 1.0/phi * np.sqrt((s[0]-alpha)**2 + (s[1]-beta)**2 )@\\
+\mbox{}\verb@            fly_time_from_site = 1.0/phi * np.sqrt((s[0]-ps[1])**2 + (s[1]-ps[1])**2)@\\
+\mbox{}\verb@        else:@\\
+\mbox{}\verb@            horse_time         = np.sqrt((ps[2*i]-ps[2*i-2])**2 + (ps[2*i+1]-ps[2*i-1])**2)@\\
+\mbox{}\verb@            fly_time_to_site   = 1.0/phi * np.sqrt(( (s[2*i]-ps[2*i-2])**2 + (s[2*i+1]-ps[2*i-1])**2 )) @\\
+\mbox{}\verb@            fly_time_from_site = 1.0/phi * np.sqrt(( (s[2*i]-ps[2*i])**2   + (s[2*i+1]-ps[2*i+1])**2 )) @\\
+\mbox{}\verb@@\\
+\mbox{}\verb@        horse_waiting_times[i] = horse_time - (fly_time_to_site + fly_time_from_site)@\\
+\mbox{}\verb@    @\\
+\mbox{}\verb@    return {'tour_points'                : tour_points,@\\
+\mbox{}\verb@            'horse_waiting_times'        : horse_waiting_times, @\\
+\mbox{}\verb@            'site_ordering'              : sites,@\\
+\mbox{}\verb@            'tour_length_with_waiting_time_included': tour_length_with_waiting_time_included(tour_points, horse_waiting_times, horseflyinit)}@\\
+\mbox{}\verb@   @\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroDefBy\ \NWlink{nuweb31}{31}\NWlink{nuweb32}{, 32}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb24a}{24a}.
 
 \item{}
 \end{list}
@@ -1216,8 +1358,8 @@ detailed steps woven together with the source code.
 
    This is in other words the objective function. 
 
-\begin{flushleft} \small\label{scrap20}\raggedright\small
-\NWtarget{nuweb31}{} $\langle\,${\itshape Local utility functions for classic horsefly}\nobreak\ {\footnotesize {31}}$\,\rangle\equiv$
+\begin{flushleft} \small\label{scrap21}\raggedright\small
+\NWtarget{nuweb35a}{} $\langle\,${\itshape Local utility functions for classic horsefly}\nobreak\ {\footnotesize {35a}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@   @\\
@@ -1243,8 +1385,8 @@ detailed steps woven together with the source code.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroDefBy\ \NWlink{nuweb31}{31}\NWlink{nuweb32}{, 32}.
-\item \NWtxtMacroRefIn\ \NWlink{nuweb23a}{23a}.
+\item \NWtxtMacroDefBy\ \NWlink{nuweb35a}{35a}\NWlink{nuweb35b}{b}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb24a}{24a}.
 
 \item{}
 \end{list}
@@ -1256,8 +1398,8 @@ detailed steps woven together with the source code.
       each link of the tour. Again note that because 
       speed of horse = 1, we can add ``time'' to ``distance''. 
 
-\begin{flushleft} \small\label{scrap21}\raggedright\small
-\NWtarget{nuweb32}{} $\langle\,${\itshape Local utility functions for classic horsefly}\nobreak\ {\footnotesize {32}}$\,\rangle\equiv$
+\begin{flushleft} \small\label{scrap22}\raggedright\small
+\NWtarget{nuweb35b}{} $\langle\,${\itshape Local utility functions for classic horsefly}\nobreak\ {\footnotesize {35b}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@   @\\
@@ -1288,8 +1430,8 @@ detailed steps woven together with the source code.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroDefBy\ \NWlink{nuweb31}{31}\NWlink{nuweb32}{, 32}.
-\item \NWtxtMacroRefIn\ \NWlink{nuweb23a}{23a}.
+\item \NWtxtMacroDefBy\ \NWlink{nuweb35a}{35a}\NWlink{nuweb35b}{b}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb24a}{24a}.
 
 \item{}
 \end{list}
@@ -1298,8 +1440,8 @@ detailed steps woven together with the source code.
 \section{Plotting Routines}
 \newchunk 
 
-\begin{flushleft} \small\label{scrap22}\raggedright\small
-\NWtarget{nuweb33}{} $\langle\,${\itshape Plotting routines for classic horsefly}\nobreak\ {\footnotesize {33}}$\,\rangle\equiv$
+\begin{flushleft} \small\label{scrap23}\raggedright\small
+\NWtarget{nuweb36}{} $\langle\,${\itshape Plotting routines for classic horsefly}\nobreak\ {\footnotesize {36}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@ @\\
@@ -1377,7 +1519,7 @@ detailed steps woven together with the source code.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb23a}{23a}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb24a}{24a}.
 
 \item{}
 \end{list}
@@ -1399,25 +1541,25 @@ detailed steps woven together with the source code.
 
 {\small\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \verb@"../main.py"@ {\footnotesize {\NWtxtDefBy} \NWlink{nuweb13}{13}.}
-\item \verb@"../src/lib/problem_classic_horsefly.py"@ {\footnotesize {\NWtxtDefBy} \NWlink{nuweb23a}{23a}.}
-\item \verb@"../src/lib/utils_algo.py"@ {\footnotesize {\NWtxtDefBy} \NWlink{nuweb18}{18}\NWlink{nuweb19}{, 19}\NWlink{nuweb20a}{, 20a}\NWlink{nuweb20b}{b}\NWlink{nuweb21}{, 21}.
+\item \verb@"../src/lib/problem_classic_horsefly.py"@ {\footnotesize {\NWtxtDefBy} \NWlink{nuweb24a}{24a}.}
+\item \verb@"../src/lib/utils_algo.py"@ {\footnotesize {\NWtxtDefBy} \NWlink{nuweb19}{19}\NWlink{nuweb20a}{, 20a}\NWlink{nuweb20b}{b}\NWlink{nuweb21a}{, 21a}\NWlink{nuweb21b}{b}.
 }
-\item \verb@"../src/lib/utils_graphics.py"@ {\footnotesize {\NWtxtDefBy} \NWlink{nuweb15}{15}\NWlink{nuweb16a}{, 16a}\NWlink{nuweb16b}{b}\NWlink{nuweb17}{, 17}.
+\item \verb@"../src/lib/utils_graphics.py"@ {\footnotesize {\NWtxtDefBy} \NWlink{nuweb15}{15}\NWlink{nuweb16}{, 16}\NWlink{nuweb17a}{, 17a}\NWlink{nuweb17b}{b}.
 }
 \end{list}}
 \chapter{Index of Fragments}
 
 {\small\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item $\langle\,$Algorithms for classic horsefly\nobreak\ {\footnotesize \NWlink{nuweb30}{30}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb23a}{23a}.}
-\item $\langle\,$Clear canvas and states of all objects\nobreak\ {\footnotesize \NWlink{nuweb27a}{27a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb24a}{24a}.}
-\item $\langle\,$Define key-press handler\nobreak\ {\footnotesize \NWlink{nuweb24a}{24a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb23a}{23a}.}
-\item $\langle\,$Generate a bunch of uniform or non-uniform random points on the canvas\nobreak\ {\footnotesize \NWlink{nuweb26}{26}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb24a}{24a}.}
-\item $\langle\,$Local data-structures for classic horsefly\nobreak\ {\footnotesize \NWlink{nuweb28}{28}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb23a}{23a}.}
-\item $\langle\,$Local utility functions for classic horsefly\nobreak\ {\footnotesize \NWlink{nuweb31}{31}\NWlink{nuweb32}{, 32}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb23a}{23a}.}
-\item $\langle\,$Plotting routines for classic horsefly\nobreak\ {\footnotesize \NWlink{nuweb33}{33}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb23a}{23a}.}
-\item $\langle\,$Relevant imports for classic horsefly\nobreak\ {\footnotesize \NWlink{nuweb23b}{23b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb23a}{23a}.}
-\item $\langle\,$Set up interactive canvas\nobreak\ {\footnotesize \NWlink{nuweb27b}{27b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb23a}{23a}.}
-\item $\langle\,$Start entering input from the command-line\nobreak\ {\footnotesize \NWlink{nuweb24b}{24b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb24a}{24a}.}
+\item $\langle\,$Algorithms for classic horsefly\nobreak\ {\footnotesize \NWlink{nuweb31}{31}\NWlink{nuweb32}{, 32}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb24a}{24a}.}
+\item $\langle\,$Clear canvas and states of all objects\nobreak\ {\footnotesize \NWlink{nuweb28a}{28a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb25}{25}.}
+\item $\langle\,$Define key-press handler\nobreak\ {\footnotesize \NWlink{nuweb25}{25}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb24a}{24a}.}
+\item $\langle\,$Generate a bunch of uniform or non-uniform random points on the canvas\nobreak\ {\footnotesize \NWlink{nuweb27}{27}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb25}{25}.}
+\item $\langle\,$Local data-structures for classic horsefly\nobreak\ {\footnotesize \NWlink{nuweb29}{29}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb24a}{24a}.}
+\item $\langle\,$Local utility functions for classic horsefly\nobreak\ {\footnotesize \NWlink{nuweb35a}{35a}\NWlink{nuweb35b}{b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb24a}{24a}.}
+\item $\langle\,$Plotting routines for classic horsefly\nobreak\ {\footnotesize \NWlink{nuweb36}{36}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb24a}{24a}.}
+\item $\langle\,$Relevant imports for classic horsefly\nobreak\ {\footnotesize \NWlink{nuweb24b}{24b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb24a}{24a}.}
+\item $\langle\,$Set up interactive canvas\nobreak\ {\footnotesize \NWlink{nuweb28b}{28b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb24a}{24a}.}
+\item $\langle\,$Start entering input from the command-line\nobreak\ {\footnotesize \NWlink{nuweb26}{26}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb25}{25}.}
 \end{list}}
 \chapter{Index of Identifiers}
  
