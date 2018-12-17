@@ -1,4 +1,4 @@
-\documentclass[12pt]{report}
+\documentclass[11pt]{report}
 \input{standard_settings.tex}
 \usepackage{tocloft}
 \renewcommand{\cftpartfont}{\LARGE\itshape} % Part title in Huge Italic font
@@ -39,6 +39,7 @@
 @i installation-and-use.web
 \part{Programs}
 @i overview-of-code-base.web
+@i utility-functions.web
 @i problem-classic-horsefly.web
 @i problem-segment-horsefly.web
 @i problem-fixed-route-horsefly.web

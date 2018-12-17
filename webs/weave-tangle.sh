@@ -2,7 +2,7 @@
 set -e
 cd ../tex
 echo "\begin{verbatim}"  > directory-tree.tex
-tree -I '*.log|README.md|clean.sh|*.out|*.pre|*.toc|*.aux|_minted*|*~|docs' --charset=ascii ..  >> directory-tree.tex
+tree -I '*.log|README.md|clean.sh|*.out|*.pre|*.toc|*.aux|_minted*|*~|docs|*.pyc' --charset=ascii ..  >> directory-tree.tex
 echo "\end{verbatim}"   >> directory-tree.tex
 
 main_web_file="../webs/horseflies.web"

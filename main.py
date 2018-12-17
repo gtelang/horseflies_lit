@@ -1,8 +1,10 @@
 
 import sys
+sys.path.append('src/lib')
+
 import problem_classic_horsefly as chf
-import problem_segment_horsefly as shf
-import problem_one_horse_two_flies as oh2f
+#import problem_segment_horsefly as shf
+#import problem_one_horse_two_flies as oh2f
    
 if __name__=="__main__":
      # Select algorithm or experiment 

@@ -1,7 +1,6 @@
 \chapter{Classic Horsefly}
 \label{chap:classic-horsefly}
 
-
 \section{Module Overview}
 
 \newchunk 
@@ -12,33 +11,42 @@ module. This function is called from \verb|main.py| which then processes the
 command-line arguments and runs the experimental or interactive sections of
 the code. 
 
-@o ../src/lib/problem_classic_horsefly.py -cp
+@O ../src/lib/problem_classic_horsefly.py -cp
 @{    
 @< Relevant imports for classic horsefly @>
 def run_handler():
     @< Define key-press handler  @>
     @< Set up interactive canvas @>
+
+@< Local data-structures for classic horsefly @>
+@< Local utility functions for classic horsefly @>
 @< Algorithms for classic horsefly @>
+@< Plotting routines for classic horsefly @>
 @|  @}
 
 \section{Module Details}
 
 \newchunk 
 @D Relevant imports for classic horsefly
-@{import sys
-import argparse
-import pprint as pp
-import matplotlib.pyplot as plt
-import matplotlib as mpl
-from   matplotlib import rc
+@{
+from matplotlib import rc
 from colorama import Fore
 from colorama import Style
-import os
-import randomcolor 
+from scipy.optimize import minimize
+from sklearn.cluster import KMeans
+import argparse
+import itertools
+import math
+import matplotlib as mpl
+import matplotlib.pyplot as plt
 import numpy as np
-import classic_horsefly as chf
-import algo_utils
-import graphics_utils
+import os
+import pprint as pp
+import randomcolor 
+import sys
+import time
+import utils_algo
+import utils_graphics
 @| @}
 
 
@@ -61,7 +69,6 @@ def wrapperkeyPressHandler(fig,ax, run):
            elif event.key in ['c', 'C']: 
                 @< Clear canvas and states of all objects @>
 @| @}
-
 
 \newchunk 
 @D Start entering input from the command-line
@@ -87,49 +94,49 @@ algo_str = algo_str.lstrip()
 clearAxPolygonPatches(ax)
 
 if   algo_str == 'e':
-      horseflytour = 
-             run.getTour( chf.algo_dumb,
+      horseflytour = \
+             run.getTour( algo_dumb,
                           phi )
 elif algo_str == 'k': 
-      horseflytour = 
-             run.getTour( chf.algo_kmeans,
+      horseflytour = \
+             run.getTour( algo_kmeans,
                           phi,
                           k=2,
-                          post_optimizer=chf.algo_exact_given_specific_ordering)
+                          post_optimizer=algo_exact_given_specific_ordering)
       print " "
       print Fore.GREEN, answer['tour_points'], Style.RESET_ALL
 elif algo_str == 'kl':
-      horseflytour = 
-             run.getTour( chf.algo_kmeans,
+      horseflytour = \
+             run.getTour( algo_kmeans,
                           phi,
                           k=2,
-                          post_optimizer=chf.algo_approximate_L1_given_specific_ordering)
+                          post_optimizer=algo_approximate_L1_given_specific_ordering)
 elif algo_str == 't':
-      horseflytour = 
-             run.getTour( chf.algo_tsp_ordering,
+      horseflytour = \
+             run.getTour( algo_tsp_ordering,
                           phi,
-                          post_optimizer=chf.algo_exact_given_specific_ordering)
+                          post_optimizer=algo_exact_given_specific_ordering)
 elif algo_str == 'tl':
-      horseflytour = 
-             run.getTour( chf.algo_tsp_ordering,
+      horseflytour = \
+             run.getTour( algo_tsp_ordering,
                           phi,
-                          post_optimizer= chf.algo_approximate_L1_given_specific_ordering)
- elif algo_str == 'g':
-      horseflytour = 
-             run.getTour( chf.algo_greedy,
+                          post_optimizer= algo_approximate_L1_given_specific_ordering)
+elif algo_str == 'g':
+      horseflytour = \
+             run.getTour( algo_greedy,
                           phi,
-                          post_optimizer= chf.algo_exact_given_specific_ordering)
+                          post_optimizer= algo_exact_given_specific_ordering)
 elif algo_str == 'gl':
-      horseflytour = 
-             run.getTour( chf.algo_greedy,
+      horseflytour = \
+             run.getTour( algo_greedy,
                           phi,
-                          post_optimizer= chf.algo_approximate_L1_given_specific_ordering)
+                          post_optimizer= algo_approximate_L1_given_specific_ordering)
 else:
       print "Unknown option. No horsefly for you! ;-D "
       sys.exit()
 
 #print horseflytour['tour_points']
-chf.plotTour(ax,horseflytour, run.inithorseposn, phi, algo_str)
+plotTour(ax,horseflytour, run.inithorseposn, phi, algo_str)
 applyAxCorrection(ax)
 fig.canvas.draw()
 @| @}
@@ -154,7 +161,7 @@ fig.texts = []
                  
 import scipy
 if event.key in ['n', 'N']: # Non-uniform random points
-        run.sites = algo_utils.bunch_of_random_points(numpts)
+        run.sites = utils_algo.bunch_of_random_points(numpts)
 else : # Uniform random points
         run.sites = scipy.rand(numpts,2).tolist()
 
@@ -170,7 +177,7 @@ fig.canvas.draw()
 
 \newchunk 
 
-@d Clear canvas and states of all objects
+@D Clear canvas and states of all objects
 @{run.clearAllStates()
 ax.cla()
               
@@ -183,9 +190,9 @@ fig.canvas.draw()
 @| @}
 
 \newchunk 
-@d Set up interactive canvas
+@D Set up interactive canvas
 @{fig, ax =  plt.subplots()
-run = chf.HorseFlyInput()
+run = HorseFlyInput()
 #print run
     
 ax.set_xlim([xlim[0], xlim[1]])
@@ -202,38 +209,220 @@ fig.canvas.mpl_connect('key_press_event', keyPress   )
 plt.show()
 @| @}
 
+
+
+\section{Local Data Structures}
+
+
+\newchunk This class manages the input and the output of the result of 
+calling various horsefly algorithms. 
+
+@D Local data-structures for classic horsefly
+@{class HorseFlyInput:
+      def __init__(self, sites=[], inithorseposn=()):
+           self.sites         = sites
+           self.inithorseposn = inithorseposn
+
+           
+      def clearAllStates (self):
+          """ Set the sites to an empty list and initial horse position 
+          to the empty tuple.
+          """
+          self.sites = []
+          self.inithorseposn = ()
+
+          
+      def getTour(self, algo, speedratio, k=None, post_optimizer=None):
+          """ This method runs an appropriate algorithm for calculating
+          a horsefly tour. The list of possible algorithms are 
+          inside this module prefixed with 'algo_'
+          
+          The output is a dictionary of size 2, containing two lists,
+          - Contains the vertices of the polygonal 
+            path taken by the horse
+          - The list of sites in the order 
+            in which they are serviced by the tour, i.e. the order 
+            in which the sites are serviced by the fly.
+          """
+
+          if k==None and post_optimizer==None:
+                return algo(self.sites, self.inithorseposn, speedratio)
+          elif k == None:
+                return algo(self.sites, self.inithorseposn, speedratio, post_optimizer)
+          else:
+                #print Fore.RED, self.sites, Style.RESET_ALL
+                return algo(self.sites, self.inithorseposn, speedratio, k, post_optimizer)
+          
+      def __repr__(self):
+          """ Printed Representation of the Input for HorseFly
+          """
+          if self.sites != []:
+              tmp = ''
+              for site in self.sites:
+                  tmp = tmp + '\n' + str(site)
+              sites = "The list of sites to be serviced are " + tmp    
+          else:
+              sites = "The list of sites is empty"
+
+          if self.inithorseposn != ():
+              inithorseposn = "\nThe initial position of the horse is " + \
+                               str(self.inithorseposn)
+          else:
+              inithorseposn = "\nThe initial position of the horse has not been specified"
+              
+          return sites + inithorseposn
+@| @}
+
+
 Now that all the boring boiler-plate and handler codes have been 
 written, its finally time for algorithmic ideas and implementations! 
 Every algorithm is given an algorithmic overview followed by the 
 detailed steps woven together with the source code. 
-
 \newpage
 
-\section{Algorithm: Dumb Exact} 
+@i algo-greedy-nn-classic-horsefly.web
 
-\subsection{Overview} 
-\blindtext
 
-\subsection{Algorithmic Details}
+\section{Local Utility Functions}
 
-@d Algorithms for classic horsefly 
+\newchunk  For a given initial position of horse and fly
+   return a function computing the tour length. 
+   The returned function computes the tour length 
+   in the order of the list of stops provided beginning 
+   with the initial position of horse and fly. Since 
+   the horse speed = 1, the tour length = time taken 
+   by horse to traverse the route.
+
+   This is in other words the objective function. 
+
+@D Local utility functions for classic horsefly
 @{   
+def tour_length(horseflyinit):
+   def _tourlength (x):
+         
+        # the first point on the tour is the
+        # initial position of horse and fly
+        # Append this to the solution x = [x0,x1,x2,....]
+        # at the front
+        htour = np.append(horseflyinit, x)
+        length = 0 
+
+        for i in range(len(htour))[:-3:2]:
+                length = length + \
+                         np.linalg.norm([htour[i+2] - htour[i], \
+                                         htour[i+3] - htour[i+1]]) 
+        return length
+
+   return _tourlength
+@}
+
+
+\newchunk It is possible that some heuristics might return non-negligible
+      waiting times. Hence I am writing a separate function which
+      adds the waiting time (if it is positive) to the length of 
+      each link of the tour. Again note that because 
+      speed of horse = 1, we can add ``time'' to ``distance''. 
+
+@D Local utility functions for classic horsefly
+@{   
+def tour_length_with_waiting_time_included(tour_points, horse_waiting_times, horseflyinit):
+      tour_points   = np.asarray([horseflyinit] + tour_points)
+      tour_links    = zip(tour_points, tour_points[1:])
+
+      # the +1 because the inital position has been tacked on at the beginning
+      # the solvers written the tour points except for the starting position
+      # because that is known and part of the input. For this function
+      # I need to tack it on for tour length
+      assert(len(tour_points) == len(horse_waiting_times)+1) 
+
+      sum = 0
+      for i in range(len(horse_waiting_times)):
+
+          # Negative waiting times means drone/fly was waiting
+          # at rendezvous point
+          if horse_waiting_times[i] >= 0:
+              wait = horse_waiting_times[i]
+          else:
+              wait = 0
+              
+          sum += wait + np.linalg.norm(tour_links[i][0] - tour_links[i][1], ord=2) # 
+      return sum
 @| @}
 
 
-\section{Algorithm: Greedy - Nearest Neighbor}  \blindtext
 
-@d Algorithms for classic horsefly 
-@{   
-@| @}
+\section{Plotting Routines}
+\newchunk 
 
-\section{\sf{Algorithm:} K2means} \blindtext 
-@d Algorithms for classic horsefly 
-@{   
-@| @}
+@D Plotting routines for classic horsefly 
+@{ 
+def plotTour(ax,horseflytour, horseflyinit, phi, algo_str, tour_color='#d13131'):
+    """ Plot the tour on the given canvas area
+    """
+   
+    # Route for the horse
+    xhs, yhs = [horseflyinit[0]], [horseflyinit[1]]
+    for pt in horseflytour['tour_points']:
+        xhs.append(pt[0])
+        yhs.append(pt[1])
+
+    # List of sites
+    xsites, ysites = [], []
+    for pt in horseflytour['site_ordering']:
+        xsites.append(pt[0])
+        ysites.append(pt[1])
+
+    # Route for the fly. The fly keeps alternating
+    # between the site and the horse
+    xfs , yfs = [xhs[0]], [yhs[0]]
+    for site, pt in zip (horseflytour['site_ordering'],
+                         horseflytour['tour_points']):
+        xfs.extend([site[0], pt[0]])
+        yfs.extend([site[1], pt[1]])
+
+    print "\n----------"
+    print "Horse Tour"
+    print "-----------"
+    waiting_times = [0.0] + horseflytour['horse_waiting_times'].tolist() # the waiting time at the starting point is 0
+    #print waiting_times
+    for pt, time in zip(zip(xhs,yhs), waiting_times) :
+        print pt, Fore.GREEN, " ---> Horse Waited ", time, Style.RESET_ALL
+
+    print "\n----------"
+    print "Fly Tour"
+    print "----------"
+    for item, i in zip(zip(xfs,yfs), range(len(xfs))):
+        if i%2 == 0:
+           print item
+        else :
+           print Fore.RED + str(item) + "----> Site" +  Style.RESET_ALL
+
+    print "----------------------------------"
+    print Fore.GREEN, "\nSpeed of the drone was set to be", phi
+    #tour_length = utils_algo.length_polygonal_chain( zip(xhs, yhs))
+    tour_length = horseflytour['tour_length_with_waiting_time_included']
+    print "Tour length of the horse is ",  tour_length
+    print "Algorithm code-Key used "    , algo_str, Style.RESET_ALL
+    print "----------------------------------\n"
+           
+    #kwargs = {'size':'large'}
+    for x,y,i in zip(xsites, ysites, range(len(xsites))):
+          ax.text(x, y, str(i+1), bbox=dict(facecolor='#ddcba0', alpha=1.0)) 
+    ax.plot(xfs,yfs,'g-') # fly tour is green
+    ax.plot(xhs, yhs, color=tour_color, marker='s', linewidth=3.0) # horse is red
 
 
-\section{Algorithm: Greedy - Incremental Insertion} \blindtext 
-@d Algorithms for classic horsefly 
-@{   
+    # Initial position of horse and fly
+    ax.add_patch( mpl.patches.Circle( horseflyinit,
+                                      radius = 1/34.0,
+                                      facecolor= '#D13131', #'red',
+                                      edgecolor='black'   )  )
+
+
+    fontsize = 10
+    tnrfont = {'fontname':'Times New Roman'}
+    ax.set_title(  'Algorithm Used: ' + algo_str +  '\nTour Length: ' \
+                    + str(tour_length)[:7], fontdict={'fontsize':fontsize}, **tnrfont)
+    ax.set_xlabel('Number of sites: ' + str(len(xsites)) + '\nDrone Speed: ' + str(phi) ,
+                  fontdict={'fontsize':fontsize}, **tnrfont)
 @| @}
