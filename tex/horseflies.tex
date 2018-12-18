@@ -236,17 +236,23 @@ script \texttt{weave-tangle.sh} in the \texttt{webs} directory.
 
 \section{The Main Files} 
 
-
-\newchunk Each of the files with prefix \texttt{problem-*}  contain implmentations of 
- algorithms for one specific problem. Thus \texttt{problem-watchman-horsefly.py} 
+\newchunk Each of the files with prefix ``\verb|problem_*|'' contain implmentations of 
+ algorithms for one specific problem. For instance \verb|problem_watchman_horsefly.py| 
  contains algorithms for approximately solving the Watchman Horsefly problem. 
+ 
+ Since Horsefly-type problems are typically NP-hard, an important factor in 
+ the subsequent experimental analysis will require, comparing an algorithm's  
+ output against good lower bounds. Hence each such file, will also collect routines
+ for efficiently computing or approximating various lower-bounds for the corresponding
+ problem's \textit{OPT}. 
+
 
  All such files are in the directory \texttt{src/lib/}
 
-\newchunk Similarly, each of the files with prefix \texttt{expt-*} contain code
+\newchunk Similarly, each of the files with prefix ``\verb|expt_*|'' contain code
  for testing hypotheses regarding a problem, generating counter-examples or 
  comparing the experimental performance of the algorithm implementations 
- for each of the problems. Thus \texttt{expt-watchman-horsefly.py} contains 
+ for each of the problems. Thus \verb|expt_watchman_horsefly.py| contains 
  code for performing experiments related to the Watchman Horsefly problem. 
 
  All such files are in the directory \texttt{src/expt/}
