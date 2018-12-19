@@ -3,9 +3,10 @@ NOTE: {\footnotesize The style of presentation in this chapter has been adapted 
 Chapter 2 of the Nuweb reference manual \url{http://nuweb.sourceforge.net/nuweb.pdf}}
 
 Almost all of the code has been written in Python 2.7 and tested using the standard CPython
-implementation of the language. In some cases, calls will be made to external C\texttt{++} libraries (mostly CGAL and VTK) 
-using SWIG (\url{http://www.swig.org/}). This is either for speeding up a slow 
-routine or to use a function that is not available in any existing Python package.
+implementation of the language. In some cases, calls will be made to external C\texttt{++} 
+libraries (mostly CGAL and VTK) using SWIG (\url{http://www.swig.org/}). This is either 
+for speeding up a slow routine or to use a function that is not available in any existing 
+Python package.
 
 \section{Source Tree}
 \input{directory-tree.tex}
@@ -127,7 +128,6 @@ if __name__=="__main__":
  routines across the entire code-base have been written in files with prefix
  \verb|test_*|.  
  
- Every problem, utility, and experimental files in \verb|src/lib| and \verb|src/expts | has 
- a corresponding test-file in this folder. 
-
+ Every problem, utility, and experimental files in \verb|src/lib| and \verb|src/expts| 
+ has a corresponding test-file in this folder. 
 \end{alphalist}
