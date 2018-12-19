@@ -1,6 +1,4 @@
 \chapter{Overview of the Code Base}
-NOTE: {\footnotesize The style of presentation in this chapter has been adapted from 
-Chapter 2 of the Nuweb reference manual \url{http://nuweb.sourceforge.net/nuweb.pdf}}
 
 Almost all of the code has been written in Python 2.7 and tested using the standard CPython
 implementation of the language. In some cases, calls will be made to external C\texttt{++} 
@@ -29,8 +27,8 @@ There are three principal directories
 \end{itemize}  
 
 The files in \texttt{src} and \texttt{tex} should not be touched. Any editing required should 
-be done to the \texttt{.web} files, which should then be weaved and tangled using the
-script \texttt{weave-tangle.sh} in the \texttt{webs} directory. 
+be done directly to the \texttt{.web} files. These .web files should then be weaved and tangled 
+using thescript \texttt{weave-tangle.sh} in the \texttt{webs} directory. 
 
 \section{The Main Files} 
 
