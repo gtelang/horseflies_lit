@@ -12,12 +12,19 @@ routine or to use a function that is not available in any existing Python packag
 
 There are three principal directories 
 \begin{itemize}
- \item[\texttt{webs/}] This contains the source code for the entire project written in the nuweb format along with documents (mostly images)
-                       needed during the compilation of the \LaTeX{} files which will be extracted from the \texttt{.web} files. 
- \item[\texttt{src/}] This contains the source code for the entire project ``tangled'' (i.e. extracted) from the \texttt{.web} files. 
- \item[\texttt{tex/}] This contains the monolithic \texttt{horseflies.tex} extracted from the \texttt{.web} files and a bunch 
-of other supporing \LaTeX{} files. It also contains the final compiled \texttt{horseflies.pdf} (the current document) which contains the 
-documentation of the project, interwoven with code-chunks and cross-references between them along with the experimental results.  
+ \item[\texttt{src/}] This contains the source code for the entire project ``tangled'' 
+                      (i.e. extracted) from the \texttt{.web} files. 
+ \item[\texttt{tex/}] This contains the monolithic \texttt{horseflies.tex} extracted 
+                      from the \texttt{.web} files and a bunch 
+                      of other supporing \LaTeX{} files. It also contains the final 
+                      compiled \texttt{horseflies.pdf} (the current document) which 
+                      contains the documentation of the project, interwoven with 
+                      code-chunks and cross-references between them along with the 
+                      experimental results.  
+ \item[\texttt{webs/}] This contains the source code for the entire project written in 
+                       the nuweb format along with documents (mostly images)
+                       needed during the compilation of the \LaTeX{} files which will 
+                       be extracted from the \texttt{.web} files. 
 \end{itemize}  
 
 The files in \texttt{src} and \texttt{tex} should not be touched. Any editing required should 
@@ -26,39 +33,53 @@ script \texttt{weave-tangle.sh} in the \texttt{webs} directory.
 
 \section{The Main Files} 
 
-\newchunk Each of the files with prefix ``\verb|problem_*|'' contain implmentations of 
- algorithms for one specific problem. For instance \verb|problem_watchman_horsefly.py| 
- contains algorithms for approximately solving the Watchman Horsefly problem. 
- 
- Since Horsefly-type problems are typically NP-hard, an important factor in 
- the subsequent experimental analysis will require, comparing an algorithm's  
- output against good lower bounds. Each such file, will collect routines
- for efficiently computing or approximating various lower-bounds for the 
- corresponding problem's \textit{OPT}. 
+\newchunk 
+\begin{alphalist}
 
- All such files are in the directory \texttt{src/lib/}
-
-\newchunk Similarly, each of the files with prefix ``\verb|expt_*|'' contain code
- for testing hypotheses regarding a problem, generating counter-examples or 
- comparing the experimental performance of the algorithm implementations 
- for each of the problems. Thus \verb|expt_watchman_horsefly.py| contains 
- code for performing experiments related to the Watchman Horsefly problem. 
-
- All such files are in the directory \texttt{src/expt/}
-
-
-
-
-
-
-\newchunk The file \verb|main.py| in the top-level folder is the \textit{entry-point} for running code. 
-Its only job is to parse the command-line arguments and pass relevant information to the handler 
+\item \crunchy{\texttt{main.py}} The file \verb|main.py| in the top-level folder is the 
+\textit{entry-point} for running code. Its only job is to parse the 
+command-line arguments and pass relevant information to the handler 
 functions for each problem and experiment. 
 
+\item \crunchy{Algorithmic Code} All such files are in the directory \texttt{src/lib/}.
+  Each of the files with prefix ``\verb|problem_*|'' contain implmentations of 
+  algorithms for one specific problem. For instance \verb|problem_watchman_horsefly.py| 
+  contains algorithms for approximately solving the Watchman Horsefly problem. 
+ 
+  Since Horsefly-type problems are typically NP-hard, an important factor in 
+  the subsequent experimental analysis will require, comparing an algorithm's  
+  output against good lower bounds. Each such file, will also have routines
+  for efficiently computing or approximating various lower-bounds for the 
+  corresponding problem's \textit{OPT}. 
+
+\item \crunchy{Experiments} All such files are in the directory \texttt{src/expt/}
+ Each of the files with prefix ``\verb|expt_*|'' 
+ contain code for testing hypotheses regarding a problem, generating 
+ counter-examples or comparing the experimental performance of the 
+ algorithm implementations for each of the problems. Thus 
+ \verb|expt_watchman_horsefly.py| contains 
+ code for performing experiments related to the 
+ Watchman Horsefly problem. 
+\end{alphalist}
+
+
+If you need to edit the source-code for algorithms or experiment 
+you should do so to the \texttt{.web} files in the web directory. Every problem
+has a dedicated \textit{folder} containing source-code for algorithms and experiments 
+pertaining to that problem. Every algorithm and experiment has a dedicated \verb|.web|
+file in these problem directories. Such files are all ``tied'' together using the 
+file with prefix \verb|problem-<problem-name>| in that same directory (i.e.
+the file acts as a kind of handler for each problem, that includes the algorithms
+and experiment \verb|web| files with the \verb|@@i| macro.) 
+
+
+\newchunk Let's define the \verb|main.py| file now. 
+
 Each problem or experiment has a handler routine 
-that effectively acts as a kind of ``main'' function for that module that does some house-keeping duties by 
-parsing the command-line arguments passed  by main, setting up the canvas by calling the appropriate
-graphics routines and calling the algorithms on the input specified through the canvas. 
+that effectively acts as a kind of ``main'' function for that module that 
+does house-keeping duties by parsing the command-line arguments passed by main, 
+setting up the canvas by calling the appropriate graphics routines and calling 
+the algorithms on the input specified through the canvas. 
 
 @o ../main.py -cp 
 @{
@@ -92,19 +113,21 @@ if __name__=="__main__":
 
 
 \section{Support Files}
-\newchunk These files contain common utility functions that will be useful for manipulating
- data-structures, common plotting and graphics routines for all horsefly-type 
- problems. All such files have the prefix \texttt{utils-*}
 
- All such files are in the directory \texttt{src/lib/}
+\begin{alphalist}
+\item \crunchy{Utility Files}  All such utility files are in the directory \texttt{src/lib/}. 
+ These files contain common utility functions that will be useful 
+ for manipulating data-structures, common plotting and graphics routines 
+ for all horsefly-type problems. All such files have the prefix \verb|utils_*|. 
+ These Python files are generated from the single \verb|.web| file \verb|utils.web| 
+ in the \verb|web| subdirectory.
 
-\newchunk To automate testing of code during implementations, tests for various 
+\item \crunchy{Tests} All such files are in the directory \texttt{src/test/}
+ To automate testing of code during implementations, tests for various 
  routines across the entire code-base have been written in files with prefix
- \texttt{test-*}.  
-
- Each of the main files have a corresponding test file. Tests for functions in the 
- support files and experimental files have all been implemented in the files 
- \texttt{test-utilities.py} and \texttt{test-experiments.py} respectively.  
-       
- All such files are in the directory \texttt{src/test/}
+ \verb|test_*|.  
  
+ Every problem, utility, and experimental files in \verb|src/lib| and \verb|src/expts | has 
+ a corresponding test-file in this folder. 
+
+\end{alphalist}

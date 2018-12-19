@@ -256,6 +256,36 @@ def tour_length_with_waiting_time_included(tour_points, horse_waiting_times, hor
 
 # Algorithms for classic horsefly
    
+def algo_dumb(sites, horseflyinit, phi):
+    """ For each of the n factorial ordering of sites
+    find the ordering which gives the smallest horsefly 
+    tour length
+    """
+    
+    tour_length_fn = tour_length(horseflyinit)
+
+    best_tour = algo_exact_given_specific_ordering(sites, horseflyinit, phi)
+
+    i = 0
+    for sites_perm in list(itertools.permutations(sites)):
+        print "Testing a new permutation ", i, " of the sites"; i = i + 1
+          
+        #tour_for_current_perm = algo_exact_given_specific_ordering (sites_perm, \
+        #                                                             horseflyinit, phi) 
+        tour_for_current_perm = algo_exact_given_specific_ordering (sites_perm, \
+                                                                    horseflyinit, phi) 
+        if tour_length_fn(utils_algo.flatten_list_of_lists(tour_for_current_perm ['tour_points']) ) \
+         < tour_length_fn(utils_algo.flatten_list_of_lists(            best_tour ['tour_points']) ):
+                best_tour = tour_for_current_perm
+                
+                print Fore.RED + "Found better tour!" + Style.RESET_ALL
+
+    #print Fore.RED + "\nHorse Waiting times are ",\ 
+    #       best_tour['horse_waiting_times'] , \
+    #       Style.RESET_ALL
+    return best_tour
+
+   
 def algo_greedy(sites, inithorseposn, phi, post_optimizer):
       """
       This implements the greedy algorithm for the canonical greedy
@@ -426,36 +456,6 @@ def algo_exact_given_specific_ordering (sites, horseflyinit, phi):
                                                     horse_waiting_times, 
                                                     horseflyinit)}
    
-   
-def algo_dumb(sites, horseflyinit, phi):
-    """ For each of the n factorial ordering of sites
-    find the ordering which gives the smallest horsefly 
-    tour length
-    """
-    
-    tour_length_fn = tour_length(horseflyinit)
-
-    best_tour = algo_exact_given_specific_ordering(sites, horseflyinit, phi)
-
-    i = 0
-    for sites_perm in list(itertools.permutations(sites)):
-        print "Testing a new permutation ", i, " of the sites"; i = i + 1
-          
-        #tour_for_current_perm = algo_exact_given_specific_ordering (sites_perm, \
-        #                                                             horseflyinit, phi) 
-        tour_for_current_perm = algo_exact_given_specific_ordering (sites_perm, \
-                                                                    horseflyinit, phi) 
-        if tour_length_fn(utils_algo.flatten_list_of_lists(tour_for_current_perm ['tour_points']) ) \
-         < tour_length_fn(utils_algo.flatten_list_of_lists(            best_tour ['tour_points']) ):
-                best_tour = tour_for_current_perm
-                
-                print Fore.RED + "Found better tour!" + Style.RESET_ALL
-
-    #print Fore.RED + "\nHorse Waiting times are ",\ 
-    #       best_tour['horse_waiting_times'] , \
-    #       Style.RESET_ALL
-    return best_tour
-
 
 # Plotting routines for classic horsefly
  
