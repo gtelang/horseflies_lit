@@ -1,4 +1,128 @@
 \section{Algorithm: Greedy---Incremental Insertion}  
+\subsection*{Algorithmic Overview}
+\newchunk The greedy nearest neighbor heuristic described in \autoref{sec:greedy-nn} gives an $O(\log n)$ 
+          approximation for $n$ sites in the plane. However, there exists an alternative greedy incremental 
+          insertion algorithm for the TSP which gives a 2-approximation. Similar to the greedy-nn algorithm 
+          we can generalize the greedy-incremental approach to the collinear-horseflies setting 
+          (cf: \autoref{fig:collinear-horseflies}). 
+\newchunk In this approach, we maintain a list of visited sites $V$ (along with the order of visitation 
+          $\mathcal{O}$) and the unvisited sites $U$. For the given collinear-horsefly tour serving $V$ 
+          pick a site $s$ from $U$ along with a position in $\mathcal{O}$ (calling the resulting ordering  
+          $\mathcal{O^{'}}$  ) that minimizes the cost of the horsefly tour serving the sites $V \cup \{s\}$ 
+          in the order $\mathcal{O^{'}}$. 
 
-\subsection{Algorithmic Overview}
-\subsection{Algorithmic Details}
+\begin{figure}[H]
+\centering
+\includegraphics[width=8cm]{../webs/docs/incremental_insertion_frames.eps}
+\end{figure}
+
+The figure above depicts the incremental insertion process for the case of 4 sites and $\varphi=3$. The 
+implementation of this algorithm for collinear-horseflies raises several interesting non-trivial 
+data-structural questions in their own right: how to quickly (and posssibly approximately) find the site from $U$ to 
+insert into $V$, and keep track the changing length of the horsefly tour. Note that inserting a site 
+causes the length of the tour of the truck to change, for all the sites after $s$. {\color{red} FIXME: This 
+is an important point, but the way I have described it is utter gibberish. Needs a more visual 
+illustration, which the text wraps around. The illustration can probably be set after we finish 
+implementing the algorithm and get nice plots. }
+ 
+\subsection*{Algorithmic Details}
+\newchunk Let's move onto the implementation. Here is how the function implementing the algorithm looks like. 
+The current implementation of the algorithm, esp with regards to finding the best point for insertion, is 
+quite slow. Efficient policies for detecting the exact or approximate point for cheapest insertion will be 
+described in section??. 
+
+@D Algorithms for classic horsefly 
+@{    
+def algo_greedy_incremental_insertion(sites, inithorseposn, phi
+                                      insertion_policy_name='naive',
+                                      log_level=none,
+                                      write_io = t, 
+                                      post_optimizer):
+
+      @<Set log and input-output file config@>
+      @<Define various insertion policies@>
+
+      @<Set insertion policy for current run@>
+      @<Initialize data-structures@>
+
+      while  @<There is at-least one unvisited site@>:
+         @<Find the cheapest unvisited site to insert into current ordering of visited sites@>
+         @<Update list of visited and unvisited sites@>
+         @<Write algorithm state to file@>
+
+      @<Write input and output to file@>
+      @<Return horsefly tour, along with additional information@>
+@| algo_greedy_incremental_insertion @}
+
+
+\newchunk Note that for each run of the algorithm, we create a dedicated directory and 
+use a corresponding log file written as an AsciiDoc file written to that 
+directory. It will typically containe detailed information on the progress 
+of the algorithm and the steps executed. For the sake of pretty printing, 
+the \verb|.adoc| file will be converted to an HTML file via 
+asciidoctor-latex. 
+
+For the sake of algorithm analysis, and verification of correctness we will 
+typically  be interested in the states of the data-structures at the end of 
+the while loop; each such state will be written out as a YAML file (that 
+will also be accessible from the log file.)
+
+Finally, just before returning the answer, we write the input and output 
+to a separate YAML file. 
+
+@D Set log and input-output file config @{   
+@| @}
+
+
+\newchunk This fragment merely sets the variable \verb|insertion_policy| to 
+the appropriate function. This will later help us in studying the speed of 
+the algorithm and quality of the solution for various insertion policies 
+during the experimental analysis. 
+
+@D Set insertion policy for current run @{   
+if insertion_policy_name == 'naive':
+         insertion_policy = policy_naive
+else: 
+         sys.exit("Unknown insertion policy: " +\
+                   insertion_policy_name)
+@| @}
+
+\newchunk 
+@d Initialize data-structures @{   
+@| @}
+
+\newchunk For now, we just implement the naive policy of iterating thorough 
+all the unvisited points, and all the positions within $\mathcal{O}$ at a 
+given stage to find the cheapest point for insertion. This will also serve 
+as a benchmark when implementing more sophisticated policies for computing 
+exactly or approximating this cheapest insertion point. 
+
+@D Define various insertion policies @{   
+     def policy_naive():
+          pass
+@| @}
+
+\newchunk 
+@D There is at-least one unvisited site @{   
+@| @}
+
+\newchunk 
+@D Find the cheapest unvisited site to insert into current ordering of visited sites @{   
+@| @}
+
+\newchunk 
+@D Update list of visited and unvisited sites @{   
+@| @}
+
+\newchunk 
+@D Write algorithm state to file @{   
+@| @}
+
+\newchunk 
+@D Write input and output to file @{   
+  @| @}
+
+\newchunk 
+@D   Return horsefly tour, along with additional information@{
+   
+@| @}

@@ -1,5 +1,25 @@
 \section{Algorithm: Greedy---Nearest Neighbor}  
+\label{sec:greedy-nn}
 \subsection{Algorithmic Overview}
+\newchunk Before proceeding we give a special case of the 
+          classical horseflies problem, which we term 
+         ``collinear-horsefly''. Here the objective function
+         is again to minimize the tour-length of the drone
+         with the additional restriction that the truck must
+     always be moving in a straight line towards the site on the 
+line-segment joining itself and the site, while the drone is also 
+restricted to travelling along the same line segment. 
+
+\begin{figure}[H]
+\centering
+    \includegraphics[width=7cm]{/home/gaurish/Dropbox/MyWiki/research_projects/horseflies_secret/horseflies_literate/webs/docs/collinear_horseflies.eps}
+    \caption{The Collinear Horsefly Problem}
+    \label{fig:collinear-horseflies}
+\end{figure}
+
+We can show that an optimal (unrestricted) horsfly solution can be converted
+to a collinear-horsefly solution at a constant factor increase in the makespan. 
+
 \subsection{Algorithmic Details}
 @D Algorithms for classic horsefly 
 @{   

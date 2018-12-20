@@ -19,7 +19,6 @@
 \renewcommand{\cftpartfont}{\LARGE\itshape} % Part title in Huge Italic font
 \usepackage{hyperref}
 \usepackage{etoolbox}
-
 % Better formatting of backticks in 
 % verbatim environment. 
 \usepackage{upquote}
@@ -817,9 +816,9 @@ the code.
 \mbox{}\verb@    @\hbox{$\langle\,${\itshape Set up interactive canvas}\nobreak\ {\footnotesize \NWlink{nuweb28b}{28b}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@@\hbox{$\langle\,${\itshape Local data-structures for classic horsefly}\nobreak\ {\footnotesize \NWlink{nuweb29}{29}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@@\hbox{$\langle\,${\itshape Local utility functions for classic horsefly}\nobreak\ {\footnotesize \NWlink{nuweb37}{37}, \ldots\ }$\,\rangle$}\verb@@\\
+\mbox{}\verb@@\hbox{$\langle\,${\itshape Local utility functions for classic horsefly}\nobreak\ {\footnotesize \NWlink{nuweb42}{42}, \ldots\ }$\,\rangle$}\verb@@\\
 \mbox{}\verb@@\hbox{$\langle\,${\itshape Algorithms for classic horsefly}\nobreak\ {\footnotesize \NWlink{nuweb31}{31}, \ldots\ }$\,\rangle$}\verb@@\\
-\mbox{}\verb@@\hbox{$\langle\,${\itshape Plotting routines for classic horsefly}\nobreak\ {\footnotesize \NWlink{nuweb38b}{38b}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@@\hbox{$\langle\,${\itshape Plotting routines for classic horsefly}\nobreak\ {\footnotesize \NWlink{nuweb44}{44}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
@@ -979,7 +978,7 @@ or just plain clearing the canvas for inserting a fresh input set of points.
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \NWtxtMacroRefIn\ \NWlink{nuweb25}{25}.
-\item \NWtxtIdentsUsed\nobreak\  \verb@algo_exact_given_specific_ordering@\nobreak\ \NWlink{nuweb33}{33}.
+\item \NWtxtIdentsUsed\nobreak\  \verb@algo_exact_given_specific_ordering@\nobreak\ \NWlink{nuweb34}{34}.
 \item{}
 \end{list}
 \vspace{4ex}
@@ -1218,15 +1217,35 @@ are collected at the end of this chapter.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroDefBy\ \NWlink{nuweb31}{31}\NWlink{nuweb32}{, 32}\NWlink{nuweb33}{, 33}.
+\item \NWtxtMacroDefBy\ \NWlink{nuweb31}{31}\NWlink{nuweb32}{, 32}\NWlink{nuweb34}{, 34}\NWlink{nuweb38}{, 38}.
 \item \NWtxtMacroRefIn\ \NWlink{nuweb24a}{24a}.
-\item \NWtxtIdentsUsed\nobreak\  \verb@algo_exact_given_specific_ordering@\nobreak\ \NWlink{nuweb33}{33}.
+\item \NWtxtIdentsUsed\nobreak\  \verb@algo_exact_given_specific_ordering@\nobreak\ \NWlink{nuweb34}{34}.
 \item{}
 \end{list}
 \end{minipage}\vspace{4ex}
 \end{flushleft}
 \section{Algorithm: Greedy---Nearest Neighbor}  
+\label{sec:greedy-nn}
 \subsection{Algorithmic Overview}
+\newchunk Before proceeding we give a special case of the 
+          classical horseflies problem, which we term 
+         ``collinear-horsefly''. Here the objective function
+         is again to minimize the tour-length of the drone
+         with the additional restriction that the truck must
+     always be moving in a straight line towards the site on the 
+line-segment joining itself and the site, while the drone is also 
+restricted to travelling along the same line segment. 
+
+\begin{figure}[H]
+\centering
+    \includegraphics[width=7cm]{/home/gaurish/Dropbox/MyWiki/research_projects/horseflies_secret/horseflies_literate/webs/docs/collinear_horseflies.eps}
+    \caption{The Collinear Horsefly Problem}
+    \label{fig:collinear-horseflies}
+\end{figure}
+
+We can show that an optimal (unrestricted) horsfly solution can be converted
+to a collinear-horsefly solution at a constant factor increase in the makespan. 
+
 \subsection{Algorithmic Details}
 \begin{flushleft} \small\label{scrap20}\raggedright\small
 \NWtarget{nuweb32}{} $\langle\,${\itshape Algorithms for classic horsefly}\nobreak\ {\footnotesize {32}}$\,\rangle\equiv$
@@ -1303,9 +1322,9 @@ are collected at the end of this chapter.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroDefBy\ \NWlink{nuweb31}{31}\NWlink{nuweb32}{, 32}\NWlink{nuweb33}{, 33}.
+\item \NWtxtMacroDefBy\ \NWlink{nuweb31}{31}\NWlink{nuweb32}{, 32}\NWlink{nuweb34}{, 34}\NWlink{nuweb38}{, 38}.
 \item \NWtxtMacroRefIn\ \NWlink{nuweb24a}{24a}.
-\item \NWtxtIdentsUsed\nobreak\  \verb@algo_exact_given_specific_ordering@\nobreak\ \NWlink{nuweb33}{33}.
+\item \NWtxtIdentsUsed\nobreak\  \verb@algo_exact_given_specific_ordering@\nobreak\ \NWlink{nuweb34}{34}.
 \item{}
 \end{list}
 \vspace{4ex}
@@ -1313,7 +1332,7 @@ are collected at the end of this chapter.
 \newchunk 
 
 \begin{flushleft} \small\label{scrap21}\raggedright\small
-\NWtarget{nuweb33}{} $\langle\,${\itshape Algorithms for classic horsefly}\nobreak\ {\footnotesize {33}}$\,\rangle\equiv$
+\NWtarget{nuweb34}{} $\langle\,${\itshape Algorithms for classic horsefly}\nobreak\ {\footnotesize {34}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
@@ -1426,7 +1445,7 @@ are collected at the end of this chapter.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroDefBy\ \NWlink{nuweb31}{31}\NWlink{nuweb32}{, 32}\NWlink{nuweb33}{, 33}.
+\item \NWtxtMacroDefBy\ \NWlink{nuweb31}{31}\NWlink{nuweb32}{, 32}\NWlink{nuweb34}{, 34}\NWlink{nuweb38}{, 38}.
 \item \NWtxtMacroRefIn\ \NWlink{nuweb24a}{24a}.
 \item \NWtxtIdentsDefed\nobreak\  \verb@algo_exact_given_specific_ordering@\nobreak\ \NWlink{nuweb26}{26}\NWlink{nuweb31}{, 31}\NWlink{nuweb32}{, 32}.
 \item{}
@@ -1434,9 +1453,275 @@ are collected at the end of this chapter.
 \vspace{4ex}
 \end{flushleft}
 \section{Algorithm: Greedy---Incremental Insertion}  
+\subsection*{Algorithmic Overview}
+\newchunk The greedy nearest neighbor heuristic described in \autoref{sec:greedy-nn} gives an $O(\log n)$ 
+          approximation for $n$ sites in the plane. However, there exists an alternative greedy incremental 
+          insertion algorithm for the TSP which gives a 2-approximation. Similar to the greedy-nn algorithm 
+          we can generalize the greedy-incremental approach to the collinear-horseflies setting 
+          (cf: \autoref{fig:collinear-horseflies}). 
+\newchunk In this approach, we maintain a list of visited sites $V$ (along with the order of visitation 
+          $\mathcal{O}$) and the unvisited sites $U$. For the given collinear-horsefly tour serving $V$ 
+          pick a site $s$ from $U$ along with a position in $\mathcal{O}$ (calling the resulting ordering  
+          $\mathcal{O^{'}}$  ) that minimizes the cost of the horsefly tour serving the sites $V \cup \{s\}$ 
+          in the order $\mathcal{O^{'}}$. 
 
-\subsection{Algorithmic Overview}
-\subsection{Algorithmic Details}
+\begin{figure}[H]
+\centering
+\includegraphics[width=8cm]{../webs/docs/incremental_insertion_frames.eps}
+\end{figure}
+
+The figure above depicts the incremental insertion process for the case of 4 sites and $\varphi=3$. The 
+implementation of this algorithm for collinear-horseflies raises several interesting non-trivial 
+data-structural questions in their own right: how to quickly (and posssibly approximately) find the site from $U$ to 
+insert into $V$, and keep track the changing length of the horsefly tour. Note that inserting a site 
+causes the length of the tour of the truck to change, for all the sites after $s$. {\color{red} FIXME: This 
+is an important point, but the way I have described it is utter gibberish. Needs a more visual 
+illustration, which the text wraps around. The illustration can probably be set after we finish 
+implementing the algorithm and get nice plots. }
+ 
+\subsection*{Algorithmic Details}
+\newchunk Let's move onto the implementation. Here is how the function implementing the algorithm looks like. 
+The current implementation of the algorithm, esp with regards to finding the best point for insertion, is 
+quite slow. Efficient policies for detecting the exact or approximate point for cheapest insertion will be 
+described in section??. 
+
+\begin{flushleft} \small\label{scrap22}\raggedright\small
+\NWtarget{nuweb38}{} $\langle\,${\itshape Algorithms for classic horsefly}\nobreak\ {\footnotesize {38}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@    @\\
+\mbox{}\verb@def algo_greedy_incremental_insertion(sites, inithorseposn, phi@\\
+\mbox{}\verb@                                      insertion_policy_name='naive',@\\
+\mbox{}\verb@                                      log_level=none,@\\
+\mbox{}\verb@                                      write_io = t, @\\
+\mbox{}\verb@                                      post_optimizer):@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@      @\hbox{$\langle\,${\itshape Set log and input-output file config}\nobreak\ {\footnotesize \NWlink{nuweb39a}{39a}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@      @\hbox{$\langle\,${\itshape Define various insertion policies}\nobreak\ {\footnotesize \NWlink{nuweb40a}{40a}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@      @\hbox{$\langle\,${\itshape Set insertion policy for current run}\nobreak\ {\footnotesize \NWlink{nuweb39b}{39b}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@      @\hbox{$\langle\,${\itshape Initialize data-structures}\nobreak\ {\footnotesize \NWlink{nuweb39c}{39c}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@      while  @\hbox{$\langle\,${\itshape There is at-least one unvisited site}\nobreak\ {\footnotesize \NWlink{nuweb40b}{40b}}$\,\rangle$}\verb@:@\\
+\mbox{}\verb@         @\hbox{$\langle\,${\itshape Find the cheapest unvisited site to insert into current ordering of visited sites}\nobreak\ {\footnotesize \NWlink{nuweb40c}{40c}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@         @\hbox{$\langle\,${\itshape Update list of visited and unvisited sites}\nobreak\ {\footnotesize \NWlink{nuweb40d}{40d}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@         @\hbox{$\langle\,${\itshape Write algorithm state to file}\nobreak\ {\footnotesize \NWlink{nuweb41a}{41a}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@      @\hbox{$\langle\,${\itshape Write input and output to file}\nobreak\ {\footnotesize \NWlink{nuweb41b}{41b}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@      @\hbox{$\langle\,${\itshape Return horsefly tour, along with additional information}\nobreak\ {\footnotesize \NWlink{nuweb41c}{41c}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroDefBy\ \NWlink{nuweb31}{31}\NWlink{nuweb32}{, 32}\NWlink{nuweb34}{, 34}\NWlink{nuweb38}{, 38}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb24a}{24a}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@algo_greedy_incremental_insertion@\nobreak\ \NWtxtIdentsNotUsed.
+\item{}
+\end{list}
+\vspace{4ex}
+\end{flushleft}
+\newchunk Note that for each run of the algorithm, we create a dedicated directory and 
+use a corresponding log file written as an AsciiDoc file written to that 
+directory. It will typically containe detailed information on the progress 
+of the algorithm and the steps executed. For the sake of pretty printing, 
+the \verb|.adoc| file will be converted to an HTML file via asciidoctor-latex. 
+
+For the sake of algorithm analysis, and verification of correctness we will 
+typically  be interested in the states of the data-structures at the end of 
+the while loop; each such state will be written out as a YAML file (that 
+will also be accessible from the log file.)
+
+Finally, just before returning the answer, we write the input and output 
+to a separate YAML file. 
+
+\begin{flushleft} \small\label{scrap23}\raggedright\small
+\NWtarget{nuweb39a}{} $\langle\,${\itshape Set log and input-output file config}\nobreak\ {\footnotesize {39a}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@   @\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb38}{38}.
+
+\item{}
+\end{list}
+\vspace{4ex}
+\end{flushleft}
+\newchunk This fragment merely sets the variable \verb|insertion_policy| to 
+the appropriate function. This will later help us in studying the speed of 
+the algorithm and quality of the solution for various insertion policies 
+during the experimental analysis. 
+
+\begin{flushleft} \small\label{scrap24}\raggedright\small
+\NWtarget{nuweb39b}{} $\langle\,${\itshape Set insertion policy for current run}\nobreak\ {\footnotesize {39b}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@   @\\
+\mbox{}\verb@if insertion_policy_name == 'naive':@\\
+\mbox{}\verb@         insertion_policy = policy_naive@\\
+\mbox{}\verb@else: @\\
+\mbox{}\verb@         sys.exit("Unknown insertion policy: " +\@\\
+\mbox{}\verb@                   insertion_policy_name)@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb38}{38}.
+
+\item{}
+\end{list}
+\vspace{4ex}
+\end{flushleft}
+\newchunk 
+\begin{flushleft} \small
+\begin{minipage}{\linewidth}\label{scrap25}\raggedright\small
+\NWtarget{nuweb39c}{} $\langle\,${\itshape Initialize data-structures}\nobreak\ {\footnotesize {39c}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@   @\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb38}{38}.
+
+\item{}
+\end{list}
+\end{minipage}\vspace{4ex}
+\end{flushleft}
+\newchunk For now, we just implement the naive policy of iterating thorough 
+all the unvisited points, and all the positions within $\mathcal{O}$ at a 
+given stage to find the cheapest point for insertion. This will also serve 
+as a benchmark when implementing more sophisticated policies for computing 
+exactly or approximating this cheapest insertion point. 
+
+\begin{flushleft} \small\label{scrap26}\raggedright\small
+\NWtarget{nuweb40a}{} $\langle\,${\itshape Define various insertion policies}\nobreak\ {\footnotesize {40a}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@   @\\
+\mbox{}\verb@     def policy_naive():@\\
+\mbox{}\verb@          pass@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb38}{38}.
+
+\item{}
+\end{list}
+\vspace{4ex}
+\end{flushleft}
+\newchunk 
+\begin{flushleft} \small\label{scrap27}\raggedright\small
+\NWtarget{nuweb40b}{} $\langle\,${\itshape There is at-least one unvisited site}\nobreak\ {\footnotesize {40b}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@   @\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb38}{38}.
+
+\item{}
+\end{list}
+\vspace{4ex}
+\end{flushleft}
+\newchunk 
+\begin{flushleft} \small\label{scrap28}\raggedright\small
+\NWtarget{nuweb40c}{} $\langle\,${\itshape Find the cheapest unvisited site to insert into current ordering of visited sites}\nobreak\ {\footnotesize {40c}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@   @\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb38}{38}.
+
+\item{}
+\end{list}
+\vspace{4ex}
+\end{flushleft}
+\newchunk 
+\begin{flushleft} \small\label{scrap29}\raggedright\small
+\NWtarget{nuweb40d}{} $\langle\,${\itshape Update list of visited and unvisited sites}\nobreak\ {\footnotesize {40d}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@   @\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb38}{38}.
+
+\item{}
+\end{list}
+\vspace{4ex}
+\end{flushleft}
+\newchunk 
+\begin{flushleft} \small\label{scrap30}\raggedright\small
+\NWtarget{nuweb41a}{} $\langle\,${\itshape Write algorithm state to file}\nobreak\ {\footnotesize {41a}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@   @\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb38}{38}.
+
+\item{}
+\end{list}
+\vspace{4ex}
+\end{flushleft}
+\newchunk 
+\begin{flushleft} \small\label{scrap31}\raggedright\small
+\NWtarget{nuweb41b}{} $\langle\,${\itshape Write input and output to file}\nobreak\ {\footnotesize {41b}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@   @\\
+\mbox{}\verb@  @{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb38}{38}.
+
+\item{}
+\end{list}
+\vspace{4ex}
+\end{flushleft}
+\newchunk 
+\begin{flushleft} \small\label{scrap32}\raggedright\small
+\NWtarget{nuweb41c}{} $\langle\,${\itshape Return horsefly tour, along with additional information}\nobreak\ {\footnotesize {41c}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@@\\
+\mbox{}\verb@   @\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb38}{38}.
+
+\item{}
+\end{list}
+\vspace{4ex}
+\end{flushleft}
 \section{Algorithm: Bottom-Up Split}  
 
 \subsection{Algorithmic Overview}
@@ -1465,8 +1750,8 @@ are collected at the end of this chapter.
 
    This is in other words the objective function. 
 
-\begin{flushleft} \small\label{scrap22}\raggedright\small
-\NWtarget{nuweb37}{} $\langle\,${\itshape Local utility functions for classic horsefly}\nobreak\ {\footnotesize {37}}$\,\rangle\equiv$
+\begin{flushleft} \small\label{scrap33}\raggedright\small
+\NWtarget{nuweb42}{} $\langle\,${\itshape Local utility functions for classic horsefly}\nobreak\ {\footnotesize {42}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@   @\\
@@ -1492,7 +1777,7 @@ are collected at the end of this chapter.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroDefBy\ \NWlink{nuweb37}{37}\NWlink{nuweb38a}{, 38a}.
+\item \NWtxtMacroDefBy\ \NWlink{nuweb42}{42}\NWlink{nuweb43}{, 43}.
 \item \NWtxtMacroRefIn\ \NWlink{nuweb24a}{24a}.
 
 \item{}
@@ -1505,8 +1790,8 @@ are collected at the end of this chapter.
       each link of the tour. Again note that because 
       speed of horse = 1, we can add ``time'' to ``distance''. 
 
-\begin{flushleft} \small\label{scrap23}\raggedright\small
-\NWtarget{nuweb38a}{} $\langle\,${\itshape Local utility functions for classic horsefly}\nobreak\ {\footnotesize {38a}}$\,\rangle\equiv$
+\begin{flushleft} \small\label{scrap34}\raggedright\small
+\NWtarget{nuweb43}{} $\langle\,${\itshape Local utility functions for classic horsefly}\nobreak\ {\footnotesize {43}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@   @\\
@@ -1537,7 +1822,7 @@ are collected at the end of this chapter.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroDefBy\ \NWlink{nuweb37}{37}\NWlink{nuweb38a}{, 38a}.
+\item \NWtxtMacroDefBy\ \NWlink{nuweb42}{42}\NWlink{nuweb43}{, 43}.
 \item \NWtxtMacroRefIn\ \NWlink{nuweb24a}{24a}.
 
 \item{}
@@ -1547,8 +1832,8 @@ are collected at the end of this chapter.
 \section{Plotting Routines}
 \newchunk 
 
-\begin{flushleft} \small\label{scrap24}\raggedright\small
-\NWtarget{nuweb38b}{} $\langle\,${\itshape Plotting routines for classic horsefly}\nobreak\ {\footnotesize {38b}}$\,\rangle\equiv$
+\begin{flushleft} \small\label{scrap35}\raggedright\small
+\NWtarget{nuweb44}{} $\langle\,${\itshape Plotting routines for classic horsefly}\nobreak\ {\footnotesize {44}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@ @\\
@@ -1654,21 +1939,32 @@ are collected at the end of this chapter.
 \chapter{Index of Fragments}
 
 {\small\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item $\langle\,$Algorithms for classic horsefly\nobreak\ {\footnotesize \NWlink{nuweb31}{31}\NWlink{nuweb32}{, 32}\NWlink{nuweb33}{, 33}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb24a}{24a}.}
+\item $\langle\,$Algorithms for classic horsefly\nobreak\ {\footnotesize \NWlink{nuweb31}{31}\NWlink{nuweb32}{, 32}\NWlink{nuweb34}{, 34}\NWlink{nuweb38}{, 38}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb24a}{24a}.}
 \item $\langle\,$Clear canvas and states of all objects\nobreak\ {\footnotesize \NWlink{nuweb28a}{28a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb25}{25}.}
 \item $\langle\,$Define key-press handler\nobreak\ {\footnotesize \NWlink{nuweb25}{25}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb24a}{24a}.}
+\item $\langle\,$Define various insertion policies\nobreak\ {\footnotesize \NWlink{nuweb40a}{40a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb38}{38}.}
+\item $\langle\,$Find the cheapest unvisited site to insert into current ordering of visited sites\nobreak\ {\footnotesize \NWlink{nuweb40c}{40c}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb38}{38}.}
 \item $\langle\,$Generate a bunch of uniform or non-uniform random points on the canvas\nobreak\ {\footnotesize \NWlink{nuweb27}{27}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb25}{25}.}
+\item $\langle\,$Initialize data-structures\nobreak\ {\footnotesize \NWlink{nuweb39c}{39c}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb38}{38}.}
 \item $\langle\,$Local data-structures for classic horsefly\nobreak\ {\footnotesize \NWlink{nuweb29}{29}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb24a}{24a}.}
-\item $\langle\,$Local utility functions for classic horsefly\nobreak\ {\footnotesize \NWlink{nuweb37}{37}\NWlink{nuweb38a}{, 38a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb24a}{24a}.}
-\item $\langle\,$Plotting routines for classic horsefly\nobreak\ {\footnotesize \NWlink{nuweb38b}{38b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb24a}{24a}.}
+\item $\langle\,$Local utility functions for classic horsefly\nobreak\ {\footnotesize \NWlink{nuweb42}{42}\NWlink{nuweb43}{, 43}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb24a}{24a}.}
+\item $\langle\,$Plotting routines for classic horsefly\nobreak\ {\footnotesize \NWlink{nuweb44}{44}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb24a}{24a}.}
 \item $\langle\,$Relevant imports for classic horsefly\nobreak\ {\footnotesize \NWlink{nuweb24b}{24b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb24a}{24a}.}
+\item $\langle\,$Return horsefly tour, along with additional information\nobreak\ {\footnotesize \NWlink{nuweb41c}{41c}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb38}{38}.}
+\item $\langle\,$Set insertion policy for current run\nobreak\ {\footnotesize \NWlink{nuweb39b}{39b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb38}{38}.}
+\item $\langle\,$Set log and input-output file config\nobreak\ {\footnotesize \NWlink{nuweb39a}{39a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb38}{38}.}
 \item $\langle\,$Set up interactive canvas\nobreak\ {\footnotesize \NWlink{nuweb28b}{28b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb24a}{24a}.}
 \item $\langle\,$Start entering input from the command-line\nobreak\ {\footnotesize \NWlink{nuweb26}{26}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb25}{25}.}
+\item $\langle\,$There is at-least one unvisited site\nobreak\ {\footnotesize \NWlink{nuweb40b}{40b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb38}{38}.}
+\item $\langle\,$Update list of visited and unvisited sites\nobreak\ {\footnotesize \NWlink{nuweb40d}{40d}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb38}{38}.}
+\item $\langle\,$Write algorithm state to file\nobreak\ {\footnotesize \NWlink{nuweb41a}{41a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb38}{38}.}
+\item $\langle\,$Write input and output to file\nobreak\ {\footnotesize \NWlink{nuweb41b}{41b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb38}{38}.}
 \end{list}}
 \chapter{Index of Identifiers}
 
 {\small\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \verb@algo_exact_given_specific_ordering@: \NWlink{nuweb26}{26}\NWlink{nuweb31}{, 31}\NWlink{nuweb32}{, 32}, \underline{\NWlink{nuweb33}{33}}.
+\item \verb@algo_exact_given_specific_ordering@: \NWlink{nuweb26}{26}\NWlink{nuweb31}{, 31}\NWlink{nuweb32}{, 32}, \underline{\NWlink{nuweb34}{34}}.
+\item \verb@algo_greedy_incremental_insertion@: \underline{\NWlink{nuweb38}{38}}.
 \end{list}} 
 \chapter{Man-page for \texttt{main.py}}
 \end{appendices}

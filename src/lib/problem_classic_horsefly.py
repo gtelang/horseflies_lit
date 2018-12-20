@@ -456,6 +456,53 @@ def algo_exact_given_specific_ordering (sites, horseflyinit, phi):
                                                     horse_waiting_times, 
                                                     horseflyinit)}
    
+    
+def algo_greedy_incremental_insertion(sites, inithorseposn, phi
+                                      insertion_policy_name='naive',
+                                      log_level=none,
+                                      write_io = t, 
+                                      post_optimizer):
+
+      # Set log and input-output file config
+         
+      
+      # Define various insertion policies
+         
+           def policy_naive():
+                pass
+      
+
+      # Set insertion policy for current run
+         
+      if insertion_policy_name == 'naive':
+               insertion_policy = policy_naive
+      else: 
+               sys.exit("Unknown insertion policy: " +\
+                         insertion_policy_name)
+      
+      # Initialize data-structures
+         
+      
+
+      while     
+             :
+         # Find the cheapest unvisited site to insert into current ordering of visited sites
+            
+         
+         # Update list of visited and unvisited sites
+            
+         
+         # Write algorithm state to file
+            
+         
+
+      # Write input and output to file
+         
+        
+      # Return horsefly tour, along with additional information
+      
+         
+      
 
 # Plotting routines for classic horsefly
  
