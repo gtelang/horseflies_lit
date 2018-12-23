@@ -1,8 +1,8 @@
 \chapter{Overview of the Code Base}
 
-Almost all of the code has been written in Python 2.7 and tested using the standard CPython
+All of the code has been written in Python 2.7 and tested using the standard CPython
 implementation of the language. In some cases, calls will be made to external C\texttt{++} 
-libraries (mostly CGAL and VTK) using SWIG (\url{http://www.swig.org/}). This is either 
+libraries (mostly CGAL and VTK) using SWIG (\url{http://www.swig.org/})
 for speeding up a slow routine or to use a function that is not available in any existing 
 Python package.
 
@@ -11,6 +11,12 @@ Python package.
 
 There are three principal directories 
 \begin{itemize}
+
+ \item[\texttt{webs/}] This contains the source code for the entire project written in 
+                       the nuweb format along with documents (mostly images)
+                       needed during the compilation of the \LaTeX{} files which will 
+                       be extracted from the \texttt{.web} files. 
+
  \item[\texttt{src/}] This contains the source code for the entire project ``tangled'' 
                       (i.e. extracted) from the \texttt{.web} files. 
  \item[\texttt{tex/}] This contains the monolithic \texttt{horseflies.tex} extracted 
@@ -20,15 +26,11 @@ There are three principal directories
                       contains the documentation of the project, interwoven with 
                       code-chunks and cross-references between them along with the 
                       experimental results.  
- \item[\texttt{webs/}] This contains the source code for the entire project written in 
-                       the nuweb format along with documents (mostly images)
-                       needed during the compilation of the \LaTeX{} files which will 
-                       be extracted from the \texttt{.web} files. 
 \end{itemize}  
 
 The files in \texttt{src} and \texttt{tex} should not be touched. Any editing required should 
-be done directly to the \texttt{.web} files. These .web files should then be weaved and tangled 
-using thescript \texttt{weave-tangle.sh} in the \texttt{webs} directory. 
+be done directly to the \texttt{.web} files which should then be weaved and tangled 
+using \texttt{weave-tangle.sh}. 
 
 \section{The Main Files} 
 
@@ -115,10 +117,9 @@ if __name__=="__main__":
 
 \begin{alphalist}
 \item \crunchy{Utility Files}  All such utility files are in the directory \texttt{src/lib/}. 
- These files contain common utility functions that will be useful 
- for manipulating data-structures, common plotting and graphics routines 
- for all horsefly-type problems. All such files have the prefix \verb|utils_*|. 
- These Python files are generated from the single \verb|.web| file \verb|utils.web| 
+ These files contain common utility functions  for manipulating data-structures, plotting 
+ and graphics routines common to all horsefly-type problems. All such files have the prefix 
+ \verb|utils_*|. These Python files are generated from the single \verb|.web| file \verb|utils.web| 
  in the \verb|web| subdirectory.
 
 \item \crunchy{Tests} All such files are in the directory \texttt{src/test/}

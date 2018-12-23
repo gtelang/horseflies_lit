@@ -40,11 +40,10 @@
 
 \newchunk 
 All algorithms to solve the classic horsefly problems have been implemented in 
-the file \verb|problem_classic_horsefly.py|. Here is a high-level view of the 
-module. The \verb|run_handler| function acts as a kind of main function for this
-module. This function is called from \verb|main.py| which then processes the 
-command-line arguments and runs the experimental or interactive sections of
-the code. 
+\verb|problem_classic_horsefly.py|. The \verb|run_handler| function acts 
+as a kind of main function for this module. It is called from 
+\verb|main.py| to process the command-line arguments and run the 
+experimental or interactive sections of the code. 
 
 @O ../src/lib/problem_classic_horsefly.py -cp
 @{    
@@ -185,8 +184,8 @@ fig.canvas.draw()
 @| @}
 
 \newchunk This chunk generates points uniformly or non-uniformly distributed in the 
-unit square $[0,1]^2$ in the Matplotlib canvas. I will document the schemes used for generating the non-uniformly
-distributed points later. These schemes are important to test the effectiveness of 
+unit square $[0,1]^2$ in the Matplotlib canvas. I will document the schemes used for 
+generating the non-uniformly distributed points later. These schemes are important to test the effectiveness of 
 the horsefly algorithms. Uniform point clouds do no highlight the weaknesses of 
 sequencing algorithms as David Johnson implies in his article on how to write 
 experimental algorithm papers when he talks about algorithms for the TSP. 

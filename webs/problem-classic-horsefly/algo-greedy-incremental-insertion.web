@@ -2,7 +2,7 @@
 \subsection*{Algorithmic Overview}
 \newchunk The greedy nearest neighbor heuristic described in \autoref{sec:greedy-nn} gives an $O(\log n)$ 
           approximation for $n$ sites in the plane. However, there exists an alternative greedy incremental 
-          insertion algorithm for the TSP which gives a 2-approximation. Similar to the greedy-nn algorithm 
+          insertion algorithm for the TSP that yields a 2-approximation. Similar to the greedy-nn algorithm 
           we can generalize the greedy-incremental approach to the collinear-horseflies setting 
           (cf: \autoref{fig:collinear-horseflies}). 
 \newchunk In this approach, we maintain a list of visited sites $V$ (along with the order of visitation 
@@ -18,18 +18,17 @@
 
 The figure above depicts the incremental insertion process for the case of 4 sites and $\varphi=3$. The 
 implementation of this algorithm for collinear-horseflies raises several interesting non-trivial 
-data-structural questions in their own right: how to quickly (and posssibly approximately) find the site from $U$ to 
+data-structural questions in their own right: how to quickly find the site from $U$ to 
 insert into $V$, and keep track the changing length of the horsefly tour. Note that inserting a site 
-causes the length of the tour of the truck to change, for all the sites after $s$. {\color{red} FIXME: This 
-is an important point, but the way I have described it is utter gibberish. Needs a more visual 
-illustration, which the text wraps around. The illustration can probably be set after we finish 
-implementing the algorithm and get nice plots. }
+causes the length of the tour of the truck to change, for all the sites after $s$. 
  
 \subsection*{Algorithmic Details}
-\newchunk Let's move onto the implementation. Here is how the function implementing the algorithm looks like. 
-The current implementation of the algorithm, esp with regards to finding the best point for insertion, is 
-quite slow. Efficient policies for detecting the exact or approximate point for cheapest insertion will be 
-described in \autoref{subsec:insertion-policies}. 
+\newchunk The implementation of the algorithm is ``parametrized'' over various strategies for insertion. 
+i.e. we treat each insertion policy as a black-box argument to the function.
+ 
+Efficient policies for detecting the exact or approximate point for cheapest insertion will be 
+described in \autoref{subsec:insertion-policies}.  We also implement a ``naive'' policy as a way 
+benchmark the quality and speed of implementation of future insertion policies. 
 
 @D Algorithms for classic horsefly @{
 @<Define auxiliary helper functions@>
@@ -39,17 +38,16 @@ def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
                                       log_level             = None,
                                       write_io              = True, 
                                       post_optimizer        = None):
-      @<Set log and input-output file config@>
-
+      @<Set log, algo-state and input-output files config@>
       @<Set insertion policy class for current run@>
-      @<Initialize data-structures@>
 
-      while @<There is at-least one unvisited site@> :
+      while insertion_policy.unvisited_sites: 
          @<Use insertion policy to find the cheapest site to insert into current tour@>
-         @<Update list of visited and unvisited sites@>
          @<Write algorithm's current state to file@>
 
       @<Write input and output to file@>
+      
+      sys.exit()
       @<Return horsefly tour, along with additional information@>
 @| algo_greedy_incremental_insertion @}
 
@@ -73,7 +71,7 @@ within each directory that corresponds to an algorithm's run:
 \underline{a log file}, \underline{algorithm states files}, and finally 
 an \underline{input-output file}. 
 
-@D Set log and input-output file config @{  
+@D Set log, algo-state and input-output files config @{  
 import sys, logging, datetime, os, errno
 
 algo_name     = 'algo-greedy-incremental-insertion'
@@ -96,7 +94,8 @@ logging.basicConfig( filename = log_file_name,
 logger = logging.getLogger()
 logger.info("Started running greedy_incremental_insertion for classic horsefly")
 
-@| @}
+algo_state_counter = 0 
+@| algo_state_counter @}
 
 
 \newchunk This fragment merely sets the variable \verb|insertion_policy| to 
@@ -111,61 +110,156 @@ else:
      print insertion_policy_name
      sys.exit("Unknown insertion policy: " )
 
-logger.debug("...Finished setting insertion policy: " + insertion_policy_name)
+logger.debug("Finished setting insertion policy: " + insertion_policy_name)
 sys.exit()
 @| @}
 
-\newchunk 
-@D Initialize data-structures @{
-logger.debug("Finished initializing data-structures")
-@| @}
 
-\newchunk This chunk is used as a testing condition for executing the body of the \verb|while| loop
-above. 
-@D There is at-least one unvisited site 
-@{True @}
-
-\newchunk Before proceeding, we define some functions that we use in the body of 
-\verb|algo_incremental_insertion|. Given the intial position of the truck and drone, 
-and a list of sites, we need to compute the collinear horsefly tour length for the 
-given ordering. This is the function that we will later use for deciding which is 
-the cheapest unvisited site to insert into the current ordering of visited sites. 
-
-Note that the order in which sites are passed to this function matters. It 
-assumes that you want to compute the collinear horseflies tour length for the 
-sites \textit{in the given order.}
-
-@D Define auxiliary helper functions @{   
-def compute_collinear_horseflies_tour_length(sites, inithorseposn, phi):
-       pass
-          
-@| compute_collinear_horseflies_tour_length @}
-
-
-\newchunk In the following chunk, we treat the insertion policy (whose name has already been 
-passed as an string argument) as a kind of black-box, since all policy classes have the 
-same interface. The detailed implementation for the various insertion policies are given later. 
+\newchunk Note that while defining the body of the algorithm, we treat the insertion policy 
+(whose name has already been passed as an string argument) as a kind of black-box, since all 
+policy classes have the same interface. The detailed implementation for the various 
+insertion policies are given later. 
 
 @D Use insertion policy to find the cheapest site to insert into current tour @{
-pass   
-@| @}
-
-\newchunk 
-@D Update list of visited and unvisited sites @{   
+insertion_policy.insert_another_unvisited_site()
+logger.debug("Inserted another unvisited site")
 @| @}
 
 \newchunk 
 @D Write algorithm's current state to file @{   
+import yaml, io
+algo_state_file_name = 'algo_state_' + \
+                       str(algo_state_counter).zfill(5) + \
+                       '.yaml'
+data = {'unvisited_sites' : [self.sites[u] for u in unvisited_sites_idxs], 
+        'visited_sites'   : self.visited_sites , 
+        'horse_tour'      : self.horse_tour }
+
+with io.open(algo_state_file_name, 'w', encoding='utf8') as outfile:
+     yaml.dump( data   , \
+                outfile, \
+                default_flow_style = False, \
+                allow_unicode      = True )
+
+algo_state_counter = algo_state_counter + 1
+logger.debug("Dumped algorithm state to " + algo_state_file_name)
+@| @}
+
+\newchunk The answer is reported in the form of a YAML file, which lists the input sites 
+in the order of visitation computed by the algorithm and gives the tour of the horse. 
+Note that the number of points on the horse's tour is 1 more than the number of given sites. 
+
+@D Write input and output to file @{
+# ASSERT: `inithorseposn` is included as first point of the tour
+assert(len(horse_tour)+1 == len(self.visited_sites)) 
+
+# ASSERT: All sites have been visited. Simple sanity check 
+assert(len(self.sites)   == len(self.visited_sites)) 
+
+io_file_name = 'input_and_output.yml'
+
+data = {'visited_sites'  : self.visited_sites, 
+        'horse_tour'     : self.horse_tour, 
+        'phi'            : self.phi, 
+        'inithorseposn'  : self.inithorseposn}
+
+with io.open(io_file_name, 'w', encoding='utf8') as outfile:
+     yaml.dump( data, \
+                outfile, \
+                default_flow_style=False, \
+                allow_unicode=True )
+
+logger.debug("Wrote input and output to " + io_file_name)
 @| @}
 
 \newchunk 
-@D Write input and output to file @{   
+
+@D Return horsefly tour, along with additional information@{
+logger.debug("Returning answer")
+horse_waiting_times = np.zeros(numsites)
+return {'tour_points'                : self.horse_tour,
+        'horse_waiting_times'        : horse_waiting_times, 
+        'site_ordering'              : self.visited_sites,
+        'tour_length_with_waiting_time_included': \
+                                       tour_length_with_waiting_time_included(\
+                                                    self.horse_tour[1:], \
+                                                    horse_waiting_times, \
+                                                    inithorseposn)}
 @| @}
 
+\UNSURE{\texttt{self.horse\_tour[0:]} or 
+        \texttt{self.horse\_tour[1:]}}
+
+\newchunk We now define some of the functions that were referred to in the above chunks. 
+Given the intial position of the truck and drone, and a list of sites, we need to compute 
+the collinear horsefly tour length for the given ordering. This is the function that is 
+used in every policy class while deciding which is the cheapest unvisited site to insert 
+into the current ordering of visited sites. 
+
+Note that the order in which sites are passed to this function matters. It 
+assumes that you want to compute the collinear horseflies tour length for the 
+sites \textit{in the given order.} 
+
+For this, we use the formula for computing the rendezvous point and  
+
+\begin{center}
+\missingfigure[figwidth=6cm]{Sigle site analytic}
+\end{center}
+
+@D Define auxiliary helper functions @{
+def single_site_solution(site, horseposn, phi):
+
+     h = np.asarray(horseposn)
+     s = np.asarray(site)
+     
+     hs_mag  = 1.0/np.linalg.norm(s-h) 
+     hs_unit = 1.0/hs_mag * (s-h)
+     
+     r      = h +  2*hs_mag/(1+phi) * hs_unit # Rendezvous point
+     hr_mag = np.linalg.norm(r-h)
+
+     return (hr_mag, r)
+@}
+
+With that the tour length functions for collinear horseflies can be implemented as 
+an elementary instance of the fold pattern of functional programming. 
+\footnote{Python has folds tucked away in some corner of its standard library. 
+But I am not using it during the first hacky portion of this draft. Also Shane 
+mentioned it has performance issues? Double-check this later!}
+
+\begin{center}
+\missingfigure[figwidth=6cm]{Figure for showing the length of tour in collinear horseflies}
+\end{center}
+
+@D Define auxiliary helper functions @{   
+def compute_collinear_horseflies_tour_length(sites, horseposn, phi):
+
+     if not sites: # No more sites, left to visit!
+          return 0
+     else:         # Some sites are still left on the itinerary
+
+          (rendezvous_pt, horse_travel_length) = single_site_solution(sites[0], horseposn, phi )
+          return horse_travel_length  + \
+                 compute_collinear_horseflies_tour_length( sites[1:], rendezvous_pt, phi )
+@| compute_collinear_horseflies_tour_length @}
+
 \newchunk 
-@D   Return horsefly tour, along with additional information@{
-   
+@d Define auxiliary helper functions @{   
+def compute_collinear_horseflies_tour(sites, inithorseposn, phi):
+
+      horseposn         = inithorseposn
+      horse_tour_points = [inithorseposn]
+
+      for site in sites:
+          (rendezvous_pt, _) = single_site_solution(site, horseposn, phi )
+            
+          horse_tour_points.append(rendezvous_pt)
+          horseposn = rendezvous_pt
+
+      return horse_tour_points
 @| @}
+
+
 
 \section{Insertion Policies} 
 \label{subsec:insertion-policies}
@@ -183,58 +277,150 @@ and details of the horsefly tour.
 To do this quickly it will typically need auxiliary data-structures whose specifics 
 will depend on the details of the policy chosen. 
 
-\subsection{Naive Insertion} To begin, we implement the naive policy of iterating through 
-all the unvisited sites $U$, and all the positions within 
-$\mathcal{O}$ at a given stage of the algorithm to find the cheapest site for 
-insertion. No special data-structures are needed for keeping track of anything. 
+\subsection{Naive Insertion} \quad First, a naive implementation
+  of the cheapest insertion heuristic, that will be useful in future
+  benchmarking of running times and solution quality for implementations 
+  that are quicker but make more sophisticated uses of data-structures. 
 
-This will also serve as a benchmark when implementing more 
-sophisticated policies for computing exactly or approximating 
-this cheapest insertion point. In theory, the naive policy should 
-an $O(n^2)$ time running algorithm. 
+  In this policy for each unvisited site we first find the 
+  position in the current tour, which after insertion into that position
+  amongst the visited sites yields the smallest increase in the 
+  collinear-horseflies tour-length. 
 
-Since the interface for all policy classes will be the same, it is 
+  Then we pick the unvisited site which yields the overall smallest 
+  increase in tour-length and insert it into its computed position
+  from its previous paragraph. 
+     
+  Clearly this implementation and has at least quadratic running time. 
+  Later on, we will be investigating algorithms and data-structures 
+  for speeding up this operation. 
+
+  The hope is to be able to find a dynamic data-structure to perform this 
+  insertion in logarithmic time. Variations on tools such as the well-separated pair 
+  decomposition might help achieve this goal. Jon Bentley
+  used kd-trees to perform the insertion in his experimental TSP
+  paper, but he wasn't dealing with the shifting tour structure
+  as we have in horseflies. Also he did not deal with the question 
+  of finding an approximate point for insertion. These 
+
+\newchunk Since the interface for all policy classes will be the same, it is 
 best, if have a base class for such classes. Since the details of 
 the interface may change, I'll probably do this later. For now, 
 I'll just keep all the policy classes completely separate while 
 keeping the interface of the constructors and methods the same. 
 I'll refactor things later. 
 
-@D Define various insertion policy classes 
-@{class PolicyNaive:
+The plan in that case should be to make an abstract class that 
+has an abstract method called \texttt{insert\_unvisited\_site}
+and three data-fields made from the base-constructor named \texttt{sites}, \texttt{inithorseposn}
+and \texttt{phi}. Classes which inherit this abstract base class, will 
+add their own local data-members and methods for keeping track of 
+data for insertion. 
+
+@D Define various insertion policy classes @{
+class PolicyNaive:
 
     def __init__(self, sites, inithorseposn, phi):
-    
-         # Remember input data for future processing
+
          self.sites           = sites
          self.inithorseposn   = inithorseposn
          self.phi             = phi
 
-         # Initialize data-elements for whom I am 
-         # responsible for keeping track and manipulating.
-         self.unvisited_sites = [] # an index list that indexes into self.sites
-         self.horse_tour      = None
+         self.visited_sites        = []                # The actual list of visited sites (not indices)
+         self.unvisited_sites_idxs = range(len(sites)) # This indexes into self.sites
+         self.horse_tour           = [self.inithorseposn]         
 
     @<Methods for \verb|PolicyNaive| @>
 @|  @}
 
-\newchunk In some sense, the method's with the following name are the most important function 
-is the implementation of greedy incremental methods. After returning the next point 
-for insertion, the method \textit{does not} update the internal state of the 
-horse tour, or the set of unvisited sites (hence the ``suggest'' in the name). 
-While it may be logical to do the update, I prefer to keep the whole 
-implementation as fine grained as possible. Later I might just dump the body of 
-\verb|PolicyNaive| at the end of \verb|suggest_site_for_insertion|. 
-
-@d Methods for \verb|PolicyNaive| @{
-def suggest_site_for_insertion(self):
-      pass
-@| suggest_site_for_insertion @}
+\newchunk 
+@D Methods for \verb|PolicyNaive| @{
+def insert_another_unvisited_site(self):
  
+     @<  Compute the length of the tour that currently services the visited sites @>    
+     delta_increase_least_table = [] # tracking variable updated in for loop below
 
-\newchunk \blindtext
+     for u in self.unvisited_sites_idxs:
 
-@d Methods for \verb|PolicyNaive| @{   
-def update_state(self):
-     pass
-@| update_state @}
+         @< Set up tracking variables local to this iteration @>
+         @< If \texttt{self.sites[u]} is chosen for insertion, find best insertion position and update \texttt{delta\_increase\_least\_table} @>  
+                 
+     @< Find the unvisited site which on insertion increases tour-length by the least amount  @>     
+     @< Update states for \texttt{PolicyNaive} @> 
+ 
+@| insert_another_unvisited_site, delta_increase_least_table @}
+
+
+\newchunk 
+
+@D  Compute the length of the tour that currently services the visited sites @{   
+current_tour_length    = \
+         compute_collinear_horseflies_tour_length(\
+                    self.visited_sites,\
+                    self.inithorseposn,\
+                    self.phi) 
+@| current_tour_length @}
+
+
+\newchunk 
+@D Set up tracking variables local to this iteration  @{   
+ibest                = 0
+delta_increase_least = float("inf")
+@| ibest, delta_increase_least @}
+
+\newchunk 
+@D If \texttt{self.sites[u]} is chosen for insertion, find best insertion position and update \texttt{delta\_increase\_least\_table} @{   
+for i in range(len(self.sites)):
+                    
+            visited_sites_test = self.visited_sites[:i] +\
+                                 [ self.sites[u] ]      +\
+                                 self.visited_sites[i:]
+                                      
+            tour_length_on_insertion = \
+                       compute_collinear_horseflies_tour_length(\
+                                  visited_sites_test,\
+                                  self.inithorseposn,\
+                                  self.phi) 
+
+            delta_increase = tour_length_on_insertion - current_tour_length                         
+            assert(delta_increase >= 0)               
+
+            if delta_increase < delta_increase_least:
+                  delta_increase_least = delta_increase
+                  ibest                = i                                              
+                      
+delta_increase_least_table.append({'unvisited_site_idx'      : u    , \
+                                   'best_insertion_position' : ibest, \
+                                   'delta_increase'          : delta_increase_least})
+@| @}
+
+
+
+\newchunk 
+@D Find the unvisited site which on insertion increases tour-length by the least amount @{
+best_table_entry = min(delta_increase_least_table, key = lambda x: x['delta_increase'])
+         
+unvisited_site_idx_for_insertion = best_table_entry['unvisited_site_idx']
+insertion_position               = best_table_entry['best_insertion_position']
+delta_increase                   = best_table_entry['delta_increase']
+@| @}
+
+
+
+\newchunk 
+@D Update states for \texttt{PolicyNaive}  @{   
+# Update visited and univisted sites info
+self.visited_sites = self.visited_sites[:insertion_position]      +\
+                     self.sites[unvisited_site_idx_for_insertion] +\
+                     self.visited_sites[insertion_position:]
+  
+self.unvisited_sites_idxs = filter( lambda elt: elt != unvisited_site_idx_for_insertion, \
+                                    self.visited_sites ) 
+
+# Update the tour of the horse
+self.horse_tour = compute_collinear_horseflies_tour(\
+                           self.sites,         \
+                           self.inithorseposn, \
+                           self.phi) 
+@| @}
+

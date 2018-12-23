@@ -465,33 +465,129 @@ def algo_exact_given_specific_ordering (sites, horseflyinit, phi):
    
 
 # Define auxiliary helper functions
+
+def single_site_solution(site, horseposn, phi):
+
+     h = np.asarray(horseposn)
+     s = np.asarray(site)
+     
+     hs_mag  = 1.0/np.linalg.norm(s-h) 
+     hs_unit = 1.0/hs_mag * (s-h)
+     
+     r      = h +  2*hs_mag/(1+phi) * hs_unit # Rendezvous point
+     hr_mag = np.linalg.norm(r-h)
+
+     return (hr_mag, r)
    
-def compute_collinear_horseflies_tour_length(sites, inithorseposn, phi):
-       pass
-          
+def compute_collinear_horseflies_tour_length(sites, horseposn, phi):
+
+     if not sites: # No more sites, left to visit!
+          return 0
+     else:         # Some sites are still left on the itinerary
+
+          (rendezvous_pt, horse_travel_length) = single_site_solution(sites[0], horseposn, phi )
+          return horse_travel_length  + \
+                 compute_collinear_horseflies_tour_length( sites[1:], rendezvous_pt, phi )
+   
+def compute_collinear_horseflies_tour(sites, inithorseposn, phi):
+
+      horseposn         = inithorseposn
+      horse_tour_points = [inithorseposn]
+
+      for site in sites:
+          (rendezvous_pt, _) = single_site_solution(site, horseposn, phi )
+            
+          horse_tour_points.append(rendezvous_pt)
+          horseposn = rendezvous_pt
+
+      return horse_tour_points
 
 # Define various insertion policy classes
+
 class PolicyNaive:
 
     def __init__(self, sites, inithorseposn, phi):
-    
-         # Remember input data for future processing
+
          self.sites           = sites
          self.inithorseposn   = inithorseposn
          self.phi             = phi
 
-         # Initialize data-elements for whom I am 
-         # responsible for keeping track and manipulating.
-         self.unvisited_sites = [] # an index list that indexes into self.sites
-         self.horse_tour      = None
+         self.visited_sites        = []                # The actual list of visited sites (not indices)
+         self.unvisited_sites_idxs = range(len(sites)) # This indexes into self.sites
+         self.horse_tour           = [self.inithorseposn]         
 
     # Methods for \verb|PolicyNaive|
     
-    def suggest_site_for_insertion(self):
-          pass
-       
-    def update_state(self):
-         pass
+    def insert_another_unvisited_site(self):
+     
+         # Compute the length of the tour that currently services the visited sites
+            
+         current_tour_length    = \
+                  compute_collinear_horseflies_tour_length(\
+                             self.visited_sites,\
+                             self.inithorseposn,\
+                             self.phi) 
+             
+         delta_increase_least_table = [] # tracking variable updated in for loop below
+
+         for u in self.unvisited_sites_idxs:
+
+             # Set up tracking variables local to this iteration
+                
+             ibest                = 0
+             delta_increase_least = float("inf")
+             
+             # If \texttt{self.sites[u]} is chosen for insertion, find best insertion position and update \texttt{delta\_increase\_least\_table}
+                
+             for i in range(len(self.sites)):
+                                 
+                         visited_sites_test = self.visited_sites[:i] +\
+                                              [ self.sites[u] ]      +\
+                                              self.visited_sites[i:]
+                                                   
+                         tour_length_on_insertion = \
+                                    compute_collinear_horseflies_tour_length(\
+                                               visited_sites_test,\
+                                               self.inithorseposn,\
+                                               self.phi) 
+
+                         delta_increase = tour_length_on_insertion - current_tour_length                         
+                         assert(delta_increase >= 0)               
+
+                         if delta_increase < delta_increase_least:
+                               delta_increase_least = delta_increase
+                               ibest                = i                                              
+                                   
+             delta_increase_least_table.append({'unvisited_site_idx'      : u    , \
+                                                'best_insertion_position' : ibest, \
+                                                'delta_increase'          : delta_increase_least})
+               
+                     
+         # Find the unvisited site which on insertion increases tour-length by the least amount
+         
+         best_table_entry = min(delta_increase_least_table, key = lambda x: x['delta_increase'])
+                  
+         unvisited_site_idx_for_insertion = best_table_entry['unvisited_site_idx']
+         insertion_position               = best_table_entry['best_insertion_position']
+         delta_increase                   = best_table_entry['delta_increase']
+              
+         # Update states for \texttt{PolicyNaive}
+            
+         # Update visited and univisted sites info
+         self.visited_sites = self.visited_sites[:insertion_position]      +\
+                              self.sites[unvisited_site_idx_for_insertion] +\
+                              self.visited_sites[insertion_position:]
+           
+         self.unvisited_sites_idxs = filter( lambda elt: elt != unvisited_site_idx_for_insertion, \
+                                             self.visited_sites ) 
+
+         # Update the tour of the horse
+         self.horse_tour = compute_collinear_horseflies_tour(\
+                                    self.sites,         \
+                                    self.inithorseposn, \
+                                    self.phi) 
+          
+     
     
 
 def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
@@ -499,7 +595,7 @@ def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
                                       log_level             = None,
                                       write_io              = True, 
                                       post_optimizer        = None):
-      # Set log and input-output file config
+      # Set log, algo-state and input-output files config
         
       import sys, logging, datetime, os, errno
 
@@ -523,8 +619,8 @@ def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
       logger = logging.getLogger()
       logger.info("Started running greedy_incremental_insertion for classic horsefly")
 
+      algo_state_counter = 0 
       
-
       # Set insertion policy class for current run
       
       if insertion_policy_name == "naive":
@@ -533,32 +629,73 @@ def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
            print insertion_policy_name
            sys.exit("Unknown insertion policy: " )
 
-      logger.debug("...Finished setting insertion policy: " + insertion_policy_name)
+      logger.debug("Finished setting insertion policy: " + insertion_policy_name)
       sys.exit()
       
-      # Initialize data-structures
-      
-      logger.debug("Finished initializing data-structures")
-      
 
-      while True  :
+      while insertion_policy.unvisited_sites: 
          # Use insertion policy to find the cheapest site to insert into current tour
          
-         pass   
-         
-         # Update list of visited and unvisited sites
-            
+         insertion_policy.insert_another_unvisited_site()
+         logger.debug("Inserted another unvisited site")
          
          # Write algorithm's current state to file
             
+         import yaml, io
+         algo_state_file_name = 'algo_state_' + \
+                                str(algo_state_counter).zfill(5) + \
+                                '.yaml'
+         data = {'unvisited_sites' : [self.sites[u] for u in unvisited_sites_idxs], 
+                 'visited_sites'   : self.visited_sites , 
+                 'horse_tour'      : self.horse_tour }
+
+         with io.open(algo_state_file_name, 'w', encoding='utf8') as outfile:
+              yaml.dump( data   , \
+                         outfile, \
+                         default_flow_style = False, \
+                         allow_unicode      = True )
+
+         algo_state_counter = algo_state_counter + 1
+         logger.debug("Dumped algorithm state to " + algo_state_file_name)
          
 
       # Write input and output to file
-         
       
+      # ASSERT: `inithorseposn` is included as first point of the tour
+      assert(len(horse_tour)+1 == len(self.visited_sites)) 
+
+      # ASSERT: All sites have been visited. Simple sanity check 
+      assert(len(self.sites)   == len(self.visited_sites)) 
+
+      io_file_name = 'input_and_output.yml'
+
+      data = {'visited_sites'  : self.visited_sites, 
+              'horse_tour'     : self.horse_tour, 
+              'phi'            : self.phi, 
+              'inithorseposn'  : self.inithorseposn}
+
+      with io.open(io_file_name, 'w', encoding='utf8') as outfile:
+           yaml.dump( data, \
+                      outfile, \
+                      default_flow_style=False, \
+                      allow_unicode=True )
+
+      logger.debug("Wrote input and output to " + io_file_name)
+      
+      
+      sys.exit()
       # Return horsefly tour, along with additional information
       
-         
+      logger.debug("Returning answer")
+      horse_waiting_times = np.zeros(numsites)
+      return {'tour_points'                : self.horse_tour,
+              'horse_waiting_times'        : horse_waiting_times, 
+              'site_ordering'              : self.visited_sites,
+              'tour_length_with_waiting_time_included': \
+                                             tour_length_with_waiting_time_included(\
+                                                          self.horse_tour[1:], \
+                                                          horse_waiting_times, \
+                                                          inithorseposn)}
       
 
 # Plotting routines for classic horsefly

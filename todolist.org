@@ -1,0 +1,41 @@
+Todo list
+=========
+
+- [ ] What is the format of the horsefly tour?   ::
+      See algo_exact_given_specific_ordering for 
+      an answer. 
+
+- [ ] Construct a dummy tour 
+
+- [ ] Write it to a YAML file. 
+
+- [ ] compute_collinear_horseflies_tour_length
+
+- [ ] PolicyNaive...this one just keeps inserting 
+  into the appropriate position does not 
+  do any fancy neighborhood searching tricks
+
+- [ ] Later we will have variations on PolicyNaive
+  and try to improve the algorithms. This will 
+  be my gold-standard implementation. 
+  The gold-standard implementation will be 
+  sufficient for the report for now. 
+  
+  Make sure all the plots are in place for this 
+  so you know what variations to make. 
+
+- [ ] Implement the MST lower-bound principle. 
+
+- [ ] For collinear horseflies you need to know
+  the ratio of deformation, introduced. This 
+  will also be necessary for figures in the paper. 
+  Implement this. 
+
+- [ ] The Next policy will be doubling this tree
+  to retrieve the ordering. 
+
+- [ ] Insert a clock statemnt. You will write the 
+  time it took to execute the while loop. 
+
+- [ ] Asymptote code, to generate the collinear-horseflies
+  thingy. Make a subroutine for this. 

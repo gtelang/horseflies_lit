@@ -1,5 +1,14 @@
 \documentclass[11.5pt]{report}
 \input{standard_settings.tex}
+
+%%% Super useful for marking todo notes, ripped from here: 
+%%% https://tex.stackexchange.com/a/178806/17858
+\usepackage{xargs}                      % Use more than one optional parameter in a new commands
+\usepackage[colorinlistoftodos,prependcaption,textsize=tiny]{todonotes}
+\newcommandx{\UNSURE}[2][1=]{\todo[linecolor=blue,backgroundcolor=blue!25,bordercolor=blue,#1]{#2}}
+\newcommandx{\TODO}[2][1=]{\todo[linecolor=red,backgroundcolor=red!25,bordercolor=red,#1]{#2}}
+
+
 \usepackage{tocloft}
 \renewcommand{\cftpartfont}{\LARGE\itshape} % Part title in Huge Italic font
 \usepackage{hyperref}
@@ -50,6 +59,9 @@
 \chapter{Index of Files}
 @f
 \chapter{Man-page for \texttt{main.py}}
+
+\listoftodos[Bucketlist of TODOS]
+
 \end{appendices}
 
 \end{document}
