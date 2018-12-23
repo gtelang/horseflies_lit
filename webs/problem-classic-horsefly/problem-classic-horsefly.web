@@ -1,3 +1,38 @@
+%---------------------------------------------------------
+% Every module is a chapter. Thus we keep the links 
+% internal. Any labelling to other modules is done 
+% manually. Nuweb provides the @s....@S sectioning 
+% commands for this. See Nuweb manual
+% http://nuweb.sourceforge.net/nuweb.pdf
+% Personally, the important thing for me is not 
+% the usage of the identifiers which can be discovered
+% with gtags, or just plain simply while reading the book
+% from which module (i.e. chapter) the identifier 
+% came from. There is no replacement for gtags
+% or doxygen like source-code navigation manuals. 
+% But then again, usage lists are important within a module. 
+% I would like to understand how identifiers are used 
+% within modules, rather than how it uses external 
+% modules which I can very well also discover using 
+% gtags software or possibly doxygen. 
+% In this case, my sections are at the problem level 
+% because each problem corresponds to a module. 
+% Every model is conceptually different, so there is 
+% virtually no overlap, between them. Thus we introduce
+% sections at the module level and *not* at the algorithm
+% An important part of software engineering is engineering
+% such loose (actually super-loose) decoupling between 
+% software elements, that allows you to maintain the 
+% software and pinpoint bugs effectively. 
+% I would say, that it helps to document the internal
+% wiring of a module rather than what is exported
+% I doubt how that is scalable though. If you want to see
+% how another module uses an identifier, you should use gtags. 
+% and do the navigation. Thus, identifiers will be used for 
+% local wiring. I think it is a good approximate solution. 
+% Thus, use @s...@S at the modulelevel. 
+%----------------------------------------------------------
+@s 
 \chapter{Classic Horsefly}
 \label{chap:classic-horsefly}
 
@@ -22,7 +57,7 @@ def run_handler():
 @< Local utility functions for classic horsefly @>
 @< Algorithms for classic horsefly @>
 @< Plotting routines for classic horsefly @>
-@|  @}
+@| run_handler @}
 
 \section{Module Details}
 
@@ -69,7 +104,7 @@ def wrapperkeyPressHandler(fig,ax, run):
            elif event.key in ['c', 'C']: 
                 @< Clear canvas and states of all objects @>
        return _keyPressHandler
-@| @}
+@| wrapperkeyPressHandler @}
 
 \newchunk 
 @D Start entering input from the command-line
@@ -86,7 +121,8 @@ algo_str = raw_input(Fore.YELLOW + \
         "  (k)   k2-center   \n"                             +\
         "  (kl)  k2-center (using approximate L1 ordering)\n"  +\
         "  (g)   Greedy\n"                                   +\
-        "  (gl) Greedy (using approximate L1 ordering])  "  +\
+        "  (gl)  Greedy (using approximate L1 ordering])\n"  +\
+        "  (ginc) Greedy Incremental  "  +\
         Style.RESET_ALL)
 
 algo_str = algo_str.lstrip()
@@ -132,6 +168,12 @@ elif algo_str == 'gl':
              run.getTour( algo_greedy,
                           phi,
                           post_optimizer= algo_approximate_L1_given_specific_ordering)
+                          
+elif algo_str == 'ginc':
+      horseflytour = \
+             run.getTour( algo_greedy_incremental_insertion,
+                          phi )
+
 else:
       print "Unknown option. No horsefly for you! ;-D "
       sys.exit()
@@ -272,7 +314,7 @@ calling various horsefly algorithms.
               inithorseposn = "\nThe initial position of the horse has not been specified"
               
           return sites + inithorseposn
-@| @}
+@| HorseFlyInput @}
 
 
 Now that all the boring boiler-plate and handler codes have been 
@@ -327,7 +369,7 @@ def tour_length(horseflyinit):
         return length
 
    return _tourlength
-@}
+@| tour_length @}
 
 
 \newchunk It is possible that some heuristics might return non-negligible
@@ -360,9 +402,7 @@ def tour_length_with_waiting_time_included(tour_points, horse_waiting_times, hor
               
           sum += wait + np.linalg.norm(tour_links[i][0] - tour_links[i][1], ord=2) # 
       return sum
-@| @}
-
-
+@| tour_length_with_waiting_time_included @}
 
 \section{Plotting Routines}
 \newchunk 
@@ -438,4 +478,14 @@ def plotTour(ax,horseflytour, horseflyinit, phi, algo_str, tour_color='#d13131')
                     + str(tour_length)[:7], fontdict={'fontsize':fontsize}, **tnrfont)
     ax.set_xlabel('Number of sites: ' + str(len(xsites)) + '\nDrone Speed: ' + str(phi) ,
                   fontdict={'fontsize':fontsize}, **tnrfont)
-@| @}
+@| plotTour @}
+
+
+\section{Chapter Index of Fragments}
+@m
+\section{Chapter Index of Identifiers}
+@u 
+
+%------------------------------------------------------
+@S
+%------------------------------------------------------

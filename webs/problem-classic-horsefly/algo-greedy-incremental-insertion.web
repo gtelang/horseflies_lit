@@ -1,4 +1,4 @@
-\section{Algorithm: Greedy---Incremental Insertion}  
+\section{Algorithm: Greedy---Incremental Insertion}
 \subsection*{Algorithmic Overview}
 \newchunk The greedy nearest neighbor heuristic described in \autoref{sec:greedy-nn} gives an $O(\log n)$ 
           approximation for $n$ sites in the plane. However, there exists an alternative greedy incremental 
@@ -29,26 +29,25 @@ implementing the algorithm and get nice plots. }
 \newchunk Let's move onto the implementation. Here is how the function implementing the algorithm looks like. 
 The current implementation of the algorithm, esp with regards to finding the best point for insertion, is 
 quite slow. Efficient policies for detecting the exact or approximate point for cheapest insertion will be 
-described in section??. 
+described in \autoref{subsec:insertion-policies}. 
 
-@D Algorithms for classic horsefly 
-@{    
-def algo_greedy_incremental_insertion(sites, inithorseposn, phi
-                                      insertion_policy_name='naive',
-                                      log_level=none,
-                                      write_io = t, 
-                                      post_optimizer):
-
+@D Algorithms for classic horsefly @{
+@<Define auxiliary helper functions@>
+@<Define various insertion policy classes@>
+def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
+                                      insertion_policy_name = "naive",
+                                      log_level             = None,
+                                      write_io              = True, 
+                                      post_optimizer        = None):
       @<Set log and input-output file config@>
-      @<Define various insertion policies@>
 
-      @<Set insertion policy for current run@>
+      @<Set insertion policy class for current run@>
       @<Initialize data-structures@>
 
-      while  @<There is at-least one unvisited site@>:
-         @<Find the cheapest unvisited site to insert into current ordering of visited sites@>
+      while @<There is at-least one unvisited site@> :
+         @<Use insertion policy to find the cheapest site to insert into current tour@>
          @<Update list of visited and unvisited sites@>
-         @<Write algorithm state to file@>
+         @<Write algorithm's current state to file@>
 
       @<Write input and output to file@>
       @<Return horsefly tour, along with additional information@>
@@ -58,19 +57,45 @@ def algo_greedy_incremental_insertion(sites, inithorseposn, phi
 \newchunk Note that for each run of the algorithm, we create a dedicated directory and 
 use a corresponding log file written as an AsciiDoc file written to that 
 directory. It will typically containe detailed information on the progress 
-of the algorithm and the steps executed. For the sake of pretty printing, 
+of the algorithm and the steps executed. For the sake of neat formatting, 
 the \verb|.adoc| file will be converted to an HTML file via 
 asciidoctor-latex. 
 
-For the sake of algorithm analysis, and verification of correctness we will 
+For algorithm analysis, and verification of correctness,on the other hand, we will 
 typically  be interested in the states of the data-structures at the end of 
 the while loop; each such state will be written out as a YAML file (that 
-will also be accessible from the log file.)
+will also be accessible from the log file.) Such files can be useful for animating 
+the algorithm. 
 
 Finally, just before returning the answer, we write the input and output 
-to a separate YAML file. 
+to a separate YAML file. Thus all in all, there are three ``types'' of output files
+within each directory that corresponds to an algorithm's run: 
+\underline{a log file}, \underline{algorithm states files}, and finally 
+an \underline{input-output file}. 
 
-@D Set log and input-output file config @{   
+@D Set log and input-output file config @{  
+import sys, logging, datetime, os, errno
+
+algo_name     = 'algo-greedy-incremental-insertion'
+time_stamp    = datetime.datetime.now().strftime('Day-%Y-%m-%d_ClockTime-%H:%M:%S')
+dir_name      = algo_name + '---' + time_stamp
+log_file_name = dir_name + '/' + 'run.log'
+
+# Create directory for writing data-files and logs to for 
+# current run of this algorithm
+try:
+    os.makedirs(dir_name)
+except OSError as e:
+    if e.errno != errno.EEXIST:
+        raise
+
+logging.basicConfig( filename = log_file_name,
+                     level    = logging.DEBUG,
+                     format   = '%(asctime)s: %(levelname)s: %(message)s',
+                     filemode = 'w' )
+logger = logging.getLogger()
+logger.info("Started running greedy_incremental_insertion for classic horsefly")
+
 @| @}
 
 
@@ -79,35 +104,50 @@ the appropriate function. This will later help us in studying the speed of
 the algorithm and quality of the solution for various insertion policies 
 during the experimental analysis. 
 
-@D Set insertion policy for current run @{   
-if insertion_policy_name == 'naive':
-         insertion_policy = policy_naive
+@D Set insertion policy class for current run @{
+if insertion_policy_name == "naive":
+     insertion_policy = PolicyNaive(sites, inithorseposn, phi)
 else: 
-         sys.exit("Unknown insertion policy: " +\
-                   insertion_policy_name)
+     print insertion_policy_name
+     sys.exit("Unknown insertion policy: " )
+
+logger.debug("...Finished setting insertion policy: " + insertion_policy_name)
+sys.exit()
 @| @}
 
 \newchunk 
-@d Initialize data-structures @{   
+@D Initialize data-structures @{
+logger.debug("Finished initializing data-structures")
 @| @}
 
-\newchunk For now, we just implement the naive policy of iterating thorough 
-all the unvisited points, and all the positions within $\mathcal{O}$ at a 
-given stage to find the cheapest point for insertion. This will also serve 
-as a benchmark when implementing more sophisticated policies for computing 
-exactly or approximating this cheapest insertion point. 
+\newchunk This chunk is used as a testing condition for executing the body of the \verb|while| loop
+above. 
+@D There is at-least one unvisited site 
+@{True @}
 
-@D Define various insertion policies @{   
-     def policy_naive():
-          pass
-@| @}
+\newchunk Before proceeding, we define some functions that we use in the body of 
+\verb|algo_incremental_insertion|. Given the intial position of the truck and drone, 
+and a list of sites, we need to compute the collinear horsefly tour length for the 
+given ordering. This is the function that we will later use for deciding which is 
+the cheapest unvisited site to insert into the current ordering of visited sites. 
 
-\newchunk 
-@D There is at-least one unvisited site @{   
-@| @}
+Note that the order in which sites are passed to this function matters. It 
+assumes that you want to compute the collinear horseflies tour length for the 
+sites \textit{in the given order.}
 
-\newchunk 
-@D Find the cheapest unvisited site to insert into current ordering of visited sites @{   
+@D Define auxiliary helper functions @{   
+def compute_collinear_horseflies_tour_length(sites, inithorseposn, phi):
+       pass
+          
+@| compute_collinear_horseflies_tour_length @}
+
+
+\newchunk In the following chunk, we treat the insertion policy (whose name has already been 
+passed as an string argument) as a kind of black-box, since all policy classes have the 
+same interface. The detailed implementation for the various insertion policies are given later. 
+
+@D Use insertion policy to find the cheapest site to insert into current tour @{
+pass   
 @| @}
 
 \newchunk 
@@ -115,14 +155,86 @@ exactly or approximating this cheapest insertion point.
 @| @}
 
 \newchunk 
-@D Write algorithm state to file @{   
+@D Write algorithm's current state to file @{   
 @| @}
 
 \newchunk 
 @D Write input and output to file @{   
-  @| @}
+@| @}
 
 \newchunk 
 @D   Return horsefly tour, along with additional information@{
    
 @| @}
+
+\section{Insertion Policies} 
+\label{subsec:insertion-policies}
+
+We have finished implemented the entire algorithm, except 
+for the implementation of the various insertion policy classes. 
+
+The main job of an insertion policy class is to keep track 
+of the  unvisited sites,  the order of the visited sites and the 
+horsefly tour itself. Every time, the method \verb|.get_next_site(...)| is called, it 
+chooses an appropriate (i.e. cheapest) unvisited site to insert 
+into the current ordering, and update the set of visited and unvisited sites
+and details of the horsefly tour.  
+
+To do this quickly it will typically need auxiliary data-structures whose specifics 
+will depend on the details of the policy chosen. 
+
+\subsection{Naive Insertion} To begin, we implement the naive policy of iterating through 
+all the unvisited sites $U$, and all the positions within 
+$\mathcal{O}$ at a given stage of the algorithm to find the cheapest site for 
+insertion. No special data-structures are needed for keeping track of anything. 
+
+This will also serve as a benchmark when implementing more 
+sophisticated policies for computing exactly or approximating 
+this cheapest insertion point. In theory, the naive policy should 
+an $O(n^2)$ time running algorithm. 
+
+Since the interface for all policy classes will be the same, it is 
+best, if have a base class for such classes. Since the details of 
+the interface may change, I'll probably do this later. For now, 
+I'll just keep all the policy classes completely separate while 
+keeping the interface of the constructors and methods the same. 
+I'll refactor things later. 
+
+@D Define various insertion policy classes 
+@{class PolicyNaive:
+
+    def __init__(self, sites, inithorseposn, phi):
+    
+         # Remember input data for future processing
+         self.sites           = sites
+         self.inithorseposn   = inithorseposn
+         self.phi             = phi
+
+         # Initialize data-elements for whom I am 
+         # responsible for keeping track and manipulating.
+         self.unvisited_sites = [] # an index list that indexes into self.sites
+         self.horse_tour      = None
+
+    @<Methods for \verb|PolicyNaive| @>
+@|  @}
+
+\newchunk In some sense, the method's with the following name are the most important function 
+is the implementation of greedy incremental methods. After returning the next point 
+for insertion, the method \textit{does not} update the internal state of the 
+horse tour, or the set of unvisited sites (hence the ``suggest'' in the name). 
+While it may be logical to do the update, I prefer to keep the whole 
+implementation as fine grained as possible. Later I might just dump the body of 
+\verb|PolicyNaive| at the end of \verb|suggest_site_for_insertion|. 
+
+@d Methods for \verb|PolicyNaive| @{
+def suggest_site_for_insertion(self):
+      pass
+@| suggest_site_for_insertion @}
+ 
+
+\newchunk \blindtext
+
+@d Methods for \verb|PolicyNaive| @{   
+def update_state(self):
+     pass
+@| update_state @}

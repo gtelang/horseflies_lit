@@ -1,4 +1,4 @@
-\documentclass[11pt]{report}
+\documentclass[11.5pt]{report}
 \input{standard_settings.tex}
 \usepackage{tocloft}
 \renewcommand{\cftpartfont}{\LARGE\itshape} % Part title in Huge Italic font
@@ -49,10 +49,6 @@
 \begin{appendices}
 \chapter{Index of Files}
 @f
-\chapter{Index of Fragments}
-@m
-\chapter{Index of Identifiers}
-@u 
 \chapter{Man-page for \texttt{main.py}}
 \end{appendices}
 

@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
-cd ../tex
+cd tex
 echo "\begin{verbatim}"  > directory-tree.tex
-tree -I '*.log|README.md|clean.sh|*.out|*.pre|*.toc|*.aux|_minted*|*~|docs|*.pyc' --charset=ascii --dirsfirst    ..  >> directory-tree.tex
+tree -I '*.log|README.md|clean.sh|*.out|*.pre|*.toc|*.aux|_minted*|*~|docs|*.pyc|*.asy' --charset=ascii --dirsfirst    ..  >> directory-tree.tex
 echo "\end{verbatim}"   >> directory-tree.tex
 
 main_web_file="../webs/horseflies.web"
@@ -13,8 +13,8 @@ if [ $# -eq 0 ]; then
         # mode, by weaving and tangling
 	nuweb -r -v $main_web_file             
 	lualatex -interaction=nonstopmode -halt-on-error  -shell-escape $main_tex_file  
+	asy -vv *.asy                              
 	bibtex $main_tex_file                 
-	asy *.asy                              
 	lualatex -interaction=nonstopmode -halt-on-error  -shell-escape $main_tex_file  
 	lualatex -interaction=nonstopmode -halt-on-error  -shell-escape $main_tex_file  
 	nuweb -r -v $main_web_file            

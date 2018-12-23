@@ -41,7 +41,8 @@ def run_handler():
                             "  (k)   k2-center   \n"                             +\
                             "  (kl)  k2-center (using approximate L1 ordering)\n"  +\
                             "  (g)   Greedy\n"                                   +\
-                            "  (gl) Greedy (using approximate L1 ordering])  "  +\
+                            "  (gl)  Greedy (using approximate L1 ordering])\n"  +\
+                            "  (ginc) Greedy Incremental  "  +\
                             Style.RESET_ALL)
 
                     algo_str = algo_str.lstrip()
@@ -87,6 +88,12 @@ def run_handler():
                                  run.getTour( algo_greedy,
                                               phi,
                                               post_optimizer= algo_approximate_L1_given_specific_ordering)
+                                              
+                    elif algo_str == 'ginc':
+                          horseflytour = \
+                                 run.getTour( algo_greedy_incremental_insertion,
+                                              phi )
+
                     else:
                           print "Unknown option. No horsefly for you! ;-D "
                           sys.exit()
@@ -456,49 +463,99 @@ def algo_exact_given_specific_ordering (sites, horseflyinit, phi):
                                                     horse_waiting_times, 
                                                     horseflyinit)}
    
+
+# Define auxiliary helper functions
+   
+def compute_collinear_horseflies_tour_length(sites, inithorseposn, phi):
+       pass
+          
+
+# Define various insertion policy classes
+class PolicyNaive:
+
+    def __init__(self, sites, inithorseposn, phi):
     
-def algo_greedy_incremental_insertion(sites, inithorseposn, phi
-                                      insertion_policy_name='naive',
-                                      log_level=none,
-                                      write_io = t, 
-                                      post_optimizer):
+         # Remember input data for future processing
+         self.sites           = sites
+         self.inithorseposn   = inithorseposn
+         self.phi             = phi
 
+         # Initialize data-elements for whom I am 
+         # responsible for keeping track and manipulating.
+         self.unvisited_sites = [] # an index list that indexes into self.sites
+         self.horse_tour      = None
+
+    # Methods for \verb|PolicyNaive|
+    
+    def suggest_site_for_insertion(self):
+          pass
+       
+    def update_state(self):
+         pass
+    
+
+def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
+                                      insertion_policy_name = "naive",
+                                      log_level             = None,
+                                      write_io              = True, 
+                                      post_optimizer        = None):
       # Set log and input-output file config
-         
-      
-      # Define various insertion policies
-         
-           def policy_naive():
-                pass
+        
+      import sys, logging, datetime, os, errno
+
+      algo_name     = 'algo-greedy-incremental-insertion'
+      time_stamp    = datetime.datetime.now().strftime('Day-%Y-%m-%d_ClockTime-%H:%M:%S')
+      dir_name      = algo_name + '---' + time_stamp
+      log_file_name = dir_name + '/' + 'run.log'
+
+      # Create directory for writing data-files and logs to for 
+      # current run of this algorithm
+      try:
+          os.makedirs(dir_name)
+      except OSError as e:
+          if e.errno != errno.EEXIST:
+              raise
+
+      logging.basicConfig( filename = log_file_name,
+                           level    = logging.DEBUG,
+                           format   = '%(asctime)s: %(levelname)s: %(message)s',
+                           filemode = 'w' )
+      logger = logging.getLogger()
+      logger.info("Started running greedy_incremental_insertion for classic horsefly")
+
       
 
-      # Set insertion policy for current run
-         
-      if insertion_policy_name == 'naive':
-               insertion_policy = policy_naive
+      # Set insertion policy class for current run
+      
+      if insertion_policy_name == "naive":
+           insertion_policy = PolicyNaive(sites, inithorseposn, phi)
       else: 
-               sys.exit("Unknown insertion policy: " +\
-                         insertion_policy_name)
+           print insertion_policy_name
+           sys.exit("Unknown insertion policy: " )
+
+      logger.debug("...Finished setting insertion policy: " + insertion_policy_name)
+      sys.exit()
       
       # Initialize data-structures
-         
+      
+      logger.debug("Finished initializing data-structures")
       
 
-      while     
-             :
-         # Find the cheapest unvisited site to insert into current ordering of visited sites
-            
+      while True  :
+         # Use insertion policy to find the cheapest site to insert into current tour
+         
+         pass   
          
          # Update list of visited and unvisited sites
             
          
-         # Write algorithm state to file
+         # Write algorithm's current state to file
             
          
 
       # Write input and output to file
          
-        
+      
       # Return horsefly tour, along with additional information
       
          

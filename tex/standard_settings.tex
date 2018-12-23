@@ -1,4 +1,5 @@
-\usepackage[a4paper, left=2cm, right=2cm]{geometry}
+%\usepackage[a4paper, left=2cm, right=2cm]{geometry}
+\usepackage[text={18cm,24cm}]{geometry}
 \usepackage{marginnote}
 
 % https://stackoverflow.com/a/27243065/505306
@@ -147,10 +148,16 @@
 % Writing the text of a section immediately after section title
 % Vedic and old british style where text immediately follows the 
 % subsection number. https://tex.stackexchange.com/a/99177/17858
-\usepackage{titlesec}
+%\usepackage{titlesec}
 %\titlespacing{\section}{0pt}{*0}{*0}
 %\titlespacing{\subsection}{0pt}{*0}{*0}
 %\titlespacing{\subsubsection}{0pt}{*0}{*0}
+\usepackage[compact]{titlesec}
+\titlespacing{\section}{0pt}{2ex}{1ex}
+\titlespacing{\subsection}{0pt}{1ex}{0ex}
+\titlespacing{\subsubsection}{0pt}{0.5ex}{0ex}
+%\setlength{\parskip}{0.1cm} % Paragraph separation
+\setlength{\parindent}{2em}
 
 \titleformat*{\section}{\Huge\bfseries}
 \titleformat{\subsection}[runin]{\normalfont\Large\bfseries}{\thesubsection}{0.5em}{}
@@ -294,3 +301,13 @@ urlcolor={linkcolor}%
 }
 \makeatother
 \fi
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% for setting program fonts
+%% As recommended by http://nepsweb.co.uk/docs/progfonts.pdf
+%% He recommends bera mono. 
+%%\usepackage[scaled]{beramono}
+%%\usepackage[T1]{fontenc}
+
+%% I liked txtt also. 
+\renewcommand{\ttdefault}{txtt}
