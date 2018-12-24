@@ -242,7 +242,7 @@ if animate_algo_p:
                       '.png'
     plt.savefig(dir_name + '/' + image_file_name,  bbox_inches='tight', dpi=300)
     print "Wrote " + image_file_name + " to disk"   
-
+    plt.close('all') # https://stackoverflow.com/a/21884375/505306
 @| @}     
 
 \newchunk The final answer is written to disk in the form of a YAML file. It lists the input sites 
@@ -279,7 +279,7 @@ for choosing the particular command-line options to \verb|ffmpeg| below.
 @{if animate_algo_p:
      import subprocess, os
      os.chdir(dir_name)
-     subprocess.call( ['ffmpeg', '-i', 'algo_state_%05d.png', '-vcodec', 'mpeg4', 'algo_state_animation.avi']  )
+     subprocess.call( ['ffmpeg', '-r', '1',  '-i', 'algo_state_%05d.png', '-vcodec', 'mpeg4', '-r', '10' ,'algo_state_animation.avi']  )
      os.chdir('../')
 @| @}
 

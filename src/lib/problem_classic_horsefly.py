@@ -733,7 +733,7 @@ def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
                                     '.png'
                   plt.savefig(dir_name + '/' + image_file_name,  bbox_inches='tight', dpi=300)
                   print "Wrote " + image_file_name + " to disk"   
-
+                  plt.close('all') # https://stackoverflow.com/a/21884375/505306
               
 
          algo_state_counter = algo_state_counter + 1
@@ -765,7 +765,7 @@ def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
       if animate_algo_p:
            import subprocess, os
            os.chdir(dir_name)
-           subprocess.call( ['ffmpeg', '-i', 'algo_state_%05d.png', '-vcodec', 'mpeg4', 'algo_state_animation.avi']  )
+           subprocess.call( ['ffmpeg', '-r', '1',  '-i', 'algo_state_%05d.png', '-vcodec', 'mpeg4', '-r', '10' ,'algo_state_animation.avi']  )
            os.chdir('../')
       
       # Return horsefly tour, along with additional information
