@@ -51,20 +51,16 @@ def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
 
 
 \newchunk Note that for each run of the algorithm, we create a dedicated directory and 
-use a corresponding log file written as an AsciiDoc file written to that 
-directory. It will typically containe detailed information on the progress 
-of the algorithm and the steps executed. For the sake of neat formatting, 
-the \verb|.adoc| file will be converted to an HTML file via 
-asciidoctor-latex. 
+use a corresponding log file  in that directory. It will typically containe detailed 
+information on the progress of the algorithm and the steps executed. 
 
 For algorithm analysis, and verification of correctness,on the other hand, we will 
 typically  be interested in the states of the data-structures at the end of 
-the while loop; each such state will be written out as a YAML file (that 
-will also be accessible from the log file.) Such files can be useful for animating 
-the algorithm. 
+the while loop; each such state will be written out as a YAML file. Such files can 
+be useful for animating the progress of the algorithm. 
 
 Finally, just before returning the answer, we write the input and output 
-to a separate YAML file. Thus all in all, there are three ``types'' of output files
+to a separate YAML file. All in all, there are three ``types'' of output files
 within each directory that corresponds to an algorithm's run: 
 \underline{a log file}, \underline{algorithm states files}, and finally 
 an \underline{input-output file}. 
@@ -76,6 +72,7 @@ algo_name     = 'algo-greedy-incremental-insertion'
 time_stamp    = datetime.datetime.now().strftime('Day-%Y-%m-%d_ClockTime-%H:%M:%S')
 dir_name      = algo_name + '---' + time_stamp
 log_file_name = dir_name + '/' + 'run.log'
+io_file_name  = 'input_and_output.yml'
 
 # Create directory for writing data-files and logs to for 
 # current run of this algorithm
@@ -93,7 +90,7 @@ logger = logging.getLogger()
 logger.info("Started running greedy_incremental_insertion for classic horsefly")
 
 algo_state_counter = 0 
-@| algo_state_counter @}
+@| io_file_name, logger @}
 
 
 \newchunk This fragment merely sets the variable \verb|insertion_policy| to 
@@ -117,8 +114,8 @@ logger.debug("Finished setting insertion policy: " + insertion_policy_name)
 policy classes have the same interface. The detailed implementation for the various 
 insertion policies are given later. 
 
-@D Use insertion policy to find the cheapest site to insert into current tour @{
-insertion_policy.insert_another_unvisited_site()
+@D Use insertion policy to find the cheapest site to insert into current tour 
+@{insertion_policy.insert_another_unvisited_site()
 logger.debug("Inserted another unvisited site")
 @| @}
 
@@ -154,7 +151,6 @@ assert(len(insertion_policy.horse_tour) == len(insertion_policy.visited_sites) +
 # ASSERT: All sites have been visited. Simple sanity check 
 assert(len(insertion_policy.sites)   == len(insertion_policy.visited_sites)) 
 
-io_file_name = 'input_and_output.yml'
 
 data = {'insertion_policy_name' : insertion_policy_name   ,
         'visited_sites'  : insertion_policy.visited_sites , 
@@ -232,7 +228,7 @@ def single_site_solution(site, horseposn, phi):
      hr_mag = np.linalg.norm(r-h)
 
      return (tuple(r), hr_mag) 
-@}
+@| single_site_solution @}
 
 With that the tour length functions for collinear horseflies can be implemented as 
 an elementary instance of the fold pattern of functional programming. 
@@ -270,7 +266,7 @@ def compute_collinear_horseflies_tour(sites, inithorseposn, phi):
           horseposn = rendezvous_pt
 
       return horse_tour_points
-@| @}
+@| compute_collinear_horseflies_tour @}
 
 
 
@@ -344,7 +340,7 @@ class PolicyNaive:
          self.horse_tour           = [self.inithorseposn]         
 
     @<Methods for \verb|PolicyNaive| @>
-@|  @}
+@| self.sites, self.inithorseposn, self.visited_sites, self.horse_tour @}
 
 \newchunk 
 @D Methods for \verb|PolicyNaive| @{
@@ -361,13 +357,13 @@ def insert_another_unvisited_site(self):
      @< Find the unvisited site which on insertion increases tour-length by the least amount  @>     
      @< Update states for \texttt{PolicyNaive} @> 
  
-@| insert_another_unvisited_site, delta_increase_least_table @}
+@| delta_increase_least_table @}
 
 
 \newchunk 
 
-@D  Compute the length of the tour that currently services the visited sites @{   
-current_tour_length    = \
+@D  Compute the length of the tour that currently services the visited sites 
+@{current_tour_length    = \
          compute_collinear_horseflies_tour_length(\
                     self.visited_sites,\
                     self.inithorseposn,\
@@ -376,8 +372,8 @@ current_tour_length    = \
 
 
 \newchunk 
-@D Set up tracking variables local to this iteration  @{   
-ibest                = 0
+@D Set up tracking variables local to this iteration 
+@{ibest                = 0
 delta_increase_least = float("inf")
 @| ibest, delta_increase_least @}
 

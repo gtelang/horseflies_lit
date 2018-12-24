@@ -521,7 +521,6 @@ class PolicyNaive:
     def insert_another_unvisited_site(self):
      
          # Compute the length of the tour that currently services the visited sites
-            
          current_tour_length    = \
                   compute_collinear_horseflies_tour_length(\
                              self.visited_sites,\
@@ -533,7 +532,6 @@ class PolicyNaive:
          for u in self.unvisited_sites_idxs:
 
              # Set up tracking variables local to this iteration
-                
              ibest                = 0
              delta_increase_least = float("inf")
              
@@ -603,6 +601,7 @@ def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
       time_stamp    = datetime.datetime.now().strftime('Day-%Y-%m-%d_ClockTime-%H:%M:%S')
       dir_name      = algo_name + '---' + time_stamp
       log_file_name = dir_name + '/' + 'run.log'
+      io_file_name  = 'input_and_output.yml'
 
       # Create directory for writing data-files and logs to for 
       # current run of this algorithm
@@ -634,7 +633,6 @@ def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
 
       while insertion_policy.unvisited_sites_idxs: 
          # Use insertion policy to find the cheapest site to insert into current tour
-         
          insertion_policy.insert_another_unvisited_site()
          logger.debug("Inserted another unvisited site")
          
@@ -667,7 +665,6 @@ def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
       # ASSERT: All sites have been visited. Simple sanity check 
       assert(len(insertion_policy.sites)   == len(insertion_policy.visited_sites)) 
 
-      io_file_name = 'input_and_output.yml'
 
       data = {'insertion_policy_name' : insertion_policy_name   ,
               'visited_sites'  : insertion_policy.visited_sites , 
