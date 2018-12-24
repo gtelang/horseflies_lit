@@ -656,7 +656,84 @@ def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
                  
               import utils_algo
               if animate_algo_p:
-                   pass
+                   
+                  
+                  # Set up plotting area and canvas, fig, ax, all that boiler-plate jazz
+                  fig,ax = plt.subplots()
+                  ax.set_xlim([0,1])
+                  ax.set_ylim([0,1])
+                  ax.set_aspect(1.0)
+                  ax = fig.gca()
+                  ax.set_xticks(np.arange(0, 1, 0.1))     
+                  ax.set_yticks(np.arange(0, 1., 0.1))
+                  plt.grid(linestyle='dotted')
+                  ax.set_xticklabels([]) # to remove those numbers at the bottom
+                  ax.set_yticklabels([])
+
+
+                  # Route for the horse, xhs, yhs
+                  xhs = [ data['horse_tour'][i][0] 
+                              for i in range(len(data['horse_tour']))  ]    
+                  yhs = [ data['horse_tour'][i][1] 
+                              for i in range(len(data['horse_tour']))  ]    
+
+                  # List of visited sites 
+                  xvisited = [ data['visited_sites'][i][0] 
+                                   for i in range(len(data['visited_sites']))  ]    
+                  yvisited = [ data['visited_sites'][i][1] 
+                                   for i in range(len(data['visited_sites']))  ]    
+                  
+                  # List of unvisited sites
+                  xunvisited = [ data['unvisited_sites'][i][0] 
+                                   for i in range(len(data['unvisited_sites']))  ]    
+                  yunvisited = [ data['unvisited_sites'][i][1] 
+                                    for i in range(len(data['unvisited_sites'])) ]    
+                  
+                  # Route for the fly. The fly keeps alternating
+                  # between the site and the horse
+                  xfs , yfs = [xhs[0]], [yhs[0]]
+                  for site, pt in zip (data['visited_sites'],
+                                       data['horse_tour'][1:]):
+                      xfs.extend([site[0], pt[0]])
+                      yfs.extend([site[1], pt[1]])
+
+
+                  # Mark initial position of horse and fly boldly on canvas
+                  ax.add_patch( mpl.patches.Circle( inithorseposn,
+                                                    radius = 1/55.0,
+                                                    facecolor= '#D13131', #'red',
+                                                    edgecolor='black')  )
+
+                  ax.plot(xfs,yfs,'g-')                                    # fly tour is green
+                  ax.plot(xhs, yhs, color='r', marker='s', markersize=2, linewidth=1.5) # horse tour is red
+                  
+                  # Place numbered markers on visited sites to mark the order of visitation explicitly
+                  for x,y,i in zip(xvisited, yvisited, range(len(xvisited))):
+                        ax.text(x, y, str(i+1),  fontsize=5, bbox=dict(facecolor='#ddcba0', alpha=1.0, pad=1.5)) 
+
+                  # Draw unvisited sites as filled blue circles
+                  for x, y in zip(xunvisited, yunvisited):
+                         ax.add_patch( mpl.patches.Circle( (x,y),
+                                                           radius    = 1/150.0,
+                                                           facecolor = 'blue',
+                                                           edgecolor = 'black')  )
+                         
+
+                  # Give metainformation about current picture as headers and footers
+                  fontsize = 10
+                  tnrfont = {'fontname':'DejaVu Sans'}
+                  ax.set_title( 'Number of sites visited so far: ' +\
+                                 str(len(data['visited_sites']))   +\
+                                 '/' + str(len(sites))           ,  \
+                                      fontdict={'fontsize':fontsize}, **tnrfont)
+
+                  # Write image file. 
+                  image_file_name = 'algo_state_' + \
+                                    str(algo_state_counter).zfill(5) + \
+                                    '.png'
+                  plt.savefig(dir_name + '/' + image_file_name,  bbox_inches='tight', dpi=300)
+                  print "Wrote " + image_file_name + " to disk"   
+
               
 
          algo_state_counter = algo_state_counter + 1
@@ -688,11 +765,12 @@ def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
       if animate_algo_p:
            import subprocess, os
            os.chdir(dir_name)
-           subprocess.call(['ffmpeg', '-i', 'algo_state_%05.png', 'insertion_process.mp4'])
+           subprocess.call( ['ffmpeg', '-i', 'algo_state_%05d.png', '-vcodec', 'mpeg4', 'algo_state_animation.avi']  )
            os.chdir('../')
       
       # Return horsefly tour, along with additional information
       
+      sys.exit()
       logger.debug("Returning answer")
       horse_waiting_times = np.zeros(len(sites))
       return {'tour_points'                : insertion_policy.horse_tour[1:],

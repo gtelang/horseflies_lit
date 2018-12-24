@@ -39,3 +39,15 @@ Todo list
 
 - [ ] Asymptote code, to generate the collinear-horseflies
   thingy. Make a subroutine for this. 
+========================================================
+
+To render the markdown state to file, we will need to rip 
+out the internals of the plothorsefly routine and stick 
+it into the chunk here. The visualization for this, will 
+be different from the ordinary representation on the canvas. 
+
+For each state written out make a plot, and save it as a 500 dpi 
+png file. Also mark the current algo_state_counter somewhere in 
+the title. 
+
+All the states to be rendered are insertion_policy.xyz
