@@ -41,13 +41,13 @@ def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
       @<Set log, algo-state and input-output files config@>
       @<Set insertion policy class for current run@>
 
-      while insertion_policy.unvisited_sites: 
+      while insertion_policy.unvisited_sites_idxs: 
          @<Use insertion policy to find the cheapest site to insert into current tour@>
          @<Write algorithm's current state to file@>
 
       @<Write input and output to file@>
       
-      sys.exit()
+      #sys.exit()
       @<Return horsefly tour, along with additional information@>
 @| algo_greedy_incremental_insertion @}
 
@@ -108,10 +108,9 @@ if insertion_policy_name == "naive":
      insertion_policy = PolicyNaive(sites, inithorseposn, phi)
 else: 
      print insertion_policy_name
-     sys.exit("Unknown insertion policy: " )
+     sys.exit("Unknown insertion policy: ")
 
 logger.debug("Finished setting insertion policy: " + insertion_policy_name)
-sys.exit()
 @| @}
 
 
@@ -127,19 +126,21 @@ logger.debug("Inserted another unvisited site")
 
 \newchunk 
 @D Write algorithm's current state to file @{   
-import yaml, io
-algo_state_file_name = 'algo_state_' + \
+import yaml
+algo_state_file_name = 'algo_state_'                    + \
                        str(algo_state_counter).zfill(5) + \
-                       '.yaml'
-data = {'unvisited_sites' : [self.sites[u] for u in unvisited_sites_idxs], 
-        'visited_sites'   : self.visited_sites , 
-        'horse_tour'      : self.horse_tour }
+                       '.yml'
 
-with io.open(algo_state_file_name, 'w', encoding='utf8') as outfile:
+data = {'insertion_policy_name' : insertion_policy_name                       ,
+        'unvisited_sites'       : [insertion_policy.sites[u] \
+                                       for u in insertion_policy.unvisited_sites_idxs], 
+        'visited_sites'         : insertion_policy.visited_sites                    , 
+        'horse_tour'            : insertion_policy.horse_tour }
+
+with open(dir_name + '/' + algo_state_file_name, 'w') as outfile:
      yaml.dump( data   , \
                 outfile, \
-                default_flow_style = False, \
-                allow_unicode      = True )
+                default_flow_style = False)
 
 algo_state_counter = algo_state_counter + 1
 logger.debug("Dumped algorithm state to " + algo_state_file_name)
@@ -151,38 +152,60 @@ Note that the number of points on the horse's tour is 1 more than the number of 
 
 @D Write input and output to file @{
 # ASSERT: `inithorseposn` is included as first point of the tour
-assert(len(horse_tour)+1 == len(self.visited_sites)) 
+assert(len(insertion_policy.horse_tour) == len(insertion_policy.visited_sites) + 1) 
 
 # ASSERT: All sites have been visited. Simple sanity check 
-assert(len(self.sites)   == len(self.visited_sites)) 
+assert(len(insertion_policy.sites)   == len(insertion_policy.visited_sites)) 
 
 io_file_name = 'input_and_output.yml'
 
-data = {'visited_sites'  : self.visited_sites, 
-        'horse_tour'     : self.horse_tour, 
-        'phi'            : self.phi, 
-        'inithorseposn'  : self.inithorseposn}
+data = {'insertion_policy_name' : insertion_policy_name   ,
+        'visited_sites'  : insertion_policy.visited_sites , 
+        'horse_tour'     : insertion_policy.horse_tour    , 
+        'phi'            : insertion_policy.phi           , 
+        'inithorseposn'  : insertion_policy.inithorseposn}
 
-with io.open(io_file_name, 'w', encoding='utf8') as outfile:
+with open(dir_name + '/' + io_file_name, 'w') as outfile:
      yaml.dump( data, \
                 outfile, \
-                default_flow_style=False, \
-                allow_unicode=True )
+                default_flow_style=False)
 
-logger.debug("Wrote input and output to " + io_file_name)
+logger.debug("Dumped input and output to " + io_file_name)
+
+# Read back the data for a quick sanity-check
+# of result before returning answer. 
+import utils_algo
+with open(dir_name + '/' + io_file_name, 'r') as stream:
+     data_loaded = yaml.load(stream)
+print '--------------------------------------------'
+print "INITIAL HORSEPOSITION "
+print data_loaded['inithorseposn']
+print "  "
+print '--------------------------------------------'
+print "SPEED RATIO"
+print data_loaded['phi']
+print " "
+print '--------------------------------------------'
+print "HORSE TOUR"
+utils_algo.print_list(data_loaded['horse_tour'])
+print "  "
+print '--------------------------------------------'
+print "VISITED SITES ARE"
+utils_algo.print_list(data_loaded['visited_sites'])
+print '--------------------------------------------'
+logger.debug("Reading back data from files printed out for sanity-check of data-written")
 @| @}
 
 \newchunk 
-
 @D Return horsefly tour, along with additional information@{
 logger.debug("Returning answer")
-horse_waiting_times = np.zeros(numsites)
-return {'tour_points'                : self.horse_tour,
+horse_waiting_times = np.zeros(len(sites))
+return {'tour_points'                : insertion_policy.horse_tour[1:],
         'horse_waiting_times'        : horse_waiting_times, 
-        'site_ordering'              : self.visited_sites,
+        'site_ordering'              : insertion_policy.visited_sites,
         'tour_length_with_waiting_time_included': \
                                        tour_length_with_waiting_time_included(\
-                                                    self.horse_tour[1:], \
+                                                    insertion_policy.horse_tour[1:], \
                                                     horse_waiting_times, \
                                                     inithorseposn)}
 @| @}
@@ -218,7 +241,7 @@ def single_site_solution(site, horseposn, phi):
      r      = h +  2*hs_mag/(1+phi) * hs_unit # Rendezvous point
      hr_mag = np.linalg.norm(r-h)
 
-     return (hr_mag, r)
+     return (tuple(r), hr_mag) 
 @}
 
 With that the tour length functions for collinear horseflies can be implemented as 
@@ -411,15 +434,15 @@ delta_increase                   = best_table_entry['delta_increase']
 @D Update states for \texttt{PolicyNaive}  @{   
 # Update visited and univisted sites info
 self.visited_sites = self.visited_sites[:insertion_position]      +\
-                     self.sites[unvisited_site_idx_for_insertion] +\
+                     [self.sites[unvisited_site_idx_for_insertion]] +\
                      self.visited_sites[insertion_position:]
   
 self.unvisited_sites_idxs = filter( lambda elt: elt != unvisited_site_idx_for_insertion, \
-                                    self.visited_sites ) 
+                                    self.unvisited_sites_idxs ) 
 
 # Update the tour of the horse
 self.horse_tour = compute_collinear_horseflies_tour(\
-                           self.sites,         \
+                           self.visited_sites,         \
                            self.inithorseposn, \
                            self.phi) 
 @| @}
