@@ -590,8 +590,7 @@ class PolicyNaive:
 
 def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
                                       insertion_policy_name = "naive",
-                                      log_level             = None,
-                                      write_io              = True, 
+                                      animate_algo_p        = True,
                                       post_optimizer        = None):
       # Set log, algo-state and input-output files config
         
@@ -653,6 +652,13 @@ def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
               yaml.dump( data   , \
                          outfile, \
                          default_flow_style = False)
+              # If \verb|animate_algo_p| flag is set to \verb|True|, render current algorithm state to file
+                 
+              import utils_algo
+              if animate_algo_p:
+                   pass
+              
+
          algo_state_counter = algo_state_counter + 1
          logger.debug("Dumped algorithm state to " + algo_state_file_name)
          
@@ -664,7 +670,6 @@ def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
 
       # ASSERT: All sites have been visited. Simple sanity check 
       assert(len(insertion_policy.sites)   == len(insertion_policy.visited_sites)) 
-
 
       data = {'insertion_policy_name' : insertion_policy_name   ,
               'visited_sites'  : insertion_policy.visited_sites , 
@@ -678,25 +683,13 @@ def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
                       default_flow_style=False)
       logger.debug("Dumped input and output to " + io_file_name)
 
-      # Read back the data for a quick sanity-check
-      # of result before returning answer. 
-      import utils_algo
-      with open(dir_name + '/' + io_file_name, 'r') as stream:
-           data_loaded = yaml.load(stream)
-      print '\n--------------------------------------------'
-      print "INITIAL HORSEPOSITION "
-      print data_loaded['inithorseposn']
-      print '\n--------------------------------------------'
-      print "SPEED RATIO"
-      print data_loaded['phi']
-      print '\n--------------------------------------------'
-      print "HORSE TOUR"
-      utils_algo.print_list(data_loaded['horse_tour'])
-      print '\n--------------------------------------------'
-      print "VISITED SITES ARE"
-      utils_algo.print_list(data_loaded['visited_sites'])
-      print '\n--------------------------------------------'
-      logger.debug("Reading back data from files printed out for sanity-check of data-written")
+      
+      # If \verb|animate_algo_p| $==$ \verb|True|, make an animation of algorithm states
+      if animate_algo_p:
+           import subprocess, os
+           os.chdir(dir_name)
+           subprocess.call(['ffmpeg', '-i', 'algo_state_%05.png', 'insertion_process.mp4'])
+           os.chdir('../')
       
       # Return horsefly tour, along with additional information
       
