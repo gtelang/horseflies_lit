@@ -643,7 +643,7 @@ def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
          import yaml
          algo_state_file_name = 'algo_state_'                    + \
                                 str(algo_state_counter).zfill(5) + \
-                                '.yaml'
+                                '.yml'
 
          data = {'insertion_policy_name' : insertion_policy_name                       ,
                  'unvisited_sites'       : [insertion_policy.sites[u] \
@@ -655,7 +655,6 @@ def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
               yaml.dump( data   , \
                          outfile, \
                          default_flow_style = False)
-
          algo_state_counter = algo_state_counter + 1
          logger.debug("Dumped algorithm state to " + algo_state_file_name)
          
@@ -680,7 +679,6 @@ def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
            yaml.dump( data, \
                       outfile, \
                       default_flow_style=False)
-
       logger.debug("Dumped input and output to " + io_file_name)
 
       # Read back the data for a quick sanity-check
@@ -688,26 +686,21 @@ def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
       import utils_algo
       with open(dir_name + '/' + io_file_name, 'r') as stream:
            data_loaded = yaml.load(stream)
-      print '--------------------------------------------'
+      print '\n--------------------------------------------'
       print "INITIAL HORSEPOSITION "
       print data_loaded['inithorseposn']
-      print "  "
-      print '--------------------------------------------'
+      print '\n--------------------------------------------'
       print "SPEED RATIO"
       print data_loaded['phi']
-      print " "
-      print '--------------------------------------------'
+      print '\n--------------------------------------------'
       print "HORSE TOUR"
       utils_algo.print_list(data_loaded['horse_tour'])
-      print "  "
-      print '--------------------------------------------'
+      print '\n--------------------------------------------'
       print "VISITED SITES ARE"
       utils_algo.print_list(data_loaded['visited_sites'])
-      print '--------------------------------------------'
+      print '\n--------------------------------------------'
       logger.debug("Reading back data from files printed out for sanity-check of data-written")
       
-      
-      #sys.exit()
       # Return horsefly tour, along with additional information
       
       logger.debug("Returning answer")

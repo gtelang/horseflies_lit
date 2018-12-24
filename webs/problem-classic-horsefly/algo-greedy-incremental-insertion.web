@@ -46,8 +46,6 @@ def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
          @<Write algorithm's current state to file@>
 
       @<Write input and output to file@>
-      
-      #sys.exit()
       @<Return horsefly tour, along with additional information@>
 @| algo_greedy_incremental_insertion @}
 
@@ -141,7 +139,6 @@ with open(dir_name + '/' + algo_state_file_name, 'w') as outfile:
      yaml.dump( data   , \
                 outfile, \
                 default_flow_style = False)
-
 algo_state_counter = algo_state_counter + 1
 logger.debug("Dumped algorithm state to " + algo_state_file_name)
 @| @}
@@ -169,7 +166,6 @@ with open(dir_name + '/' + io_file_name, 'w') as outfile:
      yaml.dump( data, \
                 outfile, \
                 default_flow_style=False)
-
 logger.debug("Dumped input and output to " + io_file_name)
 
 # Read back the data for a quick sanity-check
@@ -177,22 +173,19 @@ logger.debug("Dumped input and output to " + io_file_name)
 import utils_algo
 with open(dir_name + '/' + io_file_name, 'r') as stream:
      data_loaded = yaml.load(stream)
-print '--------------------------------------------'
+print '\n--------------------------------------------'
 print "INITIAL HORSEPOSITION "
 print data_loaded['inithorseposn']
-print "  "
-print '--------------------------------------------'
+print '\n--------------------------------------------'
 print "SPEED RATIO"
 print data_loaded['phi']
-print " "
-print '--------------------------------------------'
+print '\n--------------------------------------------'
 print "HORSE TOUR"
 utils_algo.print_list(data_loaded['horse_tour'])
-print "  "
-print '--------------------------------------------'
+print '\n--------------------------------------------'
 print "VISITED SITES ARE"
 utils_algo.print_list(data_loaded['visited_sites'])
-print '--------------------------------------------'
+print '\n--------------------------------------------'
 logger.debug("Reading back data from files printed out for sanity-check of data-written")
 @| @}
 
@@ -209,9 +202,6 @@ return {'tour_points'                : insertion_policy.horse_tour[1:],
                                                     horse_waiting_times, \
                                                     inithorseposn)}
 @| @}
-
-\UNSURE{\texttt{self.horse\_tour[0:]} or 
-        \texttt{self.horse\_tour[1:]}}
 
 \newchunk We now define some of the functions that were referred to in the above chunks. 
 Given the intial position of the truck and drone, and a list of sites, we need to compute 
