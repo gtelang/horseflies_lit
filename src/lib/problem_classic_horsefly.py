@@ -105,7 +105,7 @@ def run_handler():
                     
                elif event.key in ['n', 'N', 'u', 'U']: 
                     # Generate a bunch of uniform or non-uniform random points on the canvas
-                    numpts = int(sys.argv[1]) 
+                    numpts = int(sys.argv[2]) 
                     run.clearAllStates()
                     ax.cla()
                                    
@@ -465,7 +465,6 @@ def algo_exact_given_specific_ordering (sites, horseflyinit, phi):
    
 
 # Define auxiliary helper functions
-
 def single_site_solution(site, horseposn, phi):
 
      h = np.asarray(horseposn)
@@ -478,7 +477,6 @@ def single_site_solution(site, horseposn, phi):
      hr_mag = np.linalg.norm(r-h)
 
      return (tuple(r), hr_mag) 
-   
 def compute_collinear_horseflies_tour_length(sites, horseposn, phi):
 
      if not sites: # No more sites, left to visit!
@@ -653,87 +651,97 @@ def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
                          outfile, \
                          default_flow_style = False)
               # If \verb|animate_algo_p| flag is set to \verb|True|, render current algorithm state to file
-                 
+              
               import utils_algo
               if animate_algo_p:
+                   # Set up plotting area and canvas, fig, ax, and other configs
                    
-                  
-                  # Set up plotting area and canvas, fig, ax, all that boiler-plate jazz
-                  fig,ax = plt.subplots()
-                  ax.set_xlim([0,1])
-                  ax.set_ylim([0,1])
-                  ax.set_aspect(1.0)
-                  ax = fig.gca()
-                  ax.set_xticks(np.arange(0, 1, 0.1))     
-                  ax.set_yticks(np.arange(0, 1., 0.1))
-                  plt.grid(linestyle='dotted')
-                  ax.set_xticklabels([]) # to remove those numbers at the bottom
-                  ax.set_yticklabels([])
+                   from matplotlib import rc
+                   rc('font', **{'family': 'serif', \
+                              'serif': ['Computer Modern']})
+                   rc('text', usetex=True)
+                   fig,ax = plt.subplots()
+                   ax.set_xlim([0,1])
+                   ax.set_ylim([0,1])
+                   ax.set_aspect(1.0)
+                   ax = fig.gca()
+                   ax.set_xticks(np.arange(0, 1, 0.1))     
+                   ax.set_yticks(np.arange(0, 1., 0.1))
+                   plt.grid(linestyle='dotted')
+                   ax.set_xticklabels([]) # to remove those numbers at the bottom
+                   ax.set_yticklabels([])
 
+                   ax.tick_params(
+                       bottom=False,      # ticks along the bottom edge are off
+                       left=False,        # ticks along the top edge are off
+                       labelbottom=False) # labels along the bottom edge are off
+                     
+                   # Extract $x$ and $y$ coordinates of the points on the horse, fly tours, visited and unvisited sites
+                     
+                   # Route for the horse
+                   xhs = [ data['horse_tour'][i][0] \
+                             for i in range(len(data['horse_tour']))  ]    
+                   yhs = [ data['horse_tour'][i][1] \
+                             for i in range(len(data['horse_tour']))  ]    
 
-                  # Route for the horse, xhs, yhs
-                  xhs = [ data['horse_tour'][i][0] 
-                              for i in range(len(data['horse_tour']))  ]    
-                  yhs = [ data['horse_tour'][i][1] 
-                              for i in range(len(data['horse_tour']))  ]    
-
-                  # List of visited sites 
-                  xvisited = [ data['visited_sites'][i][0] 
-                                   for i in range(len(data['visited_sites']))  ]    
-                  yvisited = [ data['visited_sites'][i][1] 
-                                   for i in range(len(data['visited_sites']))  ]    
-                  
-                  # List of unvisited sites
-                  xunvisited = [ data['unvisited_sites'][i][0] 
-                                   for i in range(len(data['unvisited_sites']))  ]    
-                  yunvisited = [ data['unvisited_sites'][i][1] 
+                   # Route for the fly. The fly keeps alternating between the site and the horse
+                   xfs , yfs = [xhs[0]], [yhs[0]]
+                   for site, pt in zip (data['visited_sites'],
+                                        data['horse_tour'][1:]):
+                       xfs.extend([site[0], pt[0]])
+                       yfs.extend([site[1], pt[1]])
+                           
+                   xvisited = [ data['visited_sites'][i][0] \
+                                  for i in range(len(data['visited_sites']))  ]    
+                   yvisited = [ data['visited_sites'][i][1] \
+                                  for i in range(len(data['visited_sites']))  ]    
+                       
+                   xunvisited = [ data['unvisited_sites'][i][0] \
+                                    for i in range(len(data['unvisited_sites']))  ]    
+                   yunvisited = [ data['unvisited_sites'][i][1] 
                                     for i in range(len(data['unvisited_sites'])) ]    
-                  
-                  # Route for the fly. The fly keeps alternating
-                  # between the site and the horse
-                  xfs , yfs = [xhs[0]], [yhs[0]]
-                  for site, pt in zip (data['visited_sites'],
-                                       data['horse_tour'][1:]):
-                      xfs.extend([site[0], pt[0]])
-                      yfs.extend([site[1], pt[1]])
-
-
-                  # Mark initial position of horse and fly boldly on canvas
-                  ax.add_patch( mpl.patches.Circle( inithorseposn,
-                                                    radius = 1/55.0,
-                                                    facecolor= '#D13131', #'red',
-                                                    edgecolor='black')  )
-
-                  ax.plot(xfs,yfs,'g-')                                    # fly tour is green
-                  ax.plot(xhs, yhs, color='r', marker='s', markersize=2, linewidth=1.5) # horse tour is red
-                  
-                  # Place numbered markers on visited sites to mark the order of visitation explicitly
-                  for x,y,i in zip(xvisited, yvisited, range(len(xvisited))):
-                        ax.text(x, y, str(i+1),  fontsize=5, bbox=dict(facecolor='#ddcba0', alpha=1.0, pad=1.5)) 
-
-                  # Draw unvisited sites as filled blue circles
-                  for x, y in zip(xunvisited, yunvisited):
-                         ax.add_patch( mpl.patches.Circle( (x,y),
-                                                           radius    = 1/150.0,
-                                                           facecolor = 'blue',
-                                                           edgecolor = 'black')  )
-                         
-
-                  # Give metainformation about current picture as headers and footers
-                  fontsize = 10
-                  tnrfont = {'fontname':'DejaVu Sans'}
-                  ax.set_title( 'Number of sites visited so far: ' +\
-                                 str(len(data['visited_sites']))   +\
-                                 '/' + str(len(sites))           ,  \
-                                      fontdict={'fontsize':fontsize}, **tnrfont)
-
-                  # Write image file. 
-                  image_file_name = 'algo_state_' + \
-                                    str(algo_state_counter).zfill(5) + \
-                                    '.png'
-                  plt.savefig(dir_name + '/' + image_file_name,  bbox_inches='tight', dpi=300)
-                  print "Wrote " + image_file_name + " to disk"   
-                  plt.close('all') # https://stackoverflow.com/a/21884375/505306
+                     
+                   # Mark initial position of horse and fly boldly on canvas
+                   ax.add_patch( mpl.patches.Circle( inithorseposn, \
+                                                     radius = 1/55.0,\
+                                                     facecolor= '#D13131', #'red',\
+                                                     edgecolor='black')  )
+                     
+                   # Place numbered markers on visited sites to mark the order of visitation explicitly
+                   for x,y,i in zip(xvisited, yvisited, range(len(xvisited))):
+                        ax.text(x, y, str(i+1),  fontsize=8, \
+                                bbox=dict(facecolor='#ddcba0', alpha=1.0, pad=2.0)) 
+                   
+                   # Draw horse and fly-tours
+                   ax.plot(xfs,yfs,'g-',linewidth=1.5)  
+                   ax.plot(xhs, yhs, color='r', \
+                           marker='s', markersize=3, \
+                           linewidth=2.0) 
+                   
+                   # Draw unvisited sites as filled blue circles
+                   for x, y in zip(xunvisited, yunvisited):
+                        ax.add_patch( mpl.patches.Circle( (x,y),\
+                                                       radius    = 1/100.0,\
+                                                       facecolor = 'blue',\
+                                                       edgecolor = 'black')  )
+                   
+                   # Give metainformation about current picture as headers and footers
+                   fontsize = 15
+                   ax.set_title( r'Number of sites visited so far: ' +\
+                                  str(len(data['visited_sites']))   +\
+                                  '/' + str(len(sites))           ,  \
+                                       fontdict={'fontsize':fontsize})
+                   
+                   # Write image file
+                   
+                   image_file_name = 'algo_state_' + \
+                                     str(algo_state_counter).zfill(5) + \
+                                        '.png'
+                   plt.savefig(dir_name + '/' + image_file_name,  \
+                               bbox_inches='tight')
+                   print "Wrote " + image_file_name + " to disk"   
+                   plt.close('all') # https://stackoverflow.com/a/21884375/505306
+                   
               
 
          algo_state_counter = algo_state_counter + 1
@@ -741,7 +749,6 @@ def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
          
 
       # Write input and output to file
-      
       # ASSERT: `inithorseposn` is included as first point of the tour
       assert(len(insertion_policy.horse_tour) == len(insertion_policy.visited_sites) + 1) 
 
@@ -759,18 +766,16 @@ def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
                       outfile, \
                       default_flow_style=False)
       logger.debug("Dumped input and output to " + io_file_name)
-
       
       # If \verb|animate_algo_p| $==$ \verb|True|, make an animation of algorithm states
       if animate_algo_p:
            import subprocess, os
            os.chdir(dir_name)
-           subprocess.call( ['ffmpeg', '-r', '1',  '-i', 'algo_state_%05d.png', '-vcodec', 'mpeg4', '-r', '10' ,'algo_state_animation.avi']  )
+           subprocess.call( ['ffmpeg', '-r', '1',  '-i', 'algo_state_%05d.png', \
+                             '-vcodec', 'mpeg4', '-r', '10' ,'algo_state_animation.avi']  )
            os.chdir('../')
       
       # Return horsefly tour, along with additional information
-      
-      sys.exit()
       logger.debug("Returning answer")
       horse_waiting_times = np.zeros(len(sites))
       return {'tour_points'                : insertion_policy.horse_tour[1:],

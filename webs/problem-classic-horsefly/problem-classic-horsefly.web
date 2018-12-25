@@ -191,7 +191,7 @@ sequencing algorithms as David Johnson implies in his article on how to write
 experimental algorithm papers when he talks about algorithms for the TSP. 
 
 @D  Generate a bunch of uniform or non-uniform random points on the canvas
-@{numpts = int(sys.argv[1]) 
+@{numpts = int(sys.argv[2]) 
 run.clearAllStates()
 ax.cla()
                

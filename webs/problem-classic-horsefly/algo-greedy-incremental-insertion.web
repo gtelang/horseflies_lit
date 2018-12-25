@@ -11,13 +11,33 @@
           $\mathcal{O^{'}}$  ) that minimizes the cost of the horsefly tour serving the sites $V \cup \{s\}$ 
           in the order $\mathcal{O^{'}}$. 
 
+% \begin{figure}[H]
+% \centering
+% \includegraphics[width=8cm]{../webs/docs/incremental_insertion_frames.eps}
+% \end{figure}
+
 \begin{figure}[H]
 \centering
-\includegraphics[width=8cm]{../webs/docs/incremental_insertion_frames.eps}
+\begin{tabular}{cc}
+\includegraphics[width=8cm]{../webs/docs/algo-greedy-incremental-insertion---Day-2018-12-24_ClockTime-19:31:02/algo_state_00000.png}&
+\includegraphics[width=8cm]{../webs/docs/algo-greedy-incremental-insertion---Day-2018-12-24_ClockTime-19:31:02/algo_state_00001.png}\\
+\includegraphics[width=8cm]{../webs/docs/algo-greedy-incremental-insertion---Day-2018-12-24_ClockTime-19:31:02/algo_state_00002.png}&
+\includegraphics[width=8cm]{../webs/docs/algo-greedy-incremental-insertion---Day-2018-12-24_ClockTime-19:31:02/algo_state_00003.png}\\
+\includegraphics[width=8cm]{../webs/docs/algo-greedy-incremental-insertion---Day-2018-12-24_ClockTime-19:31:02/algo_state_00004.png}&
+\includegraphics[width=8cm]{../webs/docs/algo-greedy-incremental-insertion---Day-2018-12-24_ClockTime-19:31:02/algo_state_00005.png}\\
+\end{tabular}
+\caption{Greedy incremental insertion for collinear horseflies. $\varphi=3.0$. Notice that 
+the ordering of the visited sites keep changing based on where we decide to insert an 
+unvisited site.}
+\label{fig:greedy-incremental-example}
 \end{figure}
 
-The figure above depicts the incremental insertion process for the case of 4 sites and $\varphi=3$. The 
-implementation of this algorithm for collinear-horseflies raises several interesting non-trivial 
+
+\autoref{fig:greedy-incremental-example} depicts the incremental insertion process for 
+the case of 4 sites and $\varphi=3$. Notice that the ordering of the visited sites keep 
+changing based on where we decide to insert an unvisited site. 
+
+The implementation of this algorithm for collinear-horseflies raises several interesting non-trivial 
 data-structural questions in their own right: how to quickly find the site from $U$ to 
 insert into $V$, and keep track the changing length of the horsefly tour. Note that inserting a site 
 causes the length of the tour of the truck to change, for all the sites after $s$. 
@@ -120,7 +140,7 @@ logger.debug("Inserted another unvisited site")
 @| @}
 
 \newchunk When using Python 2.7 (as I am doing with this suite of programs), you should have the 
-pyyaml module version 3.12 installed. Version 4.1 breaks for some weird reason; it can't seem to serialized
+\texttt{pyyaml} module version 3.12 installed. Version 4.1 breaks for some weird reason; it can't seem to serialized
 Numpy objects. See \url{https://github.com/kevin1024/vcrpy/issues/366} for a brief discussion on this topic. 
 
 The version of \verb|pyyaml| on your machine can be checked by printing the value of \verb|yaml.__version__|. 
@@ -161,96 +181,129 @@ moment I will stick to Matplotlib because I don't want to have to switch languag
 And much of my plots will be of a reasonably high-quality for the purpose of presentations. This will naturally 
 affect timing/benchmarking results. 
 
-
-@d If \verb|animate_algo_p| flag is set to \verb|True|, render current algorithm state to file @{   
+@D If \verb|animate_algo_p| flag is set to \verb|True|, render current algorithm state to file @{
 import utils_algo
 if animate_algo_p:
-     
+     @<Set up plotting area and canvas, fig, ax, and other configs@>  
+     @<Extract $x$ and $y$ coordinates of the points on the horse, fly tours, visited and unvisited sites@>  
+     @<Mark initial position of horse and fly boldly on canvas@>  
+     @<Place numbered markers on visited sites to mark the order of visitation explicitly@>
+     @<Draw horse and fly-tours@>
+     @<Draw unvisited sites as filled blue circles@>
+     @<Give metainformation about current picture as headers and footers@>
+     @<Write image file@>
+@}
+
+\newchunk 
+@DSet up plotting area and canvas, fig, ax, and other configs @{
+from matplotlib import rc
+rc('font', **{'family': 'serif', \
+           'serif': ['Computer Modern']})
+rc('text', usetex=True)
+fig,ax = plt.subplots()
+ax.set_xlim([0,1])
+ax.set_ylim([0,1])
+ax.set_aspect(1.0)
+ax = fig.gca()
+ax.set_xticks(np.arange(0, 1, 0.1))     
+ax.set_yticks(np.arange(0, 1., 0.1))
+plt.grid(linestyle='dotted')
+ax.set_xticklabels([]) # to remove those numbers at the bottom
+ax.set_yticklabels([])
+
+ax.tick_params(
+    bottom=False,      # ticks along the bottom edge are off
+    left=False,        # ticks along the top edge are off
+    labelbottom=False) # labels along the bottom edge are off
+@}
+
+\newchunk Matplotlib typically plots points using x and y coordinates of the points in separate points. 
+@D Extract $x$ and $y$ coordinates of the points on the horse, fly tours, visited and unvisited sites @{  
+# Route for the horse
+xhs = [ data['horse_tour'][i][0] \
+          for i in range(len(data['horse_tour']))  ]    
+yhs = [ data['horse_tour'][i][1] \
+          for i in range(len(data['horse_tour']))  ]    
+
+# Route for the fly. The fly keeps alternating between the site and the horse
+xfs , yfs = [xhs[0]], [yhs[0]]
+for site, pt in zip (data['visited_sites'],
+                     data['horse_tour'][1:]):
+    xfs.extend([site[0], pt[0]])
+    yfs.extend([site[1], pt[1]])
+        
+xvisited = [ data['visited_sites'][i][0] \
+               for i in range(len(data['visited_sites']))  ]    
+yvisited = [ data['visited_sites'][i][1] \
+               for i in range(len(data['visited_sites']))  ]    
     
-    # Set up plotting area and canvas, fig, ax, all that boiler-plate jazz
-    fig,ax = plt.subplots()
-    ax.set_xlim([0,1])
-    ax.set_ylim([0,1])
-    ax.set_aspect(1.0)
-    ax = fig.gca()
-    ax.set_xticks(np.arange(0, 1, 0.1))     
-    ax.set_yticks(np.arange(0, 1., 0.1))
-    plt.grid(linestyle='dotted')
-    ax.set_xticklabels([]) # to remove those numbers at the bottom
-    ax.set_yticklabels([])
+xunvisited = [ data['unvisited_sites'][i][0] \
+                 for i in range(len(data['unvisited_sites']))  ]    
+yunvisited = [ data['unvisited_sites'][i][1] 
+                 for i in range(len(data['unvisited_sites'])) ]    
+@}
+
+\newchunk 
+@D Mark initial position of horse and fly boldly on canvas 
+@{ax.add_patch( mpl.patches.Circle( inithorseposn, \
+                                  radius = 1/55.0,\
+                                  facecolor= '#D13131', #'red',\
+                                  edgecolor='black')  )
+@}
+
+@d Draw horse and fly-tours 
+@{ax.plot(xfs,yfs,'g-',linewidth=1.5)  
+ax.plot(xhs, yhs, color='r', \
+        marker='s', markersize=3, \
+        linewidth=2.0) 
+@}
+
+@D Place numbered markers on visited sites to mark the order of visitation explicitly 
+@{for x,y,i in zip(xvisited, yvisited, range(len(xvisited))):
+     ax.text(x, y, str(i+1),  fontsize=8, \
+             bbox=dict(facecolor='#ddcba0', alpha=1.0, pad=2.0)) 
+@}
+
+@D Draw unvisited sites as filled blue circles 
+@{for x, y in zip(xunvisited, yunvisited):
+     ax.add_patch( mpl.patches.Circle( (x,y),\
+                                    radius    = 1/100.0,\
+                                    facecolor = 'blue',\
+                                    edgecolor = 'black')  )
+@| @}
 
 
-    # Route for the horse, xhs, yhs
-    xhs = [ data['horse_tour'][i][0] 
-                for i in range(len(data['horse_tour']))  ]    
-    yhs = [ data['horse_tour'][i][1] 
-                for i in range(len(data['horse_tour']))  ]    
+\newchunk 
+@D Give metainformation about current picture as headers and footers 
+@{fontsize = 15
+ax.set_title( r'Number of sites visited so far: ' +\
+               str(len(data['visited_sites']))   +\
+               '/' + str(len(sites))           ,  \
+                    fontdict={'fontsize':fontsize})
+@}
 
-    # List of visited sites 
-    xvisited = [ data['visited_sites'][i][0] 
-                     for i in range(len(data['visited_sites']))  ]    
-    yvisited = [ data['visited_sites'][i][1] 
-                     for i in range(len(data['visited_sites']))  ]    
-    
-    # List of unvisited sites
-    xunvisited = [ data['unvisited_sites'][i][0] 
-                     for i in range(len(data['unvisited_sites']))  ]    
-    yunvisited = [ data['unvisited_sites'][i][1] 
-                      for i in range(len(data['unvisited_sites'])) ]    
-    
-    # Route for the fly. The fly keeps alternating
-    # between the site and the horse
-    xfs , yfs = [xhs[0]], [yhs[0]]
-    for site, pt in zip (data['visited_sites'],
-                         data['horse_tour'][1:]):
-        xfs.extend([site[0], pt[0]])
-        yfs.extend([site[1], pt[1]])
+Note that after writing image files, you should close the current figure. Otherwise
+the collection of all the open figures start hogging the RAM. Matplotlib throws a
+a warning to this effect (if you don't close to the figures) after writing about 
+20 figures. I have linked to the stack overflow answer which advises to call 
+\verb|plt.close('all')| after writing out a file. 
 
-
-    # Mark initial position of horse and fly boldly on canvas
-    ax.add_patch( mpl.patches.Circle( inithorseposn,
-                                      radius = 1/55.0,
-                                      facecolor= '#D13131', #'red',
-                                      edgecolor='black')  )
-
-    ax.plot(xfs,yfs,'g-')                                    # fly tour is green
-    ax.plot(xhs, yhs, color='r', marker='s', markersize=2, linewidth=1.5) # horse tour is red
-    
-    # Place numbered markers on visited sites to mark the order of visitation explicitly
-    for x,y,i in zip(xvisited, yvisited, range(len(xvisited))):
-          ax.text(x, y, str(i+1),  fontsize=5, bbox=dict(facecolor='#ddcba0', alpha=1.0, pad=1.5)) 
-
-    # Draw unvisited sites as filled blue circles
-    for x, y in zip(xunvisited, yunvisited):
-           ax.add_patch( mpl.patches.Circle( (x,y),
-                                             radius    = 1/150.0,
-                                             facecolor = 'blue',
-                                             edgecolor = 'black')  )
-           
-
-    # Give metainformation about current picture as headers and footers
-    fontsize = 10
-    tnrfont = {'fontname':'DejaVu Sans'}
-    ax.set_title( 'Number of sites visited so far: ' +\
-                   str(len(data['visited_sites']))   +\
-                   '/' + str(len(sites))           ,  \
-                        fontdict={'fontsize':fontsize}, **tnrfont)
-
-    # Write image file. 
-    image_file_name = 'algo_state_' + \
-                      str(algo_state_counter).zfill(5) + \
-                      '.png'
-    plt.savefig(dir_name + '/' + image_file_name,  bbox_inches='tight', dpi=300)
-    print "Wrote " + image_file_name + " to disk"   
-    plt.close('all') # https://stackoverflow.com/a/21884375/505306
+@D Write image file @{
+image_file_name = 'algo_state_' + \
+                  str(algo_state_counter).zfill(5) + \
+                     '.png'
+plt.savefig(dir_name + '/' + image_file_name,  \
+            bbox_inches='tight')
+print "Wrote " + image_file_name + " to disk"   
+plt.close('all') # https://stackoverflow.com/a/21884375/505306
 @| @}     
 
 \newchunk The final answer is written to disk in the form of a YAML file. It lists the input sites 
 in the order of visitation computed by the algorithm and gives the tour of the horse. 
 Note that the number of points on the horse's tour is 1 more than the number of given sites. 
 
-@D Write input and output to file @{
-# ASSERT: `inithorseposn` is included as first point of the tour
+@D Write input and output to file 
+@{# ASSERT: `inithorseposn` is included as first point of the tour
 assert(len(insertion_policy.horse_tour) == len(insertion_policy.visited_sites) + 1) 
 
 # ASSERT: All sites have been visited. Simple sanity check 
@@ -267,7 +320,6 @@ with open(dir_name + '/' + io_file_name, 'w') as outfile:@%
                 outfile, \
                 default_flow_style=False)
 logger.debug("Dumped input and output to " + io_file_name)
-
 @| @}
 
 \newchunk If algorithm states have been rendered to files in the run-folder, we stitch them together using \verb|ffmpeg|
@@ -279,14 +331,14 @@ for choosing the particular command-line options to \verb|ffmpeg| below.
 @{if animate_algo_p:
      import subprocess, os
      os.chdir(dir_name)
-     subprocess.call( ['ffmpeg', '-r', '1',  '-i', 'algo_state_%05d.png', '-vcodec', 'mpeg4', '-r', '10' ,'algo_state_animation.avi']  )
+     subprocess.call( ['ffmpeg', '-r', '1',  '-i', 'algo_state_%05d.png', \
+                       '-vcodec', 'mpeg4', '-r', '10' ,'algo_state_animation.avi']  )
      os.chdir('../')
 @| @}
 
 \newchunk 
-@D Return horsefly tour, along with additional information@{
-sys.exit()
-logger.debug("Returning answer")
+@D Return horsefly tour, along with additional information
+@{logger.debug("Returning answer")
 horse_waiting_times = np.zeros(len(sites))
 return {'tour_points'                : insertion_policy.horse_tour[1:],
         'horse_waiting_times'        : horse_waiting_times, 
@@ -308,14 +360,15 @@ Note that the order in which sites are passed to this function matters. It
 assumes that you want to compute the collinear horseflies tour length for the 
 sites \textit{in the given order.} 
 
-For this, we use the formula for computing the rendezvous point and  
+For this, we use the formula for computing the rendezvous point when there is 
+only a single site, given by the code-chunk below. 
 
-\begin{center}
-\missingfigure[figwidth=6cm]{Sigle site analytic}
-\end{center}
+%\begin{center}
+%\missingfigure[figwidth=6cm]{Sigle site analytic}
+%\end{center}
 
-@D Define auxiliary helper functions @{
-def single_site_solution(site, horseposn, phi):
+@D Define auxiliary helper functions 
+@{def single_site_solution(site, horseposn, phi):
 
      h = np.asarray(horseposn)
      s = np.asarray(site)
@@ -334,13 +387,8 @@ an elementary instance of the fold pattern of functional programming.
 \footnote{Python has folds tucked away in some corner of its standard library. 
 But I am not using it during the first hacky portion of this draft. Also Shane 
 mentioned it has performance issues? Double-check this later!}
-
-\begin{center}
-\missingfigure[figwidth=6cm]{Figure for showing the length of tour in collinear horseflies}
-\end{center}
-
-@D Define auxiliary helper functions @{   
-def compute_collinear_horseflies_tour_length(sites, horseposn, phi):
+@D Define auxiliary helper functions 
+@{def compute_collinear_horseflies_tour_length(sites, horseposn, phi):
 
      if not sites: # No more sites, left to visit!
           return 0
@@ -351,7 +399,6 @@ def compute_collinear_horseflies_tour_length(sites, horseposn, phi):
                  compute_collinear_horseflies_tour_length( sites[1:], rendezvous_pt, phi )
 @| compute_collinear_horseflies_tour_length @}
 
-\newchunk 
 @d Define auxiliary helper functions @{   
 def compute_collinear_horseflies_tour(sites, inithorseposn, phi):
 
