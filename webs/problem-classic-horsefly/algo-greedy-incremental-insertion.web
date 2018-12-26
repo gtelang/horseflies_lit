@@ -348,14 +348,17 @@ debug("Dumped input and output to " + io_file_name)
 \newchunk If algorithm states have been rendered to files in the run-folder, we stitch them together using \verb|ffmpeg|
 and make an \verb|.mp4| animation of the changing states of the algorithms. The \verb|.mp4| file will be in the algorithm's
 run folder. I used the  tutorial given on \url{https://en.wikibooks.org/wiki/FFMPEG_An_Intermediate_Guide/image_sequence}
-for choosing the particular command-line options to \verb|ffmpeg| below. 
+for choosing the particular command-line options to \verb|ffmpeg| below. The options \texttt{-hide\_banner -loglevel panic} 
+to quieten \verb|ffmpeg|'s output were suggested by  \url{https://superuser.com/a/1045060/102371} 
 
 @D If \verb|render_algo_states_to_image_files_p| $==$ \verb|True|, make an animation of algorithm states 
 @{if render_algo_states_to_image_files_p:
      import subprocess, os
      os.chdir(dir_name)
-     subprocess.call( ['ffmpeg', '-r', '1',  '-i', 'algo_state_%05d.png', \
-                       '-vcodec', 'mpeg4', '-r', '10' ,'algo_state_animation.avi']  )
+     subprocess.call( ['ffmpeg',  '-hide_banner', '-loglevel', 'verbose', \
+                       '-r', '1',  '-i', 'algo_state_%05d.png', \
+                       '-vcodec', 'mpeg4', '-r', '10' , \
+                       'algo_state_animation.avi']  )
      os.chdir('../')
 @| @}
 

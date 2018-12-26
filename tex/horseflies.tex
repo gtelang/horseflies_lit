@@ -925,7 +925,7 @@ experimental or interactive sections of the code.
 \mbox{}\verb@@\hbox{$\langle\,${\itshape Local data-structures for classic horsefly}\nobreak\ {\footnotesize \NWlink{nuweb26}{26}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@@\hbox{$\langle\,${\itshape Local utility functions for classic horsefly}\nobreak\ {\footnotesize \NWlink{nuweb45}{45}, \ldots\ }$\,\rangle$}\verb@@\\
 \mbox{}\verb@@\hbox{$\langle\,${\itshape Algorithms for classic horsefly}\nobreak\ {\footnotesize \NWlink{nuweb28}{28}, \ldots\ }$\,\rangle$}\verb@@\\
-\mbox{}\verb@@\hbox{$\langle\,${\itshape Plotting routines for classic horsefly}\nobreak\ {\footnotesize \NWlink{nuweb46b}{46b}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@@\hbox{$\langle\,${\itshape Plotting routines for classic horsefly}\nobreak\ {\footnotesize \NWlink{nuweb47}{47}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
@@ -1140,7 +1140,7 @@ or just plain clearing the canvas for inserting a fresh input set of points.
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \NWtxtMacroRefIn\ \NWlink{nuweb23a}{23a}.
-\item \NWtxtIdentsUsed\nobreak\  \verb@algo_exact_given_specific_ordering@\nobreak\ \NWlink{nuweb30}{30}, \verb@algo_greedy_incremental_insertion,@\nobreak\ \NWlink{nuweb34a}{34a}, \verb@plotTour@\nobreak\ \NWlink{nuweb46b}{46b}.
+\item \NWtxtIdentsUsed\nobreak\  \verb@algo_exact_given_specific_ordering@\nobreak\ \NWlink{nuweb30}{30}, \verb@algo_greedy_incremental_insertion,@\nobreak\ \NWlink{nuweb34a}{34a}, \verb@plotTour@\nobreak\ \NWlink{nuweb47}{47}.
 \item{}
 \end{list}
 \vspace{4ex}
@@ -1318,7 +1318,7 @@ calling various horsefly algorithms.
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \NWtxtMacroRefIn\ \NWlink{nuweb21a}{21a}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@HorseFlyInput@\nobreak\ \NWlink{nuweb25b}{25b}.\item \NWtxtIdentsUsed\nobreak\  \verb@self.inithorseposn,@\nobreak\ \NWlink{nuweb42a}{42a}, \verb@self.sites,@\nobreak\ \NWlink{nuweb42a}{42a}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@HorseFlyInput@\nobreak\ \NWlink{nuweb25b}{25b}.\item \NWtxtIdentsUsed\nobreak\  \verb@self.inithorseposn,@\nobreak\ \NWlink{nuweb42}{42}, \verb@self.sites,@\nobreak\ \NWlink{nuweb42}{42}.
 \item{}
 \end{list}
 \vspace{4ex}
@@ -1609,7 +1609,7 @@ to a collinear-horsefly solution at a constant factor increase in the makespan.
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \NWtxtMacroDefBy\ \NWlink{nuweb28}{28}\NWlink{nuweb29}{, 29}\NWlink{nuweb30}{, 30}\NWlink{nuweb34a}{, 34a}.
 \item \NWtxtMacroRefIn\ \NWlink{nuweb21a}{21a}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@algo_exact_given_specific_ordering@\nobreak\ \NWlink{nuweb23b}{23b}\NWlink{nuweb28}{, 28}\NWlink{nuweb29}{, 29}.\item \NWtxtIdentsUsed\nobreak\  \verb@tour_length@\nobreak\ \NWlink{nuweb45}{45}, \verb@tour_length_with_waiting_time_included@\nobreak\ \NWlink{nuweb46a}{46a}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@algo_exact_given_specific_ordering@\nobreak\ \NWlink{nuweb23b}{23b}\NWlink{nuweb28}{, 28}\NWlink{nuweb29}{, 29}.\item \NWtxtIdentsUsed\nobreak\  \verb@tour_length@\nobreak\ \NWlink{nuweb45}{45}, \verb@tour_length_with_waiting_time_included@\nobreak\ \NWlink{nuweb46}{46}.
 \item{}
 \end{list}
 \vspace{4ex}
@@ -1672,7 +1672,7 @@ benchmark the quality and speed of implementation of future insertion policies.
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
 \mbox{}\verb@@\hbox{$\langle\,${\itshape Define auxiliary helper functions}\nobreak\ {\footnotesize \NWlink{nuweb40c}{40c}, \ldots\ }$\,\rangle$}\verb@@\\
-\mbox{}\verb@@\hbox{$\langle\,${\itshape Define various insertion policy classes}\nobreak\ {\footnotesize \NWlink{nuweb42a}{42a}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@@\hbox{$\langle\,${\itshape Define various insertion policy classes}\nobreak\ {\footnotesize \NWlink{nuweb42}{42}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@def algo_greedy_incremental_insertion(sites, inithorseposn, phi,@\\
 \mbox{}\verb@                                      insertion_policy_name = "naive",@\\
 \mbox{}\verb@                                      render_algo_states_to_image_files_p = True,@\\
@@ -2147,7 +2147,8 @@ Note that the number of points on the horse's tour is 1 more than the number of 
 \newchunk If algorithm states have been rendered to files in the run-folder, we stitch them together using \verb|ffmpeg|
 and make an \verb|.mp4| animation of the changing states of the algorithms. The \verb|.mp4| file will be in the algorithm's
 run folder. I used the  tutorial given on \url{https://en.wikibooks.org/wiki/FFMPEG_An_Intermediate_Guide/image_sequence}
-for choosing the particular command-line options to \verb|ffmpeg| below. 
+for choosing the particular command-line options to \verb|ffmpeg| below. The options \texttt{-hide\_banner -loglevel panic} 
+to quieten \verb|ffmpeg|'s output were suggested by  \url{https://superuser.com/a/1045060/102371} 
 
 \begin{flushleft} \small\label{scrap40}\raggedright\small
 \NWtarget{nuweb40a}{} $\langle\,${\itshape If \verb|render_algo_states_to_image_files_p| $==$ \verb|True|, make an animation of algorithm states}\nobreak\ {\footnotesize {40a}}$\,\rangle\equiv$
@@ -2156,8 +2157,10 @@ for choosing the particular command-line options to \verb|ffmpeg| below.
 \mbox{}\verb@if render_algo_states_to_image_files_p:@\\
 \mbox{}\verb@     import subprocess, os@\\
 \mbox{}\verb@     os.chdir(dir_name)@\\
-\mbox{}\verb@     subprocess.call( ['ffmpeg', '-r', '1',  '-i', 'algo_state_%05d.png', \@\\
-\mbox{}\verb@                       '-vcodec', 'mpeg4', '-r', '10' ,'algo_state_animation.avi']  )@\\
+\mbox{}\verb@     subprocess.call( ['ffmpeg',  '-hide_banner', '-loglevel', 'verbose', \@\\
+\mbox{}\verb@                       '-r', '1',  '-i', 'algo_state_%05d.png', \@\\
+\mbox{}\verb@                       '-vcodec', 'mpeg4', '-r', '10' , \@\\
+\mbox{}\verb@                       'algo_state_animation.avi']  )@\\
 \mbox{}\verb@     os.chdir('../')@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
@@ -2191,7 +2194,7 @@ for choosing the particular command-line options to \verb|ffmpeg| below.
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \NWtxtMacroRefIn\ \NWlink{nuweb34a}{34a}.
-\item \NWtxtIdentsUsed\nobreak\  \verb@tour_length_with_waiting_time_included@\nobreak\ \NWlink{nuweb46a}{46a}.
+\item \NWtxtIdentsUsed\nobreak\  \verb@tour_length_with_waiting_time_included@\nobreak\ \NWlink{nuweb46}{46}.
 \item{}
 \end{list}
 \vspace{4ex}
@@ -2266,7 +2269,7 @@ mentioned it has performance issues? Double-check this later!}
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \NWtxtMacroDefBy\ \NWlink{nuweb40c}{40c}\NWlink{nuweb41a}{, 41a}\NWlink{nuweb41b}{b}.
 \item \NWtxtMacroRefIn\ \NWlink{nuweb34a}{34a}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@compute_collinear_horseflies_tour_length@\nobreak\ \NWlink{nuweb43a}{43a}\NWlink{nuweb43c}{c}.\item \NWtxtIdentsUsed\nobreak\  \verb@single_site_solution@\nobreak\ \NWlink{nuweb40c}{40c}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@compute_collinear_horseflies_tour_length@\nobreak\ \NWlink{nuweb43b}{43b}\NWlink{nuweb43d}{d}.\item \NWtxtIdentsUsed\nobreak\  \verb@single_site_solution@\nobreak\ \NWlink{nuweb40c}{40c}.
 \item{}
 \end{list}
 \vspace{4ex}
@@ -2358,7 +2361,7 @@ add their own local data-members and methods for keeping track of
 data for insertion. 
 
 \begin{flushleft} \small\label{scrap45}\raggedright\small
-\NWtarget{nuweb42a}{} $\langle\,${\itshape Define various insertion policy classes}\nobreak\ {\footnotesize {42a}}$\,\rangle\equiv$
+\NWtarget{nuweb42}{} $\langle\,${\itshape Define various insertion policy classes}\nobreak\ {\footnotesize {42}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
@@ -2374,33 +2377,33 @@ data for insertion.
 \mbox{}\verb@         self.unvisited_sites_idxs = range(len(sites)) # This indexes into self.sites@\\
 \mbox{}\verb@         self.horse_tour           = [self.inithorseposn]         @\\
 \mbox{}\verb@@\\
-\mbox{}\verb@    @\hbox{$\langle\,${\itshape Methods for \verb|PolicyBestInsertionNaive|}\nobreak\ {\footnotesize \NWlink{nuweb42b}{42b}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@    @\hbox{$\langle\,${\itshape Methods for \verb|PolicyBestInsertionNaive|}\nobreak\ {\footnotesize \NWlink{nuweb43a}{43a}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \NWtxtMacroRefIn\ \NWlink{nuweb34a}{34a}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@self.horse_tour@\nobreak\ \NWlink{nuweb44b}{44b}, \verb@self.inithorseposn,@\nobreak\ \NWlink{nuweb26}{26}\NWlink{nuweb43a}{, 43a}\NWlink{nuweb43c}{c}\NWlink{nuweb44b}{, 44b}, \verb@self.sites,@\nobreak\ \NWlink{nuweb26}{26}, \verb@self.visited_sites,@\nobreak\ \NWlink{nuweb43a}{43a}\NWlink{nuweb44b}{, 44b}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@self.horse_tour@\nobreak\ \NWlink{nuweb44b}{44b}, \verb@self.inithorseposn,@\nobreak\ \NWlink{nuweb26}{26}\NWlink{nuweb43b}{, 43b}\NWlink{nuweb43d}{d}\NWlink{nuweb44b}{, 44b}, \verb@self.sites,@\nobreak\ \NWlink{nuweb26}{26}, \verb@self.visited_sites,@\nobreak\ \NWlink{nuweb43b}{43b}\NWlink{nuweb44b}{, 44b}.
 \item{}
 \end{list}
 \vspace{4ex}
 \end{flushleft}
 \newchunk 
 \begin{flushleft} \small\label{scrap46}\raggedright\small
-\NWtarget{nuweb42b}{} $\langle\,${\itshape Methods for \verb|PolicyBestInsertionNaive|}\nobreak\ {\footnotesize {42b}}$\,\rangle\equiv$
+\NWtarget{nuweb43a}{} $\langle\,${\itshape Methods for \verb|PolicyBestInsertionNaive|}\nobreak\ {\footnotesize {43a}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
 \mbox{}\verb@def insert_another_unvisited_site(self):@\\
 \mbox{}\verb@ @\\
-\mbox{}\verb@     @\hbox{$\langle\,${\itshape Compute the length of the tour that currently services the visited sites}\nobreak\ {\footnotesize \NWlink{nuweb43a}{43a}}$\,\rangle$}\verb@    @\\
+\mbox{}\verb@     @\hbox{$\langle\,${\itshape Compute the length of the tour that currently services the visited sites}\nobreak\ {\footnotesize \NWlink{nuweb43b}{43b}}$\,\rangle$}\verb@    @\\
 \mbox{}\verb@     delta_increase_least_table = [] # tracking variable updated in for loop below@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@     for u in self.unvisited_sites_idxs:@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@         @\hbox{$\langle\,${\itshape Set up tracking variables local to this iteration}\nobreak\ {\footnotesize \NWlink{nuweb43b}{43b}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@         @\hbox{$\langle\,${\itshape If \texttt{self.sites[u]} is chosen for insertion, find best insertion position and update \texttt{delta\_increase\_least\_table}}\nobreak\ {\footnotesize \NWlink{nuweb43c}{43c}}$\,\rangle$}\verb@  @\\
+\mbox{}\verb@         @\hbox{$\langle\,${\itshape Set up tracking variables local to this iteration}\nobreak\ {\footnotesize \NWlink{nuweb43c}{43c}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@         @\hbox{$\langle\,${\itshape If \texttt{self.sites[u]} is chosen for insertion, find best insertion position and update \texttt{delta\_increase\_least\_table}}\nobreak\ {\footnotesize \NWlink{nuweb43d}{43d}}$\,\rangle$}\verb@  @\\
 \mbox{}\verb@                 @\\
 \mbox{}\verb@     @\hbox{$\langle\,${\itshape Find the unvisited site which on insertion increases tour-length by the least amount}\nobreak\ {\footnotesize \NWlink{nuweb44a}{44a}}$\,\rangle$}\verb@     @\\
 \mbox{}\verb@     @\hbox{$\langle\,${\itshape Update states for \texttt{PolicyBestInsertionNaive}}\nobreak\ {\footnotesize \NWlink{nuweb44b}{44b}}$\,\rangle$}\verb@ @\\
@@ -2410,8 +2413,8 @@ data for insertion.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb42a}{42a}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@delta_increase_least_table@\nobreak\ \NWlink{nuweb43c}{43c}\NWlink{nuweb44a}{, 44a}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb42}{42}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@delta_increase_least_table@\nobreak\ \NWlink{nuweb43d}{43d}\NWlink{nuweb44a}{, 44a}.
 \item{}
 \end{list}
 \vspace{4ex}
@@ -2419,7 +2422,7 @@ data for insertion.
 \newchunk 
 
 \begin{flushleft} \small\label{scrap47}\raggedright\small
-\NWtarget{nuweb43a}{} $\langle\,${\itshape Compute the length of the tour that currently services the visited sites}\nobreak\ {\footnotesize {43a}}$\,\rangle\equiv$
+\NWtarget{nuweb43b}{} $\langle\,${\itshape Compute the length of the tour that currently services the visited sites}\nobreak\ {\footnotesize {43b}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@current_tour_length    = \@\\
@@ -2432,15 +2435,15 @@ data for insertion.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb42b}{42b}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@current_tour_length@\nobreak\ \NWlink{nuweb43c}{43c}.\item \NWtxtIdentsUsed\nobreak\  \verb@compute_collinear_horseflies_tour_length@\nobreak\ \NWlink{nuweb41a}{41a}, \verb@self.inithorseposn,@\nobreak\ \NWlink{nuweb42a}{42a}, \verb@self.visited_sites,@\nobreak\ \NWlink{nuweb42a}{42a}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb43a}{43a}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@current_tour_length@\nobreak\ \NWlink{nuweb43d}{43d}.\item \NWtxtIdentsUsed\nobreak\  \verb@compute_collinear_horseflies_tour_length@\nobreak\ \NWlink{nuweb41a}{41a}, \verb@self.inithorseposn,@\nobreak\ \NWlink{nuweb42}{42}, \verb@self.visited_sites,@\nobreak\ \NWlink{nuweb42}{42}.
 \item{}
 \end{list}
 \vspace{4ex}
 \end{flushleft}
 \newchunk 
 \begin{flushleft} \small\label{scrap48}\raggedright\small
-\NWtarget{nuweb43b}{} $\langle\,${\itshape Set up tracking variables local to this iteration}\nobreak\ {\footnotesize {43b}}$\,\rangle\equiv$
+\NWtarget{nuweb43c}{} $\langle\,${\itshape Set up tracking variables local to this iteration}\nobreak\ {\footnotesize {43c}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@ibest                = 0@\\
@@ -2450,15 +2453,15 @@ data for insertion.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb42b}{42b}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@delta_increase_least@\nobreak\ \NWlink{nuweb43c}{43c}, \verb@ibest,@\nobreak\ \NWlink{nuweb43c}{43c}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb43a}{43a}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@delta_increase_least@\nobreak\ \NWlink{nuweb43d}{43d}, \verb@ibest,@\nobreak\ \NWlink{nuweb43d}{43d}.
 \item{}
 \end{list}
 \vspace{4ex}
 \end{flushleft}
 \newchunk 
 \begin{flushleft} \small\label{scrap49}\raggedright\small
-\NWtarget{nuweb43c}{} $\langle\,${\itshape If \texttt{self.sites[u]} is chosen for insertion, find best insertion position and update \texttt{delta\_increase\_least\_table}}\nobreak\ {\footnotesize {43c}}$\,\rangle\equiv$
+\NWtarget{nuweb43d}{} $\langle\,${\itshape If \texttt{self.sites[u]} is chosen for insertion, find best insertion position and update \texttt{delta\_increase\_least\_table}}\nobreak\ {\footnotesize {43d}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@   @\\
@@ -2489,8 +2492,8 @@ data for insertion.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb42b}{42b}.
-\item \NWtxtIdentsUsed\nobreak\  \verb@compute_collinear_horseflies_tour_length@\nobreak\ \NWlink{nuweb41a}{41a}, \verb@current_tour_length@\nobreak\ \NWlink{nuweb43a}{43a}, \verb@delta_increase_least@\nobreak\ \NWlink{nuweb43b}{43b}, \verb@delta_increase_least_table@\nobreak\ \NWlink{nuweb42b}{42b}, \verb@ibest,@\nobreak\ \NWlink{nuweb43b}{43b}, \verb@self.inithorseposn,@\nobreak\ \NWlink{nuweb42a}{42a}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb43a}{43a}.
+\item \NWtxtIdentsUsed\nobreak\  \verb@compute_collinear_horseflies_tour_length@\nobreak\ \NWlink{nuweb41a}{41a}, \verb@current_tour_length@\nobreak\ \NWlink{nuweb43b}{43b}, \verb@delta_increase_least@\nobreak\ \NWlink{nuweb43c}{43c}, \verb@delta_increase_least_table@\nobreak\ \NWlink{nuweb43a}{43a}, \verb@ibest,@\nobreak\ \NWlink{nuweb43c}{43c}, \verb@self.inithorseposn,@\nobreak\ \NWlink{nuweb42}{42}.
 \item{}
 \end{list}
 \vspace{4ex}
@@ -2511,8 +2514,8 @@ data for insertion.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb42b}{42b}.
-\item \NWtxtIdentsUsed\nobreak\  \verb@delta_increase_least_table@\nobreak\ \NWlink{nuweb42b}{42b}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb43a}{43a}.
+\item \NWtxtIdentsUsed\nobreak\  \verb@delta_increase_least_table@\nobreak\ \NWlink{nuweb43a}{43a}.
 \item{}
 \end{list}
 \vspace{4ex}
@@ -2541,8 +2544,8 @@ data for insertion.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb42b}{42b}.
-\item \NWtxtIdentsUsed\nobreak\  \verb@compute_collinear_horseflies_tour@\nobreak\ \NWlink{nuweb41b}{41b}, \verb@self.horse_tour@\nobreak\ \NWlink{nuweb42a}{42a}, \verb@self.inithorseposn,@\nobreak\ \NWlink{nuweb42a}{42a}, \verb@self.visited_sites,@\nobreak\ \NWlink{nuweb42a}{42a}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb43a}{43a}.
+\item \NWtxtIdentsUsed\nobreak\  \verb@compute_collinear_horseflies_tour@\nobreak\ \NWlink{nuweb41b}{41b}, \verb@self.horse_tour@\nobreak\ \NWlink{nuweb42}{42}, \verb@self.inithorseposn,@\nobreak\ \NWlink{nuweb42}{42}, \verb@self.visited_sites,@\nobreak\ \NWlink{nuweb42}{42}.
 \item{}
 \end{list}
 \vspace{4ex}
@@ -2602,9 +2605,9 @@ data for insertion.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroDefBy\ \NWlink{nuweb45}{45}\NWlink{nuweb46a}{, 46a}.
+\item \NWtxtMacroDefBy\ \NWlink{nuweb45}{45}\NWlink{nuweb46}{, 46}.
 \item \NWtxtMacroRefIn\ \NWlink{nuweb21a}{21a}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@tour_length@\nobreak\ \NWlink{nuweb28}{28}\NWlink{nuweb30}{, 30}\NWlink{nuweb46b}{, 46b}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@tour_length@\nobreak\ \NWlink{nuweb28}{28}\NWlink{nuweb30}{, 30}\NWlink{nuweb47}{, 47}.
 \item{}
 \end{list}
 \vspace{4ex}
@@ -2616,7 +2619,7 @@ data for insertion.
       speed of horse = 1, we can add ``time'' to ``distance''. 
 
 \begin{flushleft} \small\label{scrap53}\raggedright\small
-\NWtarget{nuweb46a}{} $\langle\,${\itshape Local utility functions for classic horsefly}\nobreak\ {\footnotesize {46a}}$\,\rangle\equiv$
+\NWtarget{nuweb46}{} $\langle\,${\itshape Local utility functions for classic horsefly}\nobreak\ {\footnotesize {46}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@   @\\
@@ -2647,9 +2650,9 @@ data for insertion.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroDefBy\ \NWlink{nuweb45}{45}\NWlink{nuweb46a}{, 46a}.
+\item \NWtxtMacroDefBy\ \NWlink{nuweb45}{45}\NWlink{nuweb46}{, 46}.
 \item \NWtxtMacroRefIn\ \NWlink{nuweb21a}{21a}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@tour_length_with_waiting_time_included@\nobreak\ \NWlink{nuweb30}{30}\NWlink{nuweb40b}{, 40b}\NWlink{nuweb46b}{, 46b}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@tour_length_with_waiting_time_included@\nobreak\ \NWlink{nuweb30}{30}\NWlink{nuweb40b}{, 40b}\NWlink{nuweb47}{, 47}.
 \item{}
 \end{list}
 \vspace{4ex}
@@ -2658,7 +2661,7 @@ data for insertion.
 \newchunk 
 
 \begin{flushleft} \small\label{scrap54}\raggedright\small
-\NWtarget{nuweb46b}{} $\langle\,${\itshape Plotting routines for classic horsefly}\nobreak\ {\footnotesize {46b}}$\,\rangle\equiv$
+\NWtarget{nuweb47}{} $\langle\,${\itshape Plotting routines for classic horsefly}\nobreak\ {\footnotesize {47}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@ @\\
@@ -2737,7 +2740,7 @@ data for insertion.
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \NWtxtMacroRefIn\ \NWlink{nuweb21a}{21a}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@plotTour@\nobreak\ \NWlink{nuweb23b}{23b}.\item \NWtxtIdentsUsed\nobreak\  \verb@tour_length@\nobreak\ \NWlink{nuweb45}{45}, \verb@tour_length_with_waiting_time_included@\nobreak\ \NWlink{nuweb46a}{46a}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@plotTour@\nobreak\ \NWlink{nuweb23b}{23b}.\item \NWtxtIdentsUsed\nobreak\  \verb@tour_length@\nobreak\ \NWlink{nuweb45}{45}, \verb@tour_length_with_waiting_time_included@\nobreak\ \NWlink{nuweb46}{46}.
 \item{}
 \end{list}
 \vspace{4ex}
@@ -2747,25 +2750,25 @@ data for insertion.
 {\small\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item $\langle\,$Algorithms for classic horsefly\nobreak\ {\footnotesize \NWlink{nuweb28}{28}\NWlink{nuweb29}{, 29}\NWlink{nuweb30}{, 30}\NWlink{nuweb34a}{, 34a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb21a}{21a}.}
 \item $\langle\,$Clear canvas and states of all objects\nobreak\ {\footnotesize \NWlink{nuweb25a}{25a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb23a}{23a}.}
-\item $\langle\,$Compute the length of the tour that currently services the visited sites\nobreak\ {\footnotesize \NWlink{nuweb43a}{43a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb42b}{42b}.}
+\item $\langle\,$Compute the length of the tour that currently services the visited sites\nobreak\ {\footnotesize \NWlink{nuweb43b}{43b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb43a}{43a}.}
 \item $\langle\,$Define auxiliary helper functions\nobreak\ {\footnotesize \NWlink{nuweb40c}{40c}\NWlink{nuweb41a}{, 41a}\NWlink{nuweb41b}{b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb34a}{34a}.}
 \item $\langle\,$Define key-press handler\nobreak\ {\footnotesize \NWlink{nuweb23a}{23a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb21a}{21a}.}
-\item $\langle\,$Define various insertion policy classes\nobreak\ {\footnotesize \NWlink{nuweb42a}{42a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb34a}{34a}.}
+\item $\langle\,$Define various insertion policy classes\nobreak\ {\footnotesize \NWlink{nuweb42}{42}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb34a}{34a}.}
 \item $\langle\,$Draw horse and fly-tours\nobreak\ {\footnotesize \NWlink{nuweb38b}{38b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb36b}{36b}.}
 \item $\langle\,$Draw unvisited sites as filled blue circles\nobreak\ {\footnotesize \NWlink{nuweb38d}{38d}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb36b}{36b}.}
 \item $\langle\,$Extract $x$ and $y$ coordinates of the points on the horse, fly tours, visited and unvisited sites\nobreak\ {\footnotesize \NWlink{nuweb37b}{37b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb36b}{36b}.}
-\item $\langle\,$Find the unvisited site which on insertion increases tour-length by the least amount\nobreak\ {\footnotesize \NWlink{nuweb44a}{44a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb42b}{42b}.}
+\item $\langle\,$Find the unvisited site which on insertion increases tour-length by the least amount\nobreak\ {\footnotesize \NWlink{nuweb44a}{44a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb43a}{43a}.}
 \item $\langle\,$Generate a bunch of uniform or non-uniform random points on the canvas\nobreak\ {\footnotesize \NWlink{nuweb24}{24}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb23a}{23a}.}
 \item $\langle\,$Give metainformation about current picture as headers and footers\nobreak\ {\footnotesize \NWlink{nuweb38e}{38e}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb36b}{36b}.}
-\item $\langle\,$If \texttt{self.sites[u]} is chosen for insertion, find best insertion position and update \texttt{delta\_increase\_least\_table}\nobreak\ {\footnotesize \NWlink{nuweb43c}{43c}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb42b}{42b}.}
+\item $\langle\,$If \texttt{self.sites[u]} is chosen for insertion, find best insertion position and update \texttt{delta\_increase\_least\_table}\nobreak\ {\footnotesize \NWlink{nuweb43d}{43d}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb43a}{43a}.}
 \item $\langle\,$If \verb|render_algo_states_to_image_files_p| $==$ \verb|True|, make an animation of algorithm states\nobreak\ {\footnotesize \NWlink{nuweb40a}{40a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb34a}{34a}.}
 \item $\langle\,$If \verb|render_algo_states_to_image_files_p| flag is set to \verb|True|, render current algorithm state to file\nobreak\ {\footnotesize \NWlink{nuweb36b}{36b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb36a}{36a}.}
 \item $\langle\,$Local data-structures for classic horsefly\nobreak\ {\footnotesize \NWlink{nuweb26}{26}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb21a}{21a}.}
-\item $\langle\,$Local utility functions for classic horsefly\nobreak\ {\footnotesize \NWlink{nuweb45}{45}\NWlink{nuweb46a}{, 46a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb21a}{21a}.}
+\item $\langle\,$Local utility functions for classic horsefly\nobreak\ {\footnotesize \NWlink{nuweb45}{45}\NWlink{nuweb46}{, 46}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb21a}{21a}.}
 \item $\langle\,$Mark initial position of horse and fly boldly on canvas\nobreak\ {\footnotesize \NWlink{nuweb38a}{38a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb36b}{36b}.}
-\item $\langle\,$Methods for \verb|PolicyBestInsertionNaive|\nobreak\ {\footnotesize \NWlink{nuweb42b}{42b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb42a}{42a}.}
+\item $\langle\,$Methods for \verb|PolicyBestInsertionNaive|\nobreak\ {\footnotesize \NWlink{nuweb43a}{43a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb42}{42}.}
 \item $\langle\,$Place numbered markers on visited sites to mark the order of visitation explicitly\nobreak\ {\footnotesize \NWlink{nuweb38c}{38c}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb36b}{36b}.}
-\item $\langle\,$Plotting routines for classic horsefly\nobreak\ {\footnotesize \NWlink{nuweb46b}{46b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb21a}{21a}.}
+\item $\langle\,$Plotting routines for classic horsefly\nobreak\ {\footnotesize \NWlink{nuweb47}{47}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb21a}{21a}.}
 \item $\langle\,$Relevant imports for classic horsefly\nobreak\ {\footnotesize \NWlink{nuweb21b}{21b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb21a}{21a}.}
 \item $\langle\,$Return horsefly tour, along with additional information\nobreak\ {\footnotesize \NWlink{nuweb40b}{40b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb34a}{34a}.}
 \item $\langle\,$Set insertion policy class for current run\nobreak\ {\footnotesize \NWlink{nuweb35a}{35a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb34a}{34a}.}
@@ -2773,9 +2776,9 @@ data for insertion.
 \item $\langle\,$Set up interactive canvas\nobreak\ {\footnotesize \NWlink{nuweb25b}{25b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb21a}{21a}.}
 \item $\langle\,$Set up logging information relevant to this module\nobreak\ {\footnotesize \NWlink{nuweb22}{22}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb21a}{21a}.}
 \item $\langle\,$Set up plotting area and canvas, fig, ax, and other configs\nobreak\ {\footnotesize \NWlink{nuweb37a}{37a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb36b}{36b}.}
-\item $\langle\,$Set up tracking variables local to this iteration\nobreak\ {\footnotesize \NWlink{nuweb43b}{43b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb42b}{42b}.}
+\item $\langle\,$Set up tracking variables local to this iteration\nobreak\ {\footnotesize \NWlink{nuweb43c}{43c}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb43a}{43a}.}
 \item $\langle\,$Start entering input from the command-line\nobreak\ {\footnotesize \NWlink{nuweb23b}{23b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb23a}{23a}.}
-\item $\langle\,$Update states for \texttt{PolicyBestInsertionNaive}\nobreak\ {\footnotesize \NWlink{nuweb44b}{44b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb42b}{42b}.}
+\item $\langle\,$Update states for \texttt{PolicyBestInsertionNaive}\nobreak\ {\footnotesize \NWlink{nuweb44b}{44b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb43a}{43a}.}
 \item $\langle\,$Use insertion policy to find the cheapest site to insert into current tour\nobreak\ {\footnotesize \NWlink{nuweb35b}{35b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb34a}{34a}.}
 \item $\langle\,$Write algorithm's current state to file\nobreak\ {\footnotesize \NWlink{nuweb36a}{36a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb34a}{34a}.}
 \item $\langle\,$Write image file\nobreak\ {\footnotesize \NWlink{nuweb39a}{39a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb36b}{36b}.}
@@ -2787,24 +2790,24 @@ data for insertion.
 \item \verb@algo_exact_given_specific_ordering@: \NWlink{nuweb23b}{23b}\NWlink{nuweb28}{, 28}\NWlink{nuweb29}{, 29}, \underline{\NWlink{nuweb30}{30}}.
 \item \verb@algo_greedy_incremental_insertion,@: \NWlink{nuweb23b}{23b}, \underline{\NWlink{nuweb34a}{34a}}.
 \item \verb@compute_collinear_horseflies_tour@: \underline{\NWlink{nuweb41b}{41b}}\NWlink{nuweb44b}{, 44b}.
-\item \verb@compute_collinear_horseflies_tour_length@: \underline{\NWlink{nuweb41a}{41a}}\NWlink{nuweb43a}{, 43a}\NWlink{nuweb43c}{c}.
-\item \verb@current_tour_length@: \underline{\NWlink{nuweb43a}{43a}}\NWlink{nuweb43c}{, 43c}.
-\item \verb@delta_increase_least@: \underline{\NWlink{nuweb43b}{43b}}\NWlink{nuweb43c}{, 43c}.
-\item \verb@delta_increase_least_table@: \underline{\NWlink{nuweb42b}{42b}}\NWlink{nuweb43c}{, 43c}\NWlink{nuweb44a}{, 44a}.
+\item \verb@compute_collinear_horseflies_tour_length@: \underline{\NWlink{nuweb41a}{41a}}\NWlink{nuweb43b}{, 43b}\NWlink{nuweb43d}{d}.
+\item \verb@current_tour_length@: \underline{\NWlink{nuweb43b}{43b}}\NWlink{nuweb43d}{, 43d}.
+\item \verb@delta_increase_least@: \underline{\NWlink{nuweb43c}{43c}}\NWlink{nuweb43d}{, 43d}.
+\item \verb@delta_increase_least_table@: \underline{\NWlink{nuweb43a}{43a}}\NWlink{nuweb43d}{, 43d}\NWlink{nuweb44a}{, 44a}.
 \item \verb@HorseFlyInput@: \NWlink{nuweb25b}{25b}, \underline{\NWlink{nuweb26}{26}}.
-\item \verb@ibest,@: \underline{\NWlink{nuweb43b}{43b}}\NWlink{nuweb43c}{, 43c}.
+\item \verb@ibest,@: \underline{\NWlink{nuweb43c}{43c}}\NWlink{nuweb43d}{, 43d}.
 \item \verb@io_file_name,@: \underline{\NWlink{nuweb34b}{34b}}\NWlink{nuweb39b}{, 39b}.
 \item \verb@logger@: \NWlink{nuweb22}{22}, \underline{\NWlink{nuweb34b}{34b}}.
-\item \verb@plotTour@: \NWlink{nuweb23b}{23b}, \underline{\NWlink{nuweb46b}{46b}}.
+\item \verb@plotTour@: \NWlink{nuweb23b}{23b}, \underline{\NWlink{nuweb47}{47}}.
 \item \verb@render_algo_states_to_image_files_p@: \underline{\NWlink{nuweb34a}{34a}}\NWlink{nuweb36b}{, 36b}\NWlink{nuweb40a}{, 40a}.
 \item \verb@run_handler@: \underline{\NWlink{nuweb21a}{21a}}.
-\item \verb@self.horse_tour@: \underline{\NWlink{nuweb42a}{42a}}\NWlink{nuweb44b}{, 44b}.
-\item \verb@self.inithorseposn,@: \NWlink{nuweb26}{26}, \underline{\NWlink{nuweb42a}{42a}}\NWlink{nuweb43a}{, 43a}\NWlink{nuweb43c}{c}\NWlink{nuweb44b}{, 44b}.
-\item \verb@self.sites,@: \NWlink{nuweb26}{26}, \underline{\NWlink{nuweb42a}{42a}}.
-\item \verb@self.visited_sites,@: \underline{\NWlink{nuweb42a}{42a}}\NWlink{nuweb43a}{, 43a}\NWlink{nuweb44b}{, 44b}.
+\item \verb@self.horse_tour@: \underline{\NWlink{nuweb42}{42}}\NWlink{nuweb44b}{, 44b}.
+\item \verb@self.inithorseposn,@: \NWlink{nuweb26}{26}, \underline{\NWlink{nuweb42}{42}}\NWlink{nuweb43b}{, 43b}\NWlink{nuweb43d}{d}\NWlink{nuweb44b}{, 44b}.
+\item \verb@self.sites,@: \NWlink{nuweb26}{26}, \underline{\NWlink{nuweb42}{42}}.
+\item \verb@self.visited_sites,@: \underline{\NWlink{nuweb42}{42}}\NWlink{nuweb43b}{, 43b}\NWlink{nuweb44b}{, 44b}.
 \item \verb@single_site_solution@: \underline{\NWlink{nuweb40c}{40c}}\NWlink{nuweb41a}{, 41a}\NWlink{nuweb41b}{b}.
-\item \verb@tour_length@: \NWlink{nuweb28}{28}\NWlink{nuweb30}{, 30}, \underline{\NWlink{nuweb45}{45}}\NWlink{nuweb46b}{, 46b}.
-\item \verb@tour_length_with_waiting_time_included@: \NWlink{nuweb30}{30}\NWlink{nuweb40b}{, 40b}, \underline{\NWlink{nuweb46a}{46a}}\NWlink{nuweb46b}{, 46b}.
+\item \verb@tour_length@: \NWlink{nuweb28}{28}\NWlink{nuweb30}{, 30}, \underline{\NWlink{nuweb45}{45}}\NWlink{nuweb47}{, 47}.
+\item \verb@tour_length_with_waiting_time_included@: \NWlink{nuweb30}{30}\NWlink{nuweb40b}{, 40b}, \underline{\NWlink{nuweb46}{46}}\NWlink{nuweb47}{, 47}.
 \item \verb@wrapperkeyPressHandler@: \underline{\NWlink{nuweb23a}{23a}}\NWlink{nuweb25b}{, 25b}.
 \end{list}} 
 

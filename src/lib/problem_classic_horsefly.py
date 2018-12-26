@@ -811,8 +811,10 @@ def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
       if render_algo_states_to_image_files_p:
            import subprocess, os
            os.chdir(dir_name)
-           subprocess.call( ['ffmpeg', '-r', '1',  '-i', 'algo_state_%05d.png', \
-                             '-vcodec', 'mpeg4', '-r', '10' ,'algo_state_animation.avi']  )
+           subprocess.call( ['ffmpeg',  '-hide_banner', '-loglevel', 'verbose', \
+                             '-r', '1',  '-i', 'algo_state_%05d.png', \
+                             '-vcodec', 'mpeg4', '-r', '10' , \
+                             'algo_state_animation.avi']  )
            os.chdir('../')
       
       # Return horsefly tour, along with additional information
