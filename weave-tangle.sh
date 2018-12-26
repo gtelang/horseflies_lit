@@ -13,12 +13,10 @@ if [ $# -eq 0 ]; then
         # mode, by weaving and tangling
 	nuweb -r -v $main_web_file             
 	lualatex -interaction=nonstopmode -halt-on-error  -shell-escape $main_tex_file  
-	asy -vv *.asy                              
+	#asy -vv *.asy                              
 	bibtex $main_tex_file                 
 	lualatex -interaction=nonstopmode -halt-on-error  -shell-escape $main_tex_file  
-	lualatex -interaction=nonstopmode -halt-on-error  -shell-escape $main_tex_file  
 	nuweb -r -v $main_web_file            
-	lualatex -interaction=nonstopmode -halt-on-error  -shell-escape $main_tex_file  
 	lualatex -interaction=nonstopmode -halt-on-error  -shell-escape $main_tex_file  
 
 	# Compile the source code. This will only be useful if I will be using 

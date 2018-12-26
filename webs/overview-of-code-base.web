@@ -82,15 +82,10 @@ does house-keeping duties by parsing the command-line arguments passed by main,
 setting up the canvas by calling the appropriate graphics routines and calling 
 the algorithms on the input specified through the canvas. 
 
-@o ../main.py -cp 
-@{
-import sys
-sys.path.append('src/lib')
+@o ../main.py -cp @{
+@<Turn off Matplotlib's irritating DEBUG messages@>
+@<Import problem module files@>
 
-import problem_classic_horsefly as chf
-#import problem_segment_horsefly as shf
-#import problem_one_horse_two_flies as oh2f
-   
 if __name__=="__main__":
      # Select algorithm or experiment 
      if (len(sys.argv)==1):
@@ -111,7 +106,27 @@ if __name__=="__main__":
           sys.exit()
 @| @}
 
+\newchunk On my customized Ubuntu container, Matplotlib produces tons of DEBUG log messages because  
+it recently switched to the \verb|logging| library for...well...logging. 
+The lines in this chunk were suggested by the link \url{http://matplotlib.1069221.n5.nabble.com/How-to-turn-off-matplotlib-DEBUG-msgs-td48822.html} 
+for quietening down Matplotlib.  
 
+
+@d Turn off Matplotlib's irritating DEBUG messages 
+@{import logging
+mpl_logger = logging.getLogger('matplotlib')
+mpl_logger.setLevel(logging.WARNING)
+@| @}
+
+\newchunk 
+
+@d Import problem module files @{   
+import sys
+sys.path.append('src/lib')
+import problem_classic_horsefly as chf
+#import problem_segment_horsefly as shf
+#import problem_one_horse_two_flies as oh2f
+@| @}
 
 \section{Support Files}
 

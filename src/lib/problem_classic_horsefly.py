@@ -7,7 +7,9 @@ from colorama import Style
 from scipy.optimize import minimize
 from sklearn.cluster import KMeans
 import argparse
+import inspect 
 import itertools
+import logging
 import math
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -19,6 +21,33 @@ import sys
 import time
 import utils_algo
 import utils_graphics
+
+
+# Set up logging information relevant to this module
+   
+logger=logging.getLogger(__name__)
+logging.basicConfig(level=logging.DEBUG)
+
+def debug(msg):
+    frame,filename,line_number,function_name,lines,index=inspect.getouterframes(
+        inspect.currentframe())[1]
+    line=lines[0]
+    indentation_level=line.find(line.lstrip())
+    logger.debug('{i} [{m}]'.format(
+        i='.'*indentation_level,
+        m=msg            
+        ))
+
+def info(msg):
+    frame,filename,line_number,function_name,lines,index=inspect.getouterframes(
+        inspect.currentframe())[1]
+    line=lines[0]
+    indentation_level=line.find(line.lstrip())
+    logger.info('{i} [{m}]'.format(
+        i='.'*indentation_level,
+        m=msg            
+        ))
+
 
 def run_handler():
     # Define key-press handler
@@ -466,7 +495,7 @@ def algo_exact_given_specific_ordering (sites, horseflyinit, phi):
 
 # Define auxiliary helper functions
 def single_site_solution(site, horseposn, phi):
-
+     
      h = np.asarray(horseposn)
      s = np.asarray(site)
      
@@ -502,7 +531,7 @@ def compute_collinear_horseflies_tour(sites, inithorseposn, phi):
 
 # Define various insertion policy classes
 
-class PolicyNaive:
+class PolicyBestInsertionNaive:
 
     def __init__(self, sites, inithorseposn, phi):
 
@@ -514,7 +543,7 @@ class PolicyNaive:
          self.unvisited_sites_idxs = range(len(sites)) # This indexes into self.sites
          self.horse_tour           = [self.inithorseposn]         
 
-    # Methods for \verb|PolicyNaive|
+    # Methods for \verb|PolicyBestInsertionNaive|
     
     def insert_another_unvisited_site(self):
      
@@ -567,7 +596,7 @@ class PolicyNaive:
          insertion_position               = best_table_entry['best_insertion_position']
          delta_increase                   = best_table_entry['delta_increase']
               
-         # Update states for \texttt{PolicyNaive}
+         # Update states for \texttt{PolicyBestInsertionNaive}
             
          # Update visited and univisted sites info
          self.visited_sites = self.visited_sites[:insertion_position]      +\
@@ -588,7 +617,7 @@ class PolicyNaive:
 
 def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
                                       insertion_policy_name = "naive",
-                                      animate_algo_p        = True,
+                                      render_algo_states_to_image_files_p = True,
                                       post_optimizer        = None):
       # Set log, algo-state and input-output files config
         
@@ -612,26 +641,26 @@ def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
                            level    = logging.DEBUG,
                            format   = '%(asctime)s: %(levelname)s: %(message)s',
                            filemode = 'w' )
-      logger = logging.getLogger()
-      logger.info("Started running greedy_incremental_insertion for classic horsefly")
+      #logger = logging.getLogger()
+      info("Started running greedy_incremental_insertion for classic horsefly")
 
       algo_state_counter = 0 
       
       # Set insertion policy class for current run
       
       if insertion_policy_name == "naive":
-           insertion_policy = PolicyNaive(sites, inithorseposn, phi)
+           insertion_policy = PolicyBestInsertionNaive(sites, inithorseposn, phi)
       else: 
            print insertion_policy_name
            sys.exit("Unknown insertion policy: ")
 
-      logger.debug("Finished setting insertion policy: " + insertion_policy_name)
+      debug("Finished setting insertion policy: " + insertion_policy_name)
       
 
       while insertion_policy.unvisited_sites_idxs: 
          # Use insertion policy to find the cheapest site to insert into current tour
          insertion_policy.insert_another_unvisited_site()
-         logger.debug("Inserted another unvisited site")
+         debug(Fore.GREEN + "Inserted another unvisited site" + Style.RESET_ALL)
          
          # Write algorithm's current state to file
             
@@ -650,10 +679,10 @@ def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
               yaml.dump( data   , \
                          outfile, \
                          default_flow_style = False)
-              # If \verb|animate_algo_p| flag is set to \verb|True|, render current algorithm state to file
+              # If \verb|render_algo_states_to_image_files_p| flag is set to \verb|True|, render current algorithm state to file
               
               import utils_algo
-              if animate_algo_p:
+              if render_algo_states_to_image_files_p:
                    # Set up plotting area and canvas, fig, ax, and other configs
                    
                    from matplotlib import rc
@@ -678,6 +707,7 @@ def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
                      
                    # Extract $x$ and $y$ coordinates of the points on the horse, fly tours, visited and unvisited sites
                      
+
                    # Route for the horse
                    xhs = [ data['horse_tour'][i][0] \
                              for i in range(len(data['horse_tour']))  ]    
@@ -700,23 +730,29 @@ def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
                                     for i in range(len(data['unvisited_sites']))  ]    
                    yunvisited = [ data['unvisited_sites'][i][1] 
                                     for i in range(len(data['unvisited_sites'])) ]    
+
+                   debug("Extracted x and y coordinates for route of horse, fly, visited and unvisited sites")
                      
                    # Mark initial position of horse and fly boldly on canvas
                    ax.add_patch( mpl.patches.Circle( inithorseposn, \
                                                      radius = 1/55.0,\
                                                      facecolor= '#D13131', #'red',\
                                                      edgecolor='black')  )
+                   debug("Marked the initial position of horse and fly on canvas")
                      
                    # Place numbered markers on visited sites to mark the order of visitation explicitly
                    for x,y,i in zip(xvisited, yvisited, range(len(xvisited))):
                         ax.text(x, y, str(i+1),  fontsize=8, \
                                 bbox=dict(facecolor='#ddcba0', alpha=1.0, pad=2.0)) 
+
+                   debug("Placed numbered markers on visited sites")
                    
                    # Draw horse and fly-tours
                    ax.plot(xfs,yfs,'g-',linewidth=1.5)  
                    ax.plot(xhs, yhs, color='r', \
                            marker='s', markersize=3, \
                            linewidth=2.0) 
+                   debug("Plotted the horse and fly tours")
                    
                    # Draw unvisited sites as filled blue circles
                    for x, y in zip(xunvisited, yunvisited):
@@ -724,6 +760,7 @@ def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
                                                        radius    = 1/100.0,\
                                                        facecolor = 'blue',\
                                                        edgecolor = 'black')  )
+                   debug("Drew univisted sites")
                    
                    # Give metainformation about current picture as headers and footers
                    fontsize = 15
@@ -731,21 +768,24 @@ def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
                                   str(len(data['visited_sites']))   +\
                                   '/' + str(len(sites))           ,  \
                                        fontdict={'fontsize':fontsize})
+                   debug("Setting title, headers, footers, etc...")
                    
                    # Write image file
                    
-                   image_file_name = 'algo_state_' + \
-                                     str(algo_state_counter).zfill(5) + \
+                   image_file_name = 'algo_state_'                    +\
+                                     str(algo_state_counter).zfill(5) +\
                                         '.png'
                    plt.savefig(dir_name + '/' + image_file_name,  \
-                               bbox_inches='tight')
+                               bbox_inches='tight', dpi=250)
                    print "Wrote " + image_file_name + " to disk"   
-                   plt.close('all') # https://stackoverflow.com/a/21884375/505306
+                   plt.close() 
+
+                   debug(Fore.BLUE+"Rendered algorithm state to image file"+Style.RESET_ALL)
                    
               
 
          algo_state_counter = algo_state_counter + 1
-         logger.debug("Dumped algorithm state to " + algo_state_file_name)
+         debug("Dumped algorithm state to " + algo_state_file_name)
          
 
       # Write input and output to file
@@ -765,10 +805,10 @@ def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
            yaml.dump( data, \
                       outfile, \
                       default_flow_style=False)
-      logger.debug("Dumped input and output to " + io_file_name)
+      debug("Dumped input and output to " + io_file_name)
       
-      # If \verb|animate_algo_p| $==$ \verb|True|, make an animation of algorithm states
-      if animate_algo_p:
+      # If \verb|render_algo_states_to_image_files_p| $==$ \verb|True|, make an animation of algorithm states
+      if render_algo_states_to_image_files_p:
            import subprocess, os
            os.chdir(dir_name)
            subprocess.call( ['ffmpeg', '-r', '1',  '-i', 'algo_state_%05d.png', \
@@ -776,7 +816,7 @@ def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
            os.chdir('../')
       
       # Return horsefly tour, along with additional information
-      logger.debug("Returning answer")
+      debug("Returning answer")
       horse_waiting_times = np.zeros(len(sites))
       return {'tour_points'                : insertion_policy.horse_tour[1:],
               'horse_waiting_times'        : horse_waiting_times, 

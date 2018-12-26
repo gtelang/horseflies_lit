@@ -7,9 +7,11 @@ Todo list
   the ratio of deformation, introduced. This 
   will also be necessary for figures in the paper. 
   Implement this. 
-- [ ] Rename NaiveInsertion to _BestInsertionNaive_
 - [ ] _NearestNeighborInsertion_ insertion
 - [ ] Animation of the delivery process
 - [ ] Call root-logger at the beginning of 
       every function and add the debug logger 
       at the end of every code-block
+- [ ] Number of points, ask at the terminal
+- [ ] Render shit back at the plot window, don't close
+      remove those sys.exits()

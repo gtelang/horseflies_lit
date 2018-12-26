@@ -18,25 +18,34 @@ install Docker and to set up an X-windows connection between the host OS and an 
   \begin{description}
     \item[GNU/Linux]  \url{https://youtu.be/KCckWweNSrM}
     \item[Windows]    \url{https://youtu.be/ymlWt1MqURY}
-    \item[MacOS]      \url{https://youtu.be/MU8HUVlJTEY}
+    %\item[MacOS]      \url{https://youtu.be/MU8HUVlJTEY}
   \end{description}
-
+  To test your installation, run the \verb|hello-world| container. Note that you might 
+  need administrator privileges to run docker. On Windows, you can open the Powershell 
+  as an administrator. On GNU/Linux you should use \verb|sudo|
 \item \crunchy{Download customized Ubuntu image} \verb| docker pull gtelang/ubuntu_customized| \footnote{The customized Ubuntu image is approximately
   7 GB which contains all the libraries (e.g. CGAL, VTK, numpy, and matplotlib) that I typically use to run 
-  my research codes portably.On my home internet connection downloading this Ubuntu-image typically takes about 5 minutes. }
+  my research codes portably.On my home internet connection downloading this Ubuntu-image typically takes about 5-10 minutes. }
 \item \crunchy{Clone repository} \verb|git clone gtelang/horseflies_literate.git|
 \item \crunchy{Mount and Launch} 
 \begin{description}
-\item[For GNU/Linux] Open up your favorite terminal emulator, such xterm and then
-{\small
+\item[If you are running GNU/Linux] 
 \begin{itemize}
-   \item Copy to clipboard the output of \verb|xauth list|
+   \item Open up your favorite terminal emulator, such as xterm, rxvt or konsole
+   \item Copy to clipboard the output of \texttt{xauth list}
    \item \verb|cd horseflies_literate|
-   \item \verb|docker run -it --name horsefly_container --net=host -e DISPLAY -v /tmp/.X11-unix -v `pwd`:/horseflies_mnt gtelang/ubuntu_customized|
+   \item \texttt{docker run -it -\phantom{}-name horsefly\_container -\phantom{}-net=host \textbackslash \newline 
+                -e DISPLAY -v /tmp/.X11-unix \textbackslash                                              \newline 
+                -v  \`{}pwd\`{}:/horseflies\_mnt gtelang/ubuntu\_customized}
    \item \verb|cd horseflies_mnt| 
    \item \verb|xauth add | \textit{<paste-from-clipboard>}
-\end{itemize}}
-\item[For Windows] I had to follow the instructions in 
+\end{itemize}
+
+The purpose of using  ``\verb|xauth|'' and ``\verb|-e DISPLAY -v /tmp/.X11-unix|'' is to establish an X-windows connection between your operating 
+system and the Ubuntu container that allows you to run GUI apps e.g. the FireFox web-browser. 
+\footnote{I found the instructions for running GUI apps on containers in \url{https://www.youtube.com/watch?v=RDg6TRwiPtg}}
+
+\item[If you are running Windows] I had to follow the instructions in 
       \url{https://dev.to/darksmile92/run-gui-app-in-linux-Docker-container-on-windows-host-4kde} to be 
       able to run graphical user applications
 \end{description}

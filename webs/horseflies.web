@@ -8,6 +8,14 @@
 \newcommandx{\UNSURE}[2][1=]{\todo[linecolor=blue,backgroundcolor=blue!25,bordercolor=blue,#1]{#2}}
 \newcommandx{\TODO}[2][1=]{\todo[linecolor=red,backgroundcolor=red!25,bordercolor=red,#1]{#2}}
 
+\usepackage{kantlipsum}
+\usepackage{fancyvrb}
+\usepackage{setspace}
+\newenvironment{CVerbatim}
+ {\singlespacing\center\BVerbatim}
+ {\endBVerbatim\endcenter}
+
+
 
 \usepackage{tocloft}
 \renewcommand{\cftpartfont}{\LARGE\itshape} % Part title in Huge Italic font

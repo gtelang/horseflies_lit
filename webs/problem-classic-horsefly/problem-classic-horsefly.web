@@ -48,6 +48,7 @@ experimental or interactive sections of the code.
 @O ../src/lib/problem_classic_horsefly.py -cp
 @{    
 @< Relevant imports for classic horsefly @>
+@< Set up logging information relevant to this module @>
 def run_handler():
     @< Define key-press handler  @>
     @< Set up interactive canvas @>
@@ -69,7 +70,9 @@ from colorama import Style
 from scipy.optimize import minimize
 from sklearn.cluster import KMeans
 import argparse
+import inspect 
 import itertools
+import logging
 import math
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -81,7 +84,41 @@ import sys
 import time
 import utils_algo
 import utils_graphics
+
 @| @}
+
+\newchunk The logger variable becomes becomes global in scope to this module. This allows
+me to write a customized \texttt{debug} function that let's me format the log messages
+according to the frame level. I learned this trick from the following Stack Overflow post
+\url{https://stackoverflow.com/a/5500099/505306}. 
+
+@d  Set up logging information relevant to this module @{   
+logger=logging.getLogger(__name__)
+logging.basicConfig(level=logging.DEBUG)
+
+def debug(msg):
+    frame,filename,line_number,function_name,lines,index=inspect.getouterframes(
+        inspect.currentframe())[1]
+    line=lines[0]
+    indentation_level=line.find(line.lstrip())
+    logger.debug('{i} [{m}]'.format(
+        i='.'*indentation_level,
+        m=msg            
+        ))
+
+def info(msg):
+    frame,filename,line_number,function_name,lines,index=inspect.getouterframes(
+        inspect.currentframe())[1]
+    line=lines[0]
+    indentation_level=line.find(line.lstrip())
+    logger.info('{i} [{m}]'.format(
+        i='.'*indentation_level,
+        m=msg            
+        ))
+
+@| @}
+
+
 
 
 \newchunk The key-press handler function detects the keys pressed by the user when the canvas
