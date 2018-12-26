@@ -45,9 +45,23 @@ The purpose of using  ``\verb|xauth|'' and ``\verb|-e DISPLAY -v /tmp/.X11-unix|
 system and the Ubuntu container that allows you to run GUI apps e.g. the FireFox web-browser. 
 \footnote{I found the instructions for running GUI apps on containers in \url{https://www.youtube.com/watch?v=RDg6TRwiPtg}}
 
-\item[If you are running Windows] I had to follow the instructions in 
-      \url{https://dev.to/darksmile92/run-gui-app-in-linux-Docker-container-on-windows-host-4kde} to be 
-      able to run graphical user applications
+\item[If you are running Windows]
+  \begin{itemize}
+    \item Follow every instruction in \url{https://dev.to/darksmile92/run-gui-app-in-linux-Docker-container-on-windows-host-4kde}.
+    \footnote{This step is necessary displaying the Matplotlib canvas as we do in the horseflies project for interactive testing of algorithms.}
+      Make sure you can run a gui program like the Firefox web-browser as indicated by the article before going to the next step. 
+
+    \item To mount the horseflies folder, you need to \textit{share} the appropriate drive (e.g. \verb|C:\| or \verb|D:\|) that the \verb|horseflies| folder is in with Docker.
+      Follow instructions here: \url{https://rominirani.com/docker-on-windows-mounting-host-directories-d96f3f056a2c}
+      for sharing directories. \footnote{you might need administrator privileges to perform this step, as pointed out by the article.}
+
+    \item Open up a Windows Powershell (possibly as administrator)
+      \begin{itemize}
+           \item \verb|set-variable -name DISPLAY -value <your-ip-address>:0.0| \footnote{You can find your ip-address by the output of the \texttt{ipconfig} command in the Powershell}
+           \item \verb|docker run -ti --rm -e DISPLAY=$DISPLAY -v <location-of-horseflies-folder>:/horseflies_mnt  gtelang/ubuntu_customized|
+      \end{itemize}
+  \end{itemize}
+
 \end{description}
 
 \item \crunchy{Run experiments} If you want to run all the experiments as described in 

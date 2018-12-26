@@ -553,7 +553,6 @@ class PolicyBestInsertionNaive:
           delta_increase_least = float("inf")
           
           # If \texttt{self.sites[u]} is chosen for insertion, find best insertion position and update \texttt{delta\_increase\_least\_table}
-             
           for i in range(len(self.sites)):
                               
                       visited_sites_test = self.visited_sites[:i] +\
@@ -579,15 +578,14 @@ class PolicyBestInsertionNaive:
             
                      
        # Find the unvisited site which on insertion increases tour-length by the least amount
-       
-       best_table_entry = min(delta_increase_least_table, key = lambda x: x['delta_increase'])
+       best_table_entry = min(delta_increase_least_table, \
+                                key = lambda x: x['delta_increase'])
                 
        unvisited_site_idx_for_insertion = best_table_entry['unvisited_site_idx']
        insertion_position               = best_table_entry['best_insertion_position']
        delta_increase                   = best_table_entry['delta_increase']
             
        # Update states for \texttt{PolicyBestInsertionNaive}
-          
        # Update visited and univisted sites info
        self.visited_sites = self.visited_sites[:insertion_position]      +\
                             [self.sites[unvisited_site_idx_for_insertion]] +\
