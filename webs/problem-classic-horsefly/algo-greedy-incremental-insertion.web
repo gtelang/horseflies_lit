@@ -5,6 +5,7 @@
           insertion algorithm for the TSP that yields a 2-approximation. Similar to the greedy-nn algorithm 
           we can generalize the greedy-incremental approach to the collinear-horseflies setting 
           (cf: \autoref{fig:collinear-horseflies}). 
+
 \newchunk In this approach, we maintain a list of visited sites $V$ (along with the order of visitation 
           $\mathcal{O}$) and the unvisited sites $U$. For the given collinear-horsefly tour serving $V$ 
           pick a site $s$ from $U$ along with a position in $\mathcal{O}$ (calling the resulting ordering  
@@ -54,9 +55,9 @@ benchmark the quality and speed of implementation of future insertion policies.
 @<Define auxiliary helper functions@>
 @<Define various insertion policy classes@>
 def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
-                                      insertion_policy_name = "naive",
-                                      render_algo_states_to_image_files_p = True,
-                                      post_optimizer        = None):
+                                      insertion_policy_name       = "naive",
+                                      write_algo_states_to_disk_p = True   ,
+                                      post_optimizer              = None):
       @<Set log, algo-state and input-output files config@>
       @<Set insertion policy class for current run@>
 
@@ -65,12 +66,12 @@ def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
          @<Write algorithm's current state to file@>
 
       @<Write input and output to file@>
-      @<If \verb|render_algo_states_to_image_files_p| $==$ \verb|True|, make an animation of algorithm states @>
+      @<Make an animation of algorithm states, if \verb|write_algo_states_to_disk_p == True|  @>
       @<Return horsefly tour, along with additional information@>
-@| algo_greedy_incremental_insertion, render_algo_states_to_image_files_p @}
+@| algo_greedy_incremental_insertion, write_algo_states_to_disk_p @}
 
 
-\newchunk Note that for each run of the algorithm, we create a dedicated directory and 
+\vspace{-0.8cm}\newchunk Note that for each run of the algorithm, we create a dedicated directory and 
 use a corresponding log file  in that directory. It will typically containe detailed 
 information on the progress of the algorithm and the steps executed. 
 
@@ -113,7 +114,7 @@ algo_state_counter = 0
 @| io_file_name, logger @}
 
 
-\newchunk This fragment merely sets the variable \verb|insertion_policy| to 
+\vspace{-0.8cm}\newchunk This fragment merely sets the variable \verb|insertion_policy| to 
 the appropriate function. This will later help us in studying the speed of 
 the algorithm and quality of the solution for various insertion policies 
 during the experimental analysis. 
@@ -124,12 +125,11 @@ if insertion_policy_name == "naive":
 else: 
      print insertion_policy_name
      sys.exit("Unknown insertion policy: ")
-
 debug("Finished setting insertion policy: " + insertion_policy_name)
 @| @}
 
 
-\newchunk Note that while defining the body of the algorithm, we treat the insertion policy 
+\vspace{-0.8cm}\newchunk Note that while defining the body of the algorithm, we treat the insertion policy 
 (whose name has already been passed as an string argument) as a kind of black-box, since all 
 policy classes have the same interface. The detailed implementation for the various 
 insertion policies are given later. 
@@ -139,7 +139,7 @@ insertion policies are given later.
 debug(Fore.GREEN + "Inserted another unvisited site" + Style.RESET_ALL)
 @| @}
 
-\newchunk When using Python 2.7 (as I am doing with this suite of programs), you should have the 
+\vspace{-0.8cm}\newchunk When using Python 2.7 (as I am doing with this suite of programs), you should have the 
 \texttt{pyyaml} module version 3.12 installed. Version 4.1 breaks for some weird reason; it can't seem to serialized
 Numpy objects. See \url{https://github.com/kevin1024/vcrpy/issues/366} for a brief discussion on this topic. 
 
@@ -150,40 +150,42 @@ To install the correct version of pyyaml (if you get errors)  use
               sudo pip uninstall pyyaml && sudo pip install pyyaml=3.12
 \end{verbatim}
 
-@D Write algorithm's current state to file @{   
-import yaml
-algo_state_file_name = 'algo_state_'                    + \
-                       str(algo_state_counter).zfill(5) + \
-                       '.yml'
-
-data = {'insertion_policy_name' : insertion_policy_name                       ,
-        'unvisited_sites'       : [insertion_policy.sites[u] \
-                                       for u in insertion_policy.unvisited_sites_idxs], 
-        'visited_sites'         : insertion_policy.visited_sites                    , 
-        'horse_tour'            : insertion_policy.horse_tour }
-
-with open(dir_name + '/' + algo_state_file_name, 'w') as outfile:
-     yaml.dump( data   , \
-                outfile, \
-                default_flow_style = False)
-     @<If \verb|render_algo_states_to_image_files_p| flag is set to \verb|True|, render current algorithm state to file @>
-
-algo_state_counter = algo_state_counter + 1
-debug("Dumped algorithm state to " + algo_state_file_name)
-@| @}
-
-
-\newchunk We use the \verb|render_algo_states_to_image_files_p| boolean argument to explicitly specify whether to draw 
-the current algorithm state or not. This is because Matplotlib is \underline{very} slow when writing 
-image files to disk. Later on, I will probably switch to Asymptote for all my plotting, but for the 
-moment I will stick to Matplotlib because I don't want to have to switch languages right now. 
+\newchunk We use the \verb|write_algo_states_to_disk_p| boolean argument to explicitly specify whether to write 
+the current algorithm state along with its image to disk or not. This is because Matplotlib and PyYaml
+is \underline{very} slow when writing image files to disk. Later on, I will probably switch to Asymptote 
+for all my plotting, but for the moment I will stick to Matplotlib because I don't want to have to switch languages right now. 
  
 And much of my plots will be of a reasonably high-quality for the purpose of presentations. This will naturally 
 affect timing/benchmarking results. 
 
-@D If \verb|render_algo_states_to_image_files_p| flag is set to \verb|True|, render current algorithm state to file @{
-import utils_algo
-if render_algo_states_to_image_files_p:
+@D Write algorithm's current state to file 
+@{if write_algo_states_to_disk_p:
+     import yaml
+     algo_state_file_name = 'algo_state_'                    + \
+                       str(algo_state_counter).zfill(5) + \
+                       '.yml'
+
+     data = {'insertion_policy_name' : insertion_policy_name                       ,
+             'unvisited_sites'       : [insertion_policy.sites[u] \
+                                            for u in insertion_policy.unvisited_sites_idxs], 
+             'visited_sites'         : insertion_policy.visited_sites                    , 
+             'horse_tour'            : insertion_policy.horse_tour }
+
+     with open(dir_name + '/' + algo_state_file_name, 'w') as outfile:
+          yaml.dump( data   , \
+                     outfile, \
+                     default_flow_style = False)
+          @< Render current algorithm state to image file @>
+
+     algo_state_counter = algo_state_counter + 1
+     debug("Dumped algorithm state to " + algo_state_file_name)
+@| @}
+
+\vspace{-0.4cm}
+
+@D  Render current algorithm state to image file 
+@{import utils_algo
+if write_algo_states_to_disk_p:
      @<Set up plotting area and canvas, fig, ax, and other configs@>  
      @<Extract $x$ and $y$ coordinates of the points on the horse, fly tours, visited and unvisited sites@>  
      @<Mark initial position of horse and fly boldly on canvas@>  
@@ -194,9 +196,9 @@ if render_algo_states_to_image_files_p:
      @<Write image file@>
 @}
 
-\newchunk 
-@DSet up plotting area and canvas, fig, ax, and other configs @{
-from matplotlib import rc
+\vspace{-0.8cm}\newchunk 
+@D Set up plotting area and canvas, fig, ax, and other configs 
+@{from matplotlib import rc
 rc('font', **{'family': 'serif', \
            'serif': ['Computer Modern']})
 rc('text', usetex=True)
@@ -217,10 +219,9 @@ ax.tick_params(
     labelbottom=False) # labels along the bottom edge are off
 @}
 
-\newchunk Matplotlib typically plots points using x and y coordinates of the points in separate points. 
-@D Extract $x$ and $y$ coordinates of the points on the horse, fly tours, visited and unvisited sites @{  
-
-# Route for the horse
+\vspace{-0.8cm}\newchunk Matplotlib typically plots points using x and y coordinates of the points in separate points. 
+@D Extract $x$ and $y$ coordinates of the points on the horse, fly tours, visited and unvisited sites 
+@{# Route for the horse
 xhs = [ data['horse_tour'][i][0] \
           for i in range(len(data['horse_tour']))  ]    
 yhs = [ data['horse_tour'][i][1] \
@@ -242,11 +243,10 @@ xunvisited = [ data['unvisited_sites'][i][0] \
                  for i in range(len(data['unvisited_sites']))  ]    
 yunvisited = [ data['unvisited_sites'][i][1] 
                  for i in range(len(data['unvisited_sites'])) ]    
-
 debug("Extracted x and y coordinates for route of horse, fly, visited and unvisited sites")
 @}
 
-\newchunk 
+\vspace{-0.8cm}\newchunk 
 @D Mark initial position of horse and fly boldly on canvas 
 @{ax.add_patch( mpl.patches.Circle( inithorseposn, \
                                   radius = 1/55.0,\
@@ -256,10 +256,10 @@ debug("Marked the initial position of horse and fly on canvas")
 @}
 
 @d Draw horse and fly-tours 
-@{ax.plot(xfs,yfs,'g-',linewidth=1.5)  
+@{ax.plot(xfs,yfs,'g-',linewidth=1.1)  
 ax.plot(xhs, yhs, color='r', \
         marker='s', markersize=3, \
-        linewidth=2.0) 
+        linewidth=1.6) 
 debug("Plotted the horse and fly tours")
 @}
 
@@ -267,7 +267,6 @@ debug("Plotted the horse and fly tours")
 @{for x,y,i in zip(xvisited, yvisited, range(len(xvisited))):
      ax.text(x, y, str(i+1),  fontsize=8, \
              bbox=dict(facecolor='#ddcba0', alpha=1.0, pad=2.0)) 
-
 debug("Placed numbered markers on visited sites")
 @}
 
@@ -281,18 +280,19 @@ debug("Drew univisted sites")
 @| @}
 
 
-\newchunk 
+\vspace{-0.8cm}\newchunk 
 @D Give metainformation about current picture as headers and footers 
 @{fontsize = 15
 ax.set_title( r'Number of sites visited so far: ' +\
                str(len(data['visited_sites']))   +\
                '/' + str(len(sites))           ,  \
                     fontdict={'fontsize':fontsize})
+ax.set_xlabel(r'$\varphi=$'+str(phi), fontdict={'fontsize':fontsize})
 debug("Setting title, headers, footers, etc...")
 @}
-
+\vspace{-0.8cm}
 Note that after writing image files, you should close the current figure. Otherwise
-the collection of all the open figures start hogging the RAM. Matplotlib throws a
+the collection of all the open figures starts hogging the RAM. Matplotlib throws a
 a warning to this effect (if you don't close to the figures) after writing about 
 20 figures:
 
@@ -308,20 +308,19 @@ There is a  Stack Overflow answer (\url{https://stackoverflow.com/a/21884375/505
 which advises to call \verb|plt.close()| after writing out a file that closes the 
 \textit{current} figure to avoid the above warning. 
 
-@D Write image file @{
-image_file_name = 'algo_state_'                    +\
+@D Write image file 
+@{image_file_name = 'algo_state_'                    +\
                   str(algo_state_counter).zfill(5) +\
                      '.png'
 plt.savefig(dir_name + '/' + image_file_name,  \
             bbox_inches='tight', dpi=250)
 print "Wrote " + image_file_name + " to disk"   
 plt.close() 
-
 debug(Fore.BLUE+"Rendered algorithm state to image file"+Style.RESET_ALL)
 @| @}     
 
 
-\newchunk The final answer is written to disk in the form of a YAML file. It lists the input sites 
+\vspace{-0.8cm}\newchunk The final answer is written to disk in the form of a YAML file. It lists the input sites 
 in the order of visitation computed by the algorithm and gives the tour of the horse. 
 Note that the number of points on the horse's tour is 1 more than the number of given sites. 
 
@@ -338,6 +337,7 @@ data = {'insertion_policy_name' : insertion_policy_name   ,
         'phi'            : insertion_policy.phi           , 
         'inithorseposn'  : insertion_policy.inithorseposn}
 
+import yaml
 with open(dir_name + '/' + io_file_name, 'w') as outfile:@%
      yaml.dump( data, \
                 outfile, \
@@ -345,14 +345,15 @@ with open(dir_name + '/' + io_file_name, 'w') as outfile:@%
 debug("Dumped input and output to " + io_file_name)
 @| @}
 
-\newchunk If algorithm states have been rendered to files in the run-folder, we stitch them together using \verb|ffmpeg|
+\vspace{-0.8cm}\newchunk If algorithm states have been rendered to files in the run-folder, we stitch them together using \verb|ffmpeg|
 and make an \verb|.mp4| animation of the changing states of the algorithms. The \verb|.mp4| file will be in the algorithm's
 run folder. I used the  tutorial given on \url{https://en.wikibooks.org/wiki/FFMPEG_An_Intermediate_Guide/image_sequence}
 for choosing the particular command-line options to \verb|ffmpeg| below. The options \texttt{-hide\_banner -loglevel panic} 
 to quieten \verb|ffmpeg|'s output were suggested by  \url{https://superuser.com/a/1045060/102371} 
 
-@D If \verb|render_algo_states_to_image_files_p| $==$ \verb|True|, make an animation of algorithm states 
-@{if render_algo_states_to_image_files_p:
+
+@D Make an animation of algorithm states, if \verb|write_algo_states_to_disk_p == True|   
+@{if write_algo_states_to_disk_p:
      import subprocess, os
      os.chdir(dir_name)
      subprocess.call( ['ffmpeg',  '-hide_banner', '-loglevel', 'verbose', \
@@ -362,7 +363,7 @@ to quieten \verb|ffmpeg|'s output were suggested by  \url{https://superuser.com/
      os.chdir('../')
 @| @}
 
-\newchunk 
+\vspace{-0.8cm}\newchunk 
 @D Return horsefly tour, along with additional information
 @{debug("Returning answer")
 horse_waiting_times = np.zeros(len(sites))
@@ -376,7 +377,7 @@ return {'tour_points'                : insertion_policy.horse_tour[1:],
                                                     inithorseposn)}
 @| @}
 
-\newchunk We now define some of the functions that were referred to in the above chunks. 
+\vspace{-0.8cm}\newchunk We now define some of the functions that were referred to in the above chunks. 
 Given the intial position of the truck and drone, and a list of sites, we need to compute 
 the collinear horsefly tour length for the given ordering. This is the function that is 
 used in every policy class while deciding which is the cheapest unvisited site to insert 
@@ -408,6 +409,7 @@ only a single site, given by the code-chunk below.
      return (tuple(r), hr_mag) 
 @| single_site_solution @}
 
+\vspace{-0.8cm}
 With that the tour length functions for collinear horseflies can be implemented as 
 an elementary instance of the fold pattern of functional programming. 
 \footnote{Python has folds tucked away in some corner of its standard library. 
@@ -425,8 +427,8 @@ mentioned it has performance issues? Double-check this later!}
                  compute_collinear_horseflies_tour_length( sites[1:], rendezvous_pt, phi )
 @| compute_collinear_horseflies_tour_length @}
 
-@d Define auxiliary helper functions @{   
-def compute_collinear_horseflies_tour(sites, inithorseposn, phi):
+@d Define auxiliary helper functions 
+@{def compute_collinear_horseflies_tour(sites, inithorseposn, phi):
 
       horseposn         = inithorseposn
       horse_tour_points = [inithorseposn]
@@ -498,8 +500,8 @@ and \texttt{phi}. Classes which inherit this abstract base class, will
 add their own local data-members and methods for keeping track of 
 data for insertion. 
 
-@D Define various insertion policy classes @{
-class PolicyBestInsertionNaive:
+@D Define various insertion policy classes 
+@{class PolicyBestInsertionNaive:
 
     def __init__(self, sites, inithorseposn, phi):
 
@@ -514,25 +516,22 @@ class PolicyBestInsertionNaive:
     @<Methods for \verb|PolicyBestInsertionNaive| @>
 @| self.sites, self.inithorseposn, self.visited_sites, self.horse_tour @}
 
-\newchunk 
-@D Methods for \verb|PolicyBestInsertionNaive| @{
-def insert_another_unvisited_site(self):
- 
-     @<  Compute the length of the tour that currently services the visited sites @>    
-     delta_increase_least_table = [] # tracking variable updated in for loop below
+\vspace{-0.8cm}\newchunk 
+@D Methods for \verb|PolicyBestInsertionNaive| 
+@{def insert_another_unvisited_site(self):
+   @<  Compute the length of the tour that currently services the visited sites @>    
+   delta_increase_least_table = [] # tracking variable updated in for loop below
 
-     for u in self.unvisited_sites_idxs:
-
-         @< Set up tracking variables local to this iteration @>
-         @< If \texttt{self.sites[u]} is chosen for insertion, find best insertion position and update \texttt{delta\_increase\_least\_table} @>  
+   for u in self.unvisited_sites_idxs:
+      @< Set up tracking variables local to this iteration @>
+      @< If \texttt{self.sites[u]} is chosen for insertion, find best insertion position and update \texttt{delta\_increase\_least\_table} @>  
                  
-     @< Find the unvisited site which on insertion increases tour-length by the least amount  @>     
-     @< Update states for \texttt{PolicyBestInsertionNaive} @> 
- 
+   @< Find the unvisited site which on insertion increases tour-length by the least amount  @>     
+   @< Update states for \texttt{PolicyBestInsertionNaive} @> 
 @| delta_increase_least_table @}
 
 
-\newchunk 
+\vspace{-0.8cm}\newchunk 
 
 @D  Compute the length of the tour that currently services the visited sites 
 @{current_tour_length    = \
@@ -543,13 +542,13 @@ def insert_another_unvisited_site(self):
 @| current_tour_length @}
 
 
-\newchunk 
+\vspace{-0.8cm}\newchunk 
 @D Set up tracking variables local to this iteration 
 @{ibest                = 0
 delta_increase_least = float("inf")
 @| ibest, delta_increase_least @}
 
-\newchunk 
+\vspace{-0.8cm}\newchunk 
 @D If \texttt{self.sites[u]} is chosen for insertion, find best insertion position and update \texttt{delta\_increase\_least\_table} @{   
 for i in range(len(self.sites)):
                     
@@ -577,7 +576,7 @@ delta_increase_least_table.append({'unvisited_site_idx'      : u    , \
 
 
 
-\newchunk 
+\vspace{-0.8cm}\newchunk 
 @D Find the unvisited site which on insertion increases tour-length by the least amount @{
 best_table_entry = min(delta_increase_least_table, key = lambda x: x['delta_increase'])
          
@@ -588,7 +587,7 @@ delta_increase                   = best_table_entry['delta_increase']
 
 
 
-\newchunk 
+\vspace{-0.8cm}\newchunk 
 @D Update states for \texttt{PolicyBestInsertionNaive}  @{   
 # Update visited and univisted sites info
 self.visited_sites = self.visited_sites[:insertion_position]      +\

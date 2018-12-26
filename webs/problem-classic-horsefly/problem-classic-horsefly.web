@@ -57,7 +57,7 @@ def run_handler():
 @< Local utility functions for classic horsefly @>
 @< Algorithms for classic horsefly @>
 @< Plotting routines for classic horsefly @>
-@| run_handler @}
+@| @}
 
 \section{Module Details}
 
@@ -84,17 +84,15 @@ import sys
 import time
 import utils_algo
 import utils_graphics
-
 @| @}
+\vspace{-0.8cm}\newchunk The logger variable becomes becomes global in scope to this module. This allows
+me to write customized \texttt{debug} and \texttt{info} functions that let's me format 
+the log messages according to the frame level. I learned this trick from the following 
+Stack Overflow post \url{https://stackoverflow.com/a/5500099/505306}. 
 
-\newchunk The logger variable becomes becomes global in scope to this module. This allows
-me to write a customized \texttt{debug} function that let's me format the log messages
-according to the frame level. I learned this trick from the following Stack Overflow post
-\url{https://stackoverflow.com/a/5500099/505306}. 
-
-@d  Set up logging information relevant to this module @{   
-logger=logging.getLogger(__name__)
-logging.basicConfig(level=logging.DEBUG)
+@d  Set up logging information relevant to this module 
+@{logger=logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
 def debug(msg):
     frame,filename,line_number,function_name,lines,index=inspect.getouterframes(
@@ -102,9 +100,7 @@ def debug(msg):
     line=lines[0]
     indentation_level=line.find(line.lstrip())
     logger.debug('{i} [{m}]'.format(
-        i='.'*indentation_level,
-        m=msg            
-        ))
+        i='.'*indentation_level, m=msg))
 
 def info(msg):
     frame,filename,line_number,function_name,lines,index=inspect.getouterframes(
@@ -112,21 +108,14 @@ def info(msg):
     line=lines[0]
     indentation_level=line.find(line.lstrip())
     logger.info('{i} [{m}]'.format(
-        i='.'*indentation_level,
-        m=msg            
-        ))
-
+        i='.'*indentation_level, m=msg))
 @| @}
 
-
-
-
-\newchunk The key-press handler function detects the keys pressed by the user when the canvas
+\vspace{-0.8cm}\newchunk The key-press handler function detects the keys pressed by the user when the canvas
 is in active focus. This function allows you to set some of the input parameters like 
 speed ratio $\varphi$, or selecting an algorithm interactively at the command-line, 
 generating a bunch of uniform or non-uniformly distributed points on the canvas, 
 or just plain clearing the canvas for inserting a fresh input set of points. 
-
 
 @d Define key-press handler
 @{   
@@ -142,7 +131,7 @@ def wrapperkeyPressHandler(fig,ax, run):
        return _keyPressHandler
 @| wrapperkeyPressHandler @}
 
-\newchunk 
+\vspace{-0.8cm}\newchunk 
 @D Start entering input from the command-line
 @{phi_str = raw_input(Fore.YELLOW + \
           "Enter speed of fly (should be >1): " +\
@@ -220,7 +209,7 @@ utils_graphics.applyAxCorrection(ax)
 fig.canvas.draw()
 @| @}
 
-\newchunk This chunk generates points uniformly or non-uniformly distributed in the 
+\vspace{-0.8cm}\newchunk This chunk generates points uniformly or non-uniformly distributed in the 
 unit square $[0,1]^2$ in the Matplotlib canvas. I will document the schemes used for 
 generating the non-uniformly distributed points later. These schemes are important to test the effectiveness of 
 the horsefly algorithms. Uniform point clouds do no highlight the weaknesses of 
@@ -228,7 +217,9 @@ sequencing algorithms as David Johnson implies in his article on how to write
 experimental algorithm papers when he talks about algorithms for the TSP. 
 
 @D  Generate a bunch of uniform or non-uniform random points on the canvas
-@{numpts = int(sys.argv[2]) 
+@{numpts = int(raw_input("\n" + Fore.YELLOW+\
+                       "How many points should I generate?: "+\
+                       Style.RESET_ALL)) 
 run.clearAllStates()
 ax.cla()
                
@@ -254,7 +245,7 @@ ax.set_title('Points : ' + str(len(run.sites)), fontdict={'fontsize':40})
 fig.canvas.draw()
 @| @}
 
-\newchunk 
+\vspace{-0.8cm}\newchunk 
 
 @D Clear canvas and states of all objects
 @{run.clearAllStates()
@@ -268,7 +259,7 @@ fig.texts = []
 fig.canvas.draw()
 @| @}
 
-\newchunk 
+\vspace{-0.8cm}\newchunk 
 @D Set up interactive canvas
 @{fig, ax =  plt.subplots()
 run = HorseFlyInput()
@@ -291,7 +282,6 @@ plt.show()
 
 
 \section{Local Data Structures}
-
 
 \newchunk This class manages the input and the output of the result of 
 calling various horsefly algorithms. 
@@ -408,7 +398,7 @@ def tour_length(horseflyinit):
 @| tour_length @}
 
 
-\newchunk It is possible that some heuristics might return non-negligible
+\vspace{-0.8cm}\newchunk It is possible that some heuristics might return non-negligible
       waiting times. Hence I am writing a separate function which
       adds the waiting time (if it is positive) to the length of 
       each link of the tour. Again note that because 
@@ -442,12 +432,8 @@ def tour_length_with_waiting_time_included(tour_points, horse_waiting_times, hor
 
 \section{Plotting Routines}
 \newchunk 
-
 @D Plotting routines for classic horsefly 
-@{ 
-def plotTour(ax,horseflytour, horseflyinit, phi, algo_str, tour_color='#d13131'):
-    """ Plot the tour on the given canvas area
-    """
+@{def plotTour(ax,horseflytour, horseflyinit, phi, algo_str, tour_color='#d13131'):
    
     # Route for the horse
     xhs, yhs = [horseflyinit[0]], [horseflyinit[1]]
@@ -508,11 +494,11 @@ def plotTour(ax,horseflytour, horseflyinit, phi, algo_str, tour_color='#d13131')
                                       edgecolor='black'   )  )
 
 
-    fontsize = 10
+    fontsize = 20
     tnrfont = {'fontname':'Times New Roman'}
-    ax.set_title(  'Algorithm Used: ' + algo_str +  '\nTour Length: ' \
+    ax.set_title( r'Algorithm Used: ' + algo_str +  '\nTour Length: ' \
                     + str(tour_length)[:7], fontdict={'fontsize':fontsize}, **tnrfont)
-    ax.set_xlabel('Number of sites: ' + str(len(xsites)) + '\nDrone Speed: ' + str(phi) ,
+    ax.set_xlabel(r'Number of sites: ' + str(len(xsites)) + '\nDrone Speed: ' + str(phi) ,
                   fontdict={'fontsize':fontsize}, **tnrfont)
 @| plotTour @}
 

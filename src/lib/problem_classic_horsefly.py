@@ -22,11 +22,9 @@ import time
 import utils_algo
 import utils_graphics
 
-
 # Set up logging information relevant to this module
-   
 logger=logging.getLogger(__name__)
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 def debug(msg):
     frame,filename,line_number,function_name,lines,index=inspect.getouterframes(
@@ -34,9 +32,7 @@ def debug(msg):
     line=lines[0]
     indentation_level=line.find(line.lstrip())
     logger.debug('{i} [{m}]'.format(
-        i='.'*indentation_level,
-        m=msg            
-        ))
+        i='.'*indentation_level, m=msg))
 
 def info(msg):
     frame,filename,line_number,function_name,lines,index=inspect.getouterframes(
@@ -44,10 +40,7 @@ def info(msg):
     line=lines[0]
     indentation_level=line.find(line.lstrip())
     logger.info('{i} [{m}]'.format(
-        i='.'*indentation_level,
-        m=msg            
-        ))
-
+        i='.'*indentation_level, m=msg))
 
 def run_handler():
     # Define key-press handler
@@ -134,7 +127,9 @@ def run_handler():
                     
                elif event.key in ['n', 'N', 'u', 'U']: 
                     # Generate a bunch of uniform or non-uniform random points on the canvas
-                    numpts = int(sys.argv[2]) 
+                    numpts = int(raw_input("\n" + Fore.YELLOW+\
+                                           "How many points should I generate?: "+\
+                                           Style.RESET_ALL)) 
                     run.clearAllStates()
                     ax.cla()
                                    
@@ -515,7 +510,6 @@ def compute_collinear_horseflies_tour_length(sites, horseposn, phi):
           (rendezvous_pt, horse_travel_length) = single_site_solution(sites[0], horseposn, phi )
           return horse_travel_length  + \
                  compute_collinear_horseflies_tour_length( sites[1:], rendezvous_pt, phi )
-   
 def compute_collinear_horseflies_tour(sites, inithorseposn, phi):
 
       horseposn         = inithorseposn
@@ -530,7 +524,6 @@ def compute_collinear_horseflies_tour(sites, inithorseposn, phi):
       return horse_tour_points
 
 # Define various insertion policy classes
-
 class PolicyBestInsertionNaive:
 
     def __init__(self, sites, inithorseposn, phi):
@@ -544,81 +537,77 @@ class PolicyBestInsertionNaive:
          self.horse_tour           = [self.inithorseposn]         
 
     # Methods for \verb|PolicyBestInsertionNaive|
-    
     def insert_another_unvisited_site(self):
-     
-         # Compute the length of the tour that currently services the visited sites
-         current_tour_length    = \
-                  compute_collinear_horseflies_tour_length(\
-                             self.visited_sites,\
-                             self.inithorseposn,\
-                             self.phi) 
-             
-         delta_increase_least_table = [] # tracking variable updated in for loop below
-
-         for u in self.unvisited_sites_idxs:
-
-             # Set up tracking variables local to this iteration
-             ibest                = 0
-             delta_increase_least = float("inf")
-             
-             # If \texttt{self.sites[u]} is chosen for insertion, find best insertion position and update \texttt{delta\_increase\_least\_table}
-                
-             for i in range(len(self.sites)):
-                                 
-                         visited_sites_test = self.visited_sites[:i] +\
-                                              [ self.sites[u] ]      +\
-                                              self.visited_sites[i:]
-                                                   
-                         tour_length_on_insertion = \
-                                    compute_collinear_horseflies_tour_length(\
-                                               visited_sites_test,\
-                                               self.inithorseposn,\
-                                               self.phi) 
-
-                         delta_increase = tour_length_on_insertion - current_tour_length                         
-                         assert(delta_increase >= 0)               
-
-                         if delta_increase < delta_increase_least:
-                               delta_increase_least = delta_increase
-                               ibest                = i                                              
-                                   
-             delta_increase_least_table.append({'unvisited_site_idx'      : u    , \
-                                                'best_insertion_position' : ibest, \
-                                                'delta_increase'          : delta_increase_least})
-               
-                     
-         # Find the unvisited site which on insertion increases tour-length by the least amount
-         
-         best_table_entry = min(delta_increase_least_table, key = lambda x: x['delta_increase'])
-                  
-         unvisited_site_idx_for_insertion = best_table_entry['unvisited_site_idx']
-         insertion_position               = best_table_entry['best_insertion_position']
-         delta_increase                   = best_table_entry['delta_increase']
-              
-         # Update states for \texttt{PolicyBestInsertionNaive}
-            
-         # Update visited and univisted sites info
-         self.visited_sites = self.visited_sites[:insertion_position]      +\
-                              [self.sites[unvisited_site_idx_for_insertion]] +\
-                              self.visited_sites[insertion_position:]
+       # Compute the length of the tour that currently services the visited sites
+       current_tour_length    = \
+                compute_collinear_horseflies_tour_length(\
+                           self.visited_sites,\
+                           self.inithorseposn,\
+                           self.phi) 
            
-         self.unvisited_sites_idxs = filter( lambda elt: elt != unvisited_site_idx_for_insertion, \
-                                             self.unvisited_sites_idxs ) 
+       delta_increase_least_table = [] # tracking variable updated in for loop below
 
-         # Update the tour of the horse
-         self.horse_tour = compute_collinear_horseflies_tour(\
-                                    self.visited_sites,         \
-                                    self.inithorseposn, \
-                                    self.phi) 
+       for u in self.unvisited_sites_idxs:
+          # Set up tracking variables local to this iteration
+          ibest                = 0
+          delta_increase_least = float("inf")
           
-     
+          # If \texttt{self.sites[u]} is chosen for insertion, find best insertion position and update \texttt{delta\_increase\_least\_table}
+             
+          for i in range(len(self.sites)):
+                              
+                      visited_sites_test = self.visited_sites[:i] +\
+                                           [ self.sites[u] ]      +\
+                                           self.visited_sites[i:]
+                                                
+                      tour_length_on_insertion = \
+                                 compute_collinear_horseflies_tour_length(\
+                                            visited_sites_test,\
+                                            self.inithorseposn,\
+                                            self.phi) 
+
+                      delta_increase = tour_length_on_insertion - current_tour_length                         
+                      assert(delta_increase >= 0)               
+
+                      if delta_increase < delta_increase_least:
+                            delta_increase_least = delta_increase
+                            ibest                = i                                              
+                                
+          delta_increase_least_table.append({'unvisited_site_idx'      : u    , \
+                                             'best_insertion_position' : ibest, \
+                                             'delta_increase'          : delta_increase_least})
+            
+                     
+       # Find the unvisited site which on insertion increases tour-length by the least amount
+       
+       best_table_entry = min(delta_increase_least_table, key = lambda x: x['delta_increase'])
+                
+       unvisited_site_idx_for_insertion = best_table_entry['unvisited_site_idx']
+       insertion_position               = best_table_entry['best_insertion_position']
+       delta_increase                   = best_table_entry['delta_increase']
+            
+       # Update states for \texttt{PolicyBestInsertionNaive}
+          
+       # Update visited and univisted sites info
+       self.visited_sites = self.visited_sites[:insertion_position]      +\
+                            [self.sites[unvisited_site_idx_for_insertion]] +\
+                            self.visited_sites[insertion_position:]
+         
+       self.unvisited_sites_idxs = filter( lambda elt: elt != unvisited_site_idx_for_insertion, \
+                                           self.unvisited_sites_idxs ) 
+
+       # Update the tour of the horse
+       self.horse_tour = compute_collinear_horseflies_tour(\
+                                  self.visited_sites,         \
+                                  self.inithorseposn, \
+                                  self.phi) 
+        
     
 
 def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
-                                      insertion_policy_name = "naive",
-                                      render_algo_states_to_image_files_p = True,
-                                      post_optimizer        = None):
+                                      insertion_policy_name       = "naive",
+                                      write_algo_states_to_disk_p = True   ,
+                                      post_optimizer              = None):
       # Set log, algo-state and input-output files config
         
       import sys, logging, datetime, os, errno
@@ -653,7 +642,6 @@ def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
       else: 
            print insertion_policy_name
            sys.exit("Unknown insertion policy: ")
-
       debug("Finished setting insertion policy: " + insertion_policy_name)
       
 
@@ -663,129 +651,122 @@ def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
          debug(Fore.GREEN + "Inserted another unvisited site" + Style.RESET_ALL)
          
          # Write algorithm's current state to file
-            
-         import yaml
-         algo_state_file_name = 'algo_state_'                    + \
+         if write_algo_states_to_disk_p:
+              import yaml
+              algo_state_file_name = 'algo_state_'                    + \
                                 str(algo_state_counter).zfill(5) + \
                                 '.yml'
 
-         data = {'insertion_policy_name' : insertion_policy_name                       ,
-                 'unvisited_sites'       : [insertion_policy.sites[u] \
-                                                for u in insertion_policy.unvisited_sites_idxs], 
-                 'visited_sites'         : insertion_policy.visited_sites                    , 
-                 'horse_tour'            : insertion_policy.horse_tour }
+              data = {'insertion_policy_name' : insertion_policy_name                       ,
+                      'unvisited_sites'       : [insertion_policy.sites[u] \
+                                                     for u in insertion_policy.unvisited_sites_idxs], 
+                      'visited_sites'         : insertion_policy.visited_sites                    , 
+                      'horse_tour'            : insertion_policy.horse_tour }
 
-         with open(dir_name + '/' + algo_state_file_name, 'w') as outfile:
-              yaml.dump( data   , \
-                         outfile, \
-                         default_flow_style = False)
-              # If \verb|render_algo_states_to_image_files_p| flag is set to \verb|True|, render current algorithm state to file
-              
-              import utils_algo
-              if render_algo_states_to_image_files_p:
-                   # Set up plotting area and canvas, fig, ax, and other configs
+              with open(dir_name + '/' + algo_state_file_name, 'w') as outfile:
+                   yaml.dump( data   , \
+                              outfile, \
+                              default_flow_style = False)
+                   # Render current algorithm state to image file
+                   import utils_algo
+                   if write_algo_states_to_disk_p:
+                        # Set up plotting area and canvas, fig, ax, and other configs
+                        from matplotlib import rc
+                        rc('font', **{'family': 'serif', \
+                                   'serif': ['Computer Modern']})
+                        rc('text', usetex=True)
+                        fig,ax = plt.subplots()
+                        ax.set_xlim([0,1])
+                        ax.set_ylim([0,1])
+                        ax.set_aspect(1.0)
+                        ax = fig.gca()
+                        ax.set_xticks(np.arange(0, 1, 0.1))     
+                        ax.set_yticks(np.arange(0, 1., 0.1))
+                        plt.grid(linestyle='dotted')
+                        ax.set_xticklabels([]) # to remove those numbers at the bottom
+                        ax.set_yticklabels([])
+
+                        ax.tick_params(
+                            bottom=False,      # ticks along the bottom edge are off
+                            left=False,        # ticks along the top edge are off
+                            labelbottom=False) # labels along the bottom edge are off
+                          
+                        # Extract $x$ and $y$ coordinates of the points on the horse, fly tours, visited and unvisited sites
+                        # Route for the horse
+                        xhs = [ data['horse_tour'][i][0] \
+                                  for i in range(len(data['horse_tour']))  ]    
+                        yhs = [ data['horse_tour'][i][1] \
+                                  for i in range(len(data['horse_tour']))  ]    
+
+                        # Route for the fly. The fly keeps alternating between the site and the horse
+                        xfs , yfs = [xhs[0]], [yhs[0]]
+                        for site, pt in zip (data['visited_sites'],
+                                             data['horse_tour'][1:]):
+                            xfs.extend([site[0], pt[0]])
+                            yfs.extend([site[1], pt[1]])
+                                
+                        xvisited = [ data['visited_sites'][i][0] \
+                                       for i in range(len(data['visited_sites']))  ]    
+                        yvisited = [ data['visited_sites'][i][1] \
+                                       for i in range(len(data['visited_sites']))  ]    
+                            
+                        xunvisited = [ data['unvisited_sites'][i][0] \
+                                         for i in range(len(data['unvisited_sites']))  ]    
+                        yunvisited = [ data['unvisited_sites'][i][1] 
+                                         for i in range(len(data['unvisited_sites'])) ]    
+                        debug("Extracted x and y coordinates for route of horse, fly, visited and unvisited sites")
+                          
+                        # Mark initial position of horse and fly boldly on canvas
+                        ax.add_patch( mpl.patches.Circle( inithorseposn, \
+                                                          radius = 1/55.0,\
+                                                          facecolor= '#D13131', #'red',\
+                                                          edgecolor='black')  )
+                        debug("Marked the initial position of horse and fly on canvas")
+                          
+                        # Place numbered markers on visited sites to mark the order of visitation explicitly
+                        for x,y,i in zip(xvisited, yvisited, range(len(xvisited))):
+                             ax.text(x, y, str(i+1),  fontsize=8, \
+                                     bbox=dict(facecolor='#ddcba0', alpha=1.0, pad=2.0)) 
+                        debug("Placed numbered markers on visited sites")
+                        
+                        # Draw horse and fly-tours
+                        ax.plot(xfs,yfs,'g-',linewidth=1.1)  
+                        ax.plot(xhs, yhs, color='r', \
+                                marker='s', markersize=3, \
+                                linewidth=1.6) 
+                        debug("Plotted the horse and fly tours")
+                        
+                        # Draw unvisited sites as filled blue circles
+                        for x, y in zip(xunvisited, yunvisited):
+                             ax.add_patch( mpl.patches.Circle( (x,y),\
+                                                            radius    = 1/100.0,\
+                                                            facecolor = 'blue',\
+                                                            edgecolor = 'black')  )
+                        debug("Drew univisted sites")
+                        
+                        # Give metainformation about current picture as headers and footers
+                        fontsize = 15
+                        ax.set_title( r'Number of sites visited so far: ' +\
+                                       str(len(data['visited_sites']))   +\
+                                       '/' + str(len(sites))           ,  \
+                                            fontdict={'fontsize':fontsize})
+                        ax.set_xlabel(r'$\varphi=$'+str(phi), fontdict={'fontsize':fontsize})
+                        debug("Setting title, headers, footers, etc...")
+                        
+                        # Write image file
+                        image_file_name = 'algo_state_'                    +\
+                                          str(algo_state_counter).zfill(5) +\
+                                             '.png'
+                        plt.savefig(dir_name + '/' + image_file_name,  \
+                                    bbox_inches='tight', dpi=250)
+                        print "Wrote " + image_file_name + " to disk"   
+                        plt.close() 
+                        debug(Fore.BLUE+"Rendered algorithm state to image file"+Style.RESET_ALL)
+                        
                    
-                   from matplotlib import rc
-                   rc('font', **{'family': 'serif', \
-                              'serif': ['Computer Modern']})
-                   rc('text', usetex=True)
-                   fig,ax = plt.subplots()
-                   ax.set_xlim([0,1])
-                   ax.set_ylim([0,1])
-                   ax.set_aspect(1.0)
-                   ax = fig.gca()
-                   ax.set_xticks(np.arange(0, 1, 0.1))     
-                   ax.set_yticks(np.arange(0, 1., 0.1))
-                   plt.grid(linestyle='dotted')
-                   ax.set_xticklabels([]) # to remove those numbers at the bottom
-                   ax.set_yticklabels([])
 
-                   ax.tick_params(
-                       bottom=False,      # ticks along the bottom edge are off
-                       left=False,        # ticks along the top edge are off
-                       labelbottom=False) # labels along the bottom edge are off
-                     
-                   # Extract $x$ and $y$ coordinates of the points on the horse, fly tours, visited and unvisited sites
-                     
-
-                   # Route for the horse
-                   xhs = [ data['horse_tour'][i][0] \
-                             for i in range(len(data['horse_tour']))  ]    
-                   yhs = [ data['horse_tour'][i][1] \
-                             for i in range(len(data['horse_tour']))  ]    
-
-                   # Route for the fly. The fly keeps alternating between the site and the horse
-                   xfs , yfs = [xhs[0]], [yhs[0]]
-                   for site, pt in zip (data['visited_sites'],
-                                        data['horse_tour'][1:]):
-                       xfs.extend([site[0], pt[0]])
-                       yfs.extend([site[1], pt[1]])
-                           
-                   xvisited = [ data['visited_sites'][i][0] \
-                                  for i in range(len(data['visited_sites']))  ]    
-                   yvisited = [ data['visited_sites'][i][1] \
-                                  for i in range(len(data['visited_sites']))  ]    
-                       
-                   xunvisited = [ data['unvisited_sites'][i][0] \
-                                    for i in range(len(data['unvisited_sites']))  ]    
-                   yunvisited = [ data['unvisited_sites'][i][1] 
-                                    for i in range(len(data['unvisited_sites'])) ]    
-
-                   debug("Extracted x and y coordinates for route of horse, fly, visited and unvisited sites")
-                     
-                   # Mark initial position of horse and fly boldly on canvas
-                   ax.add_patch( mpl.patches.Circle( inithorseposn, \
-                                                     radius = 1/55.0,\
-                                                     facecolor= '#D13131', #'red',\
-                                                     edgecolor='black')  )
-                   debug("Marked the initial position of horse and fly on canvas")
-                     
-                   # Place numbered markers on visited sites to mark the order of visitation explicitly
-                   for x,y,i in zip(xvisited, yvisited, range(len(xvisited))):
-                        ax.text(x, y, str(i+1),  fontsize=8, \
-                                bbox=dict(facecolor='#ddcba0', alpha=1.0, pad=2.0)) 
-
-                   debug("Placed numbered markers on visited sites")
-                   
-                   # Draw horse and fly-tours
-                   ax.plot(xfs,yfs,'g-',linewidth=1.5)  
-                   ax.plot(xhs, yhs, color='r', \
-                           marker='s', markersize=3, \
-                           linewidth=2.0) 
-                   debug("Plotted the horse and fly tours")
-                   
-                   # Draw unvisited sites as filled blue circles
-                   for x, y in zip(xunvisited, yunvisited):
-                        ax.add_patch( mpl.patches.Circle( (x,y),\
-                                                       radius    = 1/100.0,\
-                                                       facecolor = 'blue',\
-                                                       edgecolor = 'black')  )
-                   debug("Drew univisted sites")
-                   
-                   # Give metainformation about current picture as headers and footers
-                   fontsize = 15
-                   ax.set_title( r'Number of sites visited so far: ' +\
-                                  str(len(data['visited_sites']))   +\
-                                  '/' + str(len(sites))           ,  \
-                                       fontdict={'fontsize':fontsize})
-                   debug("Setting title, headers, footers, etc...")
-                   
-                   # Write image file
-                   
-                   image_file_name = 'algo_state_'                    +\
-                                     str(algo_state_counter).zfill(5) +\
-                                        '.png'
-                   plt.savefig(dir_name + '/' + image_file_name,  \
-                               bbox_inches='tight', dpi=250)
-                   print "Wrote " + image_file_name + " to disk"   
-                   plt.close() 
-
-                   debug(Fore.BLUE+"Rendered algorithm state to image file"+Style.RESET_ALL)
-                   
-              
-
-         algo_state_counter = algo_state_counter + 1
-         debug("Dumped algorithm state to " + algo_state_file_name)
+              algo_state_counter = algo_state_counter + 1
+              debug("Dumped algorithm state to " + algo_state_file_name)
          
 
       # Write input and output to file
@@ -801,14 +782,15 @@ def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
               'phi'            : insertion_policy.phi           , 
               'inithorseposn'  : insertion_policy.inithorseposn}
 
+      import yaml
       with open(dir_name + '/' + io_file_name, 'w') as outfile:
            yaml.dump( data, \
                       outfile, \
                       default_flow_style=False)
       debug("Dumped input and output to " + io_file_name)
       
-      # If \verb|render_algo_states_to_image_files_p| $==$ \verb|True|, make an animation of algorithm states
-      if render_algo_states_to_image_files_p:
+      # Make an animation of algorithm states, if \verb|write_algo_states_to_disk_p == True|
+      if write_algo_states_to_disk_p:
            import subprocess, os
            os.chdir(dir_name)
            subprocess.call( ['ffmpeg',  '-hide_banner', '-loglevel', 'verbose', \
@@ -831,10 +813,7 @@ def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
       
 
 # Plotting routines for classic horsefly
- 
 def plotTour(ax,horseflytour, horseflyinit, phi, algo_str, tour_color='#d13131'):
-    """ Plot the tour on the given canvas area
-    """
    
     # Route for the horse
     xhs, yhs = [horseflyinit[0]], [horseflyinit[1]]
@@ -895,10 +874,10 @@ def plotTour(ax,horseflytour, horseflyinit, phi, algo_str, tour_color='#d13131')
                                       edgecolor='black'   )  )
 
 
-    fontsize = 10
+    fontsize = 20
     tnrfont = {'fontname':'Times New Roman'}
-    ax.set_title(  'Algorithm Used: ' + algo_str +  '\nTour Length: ' \
+    ax.set_title( r'Algorithm Used: ' + algo_str +  '\nTour Length: ' \
                     + str(tour_length)[:7], fontdict={'fontsize':fontsize}, **tnrfont)
-    ax.set_xlabel('Number of sites: ' + str(len(xsites)) + '\nDrone Speed: ' + str(phi) ,
+    ax.set_xlabel(r'Number of sites: ' + str(len(xsites)) + '\nDrone Speed: ' + str(phi) ,
                   fontdict={'fontsize':fontsize}, **tnrfont)
 
