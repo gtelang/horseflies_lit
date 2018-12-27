@@ -243,7 +243,6 @@ class HorseFlyInput:
           return sites + inithorseposn
 
 # Local utility functions for classic horsefly
-   
 def tour_length(horseflyinit):
    def _tourlength (x):
          
@@ -261,7 +260,6 @@ def tour_length(horseflyinit):
         return length
 
    return _tourlength
-   
 def tour_length_with_waiting_time_included(tour_points, horse_waiting_times, horseflyinit):
       tour_points   = np.asarray([horseflyinit] + tour_points)
       tour_links    = zip(tour_points, tour_points[1:])
@@ -605,6 +603,7 @@ class PolicyBestInsertionNaive:
 def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
                                       insertion_policy_name       = "naive",
                                       write_algo_states_to_disk_p = True   ,
+                                      animate_schedule_p          = True   , 
                                       post_optimizer              = None):
       # Set log, algo-state and input-output files config
         
@@ -787,6 +786,12 @@ def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
                       default_flow_style=False)
       debug("Dumped input and output to " + io_file_name)
       
+      # Make an animation of the schedule, if \verb|animate_schedule_p == True|
+         
+      if animate_schedule_p : 
+           animateSchedule(dir_name + '/' + io_file_name)
+      
+      sys.exit()
       # Make an animation of algorithm states, if \verb|write_algo_states_to_disk_p == True|
       if write_algo_states_to_disk_p:
            import subprocess, os
@@ -799,7 +804,7 @@ def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
       
       # Return horsefly tour, along with additional information
       debug("Returning answer")
-      horse_waiting_times = np.zeros(len(sites))
+      horse_waiting_times = np.zeros(len(sites)) # TODO write this to file later
       return {'tour_points'                : insertion_policy.horse_tour[1:],
               'horse_waiting_times'        : horse_waiting_times, 
               'site_ordering'              : insertion_policy.visited_sites,
@@ -878,4 +883,83 @@ def plotTour(ax,horseflytour, horseflyinit, phi, algo_str, tour_color='#d13131')
                     + str(tour_length)[:7], fontdict={'fontsize':fontsize}, **tnrfont)
     ax.set_xlabel(r'Number of sites: ' + str(len(xsites)) + '\nDrone Speed: ' + str(phi) ,
                   fontdict={'fontsize':fontsize}, **tnrfont)
+
+# Animation routines for classic horsefly
+def animateSchedule(schedule_file_name):
+      import yaml
+      import numpy as np
+
+      with open(schedule_file_name, 'r') as stream:
+            schedule = yaml.load(stream)
+
+      phi           = float(schedule['phi'])
+      inithorseposn = schedule['inithorseposn']
+
+      # Get legs of the horse and fly tours
+      horse_tour  = map(np.asarray, schedule['horse_tour']   )
+      sites         = map(np.asarray, schedule['visited_sites'])
+           
+      xhs = [ horse_tour[i][0] for i in range(len(horse_tour))]    
+      yhs = [ horse_tour[i][1] for i in range(len(horse_tour))]    
+      xfs , yfs = [xhs[0]], [yhs[0]]
+      for site, pt in zip (sites,horse_tour[1:]):
+               xfs.extend([site[0], pt[0]])
+               yfs.extend([site[1], pt[1]])
+      fly_tour = map(np.asarray,zip(xfs,yfs))
+
+      horse_legs = zip(horse_tour, horse_tour[1:])
+      fly_legs   = zip(fly_tour, fly_tour[1:], fly_tour[2:]) [0::2]
+
+      assert(len(horse_legs) == len(fly_legs))
+      
+      # Initialize the movie
+      pass
+      
+
+      for horse_leg, \
+          fly_leg,   \
+          leg_idx in zip(horse_legs, \
+                         fly_legs,   \
+                         range(len(horse_legs))):
+
+           # Discretize this iteration's horse leg and fly leg
+           def discretize_leg(pts,speed):
+                subleg_pts = []
+                numpts     = len(pts)
+                k          = 3 # the higher, the speed, the fewer the points. tentatively (40/floor(speed))
+                for p,q in zip(pts, pts[1:]):
+                     tmp = []
+                     for t in np.linspace(0,1,k): ### 10 should be replaced by an appropriate constant
+                         tmp.append( (1-t)*p + t*q ) 
+                     subleg_pts.extend(tmp[:-1])
+
+                subleg_pts.append(pts[-1])
+                return subleg_pts
+
+           horse_posns = discretize_leg(horse_leg,1.0)
+           fly_posns   = discretize_leg(fly_leg  ,phi)
+
+
+
+
+
+
+
+           
+           # Locate the position of site in \verb|fly_leg|
+           pass
+           
+           #for horse_posn, fly_posn, in zip(horse_posns, fly_posns) :
+           #      
+                  # pass
+                  
+           #         
+                  #if subleg_idx == site_loc:
+                  #   render as blue
+                  #else 
+                  #   render sites as pink whatever. 
+                  
+      #pass
+       
+      sys.exit()
 

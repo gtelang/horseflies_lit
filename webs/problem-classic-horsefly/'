@@ -554,22 +554,27 @@ incorprated give the time-till liftoff counter too maybe??!!
       for horse_leg, \
           fly_leg,   \
           leg_idx in zip(horse_legs, \
-                         fly_legs,   \
+                         fly_legs,   \          
                          range(len(horse_legs))):
 
            @<Discretize this iteration's horse leg and fly leg@>
            @<Locate the position of site in \verb|fly_leg|@>
-           #for horse_posn, fly_posn, in zip(horse_posns, fly_posns) :
-           #      @<Render frame and add to animation registry@>
-           #      @<Render visited and unvisited sites@>
-      #@<Write animation of schedule to disk@>
+
+           for   horse_posn , \
+                 fly_posn,    \
+                 subleg_idx in zip(horse_posns, \
+                                   fly_posns  , \
+                                   range(len(fly_subleg))):
+                 @<Render frame and add to animation registry@>
+                 @<Render visited and unvisited sites@>
+      @<Write animation of schedule to disk@>
       sys.exit()
 @| @}
 
 
 \vspace{-0.8cm} \newchunk
 @d Get legs of the horse and fly tours 
-@{horse_tour  = map(np.asarray, schedule['horse_tour']   )
+@{horse_tour    = map(np.asarray, schedule['horse_tour']   )
 sites         = map(np.asarray, schedule['visited_sites'])
      
 xhs = [ horse_tour[i][0] for i in range(len(horse_tour))]    
@@ -588,8 +593,8 @@ assert(len(horse_legs) == len(fly_legs))
 
 
 \vspace{-0.8cm} \newchunk
-@d Initialize the movie 
-@{pass
+@d Initialize the movie @{   
+pass
 @| @}
 
 
@@ -597,34 +602,20 @@ assert(len(horse_legs) == len(fly_legs))
 we place a dense sequence of points, based on their respective speeds. 
 By ``subleg'', I refer to this collection of points placed along a leg. 
 
-@d Discretize this iteration's horse leg and fly leg 
-@{def discretize_leg(pts,speed):
+@d Discretize this iteration's horse leg and fly leg @{   
+def discretize_leg(pts,speed):
      subleg_pts = []
-     numpts     = len(pts)
-     k          = 3 # the higher, the speed, the fewer the points. tentatively (40/floor(speed))
      for p,q in zip(pts, pts[1:]):
-          tmp = []
-          for t in np.linspace(0,1,k): ### 10 should be replaced by an appropriate constant
-              tmp.append( (1-t)*p + t*q ) 
-          subleg_pts.extend(tmp[:-1])
+          for t in np.linspace(0,1,10): ### 10 should be replaced by an appropriate constant
+              subleg_pts.append( (1-t)*p + t*q ) 
 
-     subleg_pts.append(pts[-1])
-     return subleg_pts
-
-horse_posns = discretize_leg(horse_leg,1.0)
-fly_posns   = discretize_leg(fly_leg  ,phi)
-
-@%from utils_algo import print_list
-@%print_list(horse_tour)
-@%print Fore.YELLOW
-@%print_list(horse_posns)
-@%print Style.RESET_ALL
-
+horse_subleg = discretize_leg(horse_leg,1.0)
+fly_subleg   = discretize_leg(fly_leg  ,phi)
 @| @}
 
 \vspace{-0.8cm} \newchunk
-@d Locate the position of site in \verb|fly_leg| 
-@{pass
+@d Locate the position of site in \verb|fly_leg| @{   
+pass
 @| @}
 
 \vspace{-0.8cm}\newchunk
@@ -634,22 +625,22 @@ horse-leg from 0 till \verb|leg_idx| and then upto
 happens in memory and not as a write to disk, this 
 should get rendered quickly. 
 
-@d Render frame and add to animation registry @{
-# pass
+@d Render frame and add to animation registry @{   
+pass
 @| @}
 
 \vspace{-0.8cm}\newchunk 
 @d Render visited and unvisited sites @{   
-#if subleg_idx == site_loc:
-#   render as blue
-#else 
-#   render sites as pink whatever. 
+if subleg_idx == site_loc:
+   render as blue
+else 
+   render sites as pink whatever. 
 @| @}
 
 
 
-@d Write animation of schedule to disk 
-@{pass
+@d Write animation of schedule to disk @{
+pass
 @}
 
 \section{Chapter Index of Fragments}
