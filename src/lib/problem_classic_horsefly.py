@@ -988,24 +988,29 @@ def animateSchedule(schedule_file_name):
                      fys.append(sites[leg_idx][1])
                  
                  print Fore.RED, subleg_idx, Style.RESET_ALL
-                 horseline, = ax.plot(hxs1,hys1,'ro-', linewidth=6.0,alpha=0.75)
-                 flyline,   = ax.plot(fxs1,fys1,'go-', linewidth=2.0)
+                 horseline, = ax.plot(hxs1,hys1,'ro-', linewidth=4.5)
+                 flyline,   = ax.plot(fxs1,fys1,'go-', linewidth=1.5)
 
-                 objs = [flyline,horseline] # flyline first, so that horseline covers it
+                 objs = [flyline,horseline] 
                 
-                 # Mark sites
-                 #for site in sites:
-                 #    circle = Circle((site[0], site[1]), 1, facecolor='black', edgecolor='black', linewidth=3)
-                 #    sitepatch, = ax.add_patch(circle)
-                 #    objs.append(sitepatch)
+                 # Mark sites in blue. 
+                 # serviced sites, get automatically covered in 
+                 # in green because of fly-line. 
+                 for site in sites:
+                     circle = Circle((site[0], site[1]), 0.01, \
+                                     facecolor = 'blue'      , \
+                                     edgecolor = 'black'     , \
+                                     linewidth=1.3)
+                     sitepatch = ax.add_patch(circle)
+                     objs.append(sitepatch)
 
                  ims.append(objs)
                  
 
       # Write animation of schedule to disk ims.append([im1,im2])
       ani = animation.ArtistAnimation(fig, ims, interval=180, blit=True, repeat_delay=1000)
-      ani.save(schedule_file_name+'.avi')
+      ani.save(schedule_file_name+'.avi', dpi=450)
       
-      plt.show()     
+      #plt.show()     
       sys.exit()
 
