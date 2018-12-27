@@ -900,6 +900,20 @@ def animateSchedule(schedule_file_name):
       ax.set_ylim([0,1])
       ax.set_aspect('equal')
 
+      ax.set_xticks(np.arange(0, 1, 0.1))
+      ax.set_yticks(np.arange(0, 1, 0.1))
+
+      # Found this major/minor grid thing here: http://jonathansoma.com/lede/data-studio/matplotlib/adding-grid-lines-to-a-matplotlib-chart/
+      # Turn on the minor TICKS, which are required for the minor GRID
+      ax.minorticks_on()
+      # customize the major grid
+      ax.grid(which='major', linestyle='--', linewidth='0.3', color='red')
+      # Customize the minor grid
+      ax.grid(which='minor', linestyle=':', linewidth='0.3', color='black')
+
+      ax.get_xaxis().set_ticklabels([])
+      ax.get_yaxis().set_ticklabels([])
+
       ims = []
       with open(schedule_file_name, 'r') as stream:
             schedule = yaml.load(stream)
@@ -911,6 +925,10 @@ def animateSchedule(schedule_file_name):
       horse_tour  = map(np.asarray, schedule['horse_tour']   )
       sites         = map(np.asarray, schedule['visited_sites'])
            
+      # set important meta-data for plot
+      ax.set_title("Number of sites: " + str(len(sites)), fontsize=25)
+      ax.set_xlabel(r"$\varphi$ = " + str(phi), fontsize=20)
+
       xhs = [ horse_tour[i][0] for i in range(len(horse_tour))]    
       yhs = [ horse_tour[i][1] for i in range(len(horse_tour))]    
       xfs , yfs = [xhs[0]], [yhs[0]]
@@ -971,10 +989,10 @@ def animateSchedule(schedule_file_name):
 
            number_of_sites_serviced = leg_idx
 
-           mytitle = ax.text(0.5,0.95, "", bbox={'facecolor':'w', 'alpha':0.5, 'pad':5},
-                              transform=ax.transAxes, ha="center",  fontsize=25)
+           #mytitle = ax.text(0.50,0.95, "", bbox={'facecolor':'w', 'alpha':0.5, 'pad':5},
+           #                   transform=ax.transAxes, ha="center",  fontsize=25)
 
-           mytitle.set_text("Number of sites serviced: "+str(number_of_sites_serviced)+"/"+str(len(sites)))
+           #mytitle.set_text("Number of sites serviced: "+str(number_of_sites_serviced)+"/"+str(len(sites)))
            for horse_posn, fly_posn, subleg_idx  in zip(horse_posns,\
                                                         fly_posns, \
                                                         range(len(horse_posns))):
@@ -993,13 +1011,13 @@ def animateSchedule(schedule_file_name):
                      fxs.append(sites[leg_idx][0])
                      fys.append(sites[leg_idx][1])
                      number_of_sites_serviced += 1
-                     mytitle.set_text("Number of sites serviced: "+str(number_of_sites_serviced)+"/"+str(len(sites)))
+                     #mytitle.set_text("Number of sites serviced: "+str(number_of_sites_serviced)+"/"+str(len(sites)))
 
                  #print Fore.RED, subleg_idx, Style.RESET_ALL
-                 horseline, = ax.plot(hxs1,hys1,'ro-', linewidth=4.0, markersize=9, alpha=0.70)
-                 flyline,   = ax.plot(fxs1,fys1,'go-', linewidth=1.0, markersize=9)
+                 horseline, = ax.plot(hxs1,hys1,'ro-', linewidth=5.0, markersize=6, alpha=1.00)
+                 flyline,   = ax.plot(fxs1,fys1,'go-', linewidth=1.0, markersize=3)
 
-                 objs = [flyline,horseline,mytitle] 
+                 objs = [flyline,horseline] 
                 
                  # Mark serviced sites in green. 
                  for site, j in zip(sites, range(len(sites))):
@@ -1008,20 +1026,20 @@ def animateSchedule(schedule_file_name):
                      else:
                          sitecolor = 'blue'
 
-                     circle = Circle((site[0], site[1]), 0.01, \
+                     circle = Circle((site[0], site[1]), 0.02, \
                                      facecolor = sitecolor   , \
                                      edgecolor = 'black'     , \
                                      linewidth=1.4)
                      sitepatch = ax.add_patch(circle)
                      objs.append(sitepatch)
 
-                 ims.append(objs)
+                 ims.append(objs[::-1])
                  
 
       # Write animation of schedule to disk ims.append([im1,im2])
       ani = animation.ArtistAnimation(fig, ims, interval=80, blit=True, repeat_delay=1000)
-      #ani.save(schedule_file_name+'.avi', dpi=450)
+      ani.save(schedule_file_name+'.avi', dpi=250)
       
       plt.show()     
+      plt.close('all')
       sys.exit()
-
