@@ -602,7 +602,7 @@ class PolicyBestInsertionNaive:
 
 def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
                                       insertion_policy_name       = "naive",
-                                      write_algo_states_to_disk_p = True   ,
+                                      write_algo_states_to_disk_p = False   ,
                                       animate_schedule_p          = True   , 
                                       post_optimizer              = None):
       # Set log, algo-state and input-output files config
@@ -935,6 +935,7 @@ def animateSchedule(schedule_file_name):
       for horse_leg, fly_leg, leg_idx in zip(horse_legs, \
                                              fly_legs,   \
                                              range(len(horse_legs))):
+           print Fore.YELLOW, "Animating leg: ", leg_idx, Style.RESET_ALL
            # Discretize this iteration's horse leg and fly leg
            def discretize_leg(pts,speed):
                 subleg_pts = []
@@ -968,7 +969,12 @@ def animateSchedule(schedule_file_name):
                fxs.extend([site[0], pt[0]])
                fys.extend([site[1], pt[1]])
 
-           
+           number_of_sites_serviced = leg_idx
+
+           mytitle = ax.text(0.5,0.95, "", bbox={'facecolor':'w', 'alpha':0.5, 'pad':5},
+                              transform=ax.transAxes, ha="center",  fontsize=25)
+
+           mytitle.set_text("Number of sites serviced: "+str(number_of_sites_serviced)+"/"+str(len(sites)))
            for horse_posn, fly_posn, subleg_idx  in zip(horse_posns,\
                                                         fly_posns, \
                                                         range(len(horse_posns))):
@@ -986,21 +992,26 @@ def animateSchedule(schedule_file_name):
                  if subleg_idx == 9:
                      fxs.append(sites[leg_idx][0])
                      fys.append(sites[leg_idx][1])
-                 
-                 print Fore.RED, subleg_idx, Style.RESET_ALL
+                     number_of_sites_serviced += 1
+                     mytitle.set_text("Number of sites serviced: "+str(number_of_sites_serviced)+"/"+str(len(sites)))
+
+                 #print Fore.RED, subleg_idx, Style.RESET_ALL
                  horseline, = ax.plot(hxs1,hys1,'ro-', linewidth=4.0, markersize=9, alpha=0.70)
                  flyline,   = ax.plot(fxs1,fys1,'go-', linewidth=1.0, markersize=9)
 
-                 objs = [flyline,horseline] 
+                 objs = [flyline,horseline,mytitle] 
                 
-                 # Mark sites in blue. 
-                 # serviced sites, get automatically covered in 
-                 # in green because of fly-line. 
-                 for site in sites:
+                 # Mark serviced sites in green. 
+                 for site, j in zip(sites, range(len(sites))):
+                     if j < number_of_sites_serviced:
+                         sitecolor = '#DBC657' # yellowish
+                     else:
+                         sitecolor = 'blue'
+
                      circle = Circle((site[0], site[1]), 0.01, \
-                                     facecolor = 'blue'      , \
+                                     facecolor = sitecolor   , \
                                      edgecolor = 'black'     , \
-                                     linewidth=1.3)
+                                     linewidth=1.4)
                      sitepatch = ax.add_patch(circle)
                      objs.append(sitepatch)
 
@@ -1008,7 +1019,7 @@ def animateSchedule(schedule_file_name):
                  
 
       # Write animation of schedule to disk ims.append([im1,im2])
-      ani = animation.ArtistAnimation(fig, ims, interval=180, blit=True, repeat_delay=1000)
+      ani = animation.ArtistAnimation(fig, ims, interval=80, blit=True, repeat_delay=1000)
       #ani.save(schedule_file_name+'.avi', dpi=450)
       
       plt.show()     
