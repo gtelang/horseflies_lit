@@ -888,7 +888,19 @@ def plotTour(ax,horseflytour, horseflyinit, phi, algo_str, tour_color='#d13131')
 def animateSchedule(schedule_file_name):
       import yaml
       import numpy as np
+      import matplotlib.animation as animation
+      from matplotlib.patches import Circle
+      import matplotlib.pyplot as plt 
+             
+      plt.rc('text', usetex=True)
+      plt.rc('font', family='serif')
 
+      fig, ax = plt.subplots()
+      ax.set_xlim([0,1])
+      ax.set_ylim([0,1])
+      ax.set_aspect('equal')
+
+      ims = []
       with open(schedule_file_name, 'r') as stream:
             schedule = yaml.load(stream)
 
@@ -912,36 +924,88 @@ def animateSchedule(schedule_file_name):
 
       assert(len(horse_legs) == len(fly_legs))
       
-      # Initialize the movie
-      pass
-      
+      utils_algo.print_list(horse_legs)
+      print " "
+      utils_algo.print_list(fly_legs)
 
-      for horse_leg, fly_leg, leg_idx in \
-               zip(horse_legs, fly_legs, range(len(horse_legs))):
+      print " "
+      utils_algo.print_list(sites)
+      #sys.exit()
+ 
+      for horse_leg, fly_leg, leg_idx in zip(horse_legs, \
+                                             fly_legs,   \
+                                             range(len(horse_legs))):
            # Discretize this iteration's horse leg and fly leg
            def discretize_leg(pts,speed):
                 subleg_pts = []
                 numpts     = len(pts)
-                k          = 3 # the higher, the speed, the fewer the points. tentatively (40/floor(speed))
+
+                if numpts == 2:
+                    k  = 19 # horse
+                elif numpts == 3:
+                    k  = 10 # fly
+
                 for p,q in zip(pts, pts[1:]):
-                     tmp = []
-                     for t in np.linspace(0,1,k): 
-                         tmp.append( (1-t)*p + t*q ) 
-                     subleg_pts.extend(tmp[:-1])
+                    tmp = []
+                    for t in np.linspace(0,1,k): 
+                        tmp.append( (1-t)*p + t*q ) 
+                    subleg_pts.extend(tmp[:-1])
 
                 subleg_pts.append(pts[-1])
                 return subleg_pts
+              
 
            horse_posns = discretize_leg(horse_leg,1.0)
-           fly_posns   = discretize_leg(fly_leg  ,phi)
+           fly_posns   = discretize_leg(fly_leg,phi) # make the length of this equal
+           assert(len(horse_posns) == len(fly_posns))
+
+           hxs = [xhs[i] for i in range(0,leg_idx+1) ]
+           hys = [yhs[i] for i in range(0,leg_idx+1) ]
 
            
-           for horse_posn, fly_posn, in zip(horse_posns, fly_posns) :
-                 # Render frame and add to animation registry
-                 pass
+           fxs , fys = [hxs[0]], [hys[0]]
+           for site, pt in zip (sites,(zip(hxs,hys))[1:]):
+               fxs.extend([site[0], pt[0]])
+               fys.extend([site[1], pt[1]])
+
+
+           for horse_posn, fly_posn, subleg_idx  in zip(horse_posns,\
+                                                        fly_posns, \
+                                                        range(len(horse_posns))):
+                 #Render frame and add to \verb|ims|
+
+                 hxs1 = hxs + [horse_posn[0]]
+                 hys1 = hys + [horse_posn[1]]
+               
+                 fxs1 = fxs + [fly_posn[0]]
+                 fys1 = fys + [fly_posn[1]]
                  
-      # Write animation of schedule to disk
-      pass
+                 # there is a midway update for new site
+                 # check is site has been serviced and if so, 
+                 # change fxs and fys
+                 if subleg_idx == 9:
+                     fxs.append(sites[leg_idx][0])
+                     fys.append(sites[leg_idx][1])
+                 
+                 print Fore.RED, subleg_idx, Style.RESET_ALL
+                 horseline, = ax.plot(hxs1,hys1,'ro-', linewidth=6.0,alpha=0.75)
+                 flyline,   = ax.plot(fxs1,fys1,'go-', linewidth=2.0)
+
+                 objs = [flyline,horseline] # flyline first, so that horseline covers it
+                
+                 # Mark sites
+                 #for site in sites:
+                 #    circle = Circle((site[0], site[1]), 1, facecolor='black', edgecolor='black', linewidth=3)
+                 #    sitepatch, = ax.add_patch(circle)
+                 #    objs.append(sitepatch)
+
+                 ims.append(objs)
+                 
+
+      # Write animation of schedule to disk ims.append([im1,im2])
+      ani = animation.ArtistAnimation(fig, ims, interval=180, blit=True, repeat_delay=1000)
+      ani.save(schedule_file_name+'.avi')
       
+      plt.show()     
       sys.exit()
 

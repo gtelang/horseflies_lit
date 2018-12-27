@@ -540,7 +540,14 @@ incorprated give the time-till liftoff counter too maybe??!!
 @{def animateSchedule(schedule_file_name):
       import yaml
       import numpy as np
+      import matplotlib.animation as animation
+      import matplotlib.pyplot as plt 
+             
+      plt.rc('text', usetex=True)
+      plt.rc('font', family='serif')
 
+      fig = plt.figure()
+      ims = []
       with open(schedule_file_name, 'r') as stream:
             schedule = yaml.load(stream)
 
@@ -548,16 +555,13 @@ incorprated give the time-till liftoff counter too maybe??!!
       inithorseposn = schedule['inithorseposn']
 
       @<Get legs of the horse and fly tours@>
-      @<Initialize the movie@>
-
-      for horse_leg, fly_leg, leg_idx in \
-               zip(horse_legs, fly_legs, range(len(horse_legs))):
+      for horse_leg, fly_leg, leg_idx in zip(horse_legs, fly_legs, range(len(horse_legs))):
            @<Discretize this iteration's horse leg and fly leg@>
            for horse_posn, fly_posn, in zip(horse_posns, fly_posns) :
-                 @<Render frame and add to animation registry@>
+                 @<Render frame and add to \verb|ims| @>
       @<Write animation of schedule to disk@>
       sys.exit()
-@| @}
+@| ims @}
 
 
 \vspace{-0.8cm} \newchunk
@@ -578,12 +582,6 @@ fly_legs   = zip(fly_tour, fly_tour[1:], fly_tour[2:]) [0::2]
 
 assert(len(horse_legs) == len(fly_legs))
 @| horse_legs, fly_legs, fly_tour, horse_tour @}
-
-
-\vspace{-0.8cm} \newchunk
-@d Initialize the movie 
-@{pass
-@| @}
 
 
 \vspace{-0.8cm} \newchunk On each of the legs of the horse and fly, 
@@ -616,13 +614,18 @@ horse-leg from 0 till \verb|leg_idx| and then upto
 happens in memory and not as a write to disk, this 
 should get rendered quickly. 
 
-@d Render frame and add to animation registry 
-@{pass
+@d Render frame and add to \verb|ims|
+@{objs=[]
+objs.append(horseline)
+objs.append(flyline)
+objs.append(sitepatch)
+ims.append(objs)
 @| @}
 
 
 @d Write animation of schedule to disk 
-@{pass
+@{ani = animation.ArtistAnimation(fig, ims, interval=50, blit=True, repeat_delay=1000)
+ani.save(schedule_file_name+'.avi')
 @}
 
 \section{Chapter Index of Fragments}
