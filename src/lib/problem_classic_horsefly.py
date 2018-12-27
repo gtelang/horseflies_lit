@@ -968,7 +968,7 @@ def animateSchedule(schedule_file_name):
                fxs.extend([site[0], pt[0]])
                fys.extend([site[1], pt[1]])
 
-
+           
            for horse_posn, fly_posn, subleg_idx  in zip(horse_posns,\
                                                         fly_posns, \
                                                         range(len(horse_posns))):
@@ -988,8 +988,8 @@ def animateSchedule(schedule_file_name):
                      fys.append(sites[leg_idx][1])
                  
                  print Fore.RED, subleg_idx, Style.RESET_ALL
-                 horseline, = ax.plot(hxs1,hys1,'ro-', linewidth=4.5)
-                 flyline,   = ax.plot(fxs1,fys1,'go-', linewidth=1.5)
+                 horseline, = ax.plot(hxs1,hys1,'ro-', linewidth=4.0, markersize=9, alpha=0.70)
+                 flyline,   = ax.plot(fxs1,fys1,'go-', linewidth=1.0, markersize=9)
 
                  objs = [flyline,horseline] 
                 
@@ -1009,8 +1009,8 @@ def animateSchedule(schedule_file_name):
 
       # Write animation of schedule to disk ims.append([im1,im2])
       ani = animation.ArtistAnimation(fig, ims, interval=180, blit=True, repeat_delay=1000)
-      ani.save(schedule_file_name+'.avi', dpi=450)
+      #ani.save(schedule_file_name+'.avi', dpi=450)
       
-      #plt.show()     
+      plt.show()     
       sys.exit()
 
