@@ -916,12 +916,8 @@ def animateSchedule(schedule_file_name):
       pass
       
 
-      for horse_leg, \
-          fly_leg,   \
-          leg_idx in zip(horse_legs, \
-                         fly_legs,   \
-                         range(len(horse_legs))):
-
+      for horse_leg, fly_leg, leg_idx in \
+               zip(horse_legs, fly_legs, range(len(horse_legs))):
            # Discretize this iteration's horse leg and fly leg
            def discretize_leg(pts,speed):
                 subleg_pts = []
@@ -929,7 +925,7 @@ def animateSchedule(schedule_file_name):
                 k          = 3 # the higher, the speed, the fewer the points. tentatively (40/floor(speed))
                 for p,q in zip(pts, pts[1:]):
                      tmp = []
-                     for t in np.linspace(0,1,k): ### 10 should be replaced by an appropriate constant
+                     for t in np.linspace(0,1,k): 
                          tmp.append( (1-t)*p + t*q ) 
                      subleg_pts.extend(tmp[:-1])
 
@@ -939,27 +935,13 @@ def animateSchedule(schedule_file_name):
            horse_posns = discretize_leg(horse_leg,1.0)
            fly_posns   = discretize_leg(fly_leg  ,phi)
 
-
-
-
-
-
-
            
-           # Locate the position of site in \verb|fly_leg|
-           pass
-           
-           #for horse_posn, fly_posn, in zip(horse_posns, fly_posns) :
-           #      
-                  # pass
-                  
-           #         
-                  #if subleg_idx == site_loc:
-                  #   render as blue
-                  #else 
-                  #   render sites as pink whatever. 
-                  
-      #pass
-       
+           for horse_posn, fly_posn, in zip(horse_posns, fly_posns) :
+                 # Render frame and add to animation registry
+                 pass
+                 
+      # Write animation of schedule to disk
+      pass
+      
       sys.exit()
 
