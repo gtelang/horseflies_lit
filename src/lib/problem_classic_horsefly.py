@@ -24,7 +24,7 @@ import utils_graphics
 
 # Set up logging information relevant to this module
 logger=logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 
 def debug(msg):
     frame,filename,line_number,function_name,lines,index=inspect.getouterframes(
@@ -602,7 +602,7 @@ class PolicyBestInsertionNaive:
 
 def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
                                       insertion_policy_name       = "naive",
-                                      write_algo_states_to_disk_p = False   ,
+                                      write_algo_states_to_disk_p = True   ,
                                       animate_schedule_p          = True   , 
                                       post_optimizer              = None):
       # Set log, algo-state and input-output files config
@@ -885,161 +885,165 @@ def plotTour(ax,horseflytour, horseflyinit, phi, algo_str, tour_color='#d13131')
                   fontdict={'fontsize':fontsize}, **tnrfont)
 
 # Animation routines for classic horsefly
+
 def animateSchedule(schedule_file_name):
-      import yaml
-      import numpy as np
-      import matplotlib.animation as animation
-      from matplotlib.patches import Circle
-      import matplotlib.pyplot as plt 
+     import yaml
+     import numpy as np
+     import matplotlib.animation as animation
+     from matplotlib.patches import Circle
+     import matplotlib.pyplot as plt 
+
+     # Set up configurations and parameters for animation and plotting
+     
+     plt.rc('text', usetex=True)
+     plt.rc('font', family='serif')
+
+     fig, ax = plt.subplots()
+     ax.set_xlim([0,1])
+     ax.set_ylim([0,1])
+     ax.set_aspect('equal')
+
+     ax.set_xticks(np.arange(0, 1, 0.1))
+     ax.set_yticks(np.arange(0, 1, 0.1))
+
+     # Turn on the minor TICKS, which are required for the minor GRID
+     ax.minorticks_on()
+
+     # customize the major grid
+     ax.grid(which='major', linestyle='--', linewidth='0.3', color='red')
+
+     # Customize the minor grid
+     ax.grid(which='minor', linestyle=':', linewidth='0.3', color='black')
+
+     ax.get_xaxis().set_ticklabels([])
+     ax.get_yaxis().set_ticklabels([])
+     
+     # Parse input-output file and set up required data-structures
+        
+     with open(schedule_file_name, 'r') as stream:
+           schedule = yaml.load(stream)
+
+     phi           = float(schedule['phi'])
+     inithorseposn = schedule['inithorseposn']
+
+     # Get legs of the horse and fly tours
+     horse_tour  = map(np.asarray, schedule['horse_tour']   )
+     sites       = map(np.asarray, schedule['visited_sites'])
+                
+     # set important meta-data for plot
+     ax.set_title("Number of sites: " + str(len(sites)), fontsize=25)
+     ax.set_xlabel(r"$\varphi$ = " + str(phi), fontsize=20)
+
+     xhs = [ horse_tour[i][0] for i in range(len(horse_tour))]    
+     yhs = [ horse_tour[i][1] for i in range(len(horse_tour))]    
+     xfs , yfs = [xhs[0]], [yhs[0]]
+     for site, pt in zip (sites,horse_tour[1:]):
+              xfs.extend([site[0], pt[0]])
+              yfs.extend([site[1], pt[1]])
+     fly_tour = map(np.asarray,zip(xfs,yfs))
+
+     horse_legs = zip(horse_tour, horse_tour[1:])
+     fly_legs   = zip(fly_tour, fly_tour[1:], fly_tour[2:]) [0::2]
+
+     assert(len(horse_legs) == len(fly_legs))
+     
+     # Construct and store every frame of the animation in \verb|ims|
+     ims = []
+     for horse_leg, fly_leg, leg_idx in zip(horse_legs, \
+                                            fly_legs,   \
+                                            range(len(horse_legs))):
+          debug(Fore.YELLOW + "Animating leg: "+ str(leg_idx) + Style.RESET_ALL)
+
+          # Define function to place points along a leg
              
-      plt.rc('text', usetex=True)
-      plt.rc('font', family='serif')
+          def discretize_leg(pts):
+             subleg_pts = []
+             numpts     = len(pts)
 
-      fig, ax = plt.subplots()
-      ax.set_xlim([0,1])
-      ax.set_ylim([0,1])
-      ax.set_aspect('equal')
+             if numpts == 2:
+                 k  = 19 # horse
+             elif numpts == 3:
+                 k  = 10 # fly
 
-      ax.set_xticks(np.arange(0, 1, 0.1))
-      ax.set_yticks(np.arange(0, 1, 0.1))
+             for p,q in zip(pts, pts[1:]):
+                 tmp = []
+                 for t in np.linspace(0,1,k): 
+                     tmp.append( (1-t)*p + t*q ) 
+                 subleg_pts.extend(tmp[:-1])
 
-      # Found this major/minor grid thing here: http://jonathansoma.com/lede/data-studio/matplotlib/adding-grid-lines-to-a-matplotlib-chart/
-      # Turn on the minor TICKS, which are required for the minor GRID
-      ax.minorticks_on()
-      # customize the major grid
-      ax.grid(which='major', linestyle='--', linewidth='0.3', color='red')
-      # Customize the minor grid
-      ax.grid(which='minor', linestyle=':', linewidth='0.3', color='black')
+             subleg_pts.append(pts[-1])
+             return subleg_pts
+          
 
-      ax.get_xaxis().set_ticklabels([])
-      ax.get_yaxis().set_ticklabels([])
+          horse_posns = discretize_leg(horse_leg)
+          fly_posns   = discretize_leg(fly_leg) 
+          assert(len(horse_posns) == len(fly_posns))
 
-      ims = []
-      with open(schedule_file_name, 'r') as stream:
-            schedule = yaml.load(stream)
-
-      phi           = float(schedule['phi'])
-      inithorseposn = schedule['inithorseposn']
-
-      # Get legs of the horse and fly tours
-      horse_tour  = map(np.asarray, schedule['horse_tour']   )
-      sites         = map(np.asarray, schedule['visited_sites'])
-           
-      # set important meta-data for plot
-      ax.set_title("Number of sites: " + str(len(sites)), fontsize=25)
-      ax.set_xlabel(r"$\varphi$ = " + str(phi), fontsize=20)
-
-      xhs = [ horse_tour[i][0] for i in range(len(horse_tour))]    
-      yhs = [ horse_tour[i][1] for i in range(len(horse_tour))]    
-      xfs , yfs = [xhs[0]], [yhs[0]]
-      for site, pt in zip (sites,horse_tour[1:]):
-               xfs.extend([site[0], pt[0]])
-               yfs.extend([site[1], pt[1]])
-      fly_tour = map(np.asarray,zip(xfs,yfs))
-
-      horse_legs = zip(horse_tour, horse_tour[1:])
-      fly_legs   = zip(fly_tour, fly_tour[1:], fly_tour[2:]) [0::2]
-
-      assert(len(horse_legs) == len(fly_legs))
-      
-      utils_algo.print_list(horse_legs)
-      print " "
-      utils_algo.print_list(fly_legs)
-
-      print " "
-      utils_algo.print_list(sites)
-      #sys.exit()
- 
-      for horse_leg, fly_leg, leg_idx in zip(horse_legs, \
-                                             fly_legs,   \
-                                             range(len(horse_legs))):
-           print Fore.YELLOW, "Animating leg: ", leg_idx, Style.RESET_ALL
-           # Discretize this iteration's horse leg and fly leg
-           def discretize_leg(pts,speed):
-                subleg_pts = []
-                numpts     = len(pts)
-
-                if numpts == 2:
-                    k  = 19 # horse
-                elif numpts == 3:
-                    k  = 10 # fly
-
-                for p,q in zip(pts, pts[1:]):
-                    tmp = []
-                    for t in np.linspace(0,1,k): 
-                        tmp.append( (1-t)*p + t*q ) 
-                    subleg_pts.extend(tmp[:-1])
-
-                subleg_pts.append(pts[-1])
-                return subleg_pts
-              
-
-           horse_posns = discretize_leg(horse_leg,1.0)
-           fly_posns   = discretize_leg(fly_leg,phi) # make the length of this equal
-           assert(len(horse_posns) == len(fly_posns))
-
-           hxs = [xhs[i] for i in range(0,leg_idx+1) ]
-           hys = [yhs[i] for i in range(0,leg_idx+1) ]
-
-           
-           fxs , fys = [hxs[0]], [hys[0]]
-           for site, pt in zip (sites,(zip(hxs,hys))[1:]):
+          hxs = [xhs[i] for i in range(0,leg_idx+1) ]
+          hys = [yhs[i] for i in range(0,leg_idx+1) ]
+                
+          fxs , fys = [hxs[0]], [hys[0]]
+          for site, pt in zip (sites,(zip(hxs,hys))[1:]):
                fxs.extend([site[0], pt[0]])
                fys.extend([site[1], pt[1]])
 
-           number_of_sites_serviced = leg_idx
+          number_of_sites_serviced = leg_idx
+          for horse_posn, fly_posn, subleg_idx in zip(horse_posns, \
+                                                      fly_posns,   \
+                                                      range(len(horse_posns))):
+               # Render frame and append it to \verb|ims|
+                  
+               debug(Fore.RED + "Rendering subleg "+ str(subleg_idx) + Style.RESET_ALL)
+               hxs1 = hxs + [horse_posn[0]]
+               hys1 = hys + [horse_posn[1]]
+                              
+               fxs1 = fxs + [fly_posn[0]]
+               fys1 = fys + [fly_posn[1]]
+                                
+               # There is a midway update for new site check is site 
+               # has been serviced. If so, update fxs and fys
+               if subleg_idx == 9:
+                   fxs.append(sites[leg_idx][0])
+                   fys.append(sites[leg_idx][1])
+                   number_of_sites_serviced += 1
 
-           #mytitle = ax.text(0.50,0.95, "", bbox={'facecolor':'w', 'alpha':0.5, 'pad':5},
-           #                   transform=ax.transAxes, ha="center",  fontsize=25)
+               horseline, = ax.plot(hxs1,hys1,'ro-', linewidth=5.0, markersize=6, alpha=1.00)
+               flyline,   = ax.plot(fxs1,fys1,'go-', linewidth=1.0, markersize=3)
 
-           #mytitle.set_text("Number of sites serviced: "+str(number_of_sites_serviced)+"/"+str(len(sites)))
-           for horse_posn, fly_posn, subleg_idx  in zip(horse_posns,\
-                                                        fly_posns, \
-                                                        range(len(horse_posns))):
-                 #Render frame and add to \verb|ims|
-
-                 hxs1 = hxs + [horse_posn[0]]
-                 hys1 = hys + [horse_posn[1]]
-               
-                 fxs1 = fxs + [fly_posn[0]]
-                 fys1 = fys + [fly_posn[1]]
-                 
-                 # there is a midway update for new site
-                 # check is site has been serviced and if so, 
-                 # change fxs and fys
-                 if subleg_idx == 9:
-                     fxs.append(sites[leg_idx][0])
-                     fys.append(sites[leg_idx][1])
-                     number_of_sites_serviced += 1
-                     #mytitle.set_text("Number of sites serviced: "+str(number_of_sites_serviced)+"/"+str(len(sites)))
-
-                 #print Fore.RED, subleg_idx, Style.RESET_ALL
-                 horseline, = ax.plot(hxs1,hys1,'ro-', linewidth=5.0, markersize=6, alpha=1.00)
-                 flyline,   = ax.plot(fxs1,fys1,'go-', linewidth=1.0, markersize=3)
-
-                 objs = [flyline,horseline] 
+               objs = [flyline,horseline] 
                 
-                 # Mark serviced sites in green. 
-                 for site, j in zip(sites, range(len(sites))):
-                     if j < number_of_sites_serviced:
-                         sitecolor = '#DBC657' # yellowish
-                     else:
-                         sitecolor = 'blue'
+               # Mark serviced and unserviced sites with
+               # differen colors. Use https://htmlcolorcodes.com/
+               # for choosing good colors along and their hex-codes.
 
-                     circle = Circle((site[0], site[1]), 0.02, \
-                                     facecolor = sitecolor   , \
-                                     edgecolor = 'black'     , \
-                                     linewidth=1.4)
-                     sitepatch = ax.add_patch(circle)
-                     objs.append(sitepatch)
+               for site, j in zip(sites, range(len(sites))):
+                   if j < number_of_sites_serviced:       # site has been serviced
+                       sitecolor = '#DBC657' # yellowish
+                   else:                                  # site has not been serviced
+                       sitecolor = 'blue'
 
-                 ims.append(objs[::-1])
-                 
+                   circle = Circle((site[0], site[1]), 0.02, \
+                                   facecolor = sitecolor   , \
+                                   edgecolor = 'black'     , \
+                                   linewidth=1.4)
+                   sitepatch = ax.add_patch(circle)
+                   objs.append(sitepatch)
 
-      # Write animation of schedule to disk ims.append([im1,im2])
-      ani = animation.ArtistAnimation(fig, ims, interval=80, blit=True, repeat_delay=1000)
-      ani.save(schedule_file_name+'.avi', dpi=250)
-      
-      plt.show()     
-      plt.close('all')
-      sys.exit()
+               debug(Fore.CYAN + "Appending to ims "+ Style.RESET_ALL)
+               ims.append(objs[::-1])
+               
+     
+     # Write animation of schedule to disk and display in live window
+     from colorama import Back 
+
+     debug(Fore.BLACK + Back.WHITE + "\nStarted constructing ani object"+ Style.RESET_ALL)
+     ani = animation.ArtistAnimation(fig, ims, interval=80, blit=True, repeat_delay=1000)
+     debug(Fore.BLACK + Back.WHITE + "\nFinished constructing ani object"+ Style.RESET_ALL)
+
+     plt.show() # For displaying the animation in a live window. 
+
+     debug(Fore.MAGENTA + "\nStarted writing animation to disk"+ Style.RESET_ALL)
+     ani.save(schedule_file_name+'.avi', dpi=250)
+     debug(Fore.MAGENTA + "\nFinished writing animation to disk"+ Style.RESET_ALL)
+     
+

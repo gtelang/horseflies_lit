@@ -999,7 +999,7 @@ Stack Overflow post \url{https://stackoverflow.com/a/5500099/505306}.
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@logger=logging.getLogger(__name__)@\\
-\mbox{}\verb@logging.basicConfig(level=logging.INFO)@\\
+\mbox{}\verb@logging.basicConfig(level=logging.DEBUG)@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@def debug(msg):@\\
 \mbox{}\verb@    frame,filename,line_number,function_name,lines,index=inspect.getouterframes(@\\
@@ -1862,7 +1862,7 @@ affect timing/benchmarking results.
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \NWtxtMacroRefIn\ \NWlink{nuweb33a}{33a}.
-\item \NWtxtIdentsUsed\nobreak\  \verb@horse_tour@\nobreak\ \NWlink{nuweb47b}{47b}, \verb@write_algo_states_to_disk_p@\nobreak\ \NWlink{nuweb33a}{33a}.
+\item \NWtxtIdentsUsed\nobreak\  \verb@write_algo_states_to_disk_p@\nobreak\ \NWlink{nuweb33a}{33a}.
 \item{}
 \end{list}
 \vspace{4ex}
@@ -1963,7 +1963,7 @@ affect timing/benchmarking results.
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \NWtxtMacroRefIn\ \NWlink{nuweb35b}{35b}.
-\item \NWtxtIdentsUsed\nobreak\  \verb@horse_tour@\nobreak\ \NWlink{nuweb47b}{47b}.
+
 \item{}
 \end{list}
 \vspace{4ex}
@@ -2145,7 +2145,7 @@ Note that the number of points on the horse's tour is 1 more than the number of 
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \NWtxtMacroRefIn\ \NWlink{nuweb33a}{33a}.
-\item \NWtxtIdentsUsed\nobreak\  \verb@horse_tour@\nobreak\ \NWlink{nuweb47b}{47b}, \verb@io_file_name,@\nobreak\ \NWlink{nuweb33b}{33b}.
+\item \NWtxtIdentsUsed\nobreak\  \verb@io_file_name,@\nobreak\ \NWlink{nuweb33b}{33b}.
 \item{}
 \end{list}
 \vspace{4ex}
@@ -2224,7 +2224,7 @@ delivering packages to sites.
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \NWtxtMacroRefIn\ \NWlink{nuweb33a}{33a}.
-\item \NWtxtIdentsUsed\nobreak\  \verb@horse_tour@\nobreak\ \NWlink{nuweb47b}{47b}, \verb@tour_length_with_waiting_time_included@\nobreak\ \NWlink{nuweb44b}{44b}.
+\item \NWtxtIdentsUsed\nobreak\  \verb@tour_length_with_waiting_time_included@\nobreak\ \NWlink{nuweb44b}{44b}.
 \item{}
 \end{list}
 \vspace{4ex}
@@ -2413,7 +2413,7 @@ data for insertion.
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \NWtxtMacroRefIn\ \NWlink{nuweb33a}{33a}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@self.horse_tour@\nobreak\ \NWlink{nuweb43}{43}, \verb@self.inithorseposn,@\nobreak\ \NWlink{nuweb25b}{25b}\NWlink{nuweb41c}{, 41c}\NWlink{nuweb42b}{, 42b}\NWlink{nuweb43}{, 43}, \verb@self.sites,@\nobreak\ \NWlink{nuweb25b}{25b}, \verb@self.visited_sites,@\nobreak\ \NWlink{nuweb41c}{41c}\NWlink{nuweb43}{, 43}.\item \NWtxtIdentsUsed\nobreak\  \verb@horse_tour@\nobreak\ \NWlink{nuweb47b}{47b}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@self.horse_tour@\nobreak\ \NWlink{nuweb43}{43}, \verb@self.inithorseposn,@\nobreak\ \NWlink{nuweb25b}{25b}\NWlink{nuweb41c}{, 41c}\NWlink{nuweb42b}{, 42b}\NWlink{nuweb43}{, 43}, \verb@self.sites,@\nobreak\ \NWlink{nuweb25b}{25b}, \verb@self.visited_sites,@\nobreak\ \NWlink{nuweb41c}{41c}\NWlink{nuweb43}{, 43}.
 \item{}
 \end{list}
 \vspace{4ex}
@@ -2568,7 +2568,7 @@ data for insertion.
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \NWtxtMacroRefIn\ \NWlink{nuweb41b}{41b}.
-\item \NWtxtIdentsUsed\nobreak\  \verb@compute_collinear_horseflies_tour@\nobreak\ \NWlink{nuweb40b}{40b}, \verb@horse_tour@\nobreak\ \NWlink{nuweb47b}{47b}, \verb@self.horse_tour@\nobreak\ \NWlink{nuweb41a}{41a}, \verb@self.inithorseposn,@\nobreak\ \NWlink{nuweb41a}{41a}, \verb@self.visited_sites,@\nobreak\ \NWlink{nuweb41a}{41a}.
+\item \NWtxtIdentsUsed\nobreak\  \verb@compute_collinear_horseflies_tour@\nobreak\ \NWlink{nuweb40b}{40b}, \verb@self.horse_tour@\nobreak\ \NWlink{nuweb41a}{41a}, \verb@self.inithorseposn,@\nobreak\ \NWlink{nuweb41a}{41a}, \verb@self.visited_sites,@\nobreak\ \NWlink{nuweb41a}{41a}.
 \item{}
 \end{list}
 \vspace{4ex}
@@ -2768,7 +2768,8 @@ data for insertion.
 After writing out the schedule, it would be nice to have a function that animates the 
 delivery process of the schedule. Every problem will have animation features unique to
 its features. Any abstraction will reveal itself only after I design the various
-algorithms and extract the various features. 
+algorithms and extract the various features, which is why I will develop these animation
+routines on the fly. 
 
 In general, all algorithms for a problem will write out a YAML file containing the schedule 
 in the outputted run-folder. To animate a schedule and write the resulting movie to disk
@@ -2779,73 +2780,121 @@ just one animation function.
 Schedules will typically be animated iff there is a \verb|animate_schedule_p| boolean 
 flag set to \verb|True| in the arguments of every algorithm's function. 
 
-{\color{red} TODO!! write horsewaiting and drone waiting times to disk too! and incorporate
-it into the animation. } 
-
 Here we render the Horse and Fly moving according to their 
 assigned tours at their respective speeds, we don't 
 need to ``coordinate'' the plotting since that has already 
 been done by the scheudle itself. 
     
 A site that has been unserviced is represented by a blue dot. 
-A site that has been serviced is represented by a pink dot. 
-As more and more sites get serviced you should gradually see a pinkening 
-of the sites. 
+A site that has been serviced is represented by a yellow dot. 
    
-At the top of the plot, start a countdown timer of the number 
-sites remaining to be serviced. This gives the count of blue dots. 
-give the speed ratio as the X-title. Later when waiting times are
-incorprated give the time-till liftoff counter too maybe??!!
-
 \begin{flushleft} \small
 \begin{minipage}{\linewidth}\label{scrap56}\raggedright\small
 \NWtarget{nuweb47a}{} $\langle\,${\itshape Animation routines for classic horsefly}\nobreak\ {\footnotesize {47a}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
+\mbox{}\verb@@\\
 \mbox{}\verb@def animateSchedule(schedule_file_name):@\\
-\mbox{}\verb@      import yaml@\\
-\mbox{}\verb@      import numpy as np@\\
-\mbox{}\verb@      import matplotlib.animation as animation@\\
-\mbox{}\verb@      import matplotlib.pyplot as plt @\\
-\mbox{}\verb@             @\\
-\mbox{}\verb@      plt.rc('text', usetex=True)@\\
-\mbox{}\verb@      plt.rc('font', family='serif')@\\
+\mbox{}\verb@     import yaml@\\
+\mbox{}\verb@     import numpy as np@\\
+\mbox{}\verb@     import matplotlib.animation as animation@\\
+\mbox{}\verb@     from matplotlib.patches import Circle@\\
+\mbox{}\verb@     import matplotlib.pyplot as plt @\\
 \mbox{}\verb@@\\
-\mbox{}\verb@      fig = plt.figure()@\\
-\mbox{}\verb@      ims = []@\\
-\mbox{}\verb@      with open(schedule_file_name, 'r') as stream:@\\
-\mbox{}\verb@            schedule = yaml.load(stream)@\\
-\mbox{}\verb@@\\
-\mbox{}\verb@      phi           = float(schedule['phi'])@\\
-\mbox{}\verb@      inithorseposn = schedule['inithorseposn']@\\
-\mbox{}\verb@@\\
-\mbox{}\verb@      @\hbox{$\langle\,${\itshape Get legs of the horse and fly tours}\nobreak\ {\footnotesize \NWlink{nuweb47b}{47b}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@      for horse_leg, fly_leg, leg_idx in zip(horse_legs, fly_legs, range(len(horse_legs))):@\\
-\mbox{}\verb@           @\hbox{$\langle\,${\itshape Discretize this iteration's horse leg and fly leg}\nobreak\ {\footnotesize \NWlink{nuweb48a}{48a}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@           for horse_posn, fly_posn, in zip(horse_posns, fly_posns) :@\\
-\mbox{}\verb@                 @\hbox{$\langle\,${\itshape Render frame and add to \verb|ims|}\nobreak\ {\footnotesize \NWlink{nuweb48b}{48b}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@      @\hbox{$\langle\,${\itshape Write animation of schedule to disk}\nobreak\ {\footnotesize \NWlink{nuweb48c}{48c}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@      sys.exit()@\\
+\mbox{}\verb@     @\hbox{$\langle\,${\itshape Set up configurations and parameters for animation and plotting}\nobreak\ {\footnotesize \NWlink{nuweb47b}{47b}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@     @\hbox{$\langle\,${\itshape Parse input-output file and set up required data-structures}\nobreak\ {\footnotesize \NWlink{nuweb48}{48}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@     @\hbox{$\langle\,${\itshape Construct and store every frame of the animation in \verb|ims|}\nobreak\ {\footnotesize \NWlink{nuweb49a}{49a}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@     @\hbox{$\langle\,${\itshape Write animation of schedule to disk and display in live window}\nobreak\ {\footnotesize \NWlink{nuweb50b}{50b}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \NWtxtMacroRefIn\ \NWlink{nuweb21a}{21a}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@ims@\nobreak\ \NWlink{nuweb48b}{48b}\NWlink{nuweb48c}{c}.\item \NWtxtIdentsUsed\nobreak\  \verb@fly_legs,@\nobreak\ \NWlink{nuweb47b}{47b}, \verb@fly_posns@\nobreak\ \NWlink{nuweb48a}{48a}, \verb@horse_legs,@\nobreak\ \NWlink{nuweb47b}{47b}, \verb@horse_posns,@\nobreak\ \NWlink{nuweb48a}{48a}.
+
 \item{}
 \end{list}
 \end{minipage}\vspace{4ex}
 \end{flushleft}
-\vspace{-0.8cm} \newchunk
+\vspace{-0.8cm} \newchunk In the  animation, we are going to show the process of the fly delivering 
+packages to the sites according to the pre-computed schedule. Thus the canvas must reflect the 
+underlying euclidean space. For this, we need to set the bounding box of the \verb|Axes| object
+to an axis-parallel unit-square whose lower-left corner is at the origin. 
+
+While displaying the animation it also helps to have a major and minor grid lightly visible to 
+get a rough sense of distances between the sites. The settings for setting up these grids were done following
+the tutorial on \url{http://jonathansoma.com/lede/data-studio/matplotlib/adding-grid-lines-to-a-matplotlib-chart/}
+
+We also use \LaTeX{} symbols and the Computer Modern font for representing equations and text on the plot. 
+Unfortunately, Matplotlib's present default font for text seems to be DejaVu Sans Mono, which isn't pretty 
+for publications. 
+
 \begin{flushleft} \small
 \begin{minipage}{\linewidth}\label{scrap57}\raggedright\small
-\NWtarget{nuweb47b}{} $\langle\,${\itshape Get legs of the horse and fly tours}\nobreak\ {\footnotesize {47b}}$\,\rangle\equiv$
+\NWtarget{nuweb47b}{} $\langle\,${\itshape Set up configurations and parameters for animation and plotting}\nobreak\ {\footnotesize {47b}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
+\mbox{}\verb@@\\
+\mbox{}\verb@plt.rc('text', usetex=True)@\\
+\mbox{}\verb@plt.rc('font', family='serif')@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@fig, ax = plt.subplots()@\\
+\mbox{}\verb@ax.set_xlim([0,1])@\\
+\mbox{}\verb@ax.set_ylim([0,1])@\\
+\mbox{}\verb@ax.set_aspect('equal')@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@ax.set_xticks(np.arange(0, 1, 0.1))@\\
+\mbox{}\verb@ax.set_yticks(np.arange(0, 1, 0.1))@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@# Turn on the minor TICKS, which are required for the minor GRID@\\
+\mbox{}\verb@ax.minorticks_on()@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@# customize the major grid@\\
+\mbox{}\verb@ax.grid(which='major', linestyle='--', linewidth='0.3', color='red')@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@# Customize the minor grid@\\
+\mbox{}\verb@ax.grid(which='minor', linestyle=':', linewidth='0.3', color='black')@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@ax.get_xaxis().set_ticklabels([])@\\
+\mbox{}\verb@ax.get_yaxis().set_ticklabels([])@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb47a}{47a}.
+
+\item{}
+\end{list}
+\end{minipage}\vspace{4ex}
+\end{flushleft}
+\vspace{-0.8cm} \newchunk In this chunk, by \verb|horse_leg| we mean the segment of a horse's 
+tour between two successive rendezvous points with a fly while a \verb|fly_leg| stands for 
+the part of a fly tour when the fly leaves the horse, reaches a site, and returns back to the horse. These
+concepts are illustrated in the diagram below. The frames of the animation are constructed by first
+extracting the \verb|horse_legs| and \verb|fly_legs| of the horse and fly-tours and then 
+animating the horse and fly moving along each of their respective legs. 
+
+
+\begin{flushleft} \small\label{scrap58}\raggedright\small
+\NWtarget{nuweb48}{} $\langle\,${\itshape Parse input-output file and set up required data-structures}\nobreak\ {\footnotesize {48}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@   @\\
+\mbox{}\verb@with open(schedule_file_name, 'r') as stream:@\\
+\mbox{}\verb@      schedule = yaml.load(stream)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@phi           = float(schedule['phi'])@\\
+\mbox{}\verb@inithorseposn = schedule['inithorseposn']@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@# Get legs of the horse and fly tours@\\
 \mbox{}\verb@horse_tour  = map(np.asarray, schedule['horse_tour']   )@\\
-\mbox{}\verb@sites         = map(np.asarray, schedule['visited_sites'])@\\
-\mbox{}\verb@     @\\
+\mbox{}\verb@sites       = map(np.asarray, schedule['visited_sites'])@\\
+\mbox{}\verb@           @\\
+\mbox{}\verb@# set important meta-data for plot@\\
+\mbox{}\verb@ax.set_title("Number of sites: " + str(len(sites)), fontsize=25)@\\
+\mbox{}\verb@ax.set_xlabel(r"$\varphi$ = " + str(phi), fontsize=20)@\\
+\mbox{}\verb@@\\
 \mbox{}\verb@xhs = [ horse_tour[i][0] for i in range(len(horse_tour))]    @\\
 \mbox{}\verb@yhs = [ horse_tour[i][1] for i in range(len(horse_tour))]    @\\
 \mbox{}\verb@xfs , yfs = [xhs[0]], [yhs[0]]@\\
@@ -2864,92 +2913,175 @@ incorprated give the time-till liftoff counter too maybe??!!
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \NWtxtMacroRefIn\ \NWlink{nuweb47a}{47a}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@fly_legs,@\nobreak\ \NWlink{nuweb47a}{47a}, \verb@fly_tour,@\nobreak\ \NWtxtIdentsNotUsed, \verb@horse_legs,@\nobreak\ \NWlink{nuweb47a}{47a}, \verb@horse_tour@\nobreak\ \NWlink{nuweb35a}{35a}\NWlink{nuweb36a}{, 36a}\NWlink{nuweb38a}{, 38a}\NWlink{nuweb39b}{, 39b}\NWlink{nuweb41a}{, 41a}\NWlink{nuweb43}{, 43}.
-\item{}
-\end{list}
-\end{minipage}\vspace{4ex}
-\end{flushleft}
-\vspace{-0.8cm} \newchunk On each of the legs of the horse and fly, 
-we place a dense sequence of points, based on their respective speeds. 
-By ``subleg'', I refer to this collection of points placed along a leg. 
 
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap58}\raggedright\small
-\NWtarget{nuweb48a}{} $\langle\,${\itshape Discretize this iteration's horse leg and fly leg}\nobreak\ {\footnotesize {48a}}$\,\rangle\equiv$
-\vspace{-1ex}
-\begin{list}{}{} \item
-\mbox{}\verb@def discretize_leg(pts,speed):@\\
-\mbox{}\verb@     subleg_pts = []@\\
-\mbox{}\verb@     numpts     = len(pts)@\\
-\mbox{}\verb@     k          = 3 # the higher, the speed, the fewer the points. tentatively (40/floor(speed))@\\
-\mbox{}\verb@     for p,q in zip(pts, pts[1:]):@\\
-\mbox{}\verb@          tmp = []@\\
-\mbox{}\verb@          for t in np.linspace(0,1,k): @\\
-\mbox{}\verb@              tmp.append( (1-t)*p + t*q ) @\\
-\mbox{}\verb@          subleg_pts.extend(tmp[:-1])@\\
-\mbox{}\verb@@\\
-\mbox{}\verb@     subleg_pts.append(pts[-1])@\\
-\mbox{}\verb@     return subleg_pts@\\
-\mbox{}\verb@@\\
-\mbox{}\verb@horse_posns = discretize_leg(horse_leg,1.0)@\\
-\mbox{}\verb@fly_posns   = discretize_leg(fly_leg  ,phi)@\\
-\mbox{}\verb@@\\
-\mbox{}\verb@@{\NWsep}
-\end{list}
-\vspace{-1.5ex}
-\footnotesize
-\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb47a}{47a}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@fly_posns@\nobreak\ \NWlink{nuweb47a}{47a}, \verb@horse_posns,@\nobreak\ \NWlink{nuweb47a}{47a}.
 \item{}
 \end{list}
-\end{minipage}\vspace{4ex}
+\vspace{4ex}
 \end{flushleft}
-\vspace{-0.8cm}\newchunk
-Render the frame. This means all the points along 
-horse-leg from 0 till \verb|leg_idx| and then upto 
-\verb|subleg_idx| gets rendered. Since the rendering 
-happens in memory and not as a write to disk, this 
-should get rendered quickly. 
+\vspace{-0.8cm} \newchunk The \verb|ims| array stores each frame of the animation. Every frame consists of 
+various ``artist'' objects \footnote{This is Matplotlib terminology} (e.g. circles and segments) which change dynamically as the positions of the horse 
+and flies change. 
 
 \begin{flushleft} \small
 \begin{minipage}{\linewidth}\label{scrap59}\raggedright\small
-\NWtarget{nuweb48b}{} $\langle\,${\itshape Render frame and add to \verb|ims|}\nobreak\ {\footnotesize {48b}}$\,\rangle\equiv$
+\NWtarget{nuweb49a}{} $\langle\,${\itshape Construct and store every frame of the animation in \verb|ims|}\nobreak\ {\footnotesize {49a}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
-\mbox{}\verb@objs=[]@\\
-\mbox{}\verb@objs.append(horseline)@\\
-\mbox{}\verb@objs.append(flyline)@\\
-\mbox{}\verb@objs.append(sitepatch)@\\
-\mbox{}\verb@ims.append(objs)@\\
+\mbox{}\verb@ims = []@\\
+\mbox{}\verb@for horse_leg, fly_leg, leg_idx in zip(horse_legs, \@\\
+\mbox{}\verb@                                       fly_legs,   \@\\
+\mbox{}\verb@                                       range(len(horse_legs))):@\\
+\mbox{}\verb@     debug(Fore.YELLOW + "Animating leg: "+ str(leg_idx) + Style.RESET_ALL)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@     @\hbox{$\langle\,${\itshape Define function to place points along a leg}\nobreak\ {\footnotesize \NWlink{nuweb50a}{50a}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@     horse_posns = discretize_leg(horse_leg)@\\
+\mbox{}\verb@     fly_posns   = discretize_leg(fly_leg) @\\
+\mbox{}\verb@     assert(len(horse_posns) == len(fly_posns))@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@     hxs = [xhs[i] for i in range(0,leg_idx+1) ]@\\
+\mbox{}\verb@     hys = [yhs[i] for i in range(0,leg_idx+1) ]@\\
+\mbox{}\verb@           @\\
+\mbox{}\verb@     fxs , fys = [hxs[0]], [hys[0]]@\\
+\mbox{}\verb@     for site, pt in zip (sites,(zip(hxs,hys))[1:]):@\\
+\mbox{}\verb@          fxs.extend([site[0], pt[0]])@\\
+\mbox{}\verb@          fys.extend([site[1], pt[1]])@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@     number_of_sites_serviced = leg_idx@\\
+\mbox{}\verb@     for horse_posn, fly_posn, subleg_idx in zip(horse_posns, \@\\
+\mbox{}\verb@                                                 fly_posns,   \@\\
+\mbox{}\verb@                                                 range(len(horse_posns))):@\\
+\mbox{}\verb@          @\hbox{$\langle\,${\itshape Render frame and append it to \verb|ims|}\nobreak\ {\footnotesize \NWlink{nuweb49b}{49b}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \NWtxtMacroRefIn\ \NWlink{nuweb47a}{47a}.
-\item \NWtxtIdentsUsed\nobreak\  \verb@ims@\nobreak\ \NWlink{nuweb47a}{47a}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@number_of_sites_serviced@\nobreak\ \NWlink{nuweb49b}{49b}.
 \item{}
 \end{list}
 \end{minipage}\vspace{4ex}
 \end{flushleft}
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap60}\raggedright\small
-\NWtarget{nuweb48c}{} $\langle\,${\itshape Write animation of schedule to disk}\nobreak\ {\footnotesize {48c}}$\,\rangle\equiv$
+\vspace{-0.8cm} \newchunk  Note that the magic-number  ``9'' in the block below is 
+related to the 10 and 19 constants from the \verb|discretize_leg| function
+
+\begin{flushleft} \small\label{scrap60}\raggedright\small
+\NWtarget{nuweb49b}{} $\langle\,${\itshape Render frame and append it to \verb|ims|}\nobreak\ {\footnotesize {49b}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
-\mbox{}\verb@ani = animation.ArtistAnimation(fig, ims, interval=50, blit=True, repeat_delay=1000)@\\
-\mbox{}\verb@ani.save(schedule_file_name+'.avi')@\\
+\mbox{}\verb@   @\\
+\mbox{}\verb@debug(Fore.RED + "Rendering subleg "+ str(subleg_idx) + Style.RESET_ALL)@\\
+\mbox{}\verb@hxs1 = hxs + [horse_posn[0]]@\\
+\mbox{}\verb@hys1 = hys + [horse_posn[1]]@\\
+\mbox{}\verb@               @\\
+\mbox{}\verb@fxs1 = fxs + [fly_posn[0]]@\\
+\mbox{}\verb@fys1 = fys + [fly_posn[1]]@\\
+\mbox{}\verb@                 @\\
+\mbox{}\verb@# There is a midway update for new site check is site @\\
+\mbox{}\verb@# has been serviced. If so, update fxs and fys@\\
+\mbox{}\verb@if subleg_idx == 9:@\\
+\mbox{}\verb@    fxs.append(sites[leg_idx][0])@\\
+\mbox{}\verb@    fys.append(sites[leg_idx][1])@\\
+\mbox{}\verb@    number_of_sites_serviced += 1@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@horseline, = ax.plot(hxs1,hys1,'ro-', linewidth=5.0, markersize=6, alpha=1.00)@\\
+\mbox{}\verb@flyline,   = ax.plot(fxs1,fys1,'go-', linewidth=1.0, markersize=3)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@objs = [flyline,horseline] @\\
+\mbox{}\verb@ @\\
+\mbox{}\verb@# Mark serviced and unserviced sites with@\\
+\mbox{}\verb@# differen colors. Use https://htmlcolorcodes.com/@\\
+\mbox{}\verb@# for choosing good colors along and their hex-codes.@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@for site, j in zip(sites, range(len(sites))):@\\
+\mbox{}\verb@    if j < number_of_sites_serviced:       # site has been serviced@\\
+\mbox{}\verb@        sitecolor = '#DBC657' # yellowish@\\
+\mbox{}\verb@    else:                                  # site has not been serviced@\\
+\mbox{}\verb@        sitecolor = 'blue'@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    circle = Circle((site[0], site[1]), 0.02, \@\\
+\mbox{}\verb@                    facecolor = sitecolor   , \@\\
+\mbox{}\verb@                    edgecolor = 'black'     , \@\\
+\mbox{}\verb@                    linewidth=1.4)@\\
+\mbox{}\verb@    sitepatch = ax.add_patch(circle)@\\
+\mbox{}\verb@    objs.append(sitepatch)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@debug(Fore.CYAN + "Appending to ims "+ Style.RESET_ALL)@\\
+\mbox{}\verb@ims.append(objs[::-1])@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb49a}{49a}.
+\item \NWtxtIdentsUsed\nobreak\  \verb@number_of_sites_serviced@\nobreak\ \NWlink{nuweb49a}{49a}.
+\item{}
+\end{list}
+\vspace{4ex}
+\end{flushleft}
+\vspace{-0.8cm} \newchunk The numbers 19 and 10 are arbitrarily chosen. These seem 
+to work well for real-time animation. 
+\begin{flushleft} \small
+\begin{minipage}{\linewidth}\label{scrap61}\raggedright\small
+\NWtarget{nuweb50a}{} $\langle\,${\itshape Define function to place points along a leg}\nobreak\ {\footnotesize {50a}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@   @\\
+\mbox{}\verb@def discretize_leg(pts):@\\
+\mbox{}\verb@   subleg_pts = []@\\
+\mbox{}\verb@   numpts     = len(pts)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@   if numpts == 2:@\\
+\mbox{}\verb@       k  = 19 # horse@\\
+\mbox{}\verb@   elif numpts == 3:@\\
+\mbox{}\verb@       k  = 10 # fly@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@   for p,q in zip(pts, pts[1:]):@\\
+\mbox{}\verb@       tmp = []@\\
+\mbox{}\verb@       for t in np.linspace(0,1,k): @\\
+\mbox{}\verb@           tmp.append( (1-t)*p + t*q ) @\\
+\mbox{}\verb@       subleg_pts.extend(tmp[:-1])@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@   subleg_pts.append(pts[-1])@\\
+\mbox{}\verb@   return subleg_pts@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb49a}{49a}.
+
+\item{}
+\end{list}
+\end{minipage}\vspace{4ex}
+\end{flushleft}
+\vspace{-0.8cm} \newchunk
+\begin{flushleft} \small\label{scrap62}\raggedright\small
+\NWtarget{nuweb50b}{} $\langle\,${\itshape Write animation of schedule to disk and display in live window}\nobreak\ {\footnotesize {50b}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@from colorama import Back @\\
+\mbox{}\verb@@\\
+\mbox{}\verb@debug(Fore.BLACK + Back.WHITE + "\nStarted constructing ani object"+ Style.RESET_ALL)@\\
+\mbox{}\verb@ani = animation.ArtistAnimation(fig, ims, interval=80, blit=True, repeat_delay=1000)@\\
+\mbox{}\verb@debug(Fore.BLACK + Back.WHITE + "\nFinished constructing ani object"+ Style.RESET_ALL)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@plt.show() # For displaying the animation in a live window. @\\
+\mbox{}\verb@@\\
+\mbox{}\verb@debug(Fore.MAGENTA + "\nStarted writing animation to disk"+ Style.RESET_ALL)@\\
+\mbox{}\verb@ani.save(schedule_file_name+'.avi', dpi=250)@\\
+\mbox{}\verb@debug(Fore.MAGENTA + "\nFinished writing animation to disk"+ Style.RESET_ALL)@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \NWtxtMacroRefIn\ \NWlink{nuweb47a}{47a}.
-\item \NWtxtIdentsUsed\nobreak\  \verb@ims@\nobreak\ \NWlink{nuweb47a}{47a}.
+
 \item{}
 \end{list}
-\end{minipage}\vspace{4ex}
+\vspace{4ex}
 \end{flushleft}
 \section{Chapter Index of Fragments}
 
@@ -2958,16 +3090,16 @@ should get rendered quickly.
 \item $\langle\,$Animation routines for classic horsefly\nobreak\ {\footnotesize \NWlink{nuweb47a}{47a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb21a}{21a}.}
 \item $\langle\,$Clear canvas and states of all objects\nobreak\ {\footnotesize \NWlink{nuweb24b}{24b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb22b}{22b}.}
 \item $\langle\,$Compute the length of the tour that currently services the visited sites\nobreak\ {\footnotesize \NWlink{nuweb41c}{41c}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb41b}{41b}.}
+\item $\langle\,$Construct and store every frame of the animation in \verb|ims|\nobreak\ {\footnotesize \NWlink{nuweb49a}{49a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb47a}{47a}.}
 \item $\langle\,$Define auxiliary helper functions\nobreak\ {\footnotesize \NWlink{nuweb39c}{39c}\NWlink{nuweb40a}{, 40a}\NWlink{nuweb40b}{b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb33a}{33a}.}
+\item $\langle\,$Define function to place points along a leg\nobreak\ {\footnotesize \NWlink{nuweb50a}{50a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb49a}{49a}.}
 \item $\langle\,$Define key-press handler\nobreak\ {\footnotesize \NWlink{nuweb22b}{22b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb21a}{21a}.}
 \item $\langle\,$Define various insertion policy classes\nobreak\ {\footnotesize \NWlink{nuweb41a}{41a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb33a}{33a}.}
-\item $\langle\,$Discretize this iteration's horse leg and fly leg\nobreak\ {\footnotesize \NWlink{nuweb48a}{48a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb47a}{47a}.}
 \item $\langle\,$Draw horse and fly-tours\nobreak\ {\footnotesize \NWlink{nuweb37a}{37a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb35b}{35b}.}
 \item $\langle\,$Draw unvisited sites as filled blue circles\nobreak\ {\footnotesize \NWlink{nuweb37c}{37c}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb35b}{35b}.}
 \item $\langle\,$Extract $x$ and $y$ coordinates of the points on the horse, fly tours, visited and unvisited sites\nobreak\ {\footnotesize \NWlink{nuweb36a}{36a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb35b}{35b}.}
 \item $\langle\,$Find the unvisited site which on insertion increases tour-length by the least amount\nobreak\ {\footnotesize \NWlink{nuweb42c}{42c}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb41b}{41b}.}
 \item $\langle\,$Generate a bunch of uniform or non-uniform random points on the canvas\nobreak\ {\footnotesize \NWlink{nuweb24a}{24a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb22b}{22b}.}
-\item $\langle\,$Get legs of the horse and fly tours\nobreak\ {\footnotesize \NWlink{nuweb47b}{47b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb47a}{47a}.}
 \item $\langle\,$Give metainformation about current picture as headers and footers\nobreak\ {\footnotesize \NWlink{nuweb37d}{37d}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb35b}{35b}.}
 \item $\langle\,$If \texttt{self.sites[u]} is chosen for insertion, find best insertion position and update \texttt{delta\_increase\_least\_table}\nobreak\ {\footnotesize \NWlink{nuweb42b}{42b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb41b}{41b}.}
 \item $\langle\,$Local data-structures for classic horsefly\nobreak\ {\footnotesize \NWlink{nuweb25b}{25b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb21a}{21a}.}
@@ -2976,14 +3108,16 @@ should get rendered quickly.
 \item $\langle\,$Make an animation of the schedule, if \verb|animate_schedule_p == True|\nobreak\ {\footnotesize \NWlink{nuweb39a}{39a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb33a}{33a}.}
 \item $\langle\,$Mark initial position of horse and fly boldly on canvas\nobreak\ {\footnotesize \NWlink{nuweb36b}{36b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb35b}{35b}.}
 \item $\langle\,$Methods for \verb|PolicyBestInsertionNaive|\nobreak\ {\footnotesize \NWlink{nuweb41b}{41b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb41a}{41a}.}
+\item $\langle\,$Parse input-output file and set up required data-structures\nobreak\ {\footnotesize \NWlink{nuweb48}{48}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb47a}{47a}.}
 \item $\langle\,$Place numbered markers on visited sites to mark the order of visitation explicitly\nobreak\ {\footnotesize \NWlink{nuweb37b}{37b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb35b}{35b}.}
 \item $\langle\,$Plotting routines for classic horsefly\nobreak\ {\footnotesize \NWlink{nuweb45}{45}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb21a}{21a}.}
 \item $\langle\,$Relevant imports for classic horsefly\nobreak\ {\footnotesize \NWlink{nuweb21b}{21b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb21a}{21a}.}
 \item $\langle\,$Render current algorithm state to image file\nobreak\ {\footnotesize \NWlink{nuweb35b}{35b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb35a}{35a}.}
-\item $\langle\,$Render frame and add to \verb|ims|\nobreak\ {\footnotesize \NWlink{nuweb48b}{48b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb47a}{47a}.}
+\item $\langle\,$Render frame and append it to \verb|ims|\nobreak\ {\footnotesize \NWlink{nuweb49b}{49b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb49a}{49a}.}
 \item $\langle\,$Return horsefly tour, along with additional information\nobreak\ {\footnotesize \NWlink{nuweb39b}{39b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb33a}{33a}.}
 \item $\langle\,$Set insertion policy class for current run\nobreak\ {\footnotesize \NWlink{nuweb34a}{34a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb33a}{33a}.}
 \item $\langle\,$Set log, algo-state and input-output files config\nobreak\ {\footnotesize \NWlink{nuweb33b}{33b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb33a}{33a}.}
+\item $\langle\,$Set up configurations and parameters for animation and plotting\nobreak\ {\footnotesize \NWlink{nuweb47b}{47b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb47a}{47a}.}
 \item $\langle\,$Set up interactive canvas\nobreak\ {\footnotesize \NWlink{nuweb25a}{25a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb21a}{21a}.}
 \item $\langle\,$Set up logging information relevant to this module\nobreak\ {\footnotesize \NWlink{nuweb22a}{22a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb21a}{21a}.}
 \item $\langle\,$Set up plotting area and canvas, fig, ax, and other configs\nobreak\ {\footnotesize \NWlink{nuweb35c}{35c}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb35b}{35b}.}
@@ -2992,7 +3126,7 @@ should get rendered quickly.
 \item $\langle\,$Update states for \texttt{PolicyBestInsertionNaive}\nobreak\ {\footnotesize \NWlink{nuweb43}{43}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb41b}{41b}.}
 \item $\langle\,$Use insertion policy to find the cheapest site to insert into current tour\nobreak\ {\footnotesize \NWlink{nuweb34b}{34b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb33a}{33a}.}
 \item $\langle\,$Write algorithm's current state to file\nobreak\ {\footnotesize \NWlink{nuweb35a}{35a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb33a}{33a}.}
-\item $\langle\,$Write animation of schedule to disk\nobreak\ {\footnotesize \NWlink{nuweb48c}{48c}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb47a}{47a}.}
+\item $\langle\,$Write animation of schedule to disk and display in live window\nobreak\ {\footnotesize \NWlink{nuweb50b}{50b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb47a}{47a}.}
 \item $\langle\,$Write image file\nobreak\ {\footnotesize \NWlink{nuweb37e}{37e}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb35b}{35b}.}
 \item $\langle\,$Write input and output to file\nobreak\ {\footnotesize \NWlink{nuweb38a}{38a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb33a}{33a}.}
 \end{list}}
@@ -3006,17 +3140,11 @@ should get rendered quickly.
 \item \verb@current_tour_length@: \underline{\NWlink{nuweb41c}{41c}}\NWlink{nuweb42b}{, 42b}.
 \item \verb@delta_increase_least@: \underline{\NWlink{nuweb42a}{42a}}\NWlink{nuweb42b}{, 42b}.
 \item \verb@delta_increase_least_table@: \underline{\NWlink{nuweb41b}{41b}}\NWlink{nuweb42b}{, 42b}\NWlink{nuweb42c}{c}.
-\item \verb@fly_legs,@: \NWlink{nuweb47a}{47a}, \underline{\NWlink{nuweb47b}{47b}}.
-\item \verb@fly_posns@: \NWlink{nuweb47a}{47a}, \underline{\NWlink{nuweb48a}{48a}}.
-\item \verb@fly_tour,@: \underline{\NWlink{nuweb47b}{47b}}.
 \item \verb@HorseFlyInput@: \NWlink{nuweb25a}{25a}, \underline{\NWlink{nuweb25b}{25b}}.
-\item \verb@horse_legs,@: \NWlink{nuweb47a}{47a}, \underline{\NWlink{nuweb47b}{47b}}.
-\item \verb@horse_posns,@: \NWlink{nuweb47a}{47a}, \underline{\NWlink{nuweb48a}{48a}}.
-\item \verb@horse_tour@: \NWlink{nuweb35a}{35a}\NWlink{nuweb36a}{, 36a}\NWlink{nuweb38a}{, 38a}\NWlink{nuweb39b}{, 39b}\NWlink{nuweb41a}{, 41a}\NWlink{nuweb43}{, 43}, \underline{\NWlink{nuweb47b}{47b}}.
 \item \verb@ibest,@: \underline{\NWlink{nuweb42a}{42a}}\NWlink{nuweb42b}{, 42b}.
-\item \verb@ims@: \underline{\NWlink{nuweb47a}{47a}}\NWlink{nuweb48b}{, 48b}\NWlink{nuweb48c}{c}.
 \item \verb@io_file_name,@: \underline{\NWlink{nuweb33b}{33b}}\NWlink{nuweb38a}{, 38a}.
 \item \verb@logger@: \NWlink{nuweb22a}{22a}, \underline{\NWlink{nuweb33b}{33b}}.
+\item \verb@number_of_sites_serviced@: \underline{\NWlink{nuweb49a}{49a}}\NWlink{nuweb49b}{, 49b}.
 \item \verb@plotTour@: \NWlink{nuweb22c}{22c}, \underline{\NWlink{nuweb45}{45}}.
 \item \verb@self.horse_tour@: \underline{\NWlink{nuweb41a}{41a}}\NWlink{nuweb43}{, 43}.
 \item \verb@self.inithorseposn,@: \NWlink{nuweb25b}{25b}, \underline{\NWlink{nuweb41a}{41a}}\NWlink{nuweb41c}{, 41c}\NWlink{nuweb42b}{, 42b}\NWlink{nuweb43}{, 43}.
