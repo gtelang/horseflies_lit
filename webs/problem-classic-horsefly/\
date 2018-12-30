@@ -25,26 +25,11 @@ The weight of the $\varphi$-MST is a lower-bound on the length of the
 horse's tour in $OPT$ for the classic horsefly problem. 
 \end{fconj}
 
-The proof of this conjecture seems to be non-trivial off-hand. I'll put a hold on 
-all my attempts so far to prove this, since I want the experiments to guide 
-my intuition here. 
-
 It is possible that there could be other lower bounds based on generalizing 
 the steps in Kruskal's and Boruvka's algorithms. Based on the experimental 
 success of the $\varphi$-MST's, I will think of the appropriate generalizations 
 for them later. 
 
-One particular experiment that I would be interested would be how bad is to check
-the crossing structure of the edges. In the MST edges never cross. What is the 
-structure of the crossing in $\varphi$-MSTs? That might help me in designing a local
-search operation for the Horsefly problem. 
-
-Also note, that the construction of this $\varphi$-Prim MST can be generalized to 
-two or more flies (single horse) we buld two separate trees; with two or more drones
-since we are interested in minimizing the makespan, probably we greedily them so that
-the trees are well-balanced.....?????? dunno doesn't strike as clean now that I 
-think of it. It certainly isn't as clean as my node-splitting horsefly framework. 
-Hopefully, I can prove some sort of theorems on those later? 
 
 \begin{note}
 As I type this, a separate question strikes me to be of independent interest: 
@@ -61,14 +46,13 @@ data-structure helps in the computation of horsefly like tours.
 
 \subsection*{Computing the $\varphi$-Prim-MST }
 
-\newchunk For the purposes of this section we define the notion of a rendezvous 
-point for an edge. Given a directed segment $\overrightarrow{XY}$ and a speed 
-ratio $\varphi$, assume a horse and a fly are positioned at $X$ and there is a 
-site that needs to be serviced at $Y$. The rendezvous point
-of $\overrightarrow{XY}$ is that point along $R$ at which the horse and fly meet 
-up at the earliest after the fly leaves $X$. Explicit formulae for computing this 
-point have already been implemented in \verb|single_site_solution|, in one of the 
-previous sections. 
+\newchunk For the purposes of this section we define the notion of a rendezvous point for an edge. 
+Given a directed segment $\overrightarrow{XY}$ and a speed ratio $\varphi$, assume a horse and a 
+fly are positioned at $X$ and there is a site that needs to be serviced at $Y$. The rendezvous point
+of $\overrightarrow{XY}$ is that point along $R$ at which the horse and fly meet up at the earliest 
+after the fly leaves $X$. Explicit formulae for computing this point have already been implemented
+in \verb|single_site_solution|, in one of the previous sections. 
+
 
 \newchunk Prim's algorithm for computing MSTs is essentially a greedy incremental 
 insertion process. The same structure is visible in the code fragment below. The only
@@ -77,12 +61,12 @@ the rendezvous points computed while inserting a new edge into the existing part
 tree on the set of sites. This process is animated in 
 \autoref{fig:animating-growth-of-phi-prim-mst}
 
-I have will be using the \verb|NetworkX| library (\url{https://networkx.github.io/}) for 
-storing and manipulating graphs. For performing efficient nearest-neighbor searches for 
-each rendezvous point in the partially constructed MST, I will use the \verb|scikit-learn| 
-library (\url{https://scikit-learn.org/stable/modules/neighbors.html}). When porting 
-my codes to C\texttt{++}, I will probably have to switch over to the Boost Graph library and 
-David Mount's ANN for the same purposes(both these libraries have been optmized for speed). 
+I have will be using the \verb|NetworkX| library (\url{https://networkx.github.io/}) for storing and 
+manipulating graphs. For performing efficient nearest-neighbor searches for each rendezvous point
+in the partially constructed MST, I will use the \verb|scikit-learn| library 
+(\url{https://scikit-learn.org/stable/modules/neighbors.html}). When porting my codes 
+to C\texttt{++}, I will probably have to switch over to the Boost Graph library and 
+David Mount's ANN for the same purposes. 
 
 @d Lower bounds for classic horsefly 
 @{def compute_phi_prim_mst(sites, inithorseposn,phi):
@@ -95,8 +79,8 @@ David Mount's ANN for the same purposes(both these libraries have been optmized 
      while unmarked_sites_idxs:
           @<For each node in current $\varphi$-Prim-MST compute the closest unmarked site@>
           @<Get the node $M^{*}$ with the closest unmarked site $S^{*}$ from the previous step@>
-@%          @<Compute the rendezvous point $R$ along $M^{*}S^{*}$@>
-@%          @<Mark site $S$, add node $R$ and edge $MR$ to the existing $\varphi$-Prim-MST@>
+          @<Compute the rendezvous point $R$ along $M^{*}S^{*}$@>
+          @<Mark site $S$, add node $R$ and edge $MR$ to the existing $\varphi$-Prim-MST@>
      return phi_prim_mst
 @| unmarked_sites_idxs @}
 
@@ -105,37 +89,21 @@ David Mount's ANN for the same purposes(both these libraries have been optmized 
 \end{center}
 \label{fig:animating-growth-of-phi-prim-mst}
 
-\newchunk \verb|NetworkX| allows me to store attributes associated with each node 
-and edge. For each node, the canonical attribute will be the associated point-coordinates 
-which that node represents. For each edge, a natural attribute is the weight of the 
-euclidean distance between the points corresponding to its nodes. However, since the 
-supporting half-plane through each edge also passes thorough a site(by construction!), 
-we will also store the index of the corresponding site. Note that all the sites are passed 
-as a list of $x$,$y$ coordinates to \verb|compute_phi_prim_mst|. 
 
-Storing these attributes will help later when we experiment with an algorithm where 
-we ``double''this MST
 
-@d Set \verb|phi_prim_mst| to the singleton graph, with node coordinates set at \verb|inithorseposn|@{
-info("Creating singleton graph")
-phi_prim_mst = nx.Graph()
-phi_prim_mst.add_node(0, coordinates=inithorseposn)
+\newchunk \verb|NetworkX| allows me to store attributes associated with each node and edge. For each node, the canonical 
+attribute will be the associated point-coordinates which that node represents. For each edge, a natural attribute is
+the weight of the euclidean distance between the points corresponding to its nodes. However, since the supporting half-plane 
+through each edge also passes thorough a site, we will store the index of the corresponding site. Note that all the sites
+are passed as a list of $x$,$y$ coordinates as an arguments to this function. 
+
+@d Set \verb|phi_prim_mst| to the singleton graph, with node coordinates set at \verb|inithorseposn|  @{   
+print "Hello World"
+i = 0
 @| @}
 
 \vspace{-0.8cm}\newchunk
-@d For each node in current $\varphi$-Prim-MST compute the closest unmarked site @{
-for n in phi_prim_mst.nodes:
-
-     print n, phi_prim_mst[n]
-     #distances_to_sites = []
-     #for i in unmarked_sites_idxs:
-          #sc, nc = map (np.asarray, [sites[i], phi_prim_mst[n]['coordinates']]) # the c in sc and nc means 'coordinates'
-          #dist =  np.linalg.norm(sc-nc)
-          #print dist
-          #distances_to_sites.append( (i, dist) )
-     #nsidx, nsc = min(distances_to_sites, key=lambda (_, d): d )
-     #print nsidx, nsc
-sys.exit()
+@d For each node in current $\varphi$-Prim-MST compute the closest unmarked site @{   
 @| @}
 
 \vspace{-0.8cm}\newchunk
