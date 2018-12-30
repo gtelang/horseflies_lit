@@ -1,4 +1,115 @@
-\section{Lower Bound: $\varphi$-MST}
+\newpage
+\section{Lower Bound: The $\varphi$-Prim-MST}  
 
-\subsection{Overview}
-\subsection{Computing the Lower-Bound}
+\subsection*{Overview}\hspace{0.1cm}
+To compare the experimental performance of algorithms for NP-hard optimization 
+problems wrt solution quality, it helps to have a cheaply computable lower bound 
+that acts as a proxy for OPT. In the case of the TSP, a lower bound is the weight 
+of the minimum spanning tree on the set of input sites.
+
+To compute the MST on a set of points, on typically uses greedy algorithms such as 
+those by Prim, Kruskal or Boruvka. To get a lower-bound for Horsefly, we define a 
+network that we call the $\varphi$-Prim-MST by a simple generalization of Prim. 
+Currently, we don't have a natural interpretation of this structure means in 
+terms of the sites. This is something we need to add to our TODO list. 
+
+\begin{center}
+\missingfigure[figwidth=6cm]{Testing a long text string}
+\end{center}
+
+This is clearly a lower-bound on the weight of $OPT$ for Collinear Horsefly. However, 
+I believe that the stronger statement is also true
+
+\begin{fconj}
+The weight of the $\varphi$-MST is a lower-bound on the length of the 
+horse's tour in $OPT$ for the classic horsefly problem. 
+\end{fconj}
+
+It is possible that there could be other lower bounds based on generalizing 
+the steps in Kruskal's and Boruvka's algorithms. Based on the experimental 
+success of the $\varphi$-MST's, I will think of the appropriate generalizations 
+for them later. 
+
+
+\begin{note}
+As I type this, a separate question strikes me to be of independent interest: 
+\textit{Given a point-cloud in the plane, preprocess the points such that for a 
+query $\varphi$ we can compute the $\varphi$-MST in linear time}. Perhaps the MST, 
+itself could be useful for this augmented with some data-structures for performing 
+ray-shooting in an arrangement of segments. One can use such a data-structure, for 
+making a quick animation of the evolution of the $\varphi$-MST as we keep 
+changing the $\varphi$-parameter, as one often does while playing with Mathematica's 
+\texttt{Manipulate} function. Can we motivate this by saying $\varphi$ might be 
+uncertain? I don't know, people would only find this interesting if the particular 
+data-structure helps in the computation of horsefly like tours. 
+\end{note}
+
+\subsection*{Computing the $\varphi$-Prim-MST }
+
+\newchunk For the purposes of this section we define the notion of a rendezvous point for an edge. 
+Given a directed segment $\overrightarrow{XY}$ and a speed ratio $\varphi$, assume a horse and a 
+fly are positioned at $X$ and there is a site that needs to be serviced at $Y$. The rendezvous point
+of $\overrightarrow{XY}$ is that point along $R$ at which the horse and fly meet up at the earliest 
+after the fly leaves $X$. Explicit formulae for computing this point have already been implemented
+in \verb|single_site_solution|, in one of the previous sections. 
+
+
+\newchunk Prim's algorithm for computing MSTs is essentially a greedy incremental 
+insertion process. The same structure is visible in the code fragment below. The only
+essential change from Prim's original algorithm is that we ``grow'' the tree only from 
+the rendezvous points computed while inserting a new edge into the existing partial 
+tree on the set of sites. This process is animated in \autoref{fig:animating-growth-of-phi-prim-mst}
+
+I have will be using the \verb|NetworkX| library (\url{https://networkx.github.io/}) for storing and 
+manipulating graphs. For performing efficient nearest-neighbor searches for each rendezvous point
+in the partially constructed MST, I will use the \verb|scikit-learn| library 
+(\url{https://scikit-learn.org/stable/modules/neighbors.html}). When porting my codes to C\texttt{++}
+I will probably have to switch over to the Boost Graph library and David Mount's ANN for the same purposes. 
+
+@d Lower bounds for classic horsefly 
+@{def compute_phi_prim_mst(sites, inithorseposn,phi):
+
+     import networkx as nx
+     from sklearn.neighbors import NearestNeighbors
+     @< Set \verb|phi_prim_mst| to the singleton graph, with node coordinates set at \verb|inithorseposn| @>
+
+     unmarked_sites_idxs = range(len(sites))
+     while unmarked_sites_idxs:
+          @<For each node in current $\varphi$-Prim-MST compute the closest unmarked site@>
+          @<Get the node $M^{*}$ with the closest unmarked site $S^{*}$ from the previous step@>
+          @<Compute the rendezvous point $R$ along $M^{*}S^{*}$@>
+          @<Mark site $S$, add node $R$ and edge $MR$ to the existing $\varphi$-Prim-MST@>
+     return phi_prim_mst
+@| unmarked_sites_idxs @}
+
+\begin{center}
+\missingfigure[figwidth=6cm]{animating-growth-of-phi-prim-mst}
+\end{center}
+\label{fig:animating-growth-of-phi-prim-mst}
+
+
+
+\newchunk As you can see in the previous chunk,  
+@d Set \verb|phi_prim_mst| to the singleton graph, with node coordinates set at \verb|inithorseposn|  @{   
+print "Hello World"
+i = 0
+@| @}
+
+\vspace{-0.8cm}\newchunk
+@d For each node in current $\varphi$-Prim-MST compute the closest unmarked site @{   
+@| @}
+
+\vspace{-0.8cm}\newchunk
+@d Get the node $M^{*}$ with the closest unmarked site $S^{*}$ from the previous step@{   
+pass
+@| @}
+
+\vspace{-0.8cm} \newchunk
+@d Compute the rendezvous point $R$ along $M^{*}S^{*}$ @{   
+pass
+@| @}
+
+\vspace{-0.8cm}\newchunk
+@d Mark site $S$, add node $R$ and edge $MR$ to the existing $\varphi$-Prim-MST @{   
+pass
+@| @}

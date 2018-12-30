@@ -1,4 +1,4 @@
-\section{Algorithm: Greedy---Incremental Insertion}
+\section{\framebox{Algorithm}: Greedy---Incremental Insertion}
 \subsection*{Algorithmic Overview}
 \newchunk The greedy nearest neighbor heuristic described in \autoref{sec:greedy-nn} gives an $O(\log n)$ 
           approximation for $n$ sites in the plane. However, there exists an alternative greedy incremental 

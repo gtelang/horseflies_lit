@@ -1,7 +1,6 @@
-\usepackage[a4paper, left=2cm, right=2cm, top=2cm]{geometry}
-%\usepackage[text={16cm,24cm}]{geometry}
+%\usepackage[a4paper, left=2cm, right=2cm, top=2cm]{geometry}
+\usepackage[text={16.0cm,24cm}]{geometry}
 \usepackage{marginnote}
-
 
 % https://stackoverflow.com/a/27243065/505306
 % Making caption font smaller on figures and tables.
@@ -71,6 +70,13 @@
 \newenvironment{fprop}
   {\begin{mdframed}[style=MyFrame,nobreak=true, backgroundcolor=propcol]\begin{prop}}
   {\end{prop}\end{mdframed}}
+
+\definecolor{conjcol}{RGB}{248, 218, 194}
+\newtheorem{conj}{Conjecture}
+\newenvironment{fconj}
+  {\begin{mdframed}[style=MyFrame,nobreak=true, backgroundcolor=conjcol]\begin{conj}}
+  {\end{conj}\end{mdframed}}
+
 
 \definecolor{notecol}{RGB}{255, 152, 149  }
 \newenvironment{note}

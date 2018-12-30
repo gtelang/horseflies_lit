@@ -55,7 +55,7 @@ def run_handler():
                                Style.RESET_ALL)
                     phi = float(phi_str)
 
-                    algo_str = raw_input(Fore.YELLOW + \
+                    input_str = raw_input(Fore.YELLOW + \
                               "Enter algorithm to be used to compute the tour:\n Options are:\n" +\
                             "  (e)   Exact \n"                                   +\
                             "  (t)   TSP   \n"                                   +\
@@ -64,19 +64,20 @@ def run_handler():
                             "  (kl)  k2-center (using approximate L1 ordering)\n"  +\
                             "  (g)   Greedy\n"                                   +\
                             "  (gl)  Greedy (using approximate L1 ordering])\n"  +\
-                            "  (ginc) Greedy Incremental  "  +\
+                            "  (ginc) Greedy Incremental\n"  +\
+                            "  (phi-mst) Compute the phi-prim-mst "               +\
                             Style.RESET_ALL)
 
-                    algo_str = algo_str.lstrip()
+                    input_str = input_str.lstrip()
 
                     # Incase there are patches present from the previous clustering, just clear them
                     utils_graphics.clearAxPolygonPatches(ax)
 
-                    if   algo_str == 'e':
+                    if   input_str == 'e':
                           horseflytour = \
                                  run.getTour( algo_dumb,
                                               phi )
-                    elif algo_str == 'k': 
+                    elif input_str == 'k': 
                           horseflytour = \
                                  run.getTour( algo_kmeans,
                                               phi,
@@ -84,44 +85,53 @@ def run_handler():
                                               post_optimizer=algo_exact_given_specific_ordering)
                           print " "
                           print Fore.GREEN, answer['tour_points'], Style.RESET_ALL
-                    elif algo_str == 'kl':
+                    elif input_str == 'kl':
                           horseflytour = \
                                  run.getTour( algo_kmeans,
                                               phi,
                                               k=2,
                                               post_optimizer=algo_approximate_L1_given_specific_ordering)
-                    elif algo_str == 't':
+                    elif input_str == 't':
                           horseflytour = \
                                  run.getTour( algo_tsp_ordering,
                                               phi,
                                               post_optimizer=algo_exact_given_specific_ordering)
-                    elif algo_str == 'tl':
+                    elif input_str == 'tl':
                           horseflytour = \
                                  run.getTour( algo_tsp_ordering,
                                               phi,
                                               post_optimizer= algo_approximate_L1_given_specific_ordering)
-                    elif algo_str == 'g':
+                    elif input_str == 'g':
                           horseflytour = \
                                  run.getTour( algo_greedy,
                                               phi,
                                               post_optimizer= algo_exact_given_specific_ordering)
-                    elif algo_str == 'gl':
+                    elif input_str == 'gl':
                           horseflytour = \
                                  run.getTour( algo_greedy,
                                               phi,
                                               post_optimizer= algo_approximate_L1_given_specific_ordering)
                                               
-                    elif algo_str == 'ginc':
+                    elif input_str == 'ginc':
                           horseflytour = \
                                  run.getTour( algo_greedy_incremental_insertion,
                                               phi )
+
+                    elif input_str == 'phi-mst':
+                          phi_mst = \
+                                 run.computeStructure(compute_phi_prim_mst ,phi)     
 
                     else:
                           print "Unknown option. No horsefly for you! ;-D "
                           sys.exit()
 
                     #print horseflytour['tour_points']
-                    plotTour(ax,horseflytour, run.inithorseposn, phi, algo_str)
+
+                    if input_str not in ['phi-mst']:
+                         plotTour(ax,horseflytour, run.inithorseposn, phi, input_str)
+                    elif input_str == 'phi-mst':
+                         draw_phi_mst(ax, phi_mst, run.inithorseposn, phi)
+                         
                     utils_graphics.applyAxCorrection(ax)
                     fig.canvas.draw()
                     
@@ -222,7 +232,11 @@ class HorseFlyInput:
           else:
                 #print Fore.RED, self.sites, Style.RESET_ALL
                 return algo(self.sites, self.inithorseposn, speedratio, k, post_optimizer)
-          
+
+      def  computeStructure(self, structure_func, phi):
+          print Fore.RED, "Computing the phi-mst", Style.RESET_ALL
+          structure_func(self.sites, self.inithorseposn, phi)
+
       def __repr__(self):
           """ Printed Representation of the Input for HorseFly
           """
@@ -815,6 +829,36 @@ def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
                                                           inithorseposn)}
       
 
+# Lower bounds for classic horsefly
+def compute_phi_prim_mst(sites, inithorseposn,phi):
+
+     import networkx as nx
+     from sklearn.neighbors import NearestNeighbors
+     # Set \verb|phi_prim_mst| to the singleton graph, with node coordinates set at \verb|inithorseposn|
+        
+     print "Hello World"
+     i = 0
+     
+
+     unmarked_sites_idxs = range(len(sites))
+     while unmarked_sites_idxs:
+          # For each node in current $\varphi$-Prim-MST compute the closest unmarked site
+             
+          
+          # Get the node $M^{*}$ with the closest unmarked site $S^{*}$ from the previous step
+             
+          pass
+          
+          # Compute the rendezvous point $R$ along $M^{*}S^{*}$
+             
+          pass
+          
+          # Mark site $S$, add node $R$ and edge $MR$ to the existing $\varphi$-Prim-MST
+             
+          pass
+          
+     return phi_prim_mst
+
 # Plotting routines for classic horsefly
 def plotTour(ax,horseflytour, horseflyinit, phi, algo_str, tour_color='#d13131'):
    
@@ -883,6 +927,10 @@ def plotTour(ax,horseflytour, horseflyinit, phi, algo_str, tour_color='#d13131')
                     + str(tour_length)[:7], fontdict={'fontsize':fontsize}, **tnrfont)
     ax.set_xlabel(r'Number of sites: ' + str(len(xsites)) + '\nDrone Speed: ' + str(phi) ,
                   fontdict={'fontsize':fontsize}, **tnrfont)
+
+def draw_phi_mst(ax, phi_mst, inithorseposn, phi):
+     print "Yay! Drawing the tree!"
+     sys.exit()
 
 # Animation routines for classic horsefly
 
@@ -1012,9 +1060,8 @@ def animateSchedule(schedule_file_name):
 
                objs = [flyline,horseline] 
                 
-               # Mark serviced and unserviced sites with
-               # differen colors. Use https://htmlcolorcodes.com/
-               # for choosing good colors along and their hex-codes.
+               # Mark serviced and unserviced sites with different colors. 
+               # Use https://htmlcolorcodes.com/ for choosing good colors along with their hex-codes.
 
                for site, j in zip(sites, range(len(sites))):
                    if j < number_of_sites_serviced:       # site has been serviced

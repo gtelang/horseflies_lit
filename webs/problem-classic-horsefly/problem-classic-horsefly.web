@@ -56,6 +56,7 @@ def run_handler():
 @< Local data-structures for classic horsefly @>
 @< Local utility functions for classic horsefly @>
 @< Algorithms for classic horsefly @>
+@< Lower bounds for classic horsefly @>
 @< Plotting routines for classic horsefly @>
 @< Animation routines for classic horsefly @>
 @| @}
@@ -139,7 +140,7 @@ def wrapperkeyPressHandler(fig,ax, run):
            Style.RESET_ALL)
 phi = float(phi_str)
 
-algo_str = raw_input(Fore.YELLOW + \
+input_str = raw_input(Fore.YELLOW + \
           "Enter algorithm to be used to compute the tour:\n Options are:\n" +\
         "  (e)   Exact \n"                                   +\
         "  (t)   TSP   \n"                                   +\
@@ -148,19 +149,20 @@ algo_str = raw_input(Fore.YELLOW + \
         "  (kl)  k2-center (using approximate L1 ordering)\n"  +\
         "  (g)   Greedy\n"                                   +\
         "  (gl)  Greedy (using approximate L1 ordering])\n"  +\
-        "  (ginc) Greedy Incremental  "  +\
+        "  (ginc) Greedy Incremental\n"  +\
+        "  (phi-mst) Compute the phi-prim-mst "               +\
         Style.RESET_ALL)
 
-algo_str = algo_str.lstrip()
+input_str = input_str.lstrip()
 
 # Incase there are patches present from the previous clustering, just clear them
 utils_graphics.clearAxPolygonPatches(ax)
 
-if   algo_str == 'e':
+if   input_str == 'e':
       horseflytour = \
              run.getTour( algo_dumb,
                           phi )
-elif algo_str == 'k': 
+elif input_str == 'k': 
       horseflytour = \
              run.getTour( algo_kmeans,
                           phi,
@@ -168,44 +170,53 @@ elif algo_str == 'k':
                           post_optimizer=algo_exact_given_specific_ordering)
       print " "
       print Fore.GREEN, answer['tour_points'], Style.RESET_ALL
-elif algo_str == 'kl':
+elif input_str == 'kl':
       horseflytour = \
              run.getTour( algo_kmeans,
                           phi,
                           k=2,
                           post_optimizer=algo_approximate_L1_given_specific_ordering)
-elif algo_str == 't':
+elif input_str == 't':
       horseflytour = \
              run.getTour( algo_tsp_ordering,
                           phi,
                           post_optimizer=algo_exact_given_specific_ordering)
-elif algo_str == 'tl':
+elif input_str == 'tl':
       horseflytour = \
              run.getTour( algo_tsp_ordering,
                           phi,
                           post_optimizer= algo_approximate_L1_given_specific_ordering)
-elif algo_str == 'g':
+elif input_str == 'g':
       horseflytour = \
              run.getTour( algo_greedy,
                           phi,
                           post_optimizer= algo_exact_given_specific_ordering)
-elif algo_str == 'gl':
+elif input_str == 'gl':
       horseflytour = \
              run.getTour( algo_greedy,
                           phi,
                           post_optimizer= algo_approximate_L1_given_specific_ordering)
                           
-elif algo_str == 'ginc':
+elif input_str == 'ginc':
       horseflytour = \
              run.getTour( algo_greedy_incremental_insertion,
                           phi )
+
+elif input_str == 'phi-mst':
+      phi_mst = \
+             run.computeStructure(compute_phi_prim_mst ,phi)     
 
 else:
       print "Unknown option. No horsefly for you! ;-D "
       sys.exit()
 
 #print horseflytour['tour_points']
-plotTour(ax,horseflytour, run.inithorseposn, phi, algo_str)
+
+if input_str not in ['phi-mst']:
+     plotTour(ax,horseflytour, run.inithorseposn, phi, input_str)
+elif input_str == 'phi-mst':
+     draw_phi_mst(ax, phi_mst, run.inithorseposn, phi)
+     
 utils_graphics.applyAxCorrection(ax)
 fig.canvas.draw()
 @| @}
@@ -322,7 +333,11 @@ calling various horsefly algorithms.
           else:
                 #print Fore.RED, self.sites, Style.RESET_ALL
                 return algo(self.sites, self.inithorseposn, speedratio, k, post_optimizer)
-          
+
+      def  computeStructure(self, structure_func, phi):
+          print Fore.RED, "Computing the phi-mst", Style.RESET_ALL
+          structure_func(self.sites, self.inithorseposn, phi)
+
       def __repr__(self):
           """ Printed Representation of the Input for HorseFly
           """
@@ -357,13 +372,11 @@ are collected at the end of this chapter.
 @i problem-classic-horsefly/algo-dumb.web
 @i problem-classic-horsefly/algo-greedy-nn.web
 @i problem-classic-horsefly/algo-greedy-incremental-insertion.web
+@i problem-classic-horsefly/lower-bound-phi-mst.web
+@i problem-classic-horsefly/algo-doubling-phi-mst.web
 @i problem-classic-horsefly/algo-bottom-up-split.web
 @i problem-classic-horsefly/algo-local-search-swap.web
 @i problem-classic-horsefly/algo-k2-means.web
-
-
-@i problem-classic-horsefly/lower-bound-phi-mst.web
-
 
 \section{Local Utility Functions}
 
@@ -501,6 +514,17 @@ are collected at the end of this chapter.
                   fontdict={'fontsize':fontsize}, **tnrfont)
 @| plotTour @}
 
+
+\newchunk 
+@D Plotting routines for classic horsefly @{
+def draw_phi_mst(ax, phi_mst, inithorseposn, phi):
+     print "Yay! Drawing the tree!"
+     sys.exit()
+@}
+
+
+
+
 \section{Animation routines}
 
 \newchunk 
@@ -550,9 +574,9 @@ While displaying the animation it also helps to have a major and minor grid ligh
 get a rough sense of distances between the sites. The settings for setting up these grids were done following
 the tutorial on \url{http://jonathansoma.com/lede/data-studio/matplotlib/adding-grid-lines-to-a-matplotlib-chart/}
 
-We also use \LaTeX{} symbols and the Computer Modern font for representing equations and text on the plot. 
-Unfortunately, Matplotlib's present default font for text seems to be DejaVu Sans Mono, which isn't pretty 
-for publications. 
+We also use \LaTeX{} for typesetiing symbols and equations and the Computer Modern font 
+for text on the plot canvas. Unfortunately, Matplotlib's present default font for text 
+seems to be DejaVu Sans Mono, which isn't pretty for publications. 
 
 @d Set up configurations and parameters for animation and plotting@{
 plt.rc('text', usetex=True)
@@ -653,8 +677,20 @@ for horse_leg, fly_leg, leg_idx in zip(horse_legs, \
 
 
 
-\vspace{-0.8cm} \newchunk  Note that the magic-number  ``9'' in the block below is 
-related to the 10 and 19 constants from the \verb|discretize_leg| function
+\vspace{-0.8cm} \newchunk While rendering the horse and fly tours we need to keep track of the horse and 
+fly-legs and sites that have been serviced so far.  
+
+\definecolor{myyellow}{HTML}{DBC657}
+\begin{itemize}
+\item The path covered by the horse from the initial point till its current position is colored red  \tikz{\draw[fill=red,line width=0pt] rectangle(8ex,1ex)} 
+\item The path covered by the fly from the initial point till its current position is colored green  \tikz{\draw[fill=green,line width=0pt] rectangle(8ex,1ex)}
+\item Unserviced sites are marked blue \tikz{\draw[fill=blue,line width=0pt]  circle(1ex);}. 
+\item When sites get serviced, they are marked yellow \tikz{\draw[fill=myyellow,line width=0pt] circle(1ex);}.
+\end{itemize}
+
+While iterating through all the sublegs of the current fly-leg, we need to keep track if the fly has serviced the site or not. That is the 
+job of the \verb|if subleg_idx==9| block in the code-fragment below. The magic-number  ``9'' is related to the 10 and 19 constants from the 
+\verb|discretize_leg| function defined later in \autoref{subsec-discretize-leg}. 
 
 @D Render frame and append it to \verb|ims| @{   
 debug(Fore.RED + "Rendering subleg "+ str(subleg_idx) + Style.RESET_ALL)
@@ -676,9 +712,8 @@ flyline,   = ax.plot(fxs1,fys1,'go-', linewidth=1.0, markersize=3)
 
 objs = [flyline,horseline] 
  
-# Mark serviced and unserviced sites with
-# differen colors. Use https://htmlcolorcodes.com/
-# for choosing good colors along and their hex-codes.
+# Mark serviced and unserviced sites with different colors. 
+# Use https://htmlcolorcodes.com/ for choosing good colors along with their hex-codes.
 
 for site, j in zip(sites, range(len(sites))):
     if j < number_of_sites_serviced:       # site has been serviced
@@ -698,8 +733,26 @@ ims.append(objs[::-1])
 @| @}
 
 
-\vspace{-0.8cm} \newchunk The numbers 19 and 10 are arbitrarily chosen. These seem 
-to work well for giving smooth real-time animation. 
+\vspace{-0.8cm} \newchunk \label{subsec-discretize-leg}
+The numbers 19 and 10 to discretize the horse and fly legs have been 
+arbitrarily chosen. These seem to work well for giving smooth real-time animation. 
+However, you will notice  both the horse and fly seem to speed up or sometimes slow 
+down. 
+
+That's why ideally, these discretization params should actually depend on the length of the legs, and 
+the speeds of the horse and fly. However, just using constants is good enough for now. I just 
+want a working animation. 
+
+A leg consists of either one segment (for horse) or two segments(for fly). 
+
+For a horse-leg, we must make sure that the leg-end points are part of the discretization of the leg. 
+
+For a fly-leg, we must ensure that the leg-end points \underline{and} the site being 
+serviced during the leg are in its discretization. Note that in this case, 
+since each of the two segments are being discretized with \verb|np.linspace|, we need
+to make sure that the site corresponding to the fly-leg is not counted twice, which
+explains the odd-looking \verb|subleg_pts.extend(tmp[:-1])| statement in the code-fragment below. 
+
 @d Define function to place points along a leg @{   
 def discretize_leg(pts):
    subleg_pts = []
@@ -720,9 +773,6 @@ def discretize_leg(pts):
    return subleg_pts
 @| @}
 
-
-
-
 \vspace{-0.8cm} \newchunk
 @D Write animation of schedule to disk and display in live window
 @{from colorama import Back 
@@ -737,10 +787,6 @@ debug(Fore.MAGENTA + "\nStarted writing animation to disk"+ Style.RESET_ALL)
 ani.save(schedule_file_name+'.avi', dpi=250)
 debug(Fore.MAGENTA + "\nFinished writing animation to disk"+ Style.RESET_ALL)
 @| @}
-
-
-
-
 
 \section{Chapter Index of Fragments}
 @m
