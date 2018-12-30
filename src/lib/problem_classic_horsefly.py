@@ -833,7 +833,7 @@ def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
 def compute_phi_prim_mst(sites, inithorseposn,phi):
 
      import networkx as nx
-     #from sklearn.neighbors import NearestNeighbors
+     from sklearn.neighbors import NearestNeighbors
      
      info("Creating singleton graph")
      G = nx.Graph()
@@ -844,26 +844,20 @@ def compute_phi_prim_mst(sites, inithorseposn,phi):
      # Iterate till all sites are marked
      while unmarked_sites_idxs:
 
-          print unmarked_sites_idxs
+          print Fore.YELLOW, utils_algo.print_list(G.nodes.data()), Style.RESET_ALL
           
           # For each node in the tree, this stores a tuple consisting of
           # 1. a node-id (this corresponds to a rendezvous point in the tree)
           # 2. the index of the closest site in the array sites for the node (the site)
           # 3. distance of the node to the site with the above index.
-          # that is why it has the odd-looking name rendezvous_site, it stores 
-          # associations of rendezvous points and sites, this is the most 
-          # important top-level data-structure in this while-loop
-          rendezvous_site_info = []
+          # this most important data-structure in this information
+          node_site_info = []
           
           for nodeid, nodeval in G.nodes.data():
                current_node_coordinates = np.asarray(nodeval['mycoordinates'])
                distances_of_current_node_to_sites = []
 
-               #########################################################################
-               print Fore.YELLOW, ".....Processing node : ", nodeid, \
-                                  " which has coordinates ", current_node_coordinates,\
-                                  Style.RESET_ALL
-               #########################################################################
+               #print Fore.YELLOW, ".....Processing node : ", nodeid, " which has coordinates ", current_node_coordinates,\Style.RESET_ALL
                
                # The following loop finds the nearest unmarked site. So far, I am 
                # using brute force for this, later, I will use sklearn.neighbors.
@@ -871,56 +865,51 @@ def compute_phi_prim_mst(sites, inithorseposn,phi):
                     site_coordinates = np.asarray(sites[j])
                     dist   =  np.linalg.norm( site_coordinates - current_node_coordinates )
 
-                    ##################################################################
-                    print Fore.GREEN,  "..........Distance to unmarked site : ", j,\
-                                       " which has coordinates ", site_coordinates,\
-                                       "is ", dist,\
-                                       Style.RESET_ALL
-                    ##################################################################
+                    #print Fore.GREEN,  "..........Distance to unmarked site : ", j, " which has coordinates ", site_coordinates, "is ", dist, Style.RESET_ALL
 
                     distances_of_current_node_to_sites.append( (j, dist) )
 
-               nearest_site_idx, \
-                  distance_of_current_node_to_nearest_site = \
-                                             min(distances_of_current_node_to_sites, \
-                                                 key=lambda (_, d): d)
-
-               rendezvous_site_info.append((nodeid,\
-                                            nearest_site_idx,\
-                                            distance_of_current_node_to_nearest_site))
-          rendezvous_node_idx  ,\
-          next_site_to_mark_idx, \
-          distance_to_next_site_to_mark = min(rendezvous_site_info,\
-                                              key=lambda (h,k,d) : d)
+               nearest_site_idx, distance_of_current_node_to_nearest_site = min(distances_of_current_node_to_sites, key=lambda (_, d): d)
+               node_site_info.append((nodeid, nearest_site_idx, distance_of_current_node_to_nearest_site))
+               
+          opt_node_idx, next_site_to_mark_idx, distance_to_next_site_to_mark = min(node_site_info, key=lambda (h,k,d) : d)
 
           #------------------------------------------------
           # Get some information about what just happened. 
           #------------------------------------------------
           print " "
           print G.nodes.data()
-          print "Rendezvous node idx ", rendezvous_node_idx
+          print "Rendezvous node idx ", opt_node_idx
           print "--------------------------------------------"
           print "Id of next site to mark: ", next_site_to_mark_idx,       \
                 "\nSite coordinates:      ", sites[next_site_to_mark_idx],\
                 "\nDistance to that site: ", distance_to_next_site_to_mark
-          print Fore.GREEN, "SLEEPING NOW", Style.RESET_ALL
-          import time
-          time.sleep(5000)
-          sys.exit()
           #-------------------------------
           # Graph augmentation step
           # Add rendezvous node to G
           #------------------------------
-          G[rendezvous_node_idx]['joined_site_coords'] = \
-                     single_site_solution(sites[next_site_to_mark_idx], \
-                                          G[rendezvous_node_idx]['mycoordinates']) ###### all action happens here
+          
+          tmp = sites[next_site_to_mark_idx]
+          G.nodes[opt_node_idx]['joined_site_coords'].append(  tmp   ) 
+          (r, h) = single_site_solution(tmp, \
+                                        G.nodes[opt_node_idx]['mycoordinates'],\
+                                        phi) 
+          
+          # remember! indexing of nodes started at 0, that's why you set
+          # numnodes to the index of the newly inserted node. 
+          newnodeid = len(list(G.nodes))
+          G.add_node(newnodeid, mycoordinates=r, joined_site_coords=[]) # joined_site_coords will be updated in the future iterations of while
+          G.add_edge(opt_node_idx, newnodeid, weight=h ) # insert the edge weight, will be useful later when computing sum total of all the edges.
 
-          G.add_node(numnodes, coordinates=inithorseposn, joined_site_coords=[]) #### and here
           #------------------------------------------------
           # Unmarking step
           # Marking means removing from unmarked list :-D
           #------------------------------------------------
           unmarked_sites_idxs.remove(next_site_to_mark_idx)
+          
+     print G.nodes.data()
+     import time
+     time.sleep(50000)
      return G
 
 # Plotting routines for classic horsefly
