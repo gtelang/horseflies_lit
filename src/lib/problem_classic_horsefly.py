@@ -120,7 +120,6 @@ def run_handler():
                     elif input_str == 'phi-mst':
                           phi_mst = \
                                  run.computeStructure(compute_phi_prim_mst ,phi)     
-
                     else:
                           print "Unknown option. No horsefly for you! ;-D "
                           sys.exit()
@@ -151,7 +150,7 @@ def run_handler():
                                      
                     import scipy
                     if event.key in ['n', 'N']: # Non-uniform random points
-                            run.sites = utils_algo.bunch_of_random_points(numpts)
+                            run.sites = utils_algo.bunch_of_non_uniform_random_points(numpts)
                     else : # Uniform random points
                             run.sites = scipy.rand(numpts,2).tolist()
 

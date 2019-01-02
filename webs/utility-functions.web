@@ -10,7 +10,7 @@ in the later chapters.
 
 \section{Graphical Utilities}
 
-Here We will  develop routines to interactively insert points onto a Matplotlib canvas and clear the canvas. 
+Here we will  develop routines to interactively insert points onto a Matplotlib canvas and clear the canvas. 
 Almost all variants of the horsefly problem will involve mousing in sites and the initial position of the horse 
 and fly. These points will typically be represented by small circular patches. The type of the point
 will be indicated by its color and size e.g. intial position of truck and drone 
@@ -60,7 +60,7 @@ def applyAxCorrection(ax):
       ax.set_aspect(1.0)
 @}
 %{/python-mode}%
-
+\vspace{-0.8cm}
 \newchunk Next, given an axes object (i.e. a drawing area on a figure object) we need a function
 to delete and remove all the graphical objects drawn on it. 
 
@@ -84,6 +84,8 @@ def clearPatches(ax):
 @}
 
 %{/python-mode}%
+
+\vspace{-0.8cm}
 \newchunk Now remove the patches which were rendered for each cluster
     Unfortunately, this step has to be done manually, the canvas patch
     of a cluster and the corresponding object in memory are not reactively
@@ -100,13 +102,10 @@ def clearAxPolygonPatches(ax):
             patch.remove()
 
     # Remove line patches. These get inserted during the r=2 case,
-    # For some strange reason matplotlib does not consider line objects
-    # as patches.
+    # For some strange reason matplotlib does not consider line objects as patches.
     ax.lines[:]=[]
 
-    # To verify that none of the patches 
-    # are polyon patches corresponding 
-    # to clusters.
+    # To verify that none of the patches are polyon patches corresponding to clusters.
     #pp.pprint (ax.patches) 
     applyAxCorrection(ax)
 @}
@@ -116,69 +115,82 @@ def clearAxPolygonPatches(ax):
 To insert the sites, we double-click the left mouse button and to insert the 
 initial position of the horse and fly we double-click the right mouse-button. 
 
+The following chunk defines a function that creates a closure for a mouseclick 
+even on the matplotlib canvas. 
+
 Note that the left mouse-button corresponds to button 1 and right mouse button
 to button 3 in the code-fragment below. 
 
+\TODO{Remove the previous red patches, 
+which contain the old position
+of the horse and fly. Doing this is 
+slightly painful, hence keeping it
+for later.}
+
 %{python-mode}%
 @O ../src/lib/utils_graphics.py -cp
-@{
-## Also modify to enter initial position of horse and fly
-def wrapperEnterRunPoints(fig, ax, run):
-    """ Create a closure for the mouseClick event.
-    """
+@{def wrapperEnterRunPoints(fig, ax, run):
     def _enterPoints(event):
-        if event.name     == 'button_press_event'      and \
-           (event.button   == 1 or event.button == 3)  and \
-           event.dblclick == True                      and \
-           event.xdata    != None                      and \
-           event.ydata    != None:
+        if event.name      == 'button_press_event'          and \
+           (event.button   == 1 or event.button == 3)       and \
+            event.dblclick == True and event.xdata  != None and event.ydata  != None:
 
-             if event.button == 1:        
-               newPoint = (event.xdata, event.ydata)
-               run.sites.append( newPoint  )
-               patchSize  = (xlim[1]-xlim[0])/140.0
-   
-               ax.add_patch( mpl.patches.Circle( newPoint,
-                                              radius = patchSize,
-                                              facecolor='blue',
-                                              edgecolor='black'   )  )
-               ax.set_title('Points Inserted: ' + str(len(run.sites)), \
-                             fontdict={'fontsize':40})
+             if event.button == 1:  
+                 @<Insert blue circle representing a site@>
 
+             elif event.button == 3:  
+                 @<Insert big red circle representing initial position of horse and fly@>
 
-             if event.button == 3:        
-                 inithorseposn = (event.xdata, event.ydata)
-                 run.inithorseposn = inithorseposn  
-                 patchSize  = (xlim[1]-xlim[0])/70.0
-
-                 # TODO: remove the previous red patches, 
-                 # which containg ht eold position
-                 # of the horse and fly. Doing this is 
-                 # slightly painful, hence keeping it
-                 # for later
-                 ax.add_patch( mpl.patches.Circle( inithorseposn,
-                                                   radius = patchSize,
-                                                   facecolor= '#D13131', #'red',
-                                                   edgecolor='black'   )  )
-                 
-             # It is inefficient to clear the polygon patches inside the
-             # enterpoints loop as done here.
-             # I have just done this for simplicity: the intended behaviour
-             # at any rate, is
-             # to clear all the polygon patches from the axes object,
-             # once the user starts entering in MORE POINTS TO THE CLOUD
-             # for which the clustering was just computed and rendered.
-             # The moment the user starts entering new points,
-             # the previous polygon patches are garbage collected. 
-             clearAxPolygonPatches(ax)
-             applyAxCorrection(ax)
-             fig.canvas.draw()
+             @< Clear polygon patches and set up last minute \verb|ax| tweaks  @>
 
     return _enterPoints
 @|  @}
 
 %{/python-mode}%
 
+\vspace{-0.8cm} \newchunk
+%{python-mode}%
+@d Insert blue circle representing a site @{  
+newPoint = (event.xdata, event.ydata)
+run.sites.append( newPoint  )
+patchSize  = (xlim[1]-xlim[0])/140.0
+   
+ax.add_patch( mpl.patches.Circle( newPoint, radius = patchSize,
+                                  facecolor='blue', edgecolor='black'  ))
+ax.set_title('Points Inserted: ' + str(len(run.sites)), \
+             fontdict={'fontsize':40})
+@| @}
+%{/python-mode}%
+
+\vspace{-0.8cm} \newchunk
+%{python-mode}%
+@d Insert big red circle representing initial position of horse and fly @{ 
+inithorseposn = (event.xdata, event.ydata)
+run.inithorseposn = inithorseposn  
+patchSize  = (xlim[1]-xlim[0])/70.0
+
+ax.add_patch( mpl.patches.Circle( inithorseposn,radius = patchSize,
+                                  facecolor= '#D13131', edgecolor='black' ))
+@| @}
+%{/python-mode}%
+
+
+
+\vspace{-0.8cm} \newchunk   
+ It is inefficient to clear the polygon patches \textit{inside} the
+ \verb|enterRunpoints| event loop as done here. However, this has just been done for 
+ simplicity: the intended behaviour at any rate, is to clear all the polygon patches \
+ from the axes object, once the user starts entering in more points to the cloud
+ for which the clustering was just computed and rendered. The moment the user starts 
+ entering new points, the previous polygon patches are garbage collected. 
+
+%{python-mode}%
+@d Clear polygon patches and set up last minute \verb|ax| tweaks @{   
+clearAxPolygonPatches(ax)
+applyAxCorrection(ax)
+fig.canvas.draw()
+@| @}
+%{/python-mode}%
 
 \section{Algorithmic Utilities}
 
@@ -197,12 +209,6 @@ from colorama import Style
 
 
 def vector_chain_from_point_list(pts):
-    """ Given a list of points [p0,p1,p2,....p(n-1)]
-    Make it into a list of numpy vectors 
-    [p1-p0, p2-p1,...,p(n-1)-p(n-2)]
-    
-    Points should be lists or tuples of length 2
-    """
     vec_chain = []
     for pair in zip(pts, pts[1:]):
         tail= np.array (pair[0])
@@ -214,21 +220,16 @@ def vector_chain_from_point_list(pts):
 
 %{/python-mode}%
 
-\newchunk Given a polygonal chain, an important computation is to calculate 
-its length. Typically used for computing the length of the horse's and fly's tours. 
+\newchunk Given a polygonal chain in the form of successive points  $[p_0,p_1,p_2,....p_{n-1}]$, 
+an important computation is to calculate its length. Points should be lists or tuples of length 2
+If no points or just one point is given in the list of points, then 0 is returned.
+
+Typically used for computing the length of the horse's and fly's tours. 
 
 %{python-mode}%
 @O ../src/lib/utils_algo.py -cp
 @{
 def length_polygonal_chain(pts):
-    """ Given a list of points [p0,p1,p2,....p(n-1)]
-    calculate the length of its segments. 
-
-    Points should be lists or tuples of length 2
-
-    If no points or just one point is given in the list of
-    points, then 0 is returned.
-    """
     vec_chain = vector_chain_from_point_list(pts)
 
     acc = 0
@@ -243,14 +244,13 @@ Often point-data is given to and returned from these external routines in flatte
 form. The following routines are needed to convert such a ``flattened'' list into 
 a list of points and vice versa. 
 
+Convert a vector of even length into a vector of points. i.e. 
+$[x_0,x_1,x_2,...x_{2n}] \rarr [[x_0,x_1],[x_2,x_3],,..[x_{2n-1},x_{2n}]]$
+
+
 %{python-mode}%
-@O ../src/lib/utils_algo.py -cp
-@{
-def pointify_vector (x):
-    """ Convert a vector of even length 
-    into a vector of points. i.e.
-    [x0,x1,x2,...x2n] -> [[x0,x1],[x2,x3],,..[x2n-1,x2n]]
-    """
+@o ../src/lib/utils_algo.py -cp
+@{def pointify_vector (x):
     if len(x) % 2 == 0:
         pts = []
         for i in range(len(x))[::2]:
@@ -258,40 +258,41 @@ def pointify_vector (x):
         return pts
     else :
         sys.exit('List of items does not have an even length to be able to be pointifyed')
-
-def flatten_list_of_lists(l):
-    """ Flatten vector
-      e.g.  [[0,1],[2,3],[4,5]] -> [0,1,2,3,4,5]
-    """
-    return [item for sublist in l for item in sublist]
-
 @}
 
 %{/python-mode}%
+
+\vspace{-0.8cm}
+The next chunk peforms the opposite process i.e. it flatten's the vector
+e.g. $[[0,1],[2,3],[4,5]] \rarr [0,1,2,3,4,5]$
+
+
+%{python-mode}%
+@o ../src/lib/utils_algo.py -cp
+@{def flatten_list_of_lists(l):
+       return [item for sublist in l for item in sublist]
+@}
+
+%{/python-mode}%
+
+\vspace{-0.8cm}
 \newchunk Python's default print function prints each list on a single line. For 
 debugging purposes,  it helps to print a list with one item per line. 
 
 %{python-mode}%
 @O ../src/lib/utils_algo.py -cp
-@{
-def print_list(xs):
-    """ Print each item of a list on new line
-    """
+@{def print_list(xs):
     for x in xs:
         print x
 @}
-
 %{/python-mode}%
-\newchunk The following routines are self-explanatory and are hence gathered into one chunk. 
 
+\vspace{-0.8cm}
+\newchunk This chunk just calculates the list of partial sums e.g. $[4,2,3] \rarr [4,6,9]"$
 %{python-mode}%
 @O ../src/lib/utils_algo.py -cp
 @{
 def partial_sums( xs ):
-    """
-    List of partial sums
-    [4,2,3] -> [4,6,9]
-    """
     psum = 0
     acc = []
     for x in xs:
@@ -299,29 +300,29 @@ def partial_sums( xs ):
         acc.append( psum )
 
     return acc
+@}
+%{/python-mode}%
 
-def are_site_orderings_equal(sites1, sites2):
-    """
-    For two given lists of points test if they are 
-    equal or not. We do this by checking the Linfinity
-    norm.
-    """
-    
+\vspace{-0.8cm}
+\newchunk For two given lists of points test if they are 
+equal or not. We do this by checking the $L^{\infty}$ norm.
+%{python-mode}%
+@o ../src/lib/utils_algo.py -cp
+@{def are_site_orderings_equal(sites1, sites2):
+
     for (x1,y1), (x2,y2) in zip(sites1, sites2): 
         if (x1-x2)**2 + (y1-y2)**2 > 1e-8:
-
-            print Fore.BLUE+ "Site Orderings are not equal"
-            print sites1
-            print sites2
-            print '-------------------------' + Style.RESET_ALL
             return False
-
     return True
-        
-    print "\n\n\n\n---------------------"
+@}
+%{/python-mode}%
 
-
-def bunch_of_random_points(numpts):
+\vspace{-0.8cm} \newchunk This function just generates a bunch of non-uniformly distributed
+random points inside the unit-square. According to this scheme, you will often notice
+clusters clumped near the border of the unit-square. 
+%{python-mode}%
+@O ../src/lib/utils_algo.py -cp
+@{def bunch_of_non_uniform_random_points(numpts):
     cluster_size = int(np.sqrt(numpts)) 
     numcenters   = cluster_size
     
@@ -329,29 +330,36 @@ def bunch_of_random_points(numpts):
     import random
     centers = scipy.rand(numcenters,2).tolist()
 
-    scale = 4.0
-    points = []
+    scale, points = 4.0, []
     for c in centers:
-        cx = c[0]
-        cy = c[1]
+        cx, cy = c[0], c[1]
+        @<For current center $c$ of this loop, generate \verb|cluster_size| points uniformly in a square centered at it@>
 
-        sq_size      = min(cx,1-cx,cy, 1-cy)
-        cluster_size = int(np.sqrt(numpts)) 
-        loc_pts_x    = np.random.uniform(low=cx-sq_size/scale, 
-                                         high=cx+sq_size/scale, 
-                                         size=(cluster_size,))
-        loc_pts_y    = np.random.uniform(low=cy-sq_size/scale, 
-                                         high=cy+sq_size/scale, 
-                                         size=(cluster_size,))
+    @<Whatever number of points are left to be generated, generate them uniformly inside the unit-square@>
 
-        points.extend(zip(loc_pts_x, loc_pts_y))
-
-    num_remaining_pts = numpts - cluster_size * numcenters
-
-    remaining_pts = scipy.rand(num_remaining_pts, 2).tolist()
-    points.extend(remaining_pts)
-    
     return points
+@| scale, cluster_size @}
+%{/python-mode}%
 
-@}
+
+
+\vspace{-0.8cm} \newchunk Note that the smaller square around a center, inside which the points are generated is made to lie 
+in the unit-square. This is reflected in the assignment to \verb|sq_size| below. 
+%{python-mode}%
+@d For current center $c$ of this loop, generate \verb|cluster_size| points uniformly in a square centered at it @{   
+sq_size      = min(cx,1-cx,cy, 1-cy)
+loc_pts_x    = np.random.uniform(low=cx-sq_size/scale, high=cx+sq_size/scale, size=(cluster_size,))
+loc_pts_y    = np.random.uniform(low=cy-sq_size/scale, high=cy+sq_size/scale, size=(cluster_size,))
+points.extend(zip(loc_pts_x, loc_pts_y))
+@| @}
+%{/python-mode}%
+
+
+\vspace{-0.8cm} \newchunk
+%{python-mode}%
+@d Whatever number of points are left to be generated, generate them uniformly inside the unit-square @{   
+num_remaining_pts = numpts - cluster_size * numcenters
+remaining_pts = scipy.rand(num_remaining_pts, 2).tolist()
+points.extend(remaining_pts)
+@| @}
 %{/python-mode}%
