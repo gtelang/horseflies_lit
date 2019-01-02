@@ -329,13 +329,14 @@ does house-keeping duties by parsing the command-line arguments passed by main,
 setting up the canvas by calling the appropriate graphics routines and calling 
 the algorithms on the input specified through the canvas. 
 
+%{python-mode}%
 \begin{flushleft} \small
 \begin{minipage}{\linewidth}\label{scrap1}\raggedright\small
 \NWtarget{nuweb12a}{} \verb@"../main.py"@\nobreak\ {\footnotesize {12a}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
-\mbox{}\verb@@\hbox{$\langle\,${\itshape Turn off Matplotlib's irritating DEBUG messages}\nobreak\ {\footnotesize \NWlink{nuweb12b}{12b}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@@\hbox{$\langle\,${\itshape Turn off Matplotlibs irritating DEBUG messages}\nobreak\ {\footnotesize \NWlink{nuweb12b}{12b}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@@\hbox{$\langle\,${\itshape Import problem module files}\nobreak\ {\footnotesize \NWlink{nuweb12c}{12c}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@if __name__=="__main__":@\\
@@ -366,15 +367,18 @@ the algorithms on the input specified through the canvas.
 \end{list}
 \end{minipage}\vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
 \newchunk On my customized Ubuntu container, Matplotlib produces tons of DEBUG log messages because  
 it recently switched to the \verb|logging| library for...well...logging. 
 The lines in this chunk were suggested by the link \url{http://matplotlib.1069221.n5.nabble.com/How-to-turn-off-matplotlib-DEBUG-msgs-td48822.html} 
 for quietening down Matplotlib.  
 
 
+%{python-mode}%
 \begin{flushleft} \small
 \begin{minipage}{\linewidth}\label{scrap2}\raggedright\small
-\NWtarget{nuweb12b}{} $\langle\,${\itshape Turn off Matplotlib's irritating DEBUG messages}\nobreak\ {\footnotesize {12b}}$\,\rangle\equiv$
+\NWtarget{nuweb12b}{} $\langle\,${\itshape Turn off Matplotlibs irritating DEBUG messages}\nobreak\ {\footnotesize {12b}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@import logging@\\
@@ -391,6 +395,9 @@ for quietening down Matplotlib.
 \end{list}
 \end{minipage}\vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
+%{python-mode}%
 \begin{flushleft} \small
 \begin{minipage}{\linewidth}\label{scrap3}\raggedright\small
 \NWtarget{nuweb12c}{} $\langle\,${\itshape Import problem module files}\nobreak\ {\footnotesize {12c}}$\,\rangle\equiv$
@@ -413,6 +420,7 @@ for quietening down Matplotlib.
 \end{list}
 \end{minipage}\vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
 \section{Support Files}
 
 \begin{alphalist}
@@ -462,6 +470,7 @@ aspect ratio of the axes object the same i.e. 1.0. Since Matplotlib is principal
 a plotting software, this is not the default behavior, since scales on the x and y 
 axes are adjusted according to the data to be plotted. 
 
+%{python-mode}%
 \begin{flushleft} \small\label{scrap4}\raggedright\small
 \NWtarget{nuweb14}{} \verb@"../src/lib/utils_graphics.py"@\nobreak\ {\footnotesize {14}}$\equiv$
 \vspace{-1ex}
@@ -502,9 +511,12 @@ axes are adjusted according to the data to be plotted.
 \end{list}
 \vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
 \newchunk Next, given an axes object (i.e. a drawing area on a figure object) we need a function
 to delete and remove all the graphical objects drawn on it. 
 
+%{python-mode}%
 \begin{flushleft} \small\label{scrap5}\raggedright\small
 \NWtarget{nuweb15a}{} \verb@"../src/lib/utils_graphics.py"@\nobreak\ {\footnotesize {15a}}$\equiv$
 \vspace{-1ex}
@@ -535,11 +547,13 @@ to delete and remove all the graphical objects drawn on it.
 \end{list}
 \vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
 \newchunk Now remove the patches which were rendered for each cluster
     Unfortunately, this step has to be done manually, the canvas patch
     of a cluster and the corresponding object in memory are not reactively
     connected.I presume, this behavioue can be achieved by sub-classing.
 
+%{python-mode}%
 \begin{flushleft} \small\label{scrap6}\raggedright\small
 \NWtarget{nuweb15b}{} \verb@"../src/lib/utils_graphics.py"@\nobreak\ {\footnotesize {15b}}$\equiv$
 \vspace{-1ex}
@@ -573,6 +587,7 @@ to delete and remove all the graphical objects drawn on it.
 \end{list}
 \vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
 \newchunk Now for one of the most important routines for drawing on the canvas! 
 To insert the sites, we double-click the left mouse button and to insert the 
 initial position of the horse and fly we double-click the right mouse-button. 
@@ -580,6 +595,7 @@ initial position of the horse and fly we double-click the right mouse-button.
 Note that the left mouse-button corresponds to button 1 and right mouse button
 to button 3 in the code-fragment below. 
 
+%{python-mode}%
 \begin{flushleft} \small\label{scrap7}\raggedright\small
 \NWtarget{nuweb16}{} \verb@"../src/lib/utils_graphics.py"@\nobreak\ {\footnotesize {16}}$\equiv$
 \vspace{-1ex}
@@ -649,6 +665,9 @@ to button 3 in the code-fragment below.
 \end{list}
 \vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
+
 \section{Algorithmic Utilities}
 
 \newchunk Given a list of  points $[p_0,p_1,p_2,....p_{n-1}]$. 
@@ -656,6 +675,7 @@ to button 3 in the code-fragment below.
     i.e. it converts the list of points into a consecutive list of numpy vectors. 
     Points should be lists or tuples of length 2
 
+%{python-mode}%
 \begin{flushleft} \small\label{scrap8}\raggedright\small
 \NWtarget{nuweb17a}{} \verb@"../src/lib/utils_algo.py"@\nobreak\ {\footnotesize {17a}}$\equiv$
 \vspace{-1ex}
@@ -692,9 +712,12 @@ to button 3 in the code-fragment below.
 \end{list}
 \vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
 \newchunk Given a polygonal chain, an important computation is to calculate 
 its length. Typically used for computing the length of the horse's and fly's tours. 
 
+%{python-mode}%
 \begin{flushleft} \small\label{scrap9}\raggedright\small
 \NWtarget{nuweb17b}{} \verb@"../src/lib/utils_algo.py"@\nobreak\ {\footnotesize {17b}}$\equiv$
 \vspace{-1ex}
@@ -726,11 +749,13 @@ its length. Typically used for computing the length of the horse's and fly's tou
 \end{list}
 \vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
 \newchunk The following routine is useful on long lists returned from external solvers. 
 Often point-data is given to and returned from these external routines in flattened
 form. The following routines are needed to convert such a ``flattened'' list into 
 a list of points and vice versa. 
 
+%{python-mode}%
 \begin{flushleft} \small\label{scrap10}\raggedright\small
 \NWtarget{nuweb18a}{} \verb@"../src/lib/utils_algo.py"@\nobreak\ {\footnotesize {18a}}$\equiv$
 \vspace{-1ex}
@@ -766,9 +791,11 @@ a list of points and vice versa.
 \end{list}
 \vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
 \newchunk Python's default print function prints each list on a single line. For 
 debugging purposes,  it helps to print a list with one item per line. 
 
+%{python-mode}%
 \begin{flushleft} \small\label{scrap11}\raggedright\small
 \NWtarget{nuweb18b}{} \verb@"../src/lib/utils_algo.py"@\nobreak\ {\footnotesize {18b}}$\equiv$
 \vspace{-1ex}
@@ -790,8 +817,10 @@ debugging purposes,  it helps to print a list with one item per line.
 \end{list}
 \vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
 \newchunk The following routines are self-explanatory and are hence gathered into one chunk. 
 
+%{python-mode}%
 \begin{flushleft} \small\label{scrap12}\raggedright\small
 \NWtarget{nuweb19}{} \verb@"../src/lib/utils_algo.py"@\nobreak\ {\footnotesize {19}}$\equiv$
 \vspace{-1ex}
@@ -874,6 +903,7 @@ debugging purposes,  it helps to print a list with one item per line.
 \end{list}
 \vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
 %---------------------------------------------------------
 % Every module is a chapter. Thus we keep the links 
 % internal. Any labelling to other modules is done 
@@ -921,6 +951,7 @@ as a kind of main function for this module. It is called from
 \verb|main.py| to process the command-line arguments and run the 
 experimental or interactive sections of the code. 
 
+%{python-mode}%
 \begin{flushleft} \small\label{scrap13}\raggedright\small
 \NWtarget{nuweb21a}{} \verb@"../src/lib/problem_classic_horsefly.py"@\nobreak\ {\footnotesize {21a}}$\equiv$
 \vspace{-1ex}
@@ -948,9 +979,13 @@ experimental or interactive sections of the code.
 \end{list}
 \vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
 \section{Module Details}
 
 \newchunk 
+
+%{python-mode}%
 \begin{flushleft} \small\label{scrap14}\raggedright\small
 \NWtarget{nuweb21b}{} $\langle\,${\itshape Relevant imports for classic horsefly}\nobreak\ {\footnotesize {21b}}$\,\rangle\equiv$
 \vspace{-1ex}
@@ -987,10 +1022,13 @@ experimental or interactive sections of the code.
 \end{list}
 \vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
 \vspace{-0.8cm}\newchunk The logger variable becomes becomes global in scope to this module. This allows
 me to write customized \texttt{debug} and \texttt{info} functions that let's me format 
 the log messages according to the frame level. I learned this trick from the following 
 Stack Overflow post \url{https://stackoverflow.com/a/5500099/505306}. 
+%{python-mode}%
 
 \begin{flushleft} \small
 \begin{minipage}{\linewidth}\label{scrap15}\raggedright\small
@@ -1026,12 +1064,15 @@ Stack Overflow post \url{https://stackoverflow.com/a/5500099/505306}.
 \end{list}
 \end{minipage}\vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
 \vspace{-0.8cm}\newchunk The key-press handler function detects the keys pressed by the user when the canvas
 is in active focus. This function allows you to set some of the input parameters like 
 speed ratio $\varphi$, or selecting an algorithm interactively at the command-line, 
 generating a bunch of uniform or non-uniformly distributed points on the canvas, 
 or just plain clearing the canvas for inserting a fresh input set of points. 
 
+%{python-mode}%
 \begin{flushleft} \small
 \begin{minipage}{\linewidth}\label{scrap16}\raggedright\small
 \NWtarget{nuweb22b}{} $\langle\,${\itshape Define key-press handler}\nobreak\ {\footnotesize {22b}}$\,\rangle\equiv$
@@ -1059,7 +1100,12 @@ or just plain clearing the canvas for inserting a fresh input set of points.
 \end{list}
 \end{minipage}\vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
 \vspace{-0.8cm}\newchunk 
+
+%{python-mode}%
+
 \begin{flushleft} \small\label{scrap17}\raggedright\small
 \NWtarget{nuweb22c}{} $\langle\,${\itshape Start entering input from the command-line}\nobreak\ {\footnotesize {22c}}$\,\rangle\equiv$
 \vspace{-1ex}
@@ -1159,6 +1205,8 @@ or just plain clearing the canvas for inserting a fresh input set of points.
 \end{list}
 \vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
 \vspace{-0.8cm}\newchunk This chunk generates points uniformly or non-uniformly distributed in the 
 unit square $[0,1]^2$ in the Matplotlib canvas. I will document the schemes used for 
 generating the non-uniformly distributed points later. These schemes are important to test the effectiveness of 
@@ -1166,6 +1214,7 @@ the horsefly algorithms. Uniform point clouds do no highlight the weaknesses of
 sequencing algorithms as David Johnson implies in his article on how to write 
 experimental algorithm papers when he talks about algorithms for the TSP. 
 
+%{python-mode}%
 \begin{flushleft} \small\label{scrap18}\raggedright\small
 \NWtarget{nuweb24}{} $\langle\,${\itshape Generate a bunch of uniform or non-uniform random points on the canvas}\nobreak\ {\footnotesize {24}}$\,\rangle\equiv$
 \vspace{-1ex}
@@ -1207,8 +1256,12 @@ experimental algorithm papers when he talks about algorithms for the TSP.
 \end{list}
 \vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
 \vspace{-0.8cm}\newchunk 
 
+
+%{python-mode}%
 \begin{flushleft} \small\label{scrap19}\raggedright\small
 \NWtarget{nuweb25a}{} $\langle\,${\itshape Clear canvas and states of all objects}\nobreak\ {\footnotesize {25a}}$\,\rangle\equiv$
 \vspace{-1ex}
@@ -1233,6 +1286,9 @@ experimental algorithm papers when he talks about algorithms for the TSP.
 \end{list}
 \vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
+%{python-mode}%
 \vspace{-0.8cm}\newchunk 
 \begin{flushleft} \small\label{scrap20}\raggedright\small
 \NWtarget{nuweb25b}{} $\langle\,${\itshape Set up interactive canvas}\nobreak\ {\footnotesize {25b}}$\,\rangle\equiv$
@@ -1265,11 +1321,16 @@ experimental algorithm papers when he talks about algorithms for the TSP.
 \end{list}
 \vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
+
+
 \section{Local Data Structures}
 
 \newchunk This class manages the input and the output of the result of 
 calling various horsefly algorithms. 
 
+%{python-mode}%
 \begin{flushleft} \small\label{scrap21}\raggedright\small
 \NWtarget{nuweb25c}{} $\langle\,${\itshape Local data-structures for classic horsefly}\nobreak\ {\footnotesize {25c}}$\,\rangle\equiv$
 \vspace{-1ex}
@@ -1342,6 +1403,9 @@ calling various horsefly algorithms.
 \end{list}
 \vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
+
 Now that all the boring boiler-plate and handler codes have been 
 written, its finally time for algorithmic ideas and implementations! 
 Every algorithm is given an algorithmic overview followed by the 
@@ -1428,6 +1492,8 @@ We can show that an optimal (unrestricted) horsfly solution can be converted
 to a collinear-horsefly solution at a constant factor increase in the makespan. 
 
 \subsection{Algorithmic Details}
+
+%{python-mode}%
 \begin{flushleft} \small\label{scrap23}\raggedright\small
 \NWtarget{nuweb28}{} $\langle\,${\itshape Algorithms for classic horsefly}\nobreak\ {\footnotesize {28}}$\,\rangle\equiv$
 \vspace{-1ex}
@@ -1510,8 +1576,11 @@ to a collinear-horsefly solution at a constant factor increase in the makespan.
 \end{list}
 \vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
 \newchunk 
 
+%{python-mode}%
 \begin{flushleft} \small\label{scrap24}\raggedright\small
 \NWtarget{nuweb29}{} $\langle\,${\itshape Algorithms for classic horsefly}\nobreak\ {\footnotesize {29}}$\,\rangle\equiv$
 \vspace{-1ex}
@@ -1633,7 +1702,7 @@ to a collinear-horsefly solution at a constant factor increase in the makespan.
 \end{list}
 \vspace{4ex}
 \end{flushleft}
-\section{\framebox{Algorithm}: Greedy---Incremental Insertion}
+%{/python-mode}%\section{\framebox{Algorithm}: Greedy---Incremental Insertion}
 \subsection*{Algorithmic Overview}
 \newchunk The greedy nearest neighbor heuristic described in \autoref{sec:greedy-nn} gives an $O(\log n)$ 
           approximation for $n$ sites in the plane. However, there exists an alternative greedy incremental 
@@ -1686,6 +1755,7 @@ Efficient policies for detecting the exact or approximate point for cheapest ins
 described in \autoref{subsec:insertion-policies}.  We also implement a ``naive'' policy as a way 
 benchmark the quality and speed of implementation of future insertion policies. 
 
+%{python-mode}%
 \begin{flushleft} \small\label{scrap25}\raggedright\small
 \NWtarget{nuweb33a}{} $\langle\,${\itshape Algorithms for classic horsefly}\nobreak\ {\footnotesize {33a}}$\,\rangle\equiv$
 \vspace{-1ex}
@@ -1703,7 +1773,7 @@ benchmark the quality and speed of implementation of future insertion policies.
 \mbox{}\verb@@\\
 \mbox{}\verb@      while insertion_policy.unvisited_sites_idxs: @\\
 \mbox{}\verb@         @\hbox{$\langle\,${\itshape Use insertion policy to find the cheapest site to insert into current tour}\nobreak\ {\footnotesize \NWlink{nuweb34b}{34b}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@         @\hbox{$\langle\,${\itshape Write algorithm's current state to file}\nobreak\ {\footnotesize \NWlink{nuweb35a}{35a}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@         @\hbox{$\langle\,${\itshape Write algorithms current state to file}\nobreak\ {\footnotesize \NWlink{nuweb35a}{35a}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@      @\hbox{$\langle\,${\itshape Write input and output to file}\nobreak\ {\footnotesize \NWlink{nuweb38a}{38a}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@      @\hbox{$\langle\,${\itshape Make an animation of the schedule, if \verb|animate_schedule_p == True|}\nobreak\ {\footnotesize \NWlink{nuweb39a}{39a}}$\,\rangle$}\verb@@\\
@@ -1722,6 +1792,9 @@ benchmark the quality and speed of implementation of future insertion policies.
 \end{list}
 \vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
+
 \vspace{-0.8cm}\newchunk Note that for each run of the algorithm, we create a dedicated directory and 
 use a corresponding log file  in that directory. It will typically containe detailed 
 information on the progress of the algorithm and the steps executed. 
@@ -1737,6 +1810,7 @@ within each directory that corresponds to an algorithm's run:
 \underline{a log file}, \underline{algorithm states files}, and finally 
 an \underline{input-output file}. 
 
+%{python-mode}%
 \begin{flushleft} \small\label{scrap26}\raggedright\small
 \NWtarget{nuweb33b}{} $\langle\,${\itshape Set log, algo-state and input-output files config}\nobreak\ {\footnotesize {33b}}$\,\rangle\equiv$
 \vspace{-1ex}
@@ -1777,11 +1851,14 @@ an \underline{input-output file}.
 \end{list}
 \vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
 \vspace{-0.8cm}\newchunk This fragment merely sets the variable \verb|insertion_policy| to 
 the appropriate function. This will later help us in studying the speed of 
 the algorithm and quality of the solution for various insertion policies 
 during the experimental analysis. 
 
+%{python-mode}%
 \begin{flushleft} \small\label{scrap27}\raggedright\small
 \NWtarget{nuweb34a}{} $\langle\,${\itshape Set insertion policy class for current run}\nobreak\ {\footnotesize {34a}}$\,\rangle\equiv$
 \vspace{-1ex}
@@ -1804,11 +1881,14 @@ during the experimental analysis.
 \end{list}
 \vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
 \vspace{-0.8cm}\newchunk Note that while defining the body of the algorithm, we treat the insertion policy 
 (whose name has already been passed as an string argument) as a kind of black-box, since all 
 policy classes have the same interface. The detailed implementation for the various 
 insertion policies are given later. 
 
+%{python-mode}%
 \begin{flushleft} \small\label{scrap28}\raggedright\small
 \NWtarget{nuweb34b}{} $\langle\,${\itshape Use insertion policy to find the cheapest site to insert into current tour}\nobreak\ {\footnotesize {34b}}$\,\rangle\equiv$
 \vspace{-1ex}
@@ -1826,6 +1906,8 @@ insertion policies are given later.
 \end{list}
 \vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
 \vspace{-0.8cm}\newchunk When using Python 2.7 (as I am doing with this suite of programs), you should have the 
 \texttt{pyyaml} module version 3.12 installed. Version 4.1 breaks for some weird reason; it can't seem to serialized
 Numpy objects. See \url{https://github.com/kevin1024/vcrpy/issues/366} for a brief discussion on this topic. 
@@ -1845,8 +1927,9 @@ for all my plotting, but for the moment I will stick to Matplotlib because I don
 And much of my plots will be of a reasonably high-quality for the purpose of presentations. This will naturally 
 affect timing/benchmarking results. 
 
+%{python-mode}%
 \begin{flushleft} \small\label{scrap29}\raggedright\small
-\NWtarget{nuweb35a}{} $\langle\,${\itshape Write algorithm's current state to file}\nobreak\ {\footnotesize {35a}}$\,\rangle\equiv$
+\NWtarget{nuweb35a}{} $\langle\,${\itshape Write algorithms current state to file}\nobreak\ {\footnotesize {35a}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@if write_algo_states_to_disk_p:@\\
@@ -1880,8 +1963,12 @@ affect timing/benchmarking results.
 \end{list}
 \vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
+
 \vspace{-0.4cm}
 
+%{python-mode}%
 \begin{flushleft} \small\label{scrap30}\raggedright\small
 \NWtarget{nuweb35b}{} $\langle\,${\itshape Render current algorithm state to image file}\nobreak\ {\footnotesize {35b}}$\,\rangle\equiv$
 \vspace{-1ex}
@@ -1907,7 +1994,11 @@ affect timing/benchmarking results.
 \end{list}
 \vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
 \vspace{-0.8cm}\newchunk 
+
+%{python-mode}%
 \begin{flushleft} \small\label{scrap31}\raggedright\small
 \NWtarget{nuweb35c}{} $\langle\,${\itshape Set up plotting area and canvas, fig, ax, and other configs}\nobreak\ {\footnotesize {35c}}$\,\rangle\equiv$
 \vspace{-1ex}
@@ -1942,7 +2033,11 @@ affect timing/benchmarking results.
 \end{list}
 \vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
 \vspace{-0.8cm}\newchunk Matplotlib typically plots points using x and y coordinates of the points in separate points. 
+
+%{python-mode}%
 \begin{flushleft} \small\label{scrap32}\raggedright\small
 \NWtarget{nuweb36a}{} $\langle\,${\itshape Extract $x$ and $y$ coordinates of the points on the horse, fly tours, visited and unvisited sites}\nobreak\ {\footnotesize {36a}}$\,\rangle\equiv$
 \vspace{-1ex}
@@ -1981,7 +2076,11 @@ affect timing/benchmarking results.
 \end{list}
 \vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
 \vspace{-0.8cm}\newchunk 
+
+%{python-mode}%
 \begin{flushleft} \small\label{scrap33}\raggedright\small
 \NWtarget{nuweb36b}{} $\langle\,${\itshape Mark initial position of horse and fly boldly on canvas}\nobreak\ {\footnotesize {36b}}$\,\rangle\equiv$
 \vspace{-1ex}
@@ -2002,6 +2101,9 @@ affect timing/benchmarking results.
 \end{list}
 \vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
+%{python-mode}%
 \begin{flushleft} \small
 \begin{minipage}{\linewidth}\label{scrap34}\raggedright\small
 \NWtarget{nuweb37a}{} $\langle\,${\itshape Draw horse and fly-tours}\nobreak\ {\footnotesize {37a}}$\,\rangle\equiv$
@@ -2023,6 +2125,9 @@ affect timing/benchmarking results.
 \end{list}
 \end{minipage}\vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
+%{python-mode}%
 \begin{flushleft} \small\label{scrap35}\raggedright\small
 \NWtarget{nuweb37b}{} $\langle\,${\itshape Place numbered markers on visited sites to mark the order of visitation explicitly}\nobreak\ {\footnotesize {37b}}$\,\rangle\equiv$
 \vspace{-1ex}
@@ -2042,6 +2147,9 @@ affect timing/benchmarking results.
 \end{list}
 \vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
+%{python-mode}%
 \begin{flushleft} \small\label{scrap36}\raggedright\small
 \NWtarget{nuweb37c}{} $\langle\,${\itshape Draw unvisited sites as filled blue circles}\nobreak\ {\footnotesize {37c}}$\,\rangle\equiv$
 \vspace{-1ex}
@@ -2063,7 +2171,12 @@ affect timing/benchmarking results.
 \end{list}
 \vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
+
 \vspace{-0.8cm}\newchunk 
+
+%{python-mode}%
 \begin{flushleft} \small\label{scrap37}\raggedright\small
 \NWtarget{nuweb37d}{} $\langle\,${\itshape Give metainformation about current picture as headers and footers}\nobreak\ {\footnotesize {37d}}$\,\rangle\equiv$
 \vspace{-1ex}
@@ -2086,6 +2199,8 @@ affect timing/benchmarking results.
 \end{list}
 \vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
 \vspace{-0.8cm}
 Note that after writing image files, you should close the current figure. Otherwise
 the collection of all the open figures starts hogging the RAM. Matplotlib throws a
@@ -2103,7 +2218,7 @@ max_open_warning, RuntimeWarning)
 There is a  Stack Overflow answer (\url{https://stackoverflow.com/a/21884375/505306}) 
 which advises to call \verb|plt.close()| after writing out a file that closes the 
 \textit{current} figure to avoid the above warning. 
-
+%{python-mode}%
 \begin{flushleft} \small\label{scrap38}\raggedright\small
 \NWtarget{nuweb37e}{} $\langle\,${\itshape Write image file}\nobreak\ {\footnotesize {37e}}$\,\rangle\equiv$
 \vspace{-1ex}
@@ -2127,10 +2242,13 @@ which advises to call \verb|plt.close()| after writing out a file that closes th
 \end{list}
 \vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
+
 \vspace{-0.8cm}\newchunk The final answer is written to disk in the form of a YAML file. It lists the input sites 
 in the order of visitation computed by the algorithm and gives the tour of the horse. 
 Note that the number of points on the horse's tour is 1 more than the number of given sites. 
-
+%{python-mode}%
 \begin{flushleft} \small\label{scrap39}\raggedright\small
 \NWtarget{nuweb38a}{} $\langle\,${\itshape Write input and output to file}\nobreak\ {\footnotesize {38a}}$\,\rangle\equiv$
 \vspace{-1ex}
@@ -2163,6 +2281,8 @@ Note that the number of points on the horse's tour is 1 more than the number of 
 \end{list}
 \vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
 \vspace{-0.8cm}\newchunk If algorithm states have been rendered to files in the run-folder, we stitch them together using \verb|ffmpeg|
 and make an \verb|.mp4| animation of the changing states of the algorithms. The \verb|.mp4| file will be in the algorithm's
 run folder. I used the  tutorial given on \url{https://en.wikibooks.org/wiki/FFMPEG_An_Intermediate_Guide/image_sequence}
@@ -2170,6 +2290,7 @@ for choosing the particular command-line options to \verb|ffmpeg| below. The opt
 to quieten \verb|ffmpeg|'s output were suggested by  \url{https://superuser.com/a/1045060/102371} 
 
 
+%{python-mode}%
 \begin{flushleft} \small\label{scrap40}\raggedright\small
 \NWtarget{nuweb38b}{} $\langle\,${\itshape Make an animation of algorithm states, if \verb|write_algo_states_to_disk_p == True|}\nobreak\ {\footnotesize {38b}}$\,\rangle\equiv$
 \vspace{-1ex}
@@ -2193,9 +2314,12 @@ to quieten \verb|ffmpeg|'s output were suggested by  \url{https://superuser.com/
 \end{list}
 \vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
 \vspace{-0.8cm} \newchunk This chunks reads the information in the input-output file just written out as
 a YAML file in the run-folder and then renders the process of the horse and fly moving around the plane 
 delivering packages to sites. 
+%{python-mode}%
 
 \begin{flushleft} \small
 \begin{minipage}{\linewidth}\label{scrap41}\raggedright\small
@@ -2216,7 +2340,11 @@ delivering packages to sites.
 \end{list}
 \end{minipage}\vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
 \vspace{-0.8cm}\newchunk 
+%{python-mode}%
+
 \begin{flushleft} \small\label{scrap42}\raggedright\small
 \NWtarget{nuweb39b}{} $\langle\,${\itshape Return horsefly tour, along with additional information}\nobreak\ {\footnotesize {39b}}$\,\rangle\equiv$
 \vspace{-1ex}
@@ -2242,6 +2370,8 @@ delivering packages to sites.
 \end{list}
 \vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
 \vspace{-0.8cm}\newchunk We now define some of the functions that were referred to in the above chunks. 
 Given the intial position of the truck and drone, and a list of sites, we need to compute 
 the collinear horsefly tour length for the given ordering. This is the function that is 
@@ -2258,6 +2388,7 @@ only a single site, given by the code-chunk below.
 %\begin{center}
 %\missingfigure[figwidth=6cm]{Sigle site analytic}
 %\end{center}
+%{python-mode}%
 
 \begin{flushleft} \small\label{scrap43}\raggedright\small
 \NWtarget{nuweb39c}{} $\langle\,${\itshape Define auxiliary helper functions}\nobreak\ {\footnotesize {39c}}$\,\rangle\equiv$
@@ -2287,12 +2418,17 @@ only a single site, given by the code-chunk below.
 \end{list}
 \vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
 \vspace{-0.8cm}
 With that the tour length functions for collinear horseflies can be implemented as 
 an elementary instance of the fold pattern of functional programming. 
 \footnote{Python has folds tucked away in some corner of its standard library. 
 But I am not using it during the first hacky portion of this draft. Also Shane 
 mentioned it has performance issues? Double-check this later!}
+
+%{python-mode}%
+
 \begin{flushleft} \small\label{scrap44}\raggedright\small
 \NWtarget{nuweb40a}{} $\langle\,${\itshape Define auxiliary helper functions}\nobreak\ {\footnotesize {40a}}$\,\rangle\equiv$
 \vspace{-1ex}
@@ -2318,6 +2454,10 @@ mentioned it has performance issues? Double-check this later!}
 \end{list}
 \vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
+%{python-mode}%
+
 \begin{flushleft} \small
 \begin{minipage}{\linewidth}\label{scrap45}\raggedright\small
 \NWtarget{nuweb40b}{} $\langle\,${\itshape Define auxiliary helper functions}\nobreak\ {\footnotesize {40b}}$\,\rangle\equiv$
@@ -2347,6 +2487,9 @@ mentioned it has performance issues? Double-check this later!}
 \end{list}
 \end{minipage}\vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
+
 \section{Insertion Policies} 
 \label{subsec:insertion-policies}
 
@@ -2402,6 +2545,7 @@ and three data-fields made from the base-constructor named \texttt{sites}, \text
 and \texttt{phi}. Classes which inherit this abstract base class, will 
 add their own local data-members and methods for keeping track of 
 data for insertion. 
+%{python-mode}%
 
 \begin{flushleft} \small\label{scrap46}\raggedright\small
 \NWtarget{nuweb41a}{} $\langle\,${\itshape Define various insertion policy classes}\nobreak\ {\footnotesize {41a}}$\,\rangle\equiv$
@@ -2431,7 +2575,10 @@ data for insertion.
 \end{list}
 \vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
 \vspace{-0.8cm}\newchunk 
+%{python-mode}%
 \begin{flushleft} \small\label{scrap47}\raggedright\small
 \NWtarget{nuweb41b}{} $\langle\,${\itshape Methods for \verb|PolicyBestInsertionNaive|}\nobreak\ {\footnotesize {41b}}$\,\rangle\equiv$
 \vspace{-1ex}
@@ -2457,8 +2604,11 @@ data for insertion.
 \end{list}
 \vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
 \vspace{-0.8cm}\newchunk 
 
+%{python-mode}%
 \begin{flushleft} \small\label{scrap48}\raggedright\small
 \NWtarget{nuweb42a}{} $\langle\,${\itshape Compute the length of the tour that currently services the visited sites}\nobreak\ {\footnotesize {42a}}$\,\rangle\equiv$
 \vspace{-1ex}
@@ -2479,7 +2629,11 @@ data for insertion.
 \end{list}
 \vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
 \vspace{-0.8cm}\newchunk 
+
+%{python-mode}%
 \begin{flushleft} \small\label{scrap49}\raggedright\small
 \NWtarget{nuweb42b}{} $\langle\,${\itshape Set up tracking variables local to this iteration}\nobreak\ {\footnotesize {42b}}$\,\rangle\equiv$
 \vspace{-1ex}
@@ -2497,7 +2651,11 @@ data for insertion.
 \end{list}
 \vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
 \vspace{-0.8cm}\newchunk 
+
+%{python-mode}%
 \begin{flushleft} \small\label{scrap50}\raggedright\small
 \NWtarget{nuweb42c}{} $\langle\,${\itshape If \texttt{self.sites[u]} is chosen for insertion, find best insertion position and update \texttt{delta\_increase\_least\_table}}\nobreak\ {\footnotesize {42c}}$\,\rangle\equiv$
 \vspace{-1ex}
@@ -2535,7 +2693,12 @@ data for insertion.
 \end{list}
 \vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
+
 \vspace{-0.8cm}\newchunk 
+
+%{python-mode}%
 \begin{flushleft} \small\label{scrap51}\raggedright\small
 \NWtarget{nuweb42d}{} $\langle\,${\itshape Find the unvisited site which on insertion increases tour-length by the least amount}\nobreak\ {\footnotesize {42d}}$\,\rangle\equiv$
 \vspace{-1ex}
@@ -2557,7 +2720,12 @@ data for insertion.
 \end{list}
 \vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
+
 \vspace{-0.8cm}\newchunk 
+
+%{python-mode}%
 \begin{flushleft} \small\label{scrap52}\raggedright\small
 \NWtarget{nuweb43}{} $\langle\,${\itshape Update states for \texttt{PolicyBestInsertionNaive}}\nobreak\ {\footnotesize {43}}$\,\rangle\equiv$
 \vspace{-1ex}
@@ -2586,6 +2754,7 @@ data for insertion.
 \end{list}
 \vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
 \newpage
 \section{Lower Bound: The $\varphi$-Prim-MST}  
 
@@ -2671,7 +2840,7 @@ each rendezvous point in the partially constructed MST, I will use the \verb|sci
 library (\url{https://scikit-learn.org/stable/modules/neighbors.html}). When porting 
 my codes to C\texttt{++}, I will probably have to switch over to the Boost Graph library and 
 David Mount's ANN for the same purposes(both these libraries have been optmized for speed). 
-
+%{python-mode}%
 \begin{flushleft} \small
 \begin{minipage}{\linewidth}\label{scrap53}\raggedright\small
 \NWtarget{nuweb45}{} $\langle\,${\itshape Lower bounds for classic horsefly}\nobreak\ {\footnotesize {45}}$\,\rangle\equiv$
@@ -2699,6 +2868,8 @@ David Mount's ANN for the same purposes(both these libraries have been optmized 
 \end{list}
 \end{minipage}\vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
 \begin{center}
 \missingfigure[figwidth=6cm]{animating-growth-of-phi-prim-mst}
 \end{center}
@@ -2714,7 +2885,7 @@ as a list of $x$,$y$ coordinates to \verb|compute_phi_prim_mst|.
 
 Storing these attributes will help later when we experiment with an algorithm where 
 we ``double''this MST
-
+%{python-mode}%
 \begin{flushleft} \small
 \begin{minipage}{\linewidth}\label{scrap54}\raggedright\small
 \NWtarget{nuweb46a}{} $\langle\,${\itshape Set \verb|phi_prim_mst| to the singleton graph, with node coordinates set at \verb|inithorseposn|}\nobreak\ {\footnotesize {46a}}$\,\rangle\equiv$
@@ -2735,7 +2906,10 @@ we ``double''this MST
 \end{list}
 \end{minipage}\vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
 \vspace{-0.8cm}\newchunk
+%{python-mode}%
 \begin{flushleft} \small
 \begin{minipage}{\linewidth}\label{scrap55}\raggedright\small
 \NWtarget{nuweb46b}{} $\langle\,${\itshape For each node in current $\varphi$-Prim-MST compute the closest unmarked site}\nobreak\ {\footnotesize {46b}}$\,\rangle\equiv$
@@ -2765,7 +2939,10 @@ we ``double''this MST
 \end{list}
 \end{minipage}\vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
 \vspace{-0.8cm}\newchunk
+%{python-mode}%
 \begin{flushleft} \small
 \begin{minipage}{\linewidth}\label{scrap56}\raggedright\small
 \NWtarget{nuweb46c}{} $\langle\,${\itshape Get the node $M^{*}$ with the closest unmarked site $S^{*}$ from the previous step}\nobreak\ {\footnotesize {46c}}$\,\rangle\equiv$
@@ -2784,7 +2961,10 @@ we ``double''this MST
 \end{list}
 \end{minipage}\vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
 \vspace{-0.8cm} \newchunk
+%{python-mode}%
 \begin{flushleft} \small
 \begin{minipage}{\linewidth}\label{scrap57}\raggedright\small
 \NWtarget{nuweb46d}{} $\langle\,${\itshape Compute the rendezvous point $R$ along $M^{*}S^{*}$}\nobreak\ {\footnotesize {46d}}$\,\rangle\equiv$
@@ -2803,7 +2983,10 @@ we ``double''this MST
 \end{list}
 \end{minipage}\vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
 \vspace{-0.8cm}\newchunk
+%{python-mode}%
 \begin{flushleft} \small
 \begin{minipage}{\linewidth}\label{scrap58}\raggedright\small
 \NWtarget{nuweb46e}{} $\langle\,${\itshape Mark site $S$, add node $R$ and edge $MR$ to the existing $\varphi$-Prim-MST}\nobreak\ {\footnotesize {46e}}$\,\rangle\equiv$
@@ -2822,6 +3005,7 @@ we ``double''this MST
 \end{list}
 \end{minipage}\vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
 \section{\framebox{Algorithm}: Doubling the $\varphi$-MST}  
 
 \subsection{Algorithmic Overview}
@@ -2848,6 +3032,7 @@ we ``double''this MST
 
    This is in other words the objective function. 
 
+%{python-mode}%
 \begin{flushleft} \small\label{scrap59}\raggedright\small
 \NWtarget{nuweb47}{} $\langle\,${\itshape Local utility functions for classic horsefly}\nobreak\ {\footnotesize {47}}$\,\rangle\equiv$
 \vspace{-1ex}
@@ -2881,12 +3066,16 @@ we ``double''this MST
 \end{list}
 \vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
+
 \vspace{-0.8cm}\newchunk It is possible that some heuristics might return non-negligible
       waiting times. Hence I am writing a separate function which
       adds the waiting time (if it is positive) to the length of 
       each link of the tour. Again note that because 
       speed of horse = 1, we can add ``time'' to ``distance''. 
 
+%{python-mode}%
 \begin{flushleft} \small\label{scrap60}\raggedright\small
 \NWtarget{nuweb48a}{} $\langle\,${\itshape Local utility functions for classic horsefly}\nobreak\ {\footnotesize {48a}}$\,\rangle\equiv$
 \vspace{-1ex}
@@ -2925,8 +3114,12 @@ we ``double''this MST
 \end{list}
 \vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
 \section{Plotting Routines}
 \newchunk 
+
+%{python-mode}%
 \begin{flushleft} \small\label{scrap61}\raggedright\small
 \NWtarget{nuweb48b}{} $\langle\,${\itshape Plotting routines for classic horsefly}\nobreak\ {\footnotesize {48b}}$\,\rangle\equiv$
 \vspace{-1ex}
@@ -3011,6 +3204,8 @@ we ``double''this MST
 \vspace{4ex}
 \end{flushleft}
 \newchunk 
+
+%{python-mode}%
 \begin{flushleft} \small\label{scrap62}\raggedright\small
 \NWtarget{nuweb50a}{} $\langle\,${\itshape Plotting routines for classic horsefly}\nobreak\ {\footnotesize {50a}}$\,\rangle\equiv$
 \vspace{-1ex}
@@ -3031,6 +3226,11 @@ we ``double''this MST
 \end{list}
 \vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
+
+
+
 \section{Animation routines}
 
 \newchunk 
@@ -3057,6 +3257,8 @@ been done by the scheudle itself.
 A site that has been unserviced is represented by a blue dot. 
 A site that has been serviced is represented by a yellow dot. 
    
+
+%{python-mode}%
 \begin{flushleft} \small
 \begin{minipage}{\linewidth}\label{scrap63}\raggedright\small
 \NWtarget{nuweb50b}{} $\langle\,${\itshape Animation routines for classic horsefly}\nobreak\ {\footnotesize {50b}}$\,\rangle\equiv$
@@ -3085,6 +3287,8 @@ A site that has been serviced is represented by a yellow dot.
 \end{list}
 \end{minipage}\vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
 \vspace{-0.8cm} \newchunk In the  animation, we are going to show the process of the fly delivering 
 packages to the sites according to the pre-computed schedule. Thus the canvas must reflect the 
 underlying euclidean space. For this, we need to set the bounding box of the \verb|Axes| object
@@ -3098,6 +3302,7 @@ We also use \LaTeX{} for typesetiing symbols and equations and the Computer Mode
 for text on the plot canvas. Unfortunately, Matplotlib's present default font for text 
 seems to be DejaVu Sans Mono, which isn't pretty for publications. 
 
+%{python-mode}%
 \begin{flushleft} \small
 \begin{minipage}{\linewidth}\label{scrap64}\raggedright\small
 \NWtarget{nuweb51a}{} $\langle\,${\itshape Set up configurations and parameters for animation and plotting}\nobreak\ {\footnotesize {51a}}$\,\rangle\equiv$
@@ -3137,6 +3342,10 @@ seems to be DejaVu Sans Mono, which isn't pretty for publications.
 \end{list}
 \end{minipage}\vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
+
+
 \vspace{-0.8cm} \newchunk In this chunk, by \verb|horse_leg| we mean the segment of a horse's 
 tour between two successive rendezvous points with a fly while a \verb|fly_leg| stands for 
 the part of a fly tour when the fly leaves the horse, reaches a site, and returns back to the horse. These
@@ -3145,6 +3354,7 @@ extracting the \verb|horse_legs| and \verb|fly_legs| of the horse and fly-tours 
 animating the horse and fly moving along each of their respective legs. 
 
 
+%{python-mode}%
 \begin{flushleft} \small\label{scrap65}\raggedright\small
 \NWtarget{nuweb51b}{} $\langle\,${\itshape Parse input-output file and set up required data-structures}\nobreak\ {\footnotesize {51b}}$\,\rangle\equiv$
 \vspace{-1ex}
@@ -3187,10 +3397,14 @@ animating the horse and fly moving along each of their respective legs.
 \end{list}
 \vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
+
 \vspace{-0.8cm} \newchunk The \verb|ims| array stores each frame of the animation. Every frame consists of 
 various ``artist'' objects \footnote{This is Matplotlib terminology} (e.g. circles and segments) which change dynamically as the positions of the horse 
 and flies change. 
 
+%{python-mode}%
 \begin{flushleft} \small
 \begin{minipage}{\linewidth}\label{scrap66}\raggedright\small
 \NWtarget{nuweb52a}{} $\langle\,${\itshape Construct and store every frame of the animation in \verb|ims|}\nobreak\ {\footnotesize {52a}}$\,\rangle\equiv$
@@ -3232,6 +3446,10 @@ and flies change.
 \end{list}
 \end{minipage}\vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
+
+
 \vspace{-0.8cm} \newchunk While rendering the horse and fly tours we need to keep track of the horse and 
 fly-legs and sites that have been serviced so far.  
 
@@ -3247,6 +3465,7 @@ While iterating through all the sublegs of the current fly-leg, we need to keep 
 job of the \verb|if subleg_idx==9| block in the code-fragment below. The magic-number  ``9'' is related to the 10 and 19 constants from the 
 \verb|discretize_leg| function defined later in \autoref{subsec-discretize-leg}. 
 
+%{python-mode}%
 \begin{flushleft} \small\label{scrap67}\raggedright\small
 \NWtarget{nuweb52b}{} $\langle\,${\itshape Render frame and append it to \verb|ims|}\nobreak\ {\footnotesize {52b}}$\,\rangle\equiv$
 \vspace{-1ex}
@@ -3300,6 +3519,9 @@ job of the \verb|if subleg_idx==9| block in the code-fragment below. The magic-n
 \end{list}
 \vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
+
 \vspace{-0.8cm} \newchunk \label{subsec-discretize-leg}
 The numbers 19 and 10 to discretize the horse and fly legs have been 
 arbitrarily chosen. These seem to work well for giving smooth real-time animation. 
@@ -3320,6 +3542,7 @@ since each of the two segments are being discretized with \verb|np.linspace|, we
 to make sure that the site corresponding to the fly-leg is not counted twice, which
 explains the odd-looking \verb|subleg_pts.extend(tmp[:-1])| statement in the code-fragment below. 
 
+%{python-mode}%
 \begin{flushleft} \small
 \begin{minipage}{\linewidth}\label{scrap68}\raggedright\small
 \NWtarget{nuweb54a}{} $\langle\,${\itshape Define function to place points along a leg}\nobreak\ {\footnotesize {54a}}$\,\rangle\equiv$
@@ -3354,7 +3577,12 @@ explains the odd-looking \verb|subleg_pts.extend(tmp[:-1])| statement in the cod
 \end{list}
 \end{minipage}\vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
 \vspace{-0.8cm} \newchunk
+
+
+%{python-mode}%
 \begin{flushleft} \small\label{scrap69}\raggedright\small
 \NWtarget{nuweb54b}{} $\langle\,${\itshape Write animation of schedule to disk and display in live window}\nobreak\ {\footnotesize {54b}}$\,\rangle\equiv$
 \vspace{-1ex}
@@ -3381,6 +3609,8 @@ explains the odd-looking \verb|subleg_pts.extend(tmp[:-1])| statement in the cod
 \end{list}
 \vspace{4ex}
 \end{flushleft}
+%{/python-mode}%
+
 \section{Chapter Index of Fragments}
 
 {\small\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
@@ -3429,7 +3659,7 @@ explains the odd-looking \verb|subleg_pts.extend(tmp[:-1])| statement in the cod
 \item $\langle\,$Start entering input from the command-line\nobreak\ {\footnotesize \NWlink{nuweb22c}{22c}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb22b}{22b}.}
 \item $\langle\,$Update states for \texttt{PolicyBestInsertionNaive}\nobreak\ {\footnotesize \NWlink{nuweb43}{43}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb41b}{41b}.}
 \item $\langle\,$Use insertion policy to find the cheapest site to insert into current tour\nobreak\ {\footnotesize \NWlink{nuweb34b}{34b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb33a}{33a}.}
-\item $\langle\,$Write algorithm's current state to file\nobreak\ {\footnotesize \NWlink{nuweb35a}{35a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb33a}{33a}.}
+\item $\langle\,$Write algorithms current state to file\nobreak\ {\footnotesize \NWlink{nuweb35a}{35a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb33a}{33a}.}
 \item $\langle\,$Write animation of schedule to disk and display in live window\nobreak\ {\footnotesize \NWlink{nuweb54b}{54b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb50b}{50b}.}
 \item $\langle\,$Write image file\nobreak\ {\footnotesize \NWlink{nuweb37e}{37e}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb35b}{35b}.}
 \item $\langle\,$Write input and output to file\nobreak\ {\footnotesize \NWlink{nuweb38a}{38a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb33a}{33a}.}

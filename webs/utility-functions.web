@@ -31,6 +31,7 @@ aspect ratio of the axes object the same i.e. 1.0. Since Matplotlib is principal
 a plotting software, this is not the default behavior, since scales on the x and y 
 axes are adjusted according to the data to be plotted. 
 
+%{python-mode}%
 @O ../src/lib/utils_graphics.py -cp
 @{
 
@@ -58,10 +59,12 @@ def applyAxCorrection(ax):
       ax.set_ylim([ylim[0], ylim[1]])
       ax.set_aspect(1.0)
 @}
+%{/python-mode}%
 
 \newchunk Next, given an axes object (i.e. a drawing area on a figure object) we need a function
 to delete and remove all the graphical objects drawn on it. 
 
+%{python-mode}%
 @O ../src/lib/utils_graphics.py -cp
 @{
 def clearPatches(ax):
@@ -80,11 +83,13 @@ def clearPatches(ax):
     applyAxCorrection(ax)
 @}
 
+%{/python-mode}%
 \newchunk Now remove the patches which were rendered for each cluster
     Unfortunately, this step has to be done manually, the canvas patch
     of a cluster and the corresponding object in memory are not reactively
     connected.I presume, this behavioue can be achieved by sub-classing.
 
+%{python-mode}%
 @O ../src/lib/utils_graphics.py -cp
 @{
 def clearAxPolygonPatches(ax):
@@ -106,6 +111,7 @@ def clearAxPolygonPatches(ax):
     applyAxCorrection(ax)
 @}
 
+%{/python-mode}%
 \newchunk Now for one of the most important routines for drawing on the canvas! 
 To insert the sites, we double-click the left mouse button and to insert the 
 initial position of the horse and fly we double-click the right mouse-button. 
@@ -113,6 +119,7 @@ initial position of the horse and fly we double-click the right mouse-button.
 Note that the left mouse-button corresponds to button 1 and right mouse button
 to button 3 in the code-fragment below. 
 
+%{python-mode}%
 @O ../src/lib/utils_graphics.py -cp
 @{
 ## Also modify to enter initial position of horse and fly
@@ -170,6 +177,7 @@ def wrapperEnterRunPoints(fig, ax, run):
     return _enterPoints
 @|  @}
 
+%{/python-mode}%
 
 
 \section{Algorithmic Utilities}
@@ -179,6 +187,7 @@ def wrapperEnterRunPoints(fig, ax, run):
     i.e. it converts the list of points into a consecutive list of numpy vectors. 
     Points should be lists or tuples of length 2
 
+%{python-mode}%
 @O ../src/lib/utils_algo.py -cp
 @{
 import numpy as np
@@ -203,10 +212,12 @@ def vector_chain_from_point_list(pts):
     return vec_chain
 @}
 
+%{/python-mode}%
 
 \newchunk Given a polygonal chain, an important computation is to calculate 
 its length. Typically used for computing the length of the horse's and fly's tours. 
 
+%{python-mode}%
 @O ../src/lib/utils_algo.py -cp
 @{
 def length_polygonal_chain(pts):
@@ -226,11 +237,13 @@ def length_polygonal_chain(pts):
     return acc
 @}
 
+%{/python-mode}%
 \newchunk The following routine is useful on long lists returned from external solvers. 
 Often point-data is given to and returned from these external routines in flattened
 form. The following routines are needed to convert such a ``flattened'' list into 
 a list of points and vice versa. 
 
+%{python-mode}%
 @O ../src/lib/utils_algo.py -cp
 @{
 def pointify_vector (x):
@@ -254,9 +267,11 @@ def flatten_list_of_lists(l):
 
 @}
 
+%{/python-mode}%
 \newchunk Python's default print function prints each list on a single line. For 
 debugging purposes,  it helps to print a list with one item per line. 
 
+%{python-mode}%
 @O ../src/lib/utils_algo.py -cp
 @{
 def print_list(xs):
@@ -266,8 +281,10 @@ def print_list(xs):
         print x
 @}
 
+%{/python-mode}%
 \newchunk The following routines are self-explanatory and are hence gathered into one chunk. 
 
+%{python-mode}%
 @O ../src/lib/utils_algo.py -cp
 @{
 def partial_sums( xs ):
@@ -337,5 +354,4 @@ def bunch_of_random_points(numpts):
     return points
 
 @}
-
-
+%{/python-mode}%

@@ -661,7 +661,7 @@ def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
          insertion_policy.insert_another_unvisited_site()
          debug(Fore.GREEN + "Inserted another unvisited site" + Style.RESET_ALL)
          
-         # Write algorithms current state to file
+         # Write algorithm's current state to file
          if write_algo_states_to_disk_p:
               import yaml
               algo_state_file_name = 'algo_state_'                    + \
@@ -834,37 +834,84 @@ def compute_phi_prim_mst(sites, inithorseposn,phi):
 
      import networkx as nx
      from sklearn.neighbors import NearestNeighbors
-     # Set \verb|phi_prim_mst| to the singleton graph, with node coordinates set at \verb|inithorseposn|
      
      info("Creating singleton graph")
-     phi_prim_mst = nx.Graph()
-     phi_prim_mst.add_node(0, coordinates=inithorseposn)
-     
+     G = nx.Graph()
+     G.add_node(0, mycoordinates=inithorseposn, joined_site_coords=[])
 
      unmarked_sites_idxs = range(len(sites))
+     
+     # Iterate till all sites are marked
      while unmarked_sites_idxs:
-          # For each node in current $\varphi$-Prim-MST compute the closest unmarked site
-          
-          for n in phi_prim_mst.nodes:
 
-               print n, phi_prim_mst[n]
-               #distances_to_sites = []
-               #for i in unmarked_sites_idxs:
-                    #sc, nc = map (np.asarray, [sites[i], phi_prim_mst[n]['coordinates']]) # the c in sc and nc means 'coordinates'
-                    #dist =  np.linalg.norm(sc-nc)
-                    #print dist
-                    #distances_to_sites.append( (i, dist) )
-               #nsidx, nsc = min(distances_to_sites, key=lambda (_, d): d )
-               #print nsidx, nsc
-          sys.exit()
+          print Fore.YELLOW, utils_algo.print_list(G.nodes.data()), Style.RESET_ALL
           
-          # Get the node $M^{*}$ with the closest unmarked site $S^{*}$ from the previous step
-             
-          pass
+          # For each node in the tree, this stores a tuple consisting of
+          # 1. a node-id (this corresponds to a rendezvous point in the tree)
+          # 2. the index of the closest site in the array sites for the node (the site)
+          # 3. distance of the node to the site with the above index.
+          # this most important data-structure in this information
+          node_site_info = []
           
+          for nodeid, nodeval in G.nodes.data():
+               current_node_coordinates = np.asarray(nodeval['mycoordinates'])
+               distances_of_current_node_to_sites = []
 
+               #print Fore.YELLOW, ".....Processing node : ", nodeid, " which has coordinates ", current_node_coordinates,\Style.RESET_ALL
+               
+               # The following loop finds the nearest unmarked site. So far, I am 
+               # using brute force for this, later, I will use sklearn.neighbors.
+               for j in unmarked_sites_idxs:
+                    site_coordinates = np.asarray(sites[j])
+                    dist   =  np.linalg.norm( site_coordinates - current_node_coordinates )
 
-     return phi_prim_mst
+                    #print Fore.GREEN,  "..........Distance to unmarked site : ", j, " which has coordinates ", site_coordinates, "is ", dist, Style.RESET_ALL
+
+                    distances_of_current_node_to_sites.append( (j, dist) )
+
+               nearest_site_idx, distance_of_current_node_to_nearest_site = min(distances_of_current_node_to_sites, key=lambda (_, d): d)
+               node_site_info.append((nodeid, nearest_site_idx, distance_of_current_node_to_nearest_site))
+               
+          opt_node_idx, next_site_to_mark_idx, distance_to_next_site_to_mark = min(node_site_info, key=lambda (h,k,d) : d)
+
+          #------------------------------------------------
+          # Get some information about what just happened. 
+          #------------------------------------------------
+          print " "
+          print G.nodes.data()
+          print "Rendezvous node idx ", opt_node_idx
+          print "--------------------------------------------"
+          print "Id of next site to mark: ", next_site_to_mark_idx,       \
+                "\nSite coordinates:      ", sites[next_site_to_mark_idx],\
+                "\nDistance to that site: ", distance_to_next_site_to_mark
+          #-------------------------------
+          # Graph augmentation step
+          # Add rendezvous node to G
+          #------------------------------
+          
+          tmp = sites[next_site_to_mark_idx]
+          G.nodes[opt_node_idx]['joined_site_coords'].append(  tmp   ) 
+          (r, h) = single_site_solution(tmp, \
+                                        G.nodes[opt_node_idx]['mycoordinates'],\
+                                        phi) 
+          
+          # remember! indexing of nodes started at 0, that's why you set
+          # numnodes to the index of the newly inserted node. 
+          newnodeid = len(list(G.nodes))
+          G.add_node(newnodeid, mycoordinates=r, joined_site_coords=[]) # Joined_site_coords will be updated in the future iterations of `while` for this node
+          G.add_edge(opt_node_idx, newnodeid, weight=h )                # Insert the edge weight, will be useful later when computing sum total of all the 
+                                                                        # edges for computing the tree weight
+          #------------------------------------------------
+          # Unmarking step
+          # Marking means removing from unmarked list :-D
+          #------------------------------------------------
+          unmarked_sites_idxs.remove(next_site_to_mark_idx)
+          
+     print "\nThis is what I computed"
+     utils_algo.print_list(G.nodes.data())
+     print "    "
+     utils_algo.print_list(G.edges.data())
+     return G
 
 # Plotting routines for classic horsefly
 def plotTour(ax,horseflytour, horseflyinit, phi, algo_str, tour_color='#d13131'):
@@ -936,7 +983,12 @@ def plotTour(ax,horseflytour, horseflyinit, phi, algo_str, tour_color='#d13131')
                   fontdict={'fontsize':fontsize}, **tnrfont)
 
 def draw_phi_mst(ax, phi_mst, inithorseposn, phi):
-     print "Yay! Drawing the tree!"
+     print "This is what was passed to me"
+     print "\n......This is what I computed"
+     utils_algo.print_list(G.nodes.data())
+     print "    "
+     utils_algo.print_list(G.edges.data())
+
      sys.exit()
 
 # Animation routines for classic horsefly
@@ -1099,5 +1151,3 @@ def animateSchedule(schedule_file_name):
      debug(Fore.MAGENTA + "\nStarted writing animation to disk"+ Style.RESET_ALL)
      ani.save(schedule_file_name+'.avi', dpi=250)
      debug(Fore.MAGENTA + "\nFinished writing animation to disk"+ Style.RESET_ALL)
-     
-

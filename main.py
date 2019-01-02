@@ -1,5 +1,5 @@
 
-# Turn off Matplotlib's irritating DEBUG messages
+# Turn off Matplotlibs irritating DEBUG messages
 import logging
 mpl_logger = logging.getLogger('matplotlib')
 mpl_logger.setLevel(logging.WARNING)

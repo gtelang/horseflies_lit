@@ -45,6 +45,7 @@ as a kind of main function for this module. It is called from
 \verb|main.py| to process the command-line arguments and run the 
 experimental or interactive sections of the code. 
 
+%{python-mode}%
 @O ../src/lib/problem_classic_horsefly.py -cp
 @{    
 @< Relevant imports for classic horsefly @>
@@ -60,10 +61,13 @@ def run_handler():
 @< Plotting routines for classic horsefly @>
 @< Animation routines for classic horsefly @>
 @| @}
+%{/python-mode}%
 
 \section{Module Details}
 
 \newchunk 
+
+%{python-mode}%
 @D Relevant imports for classic horsefly
 @{
 from matplotlib import rc
@@ -87,10 +91,13 @@ import time
 import utils_algo
 import utils_graphics
 @| @}
+%{/python-mode}%
+
 \vspace{-0.8cm}\newchunk The logger variable becomes becomes global in scope to this module. This allows
 me to write customized \texttt{debug} and \texttt{info} functions that let's me format 
 the log messages according to the frame level. I learned this trick from the following 
 Stack Overflow post \url{https://stackoverflow.com/a/5500099/505306}. 
+%{python-mode}%
 
 @d  Set up logging information relevant to this module 
 @{logger=logging.getLogger(__name__)
@@ -112,6 +119,7 @@ def info(msg):
     logger.info('{i} [{m}]'.format(
         i='.'*indentation_level, m=msg))
 @| @}
+%{/python-mode}%
 
 \vspace{-0.8cm}\newchunk The key-press handler function detects the keys pressed by the user when the canvas
 is in active focus. This function allows you to set some of the input parameters like 
@@ -119,6 +127,7 @@ speed ratio $\varphi$, or selecting an algorithm interactively at the command-li
 generating a bunch of uniform or non-uniformly distributed points on the canvas, 
 or just plain clearing the canvas for inserting a fresh input set of points. 
 
+%{python-mode}%
 @d Define key-press handler
 @{   
 # The key-stack argument is mutable! I am using this hack to my advantage.
@@ -132,8 +141,12 @@ def wrapperkeyPressHandler(fig,ax, run):
                 @< Clear canvas and states of all objects @>
        return _keyPressHandler
 @| wrapperkeyPressHandler @}
+%{/python-mode}%
 
 \vspace{-0.8cm}\newchunk 
+
+%{python-mode}%
+
 @D Start entering input from the command-line
 @{phi_str = raw_input(Fore.YELLOW + \
           "Enter speed of fly (should be >1): " +\
@@ -220,6 +233,7 @@ elif input_str == 'phi-mst':
 utils_graphics.applyAxCorrection(ax)
 fig.canvas.draw()
 @| @}
+%{/python-mode}%
 
 \vspace{-0.8cm}\newchunk This chunk generates points uniformly or non-uniformly distributed in the 
 unit square $[0,1]^2$ in the Matplotlib canvas. I will document the schemes used for 
@@ -228,6 +242,7 @@ the horsefly algorithms. Uniform point clouds do no highlight the weaknesses of
 sequencing algorithms as David Johnson implies in his article on how to write 
 experimental algorithm papers when he talks about algorithms for the TSP. 
 
+%{python-mode}%
 @D  Generate a bunch of uniform or non-uniform random points on the canvas
 @{numpts = int(raw_input("\n" + Fore.YELLOW+\
                        "How many points should I generate?: "+\
@@ -256,9 +271,12 @@ for site in run.sites:
 ax.set_title('Points : ' + str(len(run.sites)), fontdict={'fontsize':40})
 fig.canvas.draw()
 @| @}
+%{/python-mode}%
 
 \vspace{-0.8cm}\newchunk 
 
+
+%{python-mode}%
 @D Clear canvas and states of all objects
 @{run.clearAllStates()
 ax.cla()
@@ -270,7 +288,9 @@ ax.set_yticks([])
 fig.texts = []
 fig.canvas.draw()
 @| @}
+%{/python-mode}%
 
+%{python-mode}%
 \vspace{-0.8cm}\newchunk 
 @D Set up interactive canvas
 @{fig, ax =  plt.subplots()
@@ -290,6 +310,7 @@ keyPress     = wrapperkeyPressHandler(fig,ax, run)
 fig.canvas.mpl_connect('key_press_event', keyPress   )
 plt.show()
 @| @}
+%{/python-mode}%
 
 
 
@@ -298,6 +319,7 @@ plt.show()
 \newchunk This class manages the input and the output of the result of 
 calling various horsefly algorithms. 
 
+%{python-mode}%
 @D Local data-structures for classic horsefly
 @{class HorseFlyInput:
       def __init__(self, sites=[], inithorseposn=()):
@@ -357,6 +379,7 @@ calling various horsefly algorithms.
               
           return sites + inithorseposn
 @| HorseFlyInput @}
+%{/python-mode}%
 
 
 Now that all the boring boiler-plate and handler codes have been 
@@ -390,6 +413,7 @@ are collected at the end of this chapter.
 
    This is in other words the objective function. 
 
+%{python-mode}%
 @D Local utility functions for classic horsefly
 @{def tour_length(horseflyinit):
    def _tourlength (x):
@@ -409,6 +433,7 @@ are collected at the end of this chapter.
 
    return _tourlength
 @| tour_length @}
+%{/python-mode}%
 
 
 \vspace{-0.8cm}\newchunk It is possible that some heuristics might return non-negligible
@@ -417,6 +442,7 @@ are collected at the end of this chapter.
       each link of the tour. Again note that because 
       speed of horse = 1, we can add ``time'' to ``distance''. 
 
+%{python-mode}%
 @D Local utility functions for classic horsefly
 @{def tour_length_with_waiting_time_included(tour_points, horse_waiting_times, horseflyinit):
       tour_points   = np.asarray([horseflyinit] + tour_points)
@@ -441,9 +467,12 @@ are collected at the end of this chapter.
           sum += wait + np.linalg.norm(tour_links[i][0] - tour_links[i][1], ord=2) # 
       return sum
 @| tour_length_with_waiting_time_included @}
+%{/python-mode}%
 
 \section{Plotting Routines}
 \newchunk 
+
+%{python-mode}%
 @D Plotting routines for classic horsefly 
 @{def plotTour(ax,horseflytour, horseflyinit, phi, algo_str, tour_color='#d13131'):
    
@@ -516,11 +545,14 @@ are collected at the end of this chapter.
 
 
 \newchunk 
+
+%{python-mode}%
 @D Plotting routines for classic horsefly @{
 def draw_phi_mst(ax, phi_mst, inithorseposn, phi):
      print "Yay! Drawing the tree!"
      sys.exit()
 @}
+%{/python-mode}%
 
 
 
@@ -551,6 +583,8 @@ been done by the scheudle itself.
 A site that has been unserviced is represented by a blue dot. 
 A site that has been serviced is represented by a yellow dot. 
    
+
+%{python-mode}%
 @d Animation routines for classic horsefly@{
 def animateSchedule(schedule_file_name):
      import yaml
@@ -564,6 +598,7 @@ def animateSchedule(schedule_file_name):
      @<Construct and store every frame of the animation in \verb|ims| @>
      @<Write animation of schedule to disk and display in live window@>
 @|  @}
+%{/python-mode}%
 
 \vspace{-0.8cm} \newchunk In the  animation, we are going to show the process of the fly delivering 
 packages to the sites according to the pre-computed schedule. Thus the canvas must reflect the 
@@ -578,6 +613,7 @@ We also use \LaTeX{} for typesetiing symbols and equations and the Computer Mode
 for text on the plot canvas. Unfortunately, Matplotlib's present default font for text 
 seems to be DejaVu Sans Mono, which isn't pretty for publications. 
 
+%{python-mode}%
 @d Set up configurations and parameters for animation and plotting@{
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
@@ -602,6 +638,7 @@ ax.grid(which='minor', linestyle=':', linewidth='0.3', color='black')
 ax.get_xaxis().set_ticklabels([])
 ax.get_yaxis().set_ticklabels([])
 @| @}
+%{/python-mode}%
 
 
 
@@ -613,6 +650,7 @@ extracting the \verb|horse_legs| and \verb|fly_legs| of the horse and fly-tours 
 animating the horse and fly moving along each of their respective legs. 
 
 
+%{python-mode}%
 @D Parse input-output file and set up required data-structures @{   
 with open(schedule_file_name, 'r') as stream:
       schedule = yaml.load(stream)
@@ -641,12 +679,14 @@ fly_legs   = zip(fly_tour, fly_tour[1:], fly_tour[2:]) [0::2]
 
 assert(len(horse_legs) == len(fly_legs))
 @| @}
+%{/python-mode}%
 
 
 \vspace{-0.8cm} \newchunk The \verb|ims| array stores each frame of the animation. Every frame consists of 
 various ``artist'' objects \footnote{This is Matplotlib terminology} (e.g. circles and segments) which change dynamically as the positions of the horse 
 and flies change. 
 
+%{python-mode}%
 @d Construct and store every frame of the animation in \verb|ims|
 @{ims = []
 for horse_leg, fly_leg, leg_idx in zip(horse_legs, \
@@ -674,6 +714,7 @@ for horse_leg, fly_leg, leg_idx in zip(horse_legs, \
                                                  range(len(horse_posns))):
           @<Render frame and append it to \verb|ims|@>
 @| number_of_sites_serviced @}
+%{/python-mode}%
 
 
 
@@ -692,6 +733,7 @@ While iterating through all the sublegs of the current fly-leg, we need to keep 
 job of the \verb|if subleg_idx==9| block in the code-fragment below. The magic-number  ``9'' is related to the 10 and 19 constants from the 
 \verb|discretize_leg| function defined later in \autoref{subsec-discretize-leg}. 
 
+%{python-mode}%
 @D Render frame and append it to \verb|ims| @{   
 debug(Fore.RED + "Rendering subleg "+ str(subleg_idx) + Style.RESET_ALL)
 hxs1 = hxs + [horse_posn[0]]
@@ -731,6 +773,7 @@ for site, j in zip(sites, range(len(sites))):
 debug(Fore.CYAN + "Appending to ims "+ Style.RESET_ALL)
 ims.append(objs[::-1])
 @| @}
+%{/python-mode}%
 
 
 \vspace{-0.8cm} \newchunk \label{subsec-discretize-leg}
@@ -753,6 +796,7 @@ since each of the two segments are being discretized with \verb|np.linspace|, we
 to make sure that the site corresponding to the fly-leg is not counted twice, which
 explains the odd-looking \verb|subleg_pts.extend(tmp[:-1])| statement in the code-fragment below. 
 
+%{python-mode}%
 @d Define function to place points along a leg @{   
 def discretize_leg(pts):
    subleg_pts = []
@@ -772,8 +816,12 @@ def discretize_leg(pts):
    subleg_pts.append(pts[-1])
    return subleg_pts
 @| @}
+%{/python-mode}%
 
 \vspace{-0.8cm} \newchunk
+
+
+%{python-mode}%
 @D Write animation of schedule to disk and display in live window
 @{from colorama import Back 
 
@@ -787,6 +835,7 @@ debug(Fore.MAGENTA + "\nStarted writing animation to disk"+ Style.RESET_ALL)
 ani.save(schedule_file_name+'.avi', dpi=250)
 debug(Fore.MAGENTA + "\nFinished writing animation to disk"+ Style.RESET_ALL)
 @| @}
+%{/python-mode}%
 
 \section{Chapter Index of Fragments}
 @m

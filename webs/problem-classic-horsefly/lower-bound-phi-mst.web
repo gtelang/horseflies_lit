@@ -83,7 +83,7 @@ each rendezvous point in the partially constructed MST, I will use the \verb|sci
 library (\url{https://scikit-learn.org/stable/modules/neighbors.html}). When porting 
 my codes to C\texttt{++}, I will probably have to switch over to the Boost Graph library and 
 David Mount's ANN for the same purposes(both these libraries have been optmized for speed). 
-
+%{python-mode}%
 @d Lower bounds for classic horsefly 
 @{def compute_phi_prim_mst(sites, inithorseposn,phi):
 
@@ -99,6 +99,7 @@ David Mount's ANN for the same purposes(both these libraries have been optmized 
 @%          @<Mark site $S$, add node $R$ and edge $MR$ to the existing $\varphi$-Prim-MST@>
      return phi_prim_mst
 @| unmarked_sites_idxs @}
+%{/python-mode}%
 
 \begin{center}
 \missingfigure[figwidth=6cm]{animating-growth-of-phi-prim-mst}
@@ -115,14 +116,16 @@ as a list of $x$,$y$ coordinates to \verb|compute_phi_prim_mst|.
 
 Storing these attributes will help later when we experiment with an algorithm where 
 we ``double''this MST
-
+%{python-mode}%
 @d Set \verb|phi_prim_mst| to the singleton graph, with node coordinates set at \verb|inithorseposn|@{
 info("Creating singleton graph")
 phi_prim_mst = nx.Graph()
 phi_prim_mst.add_node(0, coordinates=inithorseposn)
 @| @}
+%{/python-mode}%
 
 \vspace{-0.8cm}\newchunk
+%{python-mode}%
 @d For each node in current $\varphi$-Prim-MST compute the closest unmarked site @{
 for n in phi_prim_mst.nodes:
 
@@ -137,18 +140,25 @@ for n in phi_prim_mst.nodes:
      #print nsidx, nsc
 sys.exit()
 @| @}
+%{/python-mode}%
 
 \vspace{-0.8cm}\newchunk
+%{python-mode}%
 @d Get the node $M^{*}$ with the closest unmarked site $S^{*}$ from the previous step@{   
 pass
 @| @}
+%{/python-mode}%
 
 \vspace{-0.8cm} \newchunk
+%{python-mode}%
 @d Compute the rendezvous point $R$ along $M^{*}S^{*}$ @{   
 pass
 @| @}
+%{/python-mode}%
 
 \vspace{-0.8cm}\newchunk
+%{python-mode}%
 @d Mark site $S$, add node $R$ and edge $MR$ to the existing $\varphi$-Prim-MST @{   
 pass
 @| @}
+%{/python-mode}%

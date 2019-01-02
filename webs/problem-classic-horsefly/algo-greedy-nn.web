@@ -21,8 +21,9 @@ We can show that an optimal (unrestricted) horsfly solution can be converted
 to a collinear-horsefly solution at a constant factor increase in the makespan. 
 
 \subsection{Algorithmic Details}
-@D Algorithms for classic horsefly 
-@{   
+
+%{python-mode}%
+@D Algorithms for classic horsefly @{   
 def algo_greedy(sites, inithorseposn, phi, post_optimizer):
       """
       This implements the greedy algorithm for the canonical greedy
@@ -90,9 +91,11 @@ def algo_greedy(sites, inithorseposn, phi, post_optimizer):
       return answer
 @| @}
 
+%{/python-mode}%
 
 \newchunk 
 
+%{python-mode}%
 @D Algorithms for classic horsefly 
 @{
 # ALGORITHMS FOR SINGLE HORSE SINGLE FLY SERVICING THE SITES IN THE GIVEN ORDER
@@ -200,3 +203,5 @@ def algo_exact_given_specific_ordering (sites, horseflyinit, phi):
                                                     horseflyinit)}
    
 @| algo_exact_given_specific_ordering @}
+
+%{/python-mode}%

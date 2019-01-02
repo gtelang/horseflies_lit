@@ -82,8 +82,9 @@ does house-keeping duties by parsing the command-line arguments passed by main,
 setting up the canvas by calling the appropriate graphics routines and calling 
 the algorithms on the input specified through the canvas. 
 
+%{python-mode}%
 @o ../main.py -cp @{
-@<Turn off Matplotlib's irritating DEBUG messages@>
+@<Turn off Matplotlibs irritating DEBUG messages@>
 @<Import problem module files@>
 
 if __name__=="__main__":
@@ -105,6 +106,7 @@ if __name__=="__main__":
           print "Option not recognized"
           sys.exit()
 @| @}
+%{/python-mode}%
 
 \newchunk On my customized Ubuntu container, Matplotlib produces tons of DEBUG log messages because  
 it recently switched to the \verb|logging| library for...well...logging. 
@@ -112,12 +114,15 @@ The lines in this chunk were suggested by the link \url{http://matplotlib.106922
 for quietening down Matplotlib.  
 
 
-@d Turn off Matplotlib's irritating DEBUG messages 
+%{python-mode}%
+@d Turn off Matplotlibs irritating DEBUG messages 
 @{import logging
 mpl_logger = logging.getLogger('matplotlib')
 mpl_logger.setLevel(logging.WARNING)
 @| @}
+%{/python-mode}%
 
+%{python-mode}%
 @d Import problem module files @{   
 import sys
 sys.path.append('src/lib')
@@ -126,6 +131,7 @@ import problem_classic_horsefly as chf
 #import problem_one_horse_two_flies as oh2f
 @| @}
 
+%{/python-mode}%
 \section{Support Files}
 
 \begin{alphalist}
