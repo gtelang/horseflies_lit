@@ -277,185 +277,125 @@ def tour_length_with_waiting_time_included(tour_points, horse_waiting_times, hor
 # Algorithms for classic horsefly
    
 def algo_dumb(sites, horseflyinit, phi):
-    """ For each of the n factorial ordering of sites
-    find the ordering which gives the smallest horsefly 
-    tour length
-    """
-    
+      
     tour_length_fn = tour_length(horseflyinit)
+    best_tour      = algo_exact_given_specific_ordering(sites, horseflyinit, phi)
+    i              = 0
 
-    best_tour = algo_exact_given_specific_ordering(sites, horseflyinit, phi)
-
-    i = 0
     for sites_perm in list(itertools.permutations(sites)):
+
         print "Testing a new permutation ", i, " of the sites"; i = i + 1
-          
-        #tour_for_current_perm = algo_exact_given_specific_ordering (sites_perm, \
-        #                                                             horseflyinit, phi) 
-        tour_for_current_perm = algo_exact_given_specific_ordering (sites_perm, \
-                                                                    horseflyinit, phi) 
+        tour_for_current_perm = algo_exact_given_specific_ordering (sites_perm, horseflyinit, phi) 
+
         if tour_length_fn(utils_algo.flatten_list_of_lists(tour_for_current_perm ['tour_points']) ) \
          < tour_length_fn(utils_algo.flatten_list_of_lists(            best_tour ['tour_points']) ):
+
                 best_tour = tour_for_current_perm
-                
                 print Fore.RED + "Found better tour!" + Style.RESET_ALL
 
-    #print Fore.RED + "\nHorse Waiting times are ",\ 
-    #       best_tour['horse_waiting_times'] , \
-    #       Style.RESET_ALL
+    #print Fore.RED + "\nHorse Waiting times are ", best_tour['horse_waiting_times'] , Style.RESET_ALL
     return best_tour
-
    
 def algo_greedy(sites, inithorseposn, phi, post_optimizer):
-      """
-      This implements the greedy algorithm for the canonical greedy
-      algorithm for collinear horsefly, and then uses the ordering 
-      obtained to get the exact tour for that given ordering.
-      
-      Many variations on this are possible. However, this algorithm
-      is simple and may be more amenable to theoretical analysis. 
-      
-      We will need an inequality for collapsing chains however. 
-      """
+
+      # Define function \verb|next_rendezvous_point_for_horse_and_fly|
+         
       def next_rendezvous_point_for_horse_and_fly(horseposn, site):
-            """
-            Just use the exact solution when there is a single site. 
-            No need to use the collinear horse formula which you can 
-            explicitly derive. That formula is  an important super-special 
-            case however to benchmark quality of solution. 
-            """
 
-            horseflytour = algo_exact_given_specific_ordering([site], horseposn, phi)
-            return horseflytour['tour_points'][-1]
+           horseflytour = algo_exact_given_specific_ordering([site], horseposn, phi)
+           return horseflytour['tour_points'][-1]
       
-      # Begin the recursion process where for a given initial
-      # position of horse and fly and a given collection of sites
-      # you find the nearst neighbor proceed according to segment
-      # horsefly formula for just and one site, and for the new
-      # position repeat the process for the remaining list of sites. 
-      # The greedy approach can be extended to by finding the k
-      # nearest neighbors, constructing the exact horsefly tour
-      # there, at the exit point, you repeat by taking k nearest
-      # neighbors and so on. 
+      # Define function \verb|greedy|
+         
       def greedy(current_horse_posn, remaining_sites):
-            if len(remaining_sites) == 1:
-                  return remaining_sites
-            else:
-                  # For reference see this link on how nn queries are performed. 
-                  # https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.KDTree.query.html
-                  # Warning this is inefficient!!! I am rebuilding the 
-                  # kd-tree at each step. Right now, I am only doing 
-                  # this for convenience.
-                  from scipy import spatial
-                  tree = spatial.KDTree(remaining_sites)
 
-                  # The next site to get serviced by the drone and horse
-                  # is the one which is closest to the current position of the
-                  # horse. 
-                  pts           = np.array([current_horse_posn])
-                  query_result  = tree.query(pts)
-                  next_site_idx = query_result[1][0]
-                  next_site     = remaining_sites[next_site_idx]
+          if len(remaining_sites) == 1:
+                return remaining_sites
+          else:
+                from scipy import spatial
+                tree          = spatial.KDTree(remaining_sites)
+                pts           = np.array([current_horse_posn])
+                query_result  = tree.query(pts)
+                next_site_idx = query_result[1][0]
+                next_site     = remaining_sites[next_site_idx]
 
-                  next_horse_posn = \
-                        next_rendezvous_point_for_horse_and_fly(current_horse_posn, next_site)
-                  #print remaining_sites
-                  remaining_sites.pop(next_site_idx) # the pop method modifies the list in place. 
-                  
-                  return [ next_site ] + greedy (current_horse_posn = next_horse_posn, \
-                                                 remaining_sites    = remaining_sites)
+                next_horse_posn = next_rendezvous_point_for_horse_and_fly(current_horse_posn, next_site)
+                remaining_sites.pop(next_site_idx) # the pop method modifies the list in place. 
+                       
+                return [next_site] + greedy(current_horse_posn = next_horse_posn, remaining_sites = remaining_sites)
+      
 
-      sites1 = sites[:]
+      sites1                  = sites[:]
       sites_ordered_by_greedy = greedy(inithorseposn, remaining_sites=sites1)
-
-      # Use exact solver for the post optimizer step
-      answer = post_optimizer(sites_ordered_by_greedy, inithorseposn, phi)
+      answer                  = post_optimizer(sites_ordered_by_greedy, inithorseposn, phi)
       return answer
-
-# ALGORITHMS FOR SINGLE HORSE SINGLE FLY SERVICING THE SITES IN THE GIVEN ORDER
 def algo_exact_given_specific_ordering (sites, horseflyinit, phi):
-    """ Use the *given* ordering of sites to compute a good tour 
-    for the horse.
-    """
+
+    # Useful functions for \verb|algo_exact_given_specific_ordering|
+    
     def ith_leg_constraint(i, horseflyinit, phi, sites):
-        """ For the ith segment of the horsefly tour
-        this function returns a constraint function which 
-        models the fact that the time taken by the fly 
-        is equal to the time taken by the horse along 
-        that particular segment.
-        """
-        if i == 0 :
-            def _constraint_function(x):
-            
-                #print "Constraint  ", i
-                start = np.array (horseflyinit)
-                site  = np.array (sites[0])
-                stop  = np.array ([x[0],x[1]])
-            
-                horsetime = np.linalg.norm( stop - start )
-            
-                flytime_to_site   = 1/phi * np.linalg.norm( site - start )
-                flytime_from_site = 1/phi * np.linalg.norm( stop - site  )
-                flytime           = flytime_to_site + flytime_from_site
-                return horsetime-flytime
+            if i == 0 :
+                def _constraint_function(x):
+                
+                    #print "Constraint  ", i
+                    start = np.array (horseflyinit)
+                    site  = np.array (sites[0])
+                    stop  = np.array ([x[0],x[1]])
+                
+                    horsetime = np.linalg.norm( stop - start )
+                
+                    flytime_to_site   = 1/phi * np.linalg.norm( site - start )
+                    flytime_from_site = 1/phi * np.linalg.norm( stop - site  )
+                    flytime           = flytime_to_site + flytime_from_site
+                    return horsetime-flytime
 
-            return _constraint_function
-        else :
-          
-            def _constraint_function(x):
+                return _constraint_function
+            else :
+              
+                def _constraint_function(x):
 
-               #print "Constraint  ", i
-               start = np.array (  [x[2*i-2], x[2*i-1]]  ) 
-               site  = np.array (  sites[i])
-               stop  = np.array (  [x[2*i]  , x[2*i+1]]  )
-            
-               horsetime = np.linalg.norm( stop - start )
-           
-               flytime_to_site   = 1/phi * np.linalg.norm( site - start )
-               flytime_from_site = 1/phi * np.linalg.norm( stop - site  )
-               flytime           = flytime_to_site + flytime_from_site
-               return horsetime-flytime
+                   #print "Constraint  ", i
+                   start = np.array (  [x[2*i-2], x[2*i-1]]  ) 
+                   site  = np.array (  sites[i])
+                   stop  = np.array (  [x[2*i]  , x[2*i+1]]  )
+                
+                   horsetime = np.linalg.norm( stop - start )
+               
+                   flytime_to_site   = 1/phi * np.linalg.norm( site - start )
+                   flytime_from_site = 1/phi * np.linalg.norm( stop - site  )
+                   flytime           = flytime_to_site + flytime_from_site
+                   return horsetime-flytime
 
-            return _constraint_function
-
-
+                return _constraint_function
+    
     def generate_constraints(horseflyinit, phi, sites):
-        """ Given input data, of the problem generate the 
-        constraint list for each leg of the tour. The number
-        of legs is equal to the number of sites for the case 
-        of single horse, single drone
-        """
-        cons = []
-        for i in range(len(sites)):
-            cons.append( { 'type':'eq',
-                            'fun': ith_leg_constraint(i,horseflyinit,phi, sites) } )
-        return cons
-
-
+       cons = []
+       for i in range(len(sites)):
+            cons.append({'type':'eq','fun': ith_leg_constraint(i,horseflyinit,phi,sites)})
+       return cons
+    
     
     cons = generate_constraints(horseflyinit, phi, sites)
-    # Since the horsely tour lies inside the square,
-    # the bounds for each coordinate is 0 and 1
-    #x0 = np.empty(2*len(sites))
-    #x0.fill(0.5) # choice of filling vector with 0.5 is arbitrary
-
+    
+    # Initial guess for the non-linear solver.
+    #x0 = np.empty(2*len(sites)); x0.fill(0.5) # choice of filling vector with 0.5 is arbitrary
     x0 = utils_algo.flatten_list_of_lists(sites) # the initial choice is just the sites
-    assert(len(x0) == 2*len(sites))
-    x0 = np.array(x0)
-    
-    sol = minimize(tour_length(horseflyinit), x0, method= 'SLSQP', \
-                               constraints=cons, options={'maxiter':500})
-    
-    tour_points = utils_algo.pointify_vector(sol.x)
 
-    # return the waiting times for the horse
+    assert(len(x0) == 2*len(sites))
+
+    x0                  = np.array(x0)
+    sol                 = minimize(tour_length(horseflyinit), x0, method= 'SLSQP', \
+                                   constraints=cons         , options={'maxiter':500})
+    tour_points         = utils_algo.pointify_vector(sol.x)
     numsites            = len(sites)
     alpha               = horseflyinit[0]
     beta                = horseflyinit[1]
     s                   = utils_algo.flatten_list_of_lists(sites)
     horse_waiting_times = np.zeros(numsites)
     ps                  = sol.x
+
     for i in range(numsites):
+
         if i == 0 :
             horse_time         = np.sqrt((ps[0]-alpha)**2 + (ps[1]-beta)**2)
             fly_time_to_site   = 1.0/phi * np.sqrt((s[0]-alpha)**2 + (s[1]-beta)**2 )
@@ -475,7 +415,6 @@ def algo_exact_given_specific_ordering (sites, horseflyinit, phi):
                                                     tour_points, \
                                                     horse_waiting_times, 
                                                     horseflyinit)}
-   
 
 # Define auxiliary helper functions
 def single_site_solution(site, horseposn, phi):

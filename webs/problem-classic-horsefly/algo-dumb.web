@@ -1,37 +1,36 @@
 \section{\framebox{Algorithm}: Dumb Brute force}
 
 \subsection{Algorithmic Overview}
+For each of the $n!$ ordering of sites find the ordering which gives the smallest horsefly tour length. Note that given 
+a particular order of visitation, the optimal tour for the horse can be computed optimally using convex optimization methods
+or by using the SLSQP solver as I do here. 
+
+This method is practical only for a very small number of sites, like say 6 or 7. However, it is useful in generating 
+small counter-examples for various conjectures and as a benchmark for the quality of other algorithms for a small number 
+of sites. 
 
 \subsection{Algorithmic Details}
 
+%{python-mode}%
 @d Algorithms for classic horsefly  @{   
 def algo_dumb(sites, horseflyinit, phi):
-    """ For each of the n factorial ordering of sites
-    find the ordering which gives the smallest horsefly 
-    tour length
-    """
-    
+      
     tour_length_fn = tour_length(horseflyinit)
+    best_tour      = algo_exact_given_specific_ordering(sites, horseflyinit, phi)
+    i              = 0
 
-    best_tour = algo_exact_given_specific_ordering(sites, horseflyinit, phi)
-
-    i = 0
     for sites_perm in list(itertools.permutations(sites)):
+
         print "Testing a new permutation ", i, " of the sites"; i = i + 1
-          
-        #tour_for_current_perm = algo_exact_given_specific_ordering (sites_perm, \
-        #                                                             horseflyinit, phi) 
-        tour_for_current_perm = algo_exact_given_specific_ordering (sites_perm, \
-                                                                    horseflyinit, phi) 
+        tour_for_current_perm = algo_exact_given_specific_ordering (sites_perm, horseflyinit, phi) 
+
         if tour_length_fn(utils_algo.flatten_list_of_lists(tour_for_current_perm ['tour_points']) ) \
          < tour_length_fn(utils_algo.flatten_list_of_lists(            best_tour ['tour_points']) ):
+
                 best_tour = tour_for_current_perm
-                
                 print Fore.RED + "Found better tour!" + Style.RESET_ALL
 
-    #print Fore.RED + "\nHorse Waiting times are ",\ 
-    #       best_tour['horse_waiting_times'] , \
-    #       Style.RESET_ALL
+    #print Fore.RED + "\nHorse Waiting times are ", best_tour['horse_waiting_times'] , Style.RESET_ALL
     return best_tour
-
 @|  @}
+%{/python-mode}%
