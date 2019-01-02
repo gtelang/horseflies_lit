@@ -1,9 +1,8 @@
     
 # Relevant imports for classic horsefly
 
+from colorama import Fore, Style
 from matplotlib import rc
-from colorama import Fore
-from colorama import Style
 from scipy.optimize import minimize
 from sklearn.cluster import KMeans
 import argparse
@@ -50,22 +49,20 @@ def run_handler():
            def _keyPressHandler(event):
                if event.key in ['i', 'I']:  
                     # Start entering input from the command-line
-                    phi_str = raw_input(Fore.YELLOW + \
-                              "Enter speed of fly (should be >1): " +\
-                               Style.RESET_ALL)
+                    phi_str = raw_input(Fore.YELLOW + "Enter speed of fly (should be >1): " + Style.RESET_ALL)
                     phi = float(phi_str)
 
-                    input_str = raw_input(Fore.YELLOW + \
+                    input_str = raw_input(Fore.YELLOW                                            +\
                               "Enter algorithm to be used to compute the tour:\n Options are:\n" +\
-                            "  (e)   Exact \n"                                   +\
-                            "  (t)   TSP   \n"                                   +\
-                            "  (tl)  TSP   (using approximate L1 ordering)\n"    +\
-                            "  (k)   k2-center   \n"                             +\
-                            "  (kl)  k2-center (using approximate L1 ordering)\n"  +\
-                            "  (g)   Greedy\n"                                   +\
-                            "  (gl)  Greedy (using approximate L1 ordering])\n"  +\
-                            "  (ginc) Greedy Incremental\n"  +\
-                            "  (phi-mst) Compute the phi-prim-mst "               +\
+                            "  (e)    Exact \n"                                                  +\
+                            "  (t)    TSP   \n"                                                  +\
+                            "  (tl)   TSP   (using approximate L1 ordering)\n"                   +\
+                            "  (k)    k2-center   \n"                                            +\
+                            "  (kl)   k2-center (using approximate L1 ordering)\n"               +\
+                            "  (g)    Greedy\n"                                                  +\
+                            "  (gl)   Greedy (using approximate L1 ordering])\n"                 +\
+                            "  (ginc) Greedy Incremental\n"                                      +\
+                            "  (phi-mst) Compute the phi-prim-mst "                              +\
                             Style.RESET_ALL)
 
                     input_str = input_str.lstrip()
@@ -149,9 +146,9 @@ def run_handler():
                     fig.texts = []
                                      
                     import scipy
-                    if event.key in ['n', 'N']: # Non-uniform random points
+                    if event.key in ['n', 'N']: 
                             run.sites = utils_algo.bunch_of_non_uniform_random_points(numpts)
-                    else : # Uniform random points
+                    else : 
                             run.sites = scipy.rand(numpts,2).tolist()
 
                     patchSize  = (utils_graphics.xlim[1]-utils_graphics.xlim[0])/140.0
@@ -202,58 +199,39 @@ class HorseFlyInput:
            self.sites         = sites
            self.inithorseposn = inithorseposn
 
-           
+      # Methods for \verb|HorseFlyInput|
       def clearAllStates (self):
-          """ Set the sites to an empty list and initial horse position 
-          to the empty tuple.
-          """
-          self.sites = []
-          self.inithorseposn = ()
+         self.sites = []
+         self.inithorseposn = ()
 
-          
       def getTour(self, algo, speedratio, k=None, post_optimizer=None):
-          """ This method runs an appropriate algorithm for calculating
-          a horsefly tour. The list of possible algorithms are 
-          inside this module prefixed with 'algo_'
-          
-          The output is a dictionary of size 2, containing two lists,
-          - Contains the vertices of the polygonal 
-            path taken by the horse
-          - The list of sites in the order 
-            in which they are serviced by the tour, i.e. the order 
-            in which the sites are serviced by the fly.
-          """
-
+       
           if k==None and post_optimizer==None:
                 return algo(self.sites, self.inithorseposn, speedratio)
           elif k == None:
                 return algo(self.sites, self.inithorseposn, speedratio, post_optimizer)
           else:
-                #print Fore.RED, self.sites, Style.RESET_ALL
                 return algo(self.sites, self.inithorseposn, speedratio, k, post_optimizer)
-
       def  computeStructure(self, structure_func, phi):
-          print Fore.RED, "Computing the phi-mst", Style.RESET_ALL
-          structure_func(self.sites, self.inithorseposn, phi)
-
+         print Fore.RED, "Computing the phi-mst", Style.RESET_ALL
+         structure_func(self.sites, self.inithorseposn, phi)
       def __repr__(self):
-          """ Printed Representation of the Input for HorseFly
-          """
-          if self.sites != []:
-              tmp = ''
-              for site in self.sites:
-                  tmp = tmp + '\n' + str(site)
-              sites = "The list of sites to be serviced are " + tmp    
-          else:
-              sites = "The list of sites is empty"
 
-          if self.inithorseposn != ():
-              inithorseposn = "\nThe initial position of the horse is " + \
-                               str(self.inithorseposn)
-          else:
-              inithorseposn = "\nThe initial position of the horse has not been specified"
-              
-          return sites + inithorseposn
+        if self.sites != []:
+           tmp = ''
+           for site in self.sites:
+               tmp = tmp + '\n' + str(site)
+           sites = "The list of sites to be serviced are " + tmp    
+        else:
+           sites = "The list of sites is empty"
+
+        if self.inithorseposn != ():
+           inithorseposn = "\nThe initial position of the horse is " + str(self.inithorseposn)
+        else:
+           inithorseposn = "\nThe initial position of the horse has not been specified"
+                    
+        return sites + inithorseposn
+      
 
 # Local utility functions for classic horsefly
 def tour_length(horseflyinit):
@@ -868,43 +846,48 @@ def compute_phi_prim_mst(sites, inithorseposn,phi):
 # Plotting routines for classic horsefly
 def plotTour(ax,horseflytour, horseflyinit, phi, algo_str, tour_color='#d13131'):
    
-    # Route for the horse
+    # Get x and y coordinates of the endpoints of segments on the horse-tour
+       
     xhs, yhs = [horseflyinit[0]], [horseflyinit[1]]
     for pt in horseflytour['tour_points']:
         xhs.append(pt[0])
         yhs.append(pt[1])
-
-    # List of sites
+    
+    # Get x and y coordinates of the sites
+       
     xsites, ysites = [], []
     for pt in horseflytour['site_ordering']:
         xsites.append(pt[0])
         ysites.append(pt[1])
-
-    # Route for the fly. The fly keeps alternating
-    # between the site and the horse
+    
+    # Construct the fly-tour from the information about horse tour and sites
+    
     xfs , yfs = [xhs[0]], [yhs[0]]
     for site, pt in zip (horseflytour['site_ordering'],
                          horseflytour['tour_points']):
-        xfs.extend([site[0], pt[0]])
-        yfs.extend([site[1], pt[1]])
-
-    print "\n----------"
-    print "Horse Tour"
-    print "-----------"
-    waiting_times = [0.0] + horseflytour['horse_waiting_times'].tolist() # the waiting time at the starting point is 0
+       xfs.extend([site[0], pt[0]])
+       yfs.extend([site[1], pt[1]])
+    
+    # Print information about the horse tour
+       
+    print "\n----------", "\nHorse Tour", "\n-----------"
+    waiting_times = [0.0] + horseflytour['horse_waiting_times'].tolist() 
     #print waiting_times
     for pt, time in zip(zip(xhs,yhs), waiting_times) :
-        print pt, Fore.GREEN, " ---> Horse Waited ", time, Style.RESET_ALL
-
-    print "\n----------"
-    print "Fly Tour"
-    print "----------"
+       print pt, Fore.GREEN, " ---> Horse Waited ", time, Style.RESET_ALL
+    
+    # Print information about the fly tour
+       
+    print "\n----------", "\nFly Tour", "\n----------"
     for item, i in zip(zip(xfs,yfs), range(len(xfs))):
-        if i%2 == 0:
+       if i%2 == 0:
            print item
-        else :
+       else :
            print Fore.RED + str(item) + "----> Site" +  Style.RESET_ALL
 
+    
+    # Print meta-data about the algorithm run
+       
     print "----------------------------------"
     print Fore.GREEN, "\nSpeed of the drone was set to be", phi
     #tour_length = utils_algo.length_polygonal_chain( zip(xhs, yhs))
@@ -912,28 +895,27 @@ def plotTour(ax,horseflytour, horseflyinit, phi, algo_str, tour_color='#d13131')
     print "Tour length of the horse is ",  tour_length
     print "Algorithm code-Key used "    , algo_str, Style.RESET_ALL
     print "----------------------------------\n"
-           
+    
+    # Plot everything
+     
     #kwargs = {'size':'large'}
     for x,y,i in zip(xsites, ysites, range(len(xsites))):
-          ax.text(x, y, str(i+1), bbox=dict(facecolor='#ddcba0', alpha=1.0)) 
-    ax.plot(xfs,yfs,'g-') # fly tour is green
-    ax.plot(xhs, yhs, color=tour_color, marker='s', linewidth=3.0) # horse is red
+        ax.text(x, y, str(i+1), bbox=dict(facecolor='#ddcba0', alpha=1.0)) 
 
+    ax.plot(xfs,yfs,'g-')
+    ax.plot(xhs, yhs, color=tour_color, marker='s', linewidth=3.0) 
 
-    # Initial position of horse and fly
-    ax.add_patch( mpl.patches.Circle( horseflyinit,
-                                      radius = 1/34.0,
-                                      facecolor= '#D13131', #'red',
-                                      edgecolor='black'   )  )
-
-
+    ax.add_patch( mpl.patches.Circle( horseflyinit, radius = 1/34.0,
+                                      facecolor= '#D13131', edgecolor='black'   )  )
     fontsize = 20
     tnrfont = {'fontname':'Times New Roman'}
-    ax.set_title( r'Algorithm Used: ' + algo_str +  '\nTour Length: ' \
-                    + str(tour_length)[:7], fontdict={'fontsize':fontsize}, **tnrfont)
-    ax.set_xlabel(r'Number of sites: ' + str(len(xsites)) + '\nDrone Speed: ' + str(phi) ,
-                  fontdict={'fontsize':fontsize}, **tnrfont)
 
+    ax.set_title( r'Algorithm Used: ' + algo_str +  '\nTour Length: ' \
+                   + str(tour_length)[:7], fontdict={'fontsize':fontsize}, **tnrfont)
+    ax.set_xlabel(r'Number of sites: ' + str(len(xsites)) + '\nDrone Speed: ' + str(phi) ,
+                      fontdict={'fontsize':fontsize}, **tnrfont)
+    
+    
 def draw_phi_mst(ax, phi_mst, inithorseposn, phi):
      print "Yay! Drawing the tree!"
      sys.exit()

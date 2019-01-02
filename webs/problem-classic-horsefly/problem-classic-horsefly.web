@@ -70,9 +70,8 @@ def run_handler():
 %{python-mode}%
 @D Relevant imports for classic horsefly
 @{
+from colorama import Fore, Style
 from matplotlib import rc
-from colorama import Fore
-from colorama import Style
 from scipy.optimize import minimize
 from sklearn.cluster import KMeans
 import argparse
@@ -143,27 +142,34 @@ def wrapperkeyPressHandler(fig,ax, run):
 @| wrapperkeyPressHandler @}
 %{/python-mode}%
 
-\vspace{-0.8cm}\newchunk 
+\vspace{-0.8cm}\newchunk Before running an algorithm, the user needs to select through 
+a menu displayed at the terminal, which one to run. Each algorithm itself, may be 
+run under different conditions, so depending on the key-pressed(and thus algorithm chosen) 
+further sub-menus will be generated at the command-line. 
+
+After running the appropriate algorithm, we render the structure computed to a matplotlib canvas/window
+along with possibly some meta data about the run at the terminal. 
+
+This code-chunk is long, but just has brain-dead code. Nothing really needs to be explained 
+about it any further, nor does it need to be broken down. 
 
 %{python-mode}%
 
 @D Start entering input from the command-line
-@{phi_str = raw_input(Fore.YELLOW + \
-          "Enter speed of fly (should be >1): " +\
-           Style.RESET_ALL)
+@{phi_str = raw_input(Fore.YELLOW + "Enter speed of fly (should be >1): " + Style.RESET_ALL)
 phi = float(phi_str)
 
-input_str = raw_input(Fore.YELLOW + \
+input_str = raw_input(Fore.YELLOW                                            +\
           "Enter algorithm to be used to compute the tour:\n Options are:\n" +\
-        "  (e)   Exact \n"                                   +\
-        "  (t)   TSP   \n"                                   +\
-        "  (tl)  TSP   (using approximate L1 ordering)\n"    +\
-        "  (k)   k2-center   \n"                             +\
-        "  (kl)  k2-center (using approximate L1 ordering)\n"  +\
-        "  (g)   Greedy\n"                                   +\
-        "  (gl)  Greedy (using approximate L1 ordering])\n"  +\
-        "  (ginc) Greedy Incremental\n"  +\
-        "  (phi-mst) Compute the phi-prim-mst "               +\
+        "  (e)    Exact \n"                                                  +\
+        "  (t)    TSP   \n"                                                  +\
+        "  (tl)   TSP   (using approximate L1 ordering)\n"                   +\
+        "  (k)    k2-center   \n"                                            +\
+        "  (kl)   k2-center (using approximate L1 ordering)\n"               +\
+        "  (g)    Greedy\n"                                                  +\
+        "  (gl)   Greedy (using approximate L1 ordering])\n"                 +\
+        "  (ginc) Greedy Incremental\n"                                      +\
+        "  (phi-mst) Compute the phi-prim-mst "                              +\
         Style.RESET_ALL)
 
 input_str = input_str.lstrip()
@@ -241,6 +247,10 @@ the horsefly algorithms. Uniform point clouds do no highlight the weaknesses of
 sequencing algorithms as David Johnson implies in his article on how to write 
 experimental algorithm papers when he talks about algorithms for the TSP. 
 
+Note that the option keys \verb|'n'| or \verb|'N'| for entering in non-uniform random-points is just 
+incase the caps-lock key has been pressed on by the user accidentally. Similarly for the \verb|'u'|
+and \verb|'U'| keys.  
+
 %{python-mode}%
 @D  Generate a bunch of uniform or non-uniform random points on the canvas
 @{numpts = int(raw_input("\n" + Fore.YELLOW+\
@@ -256,9 +266,9 @@ ax.set_yticks([])
 fig.texts = []
                  
 import scipy
-if event.key in ['n', 'N']: # Non-uniform random points
+if event.key in ['n', 'N']: 
         run.sites = utils_algo.bunch_of_non_uniform_random_points(numpts)
-else : # Uniform random points
+else : 
         run.sites = scipy.rand(numpts,2).tolist()
 
 patchSize  = (utils_graphics.xlim[1]-utils_graphics.xlim[0])/140.0
@@ -272,9 +282,8 @@ fig.canvas.draw()
 @| @}
 %{/python-mode}%
 
-\vspace{-0.8cm}\newchunk 
-
-
+\vspace{-0.8cm}\newchunk Clearing the canvas and states of all objects is essential when we want to test out the algorithm on a fresh
+new point-set; the program need not be shut-down and rerun. 
 %{python-mode}%
 @D Clear canvas and states of all objects
 @{run.clearAllStates()
@@ -313,71 +322,92 @@ plt.show()
 
 
 
+\needspace{7cm}
 \section{Local Data Structures}
 
 \newchunk This class manages the input and the output of the result of 
 calling various horsefly algorithms. 
 
 %{python-mode}%
-@D Local data-structures for classic horsefly
+@d Local data-structures for classic horsefly
 @{class HorseFlyInput:
       def __init__(self, sites=[], inithorseposn=()):
            self.sites         = sites
            self.inithorseposn = inithorseposn
 
-           
-      def clearAllStates (self):
-          """ Set the sites to an empty list and initial horse position 
-          to the empty tuple.
-          """
-          self.sites = []
-          self.inithorseposn = ()
-
-          
-      def getTour(self, algo, speedratio, k=None, post_optimizer=None):
-          """ This method runs an appropriate algorithm for calculating
-          a horsefly tour. The list of possible algorithms are 
-          inside this module prefixed with 'algo_'
-          
-          The output is a dictionary of size 2, containing two lists,
-          - Contains the vertices of the polygonal 
-            path taken by the horse
-          - The list of sites in the order 
-            in which they are serviced by the tour, i.e. the order 
-            in which the sites are serviced by the fly.
-          """
-
-          if k==None and post_optimizer==None:
-                return algo(self.sites, self.inithorseposn, speedratio)
-          elif k == None:
-                return algo(self.sites, self.inithorseposn, speedratio, post_optimizer)
-          else:
-                #print Fore.RED, self.sites, Style.RESET_ALL
-                return algo(self.sites, self.inithorseposn, speedratio, k, post_optimizer)
-
-      def  computeStructure(self, structure_func, phi):
-          print Fore.RED, "Computing the phi-mst", Style.RESET_ALL
-          structure_func(self.sites, self.inithorseposn, phi)
-
-      def __repr__(self):
-          """ Printed Representation of the Input for HorseFly
-          """
-          if self.sites != []:
-              tmp = ''
-              for site in self.sites:
-                  tmp = tmp + '\n' + str(site)
-              sites = "The list of sites to be serviced are " + tmp    
-          else:
-              sites = "The list of sites is empty"
-
-          if self.inithorseposn != ():
-              inithorseposn = "\nThe initial position of the horse is " + \
-                               str(self.inithorseposn)
-          else:
-              inithorseposn = "\nThe initial position of the horse has not been specified"
-              
-          return sites + inithorseposn
+      @<Methods for \verb|HorseFlyInput|@>
 @| HorseFlyInput @}
+%{/python-mode}%
+
+\vspace{-0.8cm}
+\newchunk Set the sites to an empty list and initial horse position to the empty tuple.
+%{python-mode}%
+@D Methods for \verb|HorseFlyInput|
+@{def clearAllStates (self):
+   self.sites = []
+   self.inithorseposn = ()
+
+@| clearAllStates @}
+%{/python-mode}%
+
+
+\vspace{-0.8cm} \newchunk 
+This method sets an algorithm for calculating
+a horsefly tour. The name of the algorithm is passed as a command-line argument.  
+The list of possible algorithms are typically prefixed with \verb|algo_|. 
+          
+The output is a dictionary of size 2, containing two lists:
+
+\begin{enumerate}
+\item  Contains the vertices of the polygonal path taken by the horse
+\item  The list of sites in the order in which they are serviced by the tour, 
+       i.e. the order in which the sites are serviced by the fly.
+\end{enumerate}
+
+%{python-mode}%
+@D Methods for \verb|HorseFlyInput|
+@{def getTour(self, algo, speedratio, k=None, post_optimizer=None):
+ 
+    if k==None and post_optimizer==None:
+          return algo(self.sites, self.inithorseposn, speedratio)
+    elif k == None:
+          return algo(self.sites, self.inithorseposn, speedratio, post_optimizer)
+    else:
+          return algo(self.sites, self.inithorseposn, speedratio, k, post_optimizer)
+@| getTour @}
+%{/python-mode}%
+
+\vspace{-0.8cm}
+\newchunk 
+%{python-mode}%
+@D Methods for \verb|HorseFlyInput|
+@{def  computeStructure(self, structure_func, phi):
+   print Fore.RED, "Computing the phi-mst", Style.RESET_ALL
+   structure_func(self.sites, self.inithorseposn, phi)
+@| computeStructure @}
+%{/python-mode}%
+
+\vspace{-0.8cm} \newchunk This chunk prints a customized representation of the \verb|HorseFlyInput| class
+
+%{python-mode}%
+@D Methods for \verb|HorseFlyInput|
+@{def __repr__(self):
+
+  if self.sites != []:
+     tmp = ''
+     for site in self.sites:
+         tmp = tmp + '\n' + str(site)
+     sites = "The list of sites to be serviced are " + tmp    
+  else:
+     sites = "The list of sites is empty"
+
+  if self.inithorseposn != ():
+     inithorseposn = "\nThe initial position of the horse is " + str(self.inithorseposn)
+  else:
+     inithorseposn = "\nThe initial position of the horse has not been specified"
+              
+  return sites + inithorseposn
+@|  @}
 %{/python-mode}%
 
 
@@ -400,6 +430,8 @@ are collected at the end of this chapter.
 @i problem-classic-horsefly/algo-local-search-swap.web
 @i problem-classic-horsefly/algo-k2-means.web
 
+
+\needspace{17cm}
 \section{Local Utility Functions}
 
 \newchunk  For a given initial position of horse and fly
@@ -468,6 +500,8 @@ are collected at the end of this chapter.
 @| tour_length_with_waiting_time_included @}
 %{/python-mode}%
 
+
+\needspace{17cm}
 \section{Plotting Routines}
 \newchunk 
 
@@ -475,75 +509,107 @@ are collected at the end of this chapter.
 @D Plotting routines for classic horsefly 
 @{def plotTour(ax,horseflytour, horseflyinit, phi, algo_str, tour_color='#d13131'):
    
-    # Route for the horse
-    xhs, yhs = [horseflyinit[0]], [horseflyinit[1]]
-    for pt in horseflytour['tour_points']:
-        xhs.append(pt[0])
-        yhs.append(pt[1])
+    @<Get x and y coordinates of the endpoints of segments on the horse-tour@>
+    @<Get x and y coordinates of the sites@>
+    @<Construct the fly-tour from the information about horse tour and sites@>
+    @<Print information about the horse tour@>
+    @<Print information about the fly tour@>
+    @<Print meta-data about the algorithm run@>
+    @<Plot everything@>
+    @| plotTour @}
+%{/python-mode}%
 
-    # List of sites
-    xsites, ysites = [], []
-    for pt in horseflytour['site_ordering']:
-        xsites.append(pt[0])
-        ysites.append(pt[1])
+\vspace{-0.8cm} \newchunk
+%{python-mode}%
+@d Get x and y coordinates of the endpoints of segments on the horse-tour @{   
+xhs, yhs = [horseflyinit[0]], [horseflyinit[1]]
+for pt in horseflytour['tour_points']:
+    xhs.append(pt[0])
+    yhs.append(pt[1])
+@| @}
+%{/python-mode}%
 
-    # Route for the fly. The fly keeps alternating
-    # between the site and the horse
-    xfs , yfs = [xhs[0]], [yhs[0]]
-    for site, pt in zip (horseflytour['site_ordering'],
-                         horseflytour['tour_points']):
-        xfs.extend([site[0], pt[0]])
-        yfs.extend([site[1], pt[1]])
+\vspace{-0.8cm} \newchunk
+%{python-mode}%
+@d Get x and y coordinates of the sites @{   
+xsites, ysites = [], []
+for pt in horseflytour['site_ordering']:
+    xsites.append(pt[0])
+    ysites.append(pt[1])
+@| @}
+%{/python-mode}%
 
-    print "\n----------"
-    print "Horse Tour"
-    print "-----------"
-    waiting_times = [0.0] + horseflytour['horse_waiting_times'].tolist() # the waiting time at the starting point is 0
-    #print waiting_times
-    for pt, time in zip(zip(xhs,yhs), waiting_times) :
-        print pt, Fore.GREEN, " ---> Horse Waited ", time, Style.RESET_ALL
+\vspace{-0.8cm} \newchunk Route for the fly  keeps alternating between the site and the horse
+%{python-mode}%
+@d Construct the fly-tour from the information about horse tour and sites @{
+xfs , yfs = [xhs[0]], [yhs[0]]
+for site, pt in zip (horseflytour['site_ordering'],
+                     horseflytour['tour_points']):
+   xfs.extend([site[0], pt[0]])
+   yfs.extend([site[1], pt[1]])
+@| @}
+%{/python-mode}%
 
-    print "\n----------"
-    print "Fly Tour"
-    print "----------"
-    for item, i in zip(zip(xfs,yfs), range(len(xfs))):
-        if i%2 == 0:
-           print item
-        else :
-           print Fore.RED + str(item) + "----> Site" +  Style.RESET_ALL
+\vspace{-0.8cm} \newchunk  Note that the waiting time at the starting point is 0
+%{python-mode}%
+@D Print information about the horse tour @{   
+print "\n----------", "\nHorse Tour", "\n-----------"
+waiting_times = [0.0] + horseflytour['horse_waiting_times'].tolist() 
+#print waiting_times
+for pt, time in zip(zip(xhs,yhs), waiting_times) :
+   print pt, Fore.GREEN, " ---> Horse Waited ", time, Style.RESET_ALL
+@| @}
+%{/python-mode}%
 
-    print "----------------------------------"
-    print Fore.GREEN, "\nSpeed of the drone was set to be", phi
-    #tour_length = utils_algo.length_polygonal_chain( zip(xhs, yhs))
-    tour_length = horseflytour['tour_length_with_waiting_time_included']
-    print "Tour length of the horse is ",  tour_length
-    print "Algorithm code-Key used "    , algo_str, Style.RESET_ALL
-    print "----------------------------------\n"
-           
-    #kwargs = {'size':'large'}
-    for x,y,i in zip(xsites, ysites, range(len(xsites))):
-          ax.text(x, y, str(i+1), bbox=dict(facecolor='#ddcba0', alpha=1.0)) 
-    ax.plot(xfs,yfs,'g-') # fly tour is green
-    ax.plot(xhs, yhs, color=tour_color, marker='s', linewidth=3.0) # horse is red
+\vspace{-0.8cm} \newchunk
+%{python-mode}%
+@D Print information about the fly tour  @{   
+print "\n----------", "\nFly Tour", "\n----------"
+for item, i in zip(zip(xfs,yfs), range(len(xfs))):
+   if i%2 == 0:
+       print item
+   else :
+       print Fore.RED + str(item) + "----> Site" +  Style.RESET_ALL
 
+@| @}
+%{/python-mode}%
 
-    # Initial position of horse and fly
-    ax.add_patch( mpl.patches.Circle( horseflyinit,
-                                      radius = 1/34.0,
-                                      facecolor= '#D13131', #'red',
-                                      edgecolor='black'   )  )
+\vspace{-0.8cm} \newchunk
+%{python-mode}%
+@d Print meta-data about the algorithm run @{   
+print "----------------------------------"
+print Fore.GREEN, "\nSpeed of the drone was set to be", phi
+#tour_length = utils_algo.length_polygonal_chain( zip(xhs, yhs))
+tour_length = horseflytour['tour_length_with_waiting_time_included']
+print "Tour length of the horse is ",  tour_length
+print "Algorithm code-Key used "    , algo_str, Style.RESET_ALL
+print "----------------------------------\n"
+@| @}
+%{/python-mode}%
 
+\vspace{-0.8cm} \newchunk
+%{python-mode}%
+@d Plot everything @{ 
+#kwargs = {'size':'large'}
+for x,y,i in zip(xsites, ysites, range(len(xsites))):
+    ax.text(x, y, str(i+1), bbox=dict(facecolor='#ddcba0', alpha=1.0)) 
 
-    fontsize = 20
-    tnrfont = {'fontname':'Times New Roman'}
-    ax.set_title( r'Algorithm Used: ' + algo_str +  '\nTour Length: ' \
-                    + str(tour_length)[:7], fontdict={'fontsize':fontsize}, **tnrfont)
-    ax.set_xlabel(r'Number of sites: ' + str(len(xsites)) + '\nDrone Speed: ' + str(phi) ,
+ax.plot(xfs,yfs,'g-')
+ax.plot(xhs, yhs, color=tour_color, marker='s', linewidth=3.0) 
+
+ax.add_patch( mpl.patches.Circle( horseflyinit, radius = 1/34.0,
+                                  facecolor= '#D13131', edgecolor='black'   )  )
+fontsize = 20
+tnrfont = {'fontname':'Times New Roman'}
+
+ax.set_title( r'Algorithm Used: ' + algo_str +  '\nTour Length: ' \
+               + str(tour_length)[:7], fontdict={'fontsize':fontsize}, **tnrfont)
+ax.set_xlabel(r'Number of sites: ' + str(len(xsites)) + '\nDrone Speed: ' + str(phi) ,
                   fontdict={'fontsize':fontsize}, **tnrfont)
-@| plotTour @}
+@| @}
+%{/python-mode}%
 
-
-\newchunk 
+\vspace{-0.8cm} \newchunk 
 
 %{python-mode}%
 @D Plotting routines for classic horsefly @{
@@ -553,9 +619,7 @@ def draw_phi_mst(ax, phi_mst, inithorseposn, phi):
 @}
 %{/python-mode}%
 
-
-
-
+\needspace{7cm}
 \section{Animation routines}
 
 \newchunk 
