@@ -2,3 +2,293 @@
 
 \subsection{Algorithmic Overview}
 \subsection{Algorithmic Details}
+\newchunk
+%{python-mode}%
+@D Algorithms for classic horsefly @{   
+def algo_kmeans(sites, inithorseposn, phi, k, post_optimizer):
+     """
+     type Point   (Double, Double)
+     type Site    Point
+     type Cluster (Point, [Site])
+     type Tour    {'site_ordering':[Site], 
+                   'tour_points'  :[Point]}
+     algo_kmeans :: [Site] -> Point -> Double -> Int
+     """
+     def get_clusters(site_list):
+           """ 
+           get_clusters :: [Site] -> [Cluster]
+           For the given list of sites, perform k-means clustering
+           and return the list of k-centers, along with a list of sites
+           assigned to each center. 
+           """
+           X      = np.array(site_list)
+           kmeans = KMeans(n_clusters=k, random_state=0).fit(X)
+
+           accum = [ (center, [])  for center in kmeans.cluster_centers_ ]
+           for label, site in zip(kmeans.labels_, site_list):
+                 accum [label][1].append(site)
+
+           return accum 
+
+     def extract_cluster_sites_for_each_cluster(clusters):
+         """
+         extract_cluster_sites_for_each_cluster :: [Cluster] -> [[Site]]
+         """
+         return [ cluster_sites for (_, cluster_sites) in clusters  ]
+
+     def fuse_tours(tours):
+         """ 
+          fuse_tours :: [Tour] -> Tour
+         """
+         fused_tour = {'site_ordering':[], 'tour_points':[]}
+         for tour, i in zip(tours, range(len(tours))):
+               fused_tour['site_ordering'].extend(tour['site_ordering'])
+               if i != len(tours)-1:
+                     # Remember! last point of previous tour is first point of
+                     # this tour, which is why we need to avoid duplication
+                     # Hence the [:-1]
+                     fused_tour['tour_points'].extend(tour['tour_points'][:-1]) 
+               else: 
+                     # Because this is the last tour in the iteration, we include
+                     # its end point also, hence no [:-1] here
+                     fused_tour['tour_points'].extend(tour['tour_points'])
+         return fused_tour
+
+     def  weighted_center_tour(clusters, horseflyinit):
+         """ 
+         weighted_center_tour :: [Cluster] -> Point -> [Cluster]
+         
+         Just return a permutation of the clusters. 
+         need to return actual weighted tour
+         since we are only interested in the order
+         in which the weighted center tour is performed
+         on k weighted points, where k is the clustering 
+         number used here
+         """
+         
+         #print Fore.CYAN, " Clusters: "    , clusters, Style.RESET_ALL
+         #print " "
+         #print Fore.CYAN, " Horseflyinit: ", horseflyinit, Style.RESET_ALL
+         
+         assert( k == len(clusters) )
+         tour_length_fn = tour_length(horseflyinit)
+
+         #-------------------------------------------------
+         # For each of the k! permutations of the weighted sites
+         # give the permutation with the smallest weighted tour
+         # Note that k is typically small, say 2,3 or 4
+         #-------------------------------------------------
+         # But first we initialize the accumulator variables prefixed with best_
+
+         #print Fore.YELLOW , " Computing Weighted Center Tour ", Style.RESET_ALL
+         clustering_centers = [ center          for (center, _)    in clusters]
+         centers_weights   =  [ len(site_list)  for (_, site_list) in clusters]
+
+         #utils_algo.print_list(clustering_centers)
+         #utils_algo.print_list(centers_weights)
+         #time.sleep(5000)
+
+         best_perm = clusters
+         best_perm_tour = algo_weighted_sites_given_specific_ordering(clustering_centers, \
+                                                               centers_weights, \
+                                                               horseflyinit, \
+                                                               phi)
+
+         i = 1
+         for clusters_perm in list(itertools.permutations(clusters)):
+
+               #print Fore.YELLOW , "......Testing a new cluster permutation [ ", i ,  \
+               #                     "/", math.factorial(k) , " ] of the sites", \
+               #                    Style.RESET_ALL
+
+               i = i + 1
+               # cluster_centers_and_weights ::  [(Point, Int)]
+               # This is what is used for the weighted tour
+               clustering_centers = [ center          for (center, _)    in clusters_perm]
+               centers_weights    = [ len(site_list)  for (_, site_list) in clusters_perm] 
+               
+               tour_current_perm = \
+                   algo_weighted_sites_given_specific_ordering(clustering_centers, \
+                                                               centers_weights, \
+                                                               horseflyinit, \
+                                                               phi)
+
+               if tour_length_fn( utils_algo.flatten_list_of_lists(tour_current_perm ['tour_points']) ) \
+                < tour_length_fn( utils_algo.flatten_list_of_lists(   best_perm_tour ['tour_points']) ):
+ 
+                   print Fore.RED + ".................Found better cluster order" + Style.RESET_ALL
+                   best_perm = clusters_perm
+
+         return best_perm
+               
+     def get_tour (site_list, horseflyinit):
+        """
+        get_tour :: [Site] -> Point -> Tour
+        
+        A recursive function which does the job 
+        of extracting a tour
+        """
+
+        if len (site_list) <= k: # Base-case for the recursion
+              #print Fore.CYAN + ".....Reached Recursion Base case" + Style.RESET_ALL
+              result = algo_dumb(site_list, horseflyinit, phi)
+              return result 
+        else: # The main recursion
+           # Perform k-means clustering and get the clusters
+           clusters = get_clusters(site_list)
+
+           #utils_algo.print_list(clusters)
+
+           ###################################################################
+           # Permute the clusters depending on which is better to visit first
+           clusters_perm = weighted_center_tour(clusters, horseflyinit)
+           ####################################################################
+
+           # Extract cluster sites for each cluster
+           cluster_sites_for_each_cluster  = \
+                  extract_cluster_sites_for_each_cluster(clusters_perm)
+
+           # Apply the get_tour function on each chunk while folding across
+           # using the last point of the tour of the previous cluster
+           # as the first point of this current one. This is a kind of recursion
+           # that pays forward.
+           tours = []
+           for site_list, i in zip(cluster_sites_for_each_cluster,
+                                   range(len(cluster_sites_for_each_cluster))):
+                 
+                 if i == 0:# first point is horseflyinit. The starting fold value!!
+                       tours.append( get_tour(site_list, inithorseposn)  )
+                 else: # use the last point of the previous tour (i-1 index)
+                       # as the first point of this one !!
+                       prev_tour  = tours[i-1]
+                       tours.append( get_tour(site_list, prev_tour['tour_points'][-1]))
+           # Fuse the tours you obtained above to get a site ordering
+           return fuse_tours(tours)
+
+     print Fore.MAGENTA + "RUNNING algo_kmeans......." + Style.RESET_ALL
+     sites1 = get_tour(sites, inithorseposn)['site_ordering']
+     return  post_optimizer(sites1, inithorseposn, phi )
+
+
+@| @}
+%{/python-mode}%
+
+
+
+
+
+\vspace{-0.8cm} \newchunk
+%{python-mode}%
+@D  Algorithms for classic horsefly @{
+def algo_weighted_sites_given_specific_ordering (sites, weights, horseflyinit, phi):
+      
+     def site_constraints(i, sites, weights):
+          """
+          site_constraints :: Int -> [Site] -> [Double] 
+                          -> [ [Double] -> Double  ]
+          
+          Generate a list of constraint functions for the ith site
+          The number of constraint functions is equal to the weight
+          of the site!
+          """
+
+          #print Fore.RED, sites, Style.RESET_ALL
+         
+          psum_weights = utils_algo.partial_sums( weights ) # partial sum of ALL the site-weights
+          accum        = [ ]
+          site_weight  = weights[i]
+
+          for j in range(site_weight): 
+
+              if i == 0 and j == 0:
+
+                    #print "i= ", i, " j= ", j
+                    def _constraint_function(x):
+                        """
+                        constraint_function :: [Double] -> Double
+                        """
+                        start = np.array (horseflyinit)
+                        site  = np.array (sites[0])
+                        stop  = np.array ([x[0],x[1]])
+                        
+                        horsetime = np.linalg.norm( stop - start )
+                        
+                        flytime_to_site   = 1/phi * np.linalg.norm( site - start )
+                        flytime_from_site = 1/phi * np.linalg.norm( stop - site  )
+                        flytime           = flytime_to_site + flytime_from_site
+                        return horsetime-flytime
+                    
+                    accum.append( _constraint_function )
+                    
+              elif  i == 0 and j != 0 :
+
+                    #print "i= ", i, " j= ", j
+                    def _constraint_function(x):
+                          """
+                          constraint_function :: [Double] -> Double
+                          """
+                          start = np.array( [x[2*j-2], x[2*j-1]] ) 
+                          site  = np.array(sites[0])
+                          stop  = np.array( [x[2*j]  , x[2*j+1]] )
+
+                          horsetime = np.linalg.norm( stop - start )
+                          
+                          flytime_to_site   = 1/phi * np.linalg.norm( site - start )
+                          flytime_from_site = 1/phi * np.linalg.norm( stop - site  )
+                          flytime           = flytime_to_site + flytime_from_site
+                          return horsetime-flytime
+
+                    accum.append( _constraint_function )
+              else:
+
+                    #print "i= ", i, " j= ", j
+                    def _constraint_function(x):
+                          """
+                          constraint_function :: [Double] -> Double
+                          """
+                          
+                          offset = 2 * psum_weights[i-1]
+                          
+                          start  = np.array( [ x[offset + 2*j-2 ], x[offset + 2*j-1 ] ] ) 
+                          site   = np.array(sites[i])
+                          stop   = np.array( [ x[offset + 2*j ]  , x[offset + 2*j+1 ] ] )
+
+                          horsetime = np.linalg.norm( stop - start )
+                          
+                          flytime_to_site   = 1/phi * np.linalg.norm( site - start )
+                          flytime_from_site = 1/phi * np.linalg.norm( stop - site  )
+                          flytime           = flytime_to_site + flytime_from_site
+                          return horsetime-flytime
+
+                    accum.append( _constraint_function )
+
+          return accum 
+
+     def generate_constraints(sites, weights):
+         return [site_constraints(i, sites, weights) for i in range(len(sites))]
+
+     #####
+     #print weights
+     #### For debugging
+     weights = [1 for wt in weights]
+     ####
+     
+     cons = utils_algo.flatten_list_of_lists (generate_constraints(sites, weights))
+     cons1 = [  {'type':'eq', 'fun':f}  for f in cons]
+     
+     # Since the horsely tour lies inside the square,
+     # the bounds for each coordinate is 0 and 1
+     x0 = np.empty(2*sum(weights))
+     x0.fill(0.5) # choice of filling vector with 0.5 is arbitrary
+
+     # Run scipy's minimization solver
+     sol = minimize(tour_length(horseflyinit), x0, method= 'SLSQP', constraints=cons1)
+     tour_points = utils_algo.pointify_vector(sol.x)
+
+     #print sol
+
+     #time.sleep(5000)
+     return {'tour_points'  : tour_points,
+             'site_ordering': sites}
+@| @}
+%{/python-mode}%

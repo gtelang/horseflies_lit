@@ -81,6 +81,7 @@ import logging
 import math
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+# plt.style.use('seaborn-poster')
 import numpy as np
 import os
 import pprint as pp
@@ -97,7 +98,6 @@ me to write customized \texttt{debug} and \texttt{info} functions that let's me 
 the log messages according to the frame level. I learned this trick from the following 
 Stack Overflow post \url{https://stackoverflow.com/a/5500099/505306}. 
 %{python-mode}%
-
 @d  Set up logging information relevant to this module 
 @{logger=logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
@@ -188,7 +188,7 @@ elif input_str == 'k':
                           k=2,
                           post_optimizer=algo_exact_given_specific_ordering)
       print " "
-      print Fore.GREEN, answer['tour_points'], Style.RESET_ALL
+      print Fore.GREEN, horseflytour['tour_points'], Style.RESET_ALL
 elif input_str == 'kl':
       horseflytour = \
              run.getTour( algo_kmeans,
@@ -429,6 +429,7 @@ are collected at the end of this chapter.
 @i problem-classic-horsefly/algo-bottom-up-split.web
 @i problem-classic-horsefly/algo-local-search-swap.web
 @i problem-classic-horsefly/algo-k2-means.web
+@i problem-classic-horsefly/algo-tsp-ordering.web
 
 
 \needspace{17cm}
@@ -601,6 +602,9 @@ ax.add_patch( mpl.patches.Circle( horseflyinit, radius = 1/140.0,
                                   facecolor= '#D13131', edgecolor='black'   )  )
 fontsize = 20
 
+
+plt.rc('text', usetex=True)
+plt.rc('font', family='serif')
 ax.set_title( r'Algorithm Used: ' + algo_str +  '\nTour Length: ' \
                + str(tour_length)[:7], fontdict={'fontsize':fontsize})
 ax.set_xlabel(r'Number of sites: ' + str(len(xsites)) + '\nDrone Speed: ' + str(phi) ,

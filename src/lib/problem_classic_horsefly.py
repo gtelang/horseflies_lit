@@ -12,6 +12,7 @@ import logging
 import math
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+# plt.style.use('seaborn-poster')
 import numpy as np
 import os
 import pprint as pp
@@ -81,7 +82,7 @@ def run_handler():
                                               k=2,
                                               post_optimizer=algo_exact_given_specific_ordering)
                           print " "
-                          print Fore.GREEN, answer['tour_points'], Style.RESET_ALL
+                          print Fore.GREEN, horseflytour['tour_points'], Style.RESET_ALL
                     elif input_str == 'kl':
                           horseflytour = \
                                  run.getTour( algo_kmeans,
@@ -415,6 +416,191 @@ def algo_exact_given_specific_ordering (sites, horseflyinit, phi):
                                                     tour_points, \
                                                     horse_waiting_times, 
                                                     horseflyinit)}
+ 
+def  algo_approximate_L1_given_specific_ordering(sites, horseflyinit, phi):
+    import mosek
+    numsites = len(sites)
+
+    def p(idx):
+        return idx + 0*numsites
+
+    def b(idx):
+        return idx + 2*numsites
+
+    def f(idx):
+        return idx + 4*numsites
+
+    def h(idx):
+        return idx + 6*numsites
+    
+    # Define a stream printer to grab output from MOSEK
+    def streamprinter(text):
+        sys.stdout.write(text)
+        sys.stdout.flush()
+
+    numcon = 9 + 13*(numsites-1) # the first site has 9 constraints while the remaining n-1 sites have 13 constraints each
+    numvar = 8 * numsites # Each ``L1 triangle'' has 8 variables associated with it
+
+    alpha = horseflyinit[0]
+    beta  = horseflyinit[1]
+
+    s = utils_algo.flatten_list_of_lists(sites)
+
+    # Make mosek environment
+    with mosek.Env() as env:
+        # Create a task object
+        with env.Task(0, 0) as task:
+            # Attach a log stream printer to the task
+            task.set_Stream(mosek.streamtype.log, streamprinter)
+            # Append 'numcon' empty constraints.
+            # The constraints will initially have no bounds.
+            task.appendcons(numcon)
+            # Append 'numvar' variables.
+            # The variables will initially be fixed at zero (x=0).
+            task.appendvars(numvar)
+
+            for idx in range(numvar):
+                if (0   <= idx) and (idx < 2*numsites): # free variables (p section of the vector)
+                    task.putvarbound(idx, mosek.boundkey.fr, -np.inf, np.inf)
+                    
+                elif  idx == 2*numsites : # b_0 is a known variable
+                    val = abs(s[0]-alpha)
+                    task.putvarbound(idx, mosek.boundkey.fx, val, val)
+                
+                elif  idx == 2*numsites +1 : # b_1 is a known variable
+                    val = abs(s[1]-beta)
+                    task.putvarbound(idx, mosek.boundkey.fx, val, val)
+
+                else : # b_2, onwards and the f and h sections of the vector
+                    task.putvarbound(idx, mosek.boundkey.lo, 0.0, np.inf)
+                    
+            # All the coefficients corresponding to the h's are 1's
+            # and for the others the coefficients are 0. 
+            for i in range(numvar):
+                if i >= 6*numsites: # the h-section
+                    task.putcj(i,1)
+                else: # the p,b,f sections of x
+                    task.putcj(i,0)
+
+            # Constraints for the zeroth triangle corresponding to the zeroth site
+            row = -1
+            row += 1; task.putconbound(row, mosek.boundkey.up, -np.inf, alpha ) ; task.putarow(row, [p(0), h(0)],[1.0, -1.0])
+            row += 1; task.putconbound(row, mosek.boundkey.lo, alpha  , np.inf) ; task.putarow(row, [p(0), h(0)],[1.0,  1.0])
+
+            row += 1; task.putconbound(row, mosek.boundkey.up, -np.inf, beta ) ; task.putarow(row, [p(1), h(1)],[1.0, -1.0])
+            row += 1; task.putconbound(row, mosek.boundkey.lo, beta  , np.inf) ; task.putarow(row, [p(1), h(1)],[1.0,  1.0])
+            
+            row += 1; task.putconbound(row, mosek.boundkey.up, -np.inf, s[0]  ) ; task.putarow(row, [p(0), f(0)],[1.0, -1.0])
+            row += 1; task.putconbound(row, mosek.boundkey.lo,  s[0]  , np.inf) ; task.putarow(row, [p(0), f(0)],[1.0,  1.0])
+
+            row += 1; task.putconbound(row, mosek.boundkey.up, -np.inf, s[1]  ) ; task.putarow(row, [p(1), f(1)],[1.0, -1.0])
+            row += 1; task.putconbound(row, mosek.boundkey.lo,  s[1]  , np.inf) ; task.putarow(row, [p(1), f(1)],[1.0,  1.0])
+
+            # The most important constraint of all! On the ``L1 triangle''
+            # time for drone to start from the truck reach site and get back to truck
+            # = time for truck between the two successive rendezvous points
+            # The way I have modelled the following constraint it is not exactly
+            # the same as the previous statement of equality of times of truck
+            # and drone, but for initial experiments it looks like this gives
+            # waiting times to be automatically close to 0 (1e-9 close to machine-epsilon)
+            # Theorem in the making?? 
+            row += 1; task.putconbound(row, mosek.boundkey.fx, 0.0 , 0.0 ) ;
+            task.putarow(row, [b(0), b(1), f(0), f(1), h(0), h(1)], [1.0,1.0,1.0,1.0,-phi, -phi])
+
+            # Constraints beginning from the 1st triangle
+            for  i in range(1,numsites):
+                row+=1 ;  task.putconbound(row, mosek.boundkey.lo, -s[2*i]  , np.inf) ; task.putarow(row, [b(2*i),   p(2*i-2)],[1.0, -1.0])
+                row+=1 ;  task.putconbound(row, mosek.boundkey.lo,  s[2*i]  , np.inf) ; task.putarow(row, [b(2*i),   p(2*i-2)],[1.0,  1.0])
+                row+=1 ;  task.putconbound(row, mosek.boundkey.lo, -s[2*i+1], np.inf) ; task.putarow(row, [b(2*i+1), p(2*i-1)],[1.0, -1.0])
+                row+=1 ;  task.putconbound(row, mosek.boundkey.lo,  s[2*i+1], np.inf) ; task.putarow(row, [b(2*i+1), p(2*i-1)],[1.0,  1.0])
+                
+                row+=1 ;  task.putconbound(row, mosek.boundkey.lo, -s[2*i]  , np.inf) ; task.putarow(row, [f(2*i),    p(2*i)]  ,[1.0, -1.0])
+                row+=1 ;  task.putconbound(row, mosek.boundkey.lo,  s[2*i]  , np.inf) ; task.putarow(row, [f(2*i),    p(2*i)]  ,[1.0,  1.0])
+                row+=1 ;  task.putconbound(row, mosek.boundkey.lo, -s[2*i+1], np.inf) ; task.putarow(row, [f(2*i+1),  p(2*i+1)],[1.0, -1.0])
+                row+=1 ;  task.putconbound(row, mosek.boundkey.lo,  s[2*i+1], np.inf) ; task.putarow(row, [f(2*i+1),  p(2*i+1)],[1.0,  1.0])
+                
+                row+=1 ;  task.putconbound(row, mosek.boundkey.lo, 0.0     , np.inf); task.putarow(row, [p(2*i)  , p(2*i-2), h(2*i)]  , [1.0,-1.0, 1.0])
+                row+=1 ;  task.putconbound(row, mosek.boundkey.up, -np.inf , 0.0   ); task.putarow(row, [p(2*i)  , p(2*i-2), h(2*i)]  , [1.0,-1.0,-1.0])
+                row+=1 ;  task.putconbound(row, mosek.boundkey.lo, 0.0     , np.inf); task.putarow(row, [p(2*i+1), p(2*i-1), h(2*i+1)], [1.0,-1.0, 1.0])
+                row+=1 ;  task.putconbound(row, mosek.boundkey.up, -np.inf , 0.0   ); task.putarow(row, [p(2*i+1), p(2*i-1), h(2*i+1)], [1.0,-1.0,-1.0])
+                # The most important constraint of all! On the ``L1 triangle''
+                # time for drone to start from the truck reach site and get back to truck
+                # = time for truck between the two successive rendezvous points
+                row+=1; task.putconbound(row, mosek.boundkey.fx, 0.0 , 0.0 ) ;
+                task.putarow(row, [b(2*i), b(2*i+1), f(2*i), f(2*i+1), h(2*i), h(2*i+1)], [1.0,1.0,1.0,1.0,-phi, -phi])
+
+            # Input the objective sense (minimize/maximize)
+            task.putobjsense(mosek.objsense.minimize)
+            task.optimize()
+            # Print a summary containing information
+            # about the solution for debugging purposes
+            #task.solutionsummary(mosek.streamtype.msg)
+
+            # Get status information about the solution
+            solsta = task.getsolsta(mosek.soltype.bas)
+            
+            if (solsta == mosek.solsta.optimal or
+                        solsta == mosek.solsta.near_optimal):
+                    xx = [0.] * numvar
+                        # Request the basic solution.
+                    task.getxx(mosek.soltype.bas, xx)
+                    #print("Optimal solution: ")
+                    #for i in range(numvar):
+                    #    print("x[" + str(i) + "]=" + str(xx[i]))
+            elif (solsta == mosek.solsta.dual_infeas_cer or
+                    solsta == mosek.solsta.prim_infeas_cer or
+                    solsta == mosek.solsta.near_dual_infeas_cer or
+                    solsta == mosek.solsta.near_prim_infeas_cer):
+                    print("Primal or dual infeasibility certificate found.\n")
+            elif solsta == mosek.solsta.unknown:
+                    print("Unknown solution status")
+            else:
+                    print("Other solution status")
+
+            # Now that we have solved the LP
+            # We need to extract the ``p'' section of the vector
+            ps = xx[:2*numsites]
+            bs = xx[2*numsites:4*numsites]
+            fs = xx[4*numsites:6*numsites]
+            hs = xx[6*numsites:]
+
+            ######################################################################################
+            # This commented out section is important to check how close to zero the waiting times
+            # are as calculated by the LP. To understand this, comment in this section and comment
+            # out the part using tghe L2 metric below it
+            ######################################################################################
+            # horse_waiting_times = np.zeros(numsites)
+            # for i in range(numsites):
+            #     if i == 0 :
+            #         horse_time         = abs(ps[0]-alpha) + abs(ps[1]-beta)
+            #         fly_time_to_site   = 1.0/phi * (abs(s[0]-alpha) + abs(s[1]-beta))
+            #         fly_time_from_site = 1.0/phi * (abs(s[0]-ps[1]) + abs(s[1]-ps[1]))
+            #     else:
+            #         horse_time         = abs(ps[2*i]-ps[2*i-2]) + abs(ps[2*i+1]-ps[2*i-1])
+            #         fly_time_to_site   = 1.0/phi * ( abs(s[2*i]-ps[2*i-2]) + abs(s[2*i+1]-ps[2*i-1]) ) 
+            #         fly_time_from_site = 1.0/phi * ( abs(s[2*i]-ps[2*i])   + abs(s[2*i+1]-ps[2*i+1]) ) 
+            #     horse_waiting_times[i] = horse_time - (fly_time_to_site + fly_time_from_site)
+
+            horse_waiting_times = np.zeros(numsites)
+            for i in range(numsites):
+                if i == 0 :
+                    horse_time         = np.sqrt((ps[0]-alpha)**2 + (ps[1]-beta)**2)
+                    fly_time_to_site   = 1.0/phi * np.sqrt((s[0]-alpha)**2 + (s[1]-beta)**2)
+                    fly_time_from_site = 1.0/phi * np.sqrt((s[0]-ps[1])**2 + (s[1]-ps[1])**2)
+                else:
+                    horse_time         = np.sqrt((ps[2*i]-ps[2*i-2])**2 + (ps[2*i+1]-ps[2*i-1])**2)
+                    fly_time_to_site   = 1.0/phi * np.sqrt( (s[2*i]-ps[2*i-2])**2 + (s[2*i+1]-ps[2*i-1])**2 ) 
+                    fly_time_from_site = 1.0/phi * np.sqrt( (s[2*i]-ps[2*i])**2   + (s[2*i+1]-ps[2*i+1])**2 ) 
+                    
+                horse_waiting_times[i] = horse_time - (fly_time_to_site + fly_time_from_site)
+                
+            tour_points = utils_algo.pointify_vector(ps)
+            return {'tour_points'        : tour_points,
+                    'horse_waiting_times': horse_waiting_times, 
+                    'site_ordering'      : sites,
+                    'tour_length_with_waiting_time_included': tour_length_with_waiting_time_included(tour_points, horse_waiting_times, horseflyinit)}
+
+ 
 
 # Define auxiliary helper functions
 def single_site_solution(site, horseposn, phi):
@@ -744,6 +930,318 @@ def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
                                                           horse_waiting_times, \
                                                           inithorseposn)}
       
+   
+def algo_kmeans(sites, inithorseposn, phi, k, post_optimizer):
+     """
+     type Point   (Double, Double)
+     type Site    Point
+     type Cluster (Point, [Site])
+     type Tour    {'site_ordering':[Site], 
+                   'tour_points'  :[Point]}
+     algo_kmeans :: [Site] -> Point -> Double -> Int
+     """
+     def get_clusters(site_list):
+           """ 
+           get_clusters :: [Site] -> [Cluster]
+           For the given list of sites, perform k-means clustering
+           and return the list of k-centers, along with a list of sites
+           assigned to each center. 
+           """
+           X      = np.array(site_list)
+           kmeans = KMeans(n_clusters=k, random_state=0).fit(X)
+
+           accum = [ (center, [])  for center in kmeans.cluster_centers_ ]
+           for label, site in zip(kmeans.labels_, site_list):
+                 accum [label][1].append(site)
+
+           return accum 
+
+     def extract_cluster_sites_for_each_cluster(clusters):
+         """
+         extract_cluster_sites_for_each_cluster :: [Cluster] -> [[Site]]
+         """
+         return [ cluster_sites for (_, cluster_sites) in clusters  ]
+
+     def fuse_tours(tours):
+         """ 
+          fuse_tours :: [Tour] -> Tour
+         """
+         fused_tour = {'site_ordering':[], 'tour_points':[]}
+         for tour, i in zip(tours, range(len(tours))):
+               fused_tour['site_ordering'].extend(tour['site_ordering'])
+               if i != len(tours)-1:
+                     # Remember! last point of previous tour is first point of
+                     # this tour, which is why we need to avoid duplication
+                     # Hence the [:-1]
+                     fused_tour['tour_points'].extend(tour['tour_points'][:-1]) 
+               else: 
+                     # Because this is the last tour in the iteration, we include
+                     # its end point also, hence no [:-1] here
+                     fused_tour['tour_points'].extend(tour['tour_points'])
+         return fused_tour
+
+     def  weighted_center_tour(clusters, horseflyinit):
+         """ 
+         weighted_center_tour :: [Cluster] -> Point -> [Cluster]
+         
+         Just return a permutation of the clusters. 
+         need to return actual weighted tour
+         since we are only interested in the order
+         in which the weighted center tour is performed
+         on k weighted points, where k is the clustering 
+         number used here
+         """
+         
+         #print Fore.CYAN, " Clusters: "    , clusters, Style.RESET_ALL
+         #print " "
+         #print Fore.CYAN, " Horseflyinit: ", horseflyinit, Style.RESET_ALL
+         
+         assert( k == len(clusters) )
+         tour_length_fn = tour_length(horseflyinit)
+
+         #-------------------------------------------------
+         # For each of the k! permutations of the weighted sites
+         # give the permutation with the smallest weighted tour
+         # Note that k is typically small, say 2,3 or 4
+         #-------------------------------------------------
+         # But first we initialize the accumulator variables prefixed with best_
+
+         #print Fore.YELLOW , " Computing Weighted Center Tour ", Style.RESET_ALL
+         clustering_centers = [ center          for (center, _)    in clusters]
+         centers_weights   =  [ len(site_list)  for (_, site_list) in clusters]
+
+         #utils_algo.print_list(clustering_centers)
+         #utils_algo.print_list(centers_weights)
+         #time.sleep(5000)
+
+         best_perm = clusters
+         best_perm_tour = algo_weighted_sites_given_specific_ordering(clustering_centers, \
+                                                               centers_weights, \
+                                                               horseflyinit, \
+                                                               phi)
+
+         i = 1
+         for clusters_perm in list(itertools.permutations(clusters)):
+
+               #print Fore.YELLOW , "......Testing a new cluster permutation [ ", i ,  \
+               #                     "/", math.factorial(k) , " ] of the sites", \
+               #                    Style.RESET_ALL
+
+               i = i + 1
+               # cluster_centers_and_weights ::  [(Point, Int)]
+               # This is what is used for the weighted tour
+               clustering_centers = [ center          for (center, _)    in clusters_perm]
+               centers_weights    = [ len(site_list)  for (_, site_list) in clusters_perm] 
+               
+               tour_current_perm = \
+                   algo_weighted_sites_given_specific_ordering(clustering_centers, \
+                                                               centers_weights, \
+                                                               horseflyinit, \
+                                                               phi)
+
+               if tour_length_fn( utils_algo.flatten_list_of_lists(tour_current_perm ['tour_points']) ) \
+                < tour_length_fn( utils_algo.flatten_list_of_lists(   best_perm_tour ['tour_points']) ):
+ 
+                   print Fore.RED + ".................Found better cluster order" + Style.RESET_ALL
+                   best_perm = clusters_perm
+
+         return best_perm
+               
+     def get_tour (site_list, horseflyinit):
+        """
+        get_tour :: [Site] -> Point -> Tour
+        
+        A recursive function which does the job 
+        of extracting a tour
+        """
+
+        if len (site_list) <= k: # Base-case for the recursion
+              #print Fore.CYAN + ".....Reached Recursion Base case" + Style.RESET_ALL
+              result = algo_dumb(site_list, horseflyinit, phi)
+              return result 
+        else: # The main recursion
+           # Perform k-means clustering and get the clusters
+           clusters = get_clusters(site_list)
+
+           #utils_algo.print_list(clusters)
+
+           ###################################################################
+           # Permute the clusters depending on which is better to visit first
+           clusters_perm = weighted_center_tour(clusters, horseflyinit)
+           ####################################################################
+
+           # Extract cluster sites for each cluster
+           cluster_sites_for_each_cluster  = \
+                  extract_cluster_sites_for_each_cluster(clusters_perm)
+
+           # Apply the get_tour function on each chunk while folding across
+           # using the last point of the tour of the previous cluster
+           # as the first point of this current one. This is a kind of recursion
+           # that pays forward.
+           tours = []
+           for site_list, i in zip(cluster_sites_for_each_cluster,
+                                   range(len(cluster_sites_for_each_cluster))):
+                 
+                 if i == 0:# first point is horseflyinit. The starting fold value!!
+                       tours.append( get_tour(site_list, inithorseposn)  )
+                 else: # use the last point of the previous tour (i-1 index)
+                       # as the first point of this one !!
+                       prev_tour  = tours[i-1]
+                       tours.append( get_tour(site_list, prev_tour['tour_points'][-1]))
+           # Fuse the tours you obtained above to get a site ordering
+           return fuse_tours(tours)
+
+     print Fore.MAGENTA + "RUNNING algo_kmeans......." + Style.RESET_ALL
+     sites1 = get_tour(sites, inithorseposn)['site_ordering']
+     return  post_optimizer(sites1, inithorseposn, phi )
+
+
+
+def algo_weighted_sites_given_specific_ordering (sites, weights, horseflyinit, phi):
+      
+     def site_constraints(i, sites, weights):
+          """
+          site_constraints :: Int -> [Site] -> [Double] 
+                          -> [ [Double] -> Double  ]
+          
+          Generate a list of constraint functions for the ith site
+          The number of constraint functions is equal to the weight
+          of the site!
+          """
+
+          #print Fore.RED, sites, Style.RESET_ALL
+         
+          psum_weights = utils_algo.partial_sums( weights ) # partial sum of ALL the site-weights
+          accum        = [ ]
+          site_weight  = weights[i]
+
+          for j in range(site_weight): 
+
+              if i == 0 and j == 0:
+
+                    #print "i= ", i, " j= ", j
+                    def _constraint_function(x):
+                        """
+                        constraint_function :: [Double] -> Double
+                        """
+                        start = np.array (horseflyinit)
+                        site  = np.array (sites[0])
+                        stop  = np.array ([x[0],x[1]])
+                        
+                        horsetime = np.linalg.norm( stop - start )
+                        
+                        flytime_to_site   = 1/phi * np.linalg.norm( site - start )
+                        flytime_from_site = 1/phi * np.linalg.norm( stop - site  )
+                        flytime           = flytime_to_site + flytime_from_site
+                        return horsetime-flytime
+                    
+                    accum.append( _constraint_function )
+                    
+              elif  i == 0 and j != 0 :
+
+                    #print "i= ", i, " j= ", j
+                    def _constraint_function(x):
+                          """
+                          constraint_function :: [Double] -> Double
+                          """
+                          start = np.array( [x[2*j-2], x[2*j-1]] ) 
+                          site  = np.array(sites[0])
+                          stop  = np.array( [x[2*j]  , x[2*j+1]] )
+
+                          horsetime = np.linalg.norm( stop - start )
+                          
+                          flytime_to_site   = 1/phi * np.linalg.norm( site - start )
+                          flytime_from_site = 1/phi * np.linalg.norm( stop - site  )
+                          flytime           = flytime_to_site + flytime_from_site
+                          return horsetime-flytime
+
+                    accum.append( _constraint_function )
+              else:
+
+                    #print "i= ", i, " j= ", j
+                    def _constraint_function(x):
+                          """
+                          constraint_function :: [Double] -> Double
+                          """
+                          
+                          offset = 2 * psum_weights[i-1]
+                          
+                          start  = np.array( [ x[offset + 2*j-2 ], x[offset + 2*j-1 ] ] ) 
+                          site   = np.array(sites[i])
+                          stop   = np.array( [ x[offset + 2*j ]  , x[offset + 2*j+1 ] ] )
+
+                          horsetime = np.linalg.norm( stop - start )
+                          
+                          flytime_to_site   = 1/phi * np.linalg.norm( site - start )
+                          flytime_from_site = 1/phi * np.linalg.norm( stop - site  )
+                          flytime           = flytime_to_site + flytime_from_site
+                          return horsetime-flytime
+
+                    accum.append( _constraint_function )
+
+          return accum 
+
+     def generate_constraints(sites, weights):
+         return [site_constraints(i, sites, weights) for i in range(len(sites))]
+
+     #####
+     #print weights
+     #### For debugging
+     weights = [1 for wt in weights]
+     ####
+     
+     cons = utils_algo.flatten_list_of_lists (generate_constraints(sites, weights))
+     cons1 = [  {'type':'eq', 'fun':f}  for f in cons]
+     
+     # Since the horsely tour lies inside the square,
+     # the bounds for each coordinate is 0 and 1
+     x0 = np.empty(2*sum(weights))
+     x0.fill(0.5) # choice of filling vector with 0.5 is arbitrary
+
+     # Run scipy's minimization solver
+     sol = minimize(tour_length(horseflyinit), x0, method= 'SLSQP', constraints=cons1)
+     tour_points = utils_algo.pointify_vector(sol.x)
+
+     #print sol
+
+     #time.sleep(5000)
+     return {'tour_points'  : tour_points,
+             'site_ordering': sites}
+
+def algo_tsp_ordering(sites, inithorseposn, phi, post_optimizer):
+    import tsp
+    horseinit_and_sites = [inithorseposn] + sites
+
+    _, tsp_idxs = tsp.tsp(horseinit_and_sites)
+
+          
+    # Get the position of the horse in tsp_idxss
+    h = tsp_idxs.index(0) # 0 because the horse was placed first in the above vector
+
+    if h != len(tsp_idxs)-1:
+        idx_vec = tsp_idxs[h+1:] + tsp_idxs[:h]
+    else:
+        idx_vec = tsp_idxs[:h]
+
+    # idx-1 because all the indexes of the sites were pushed forward
+    # by 1 when we tacked on inithorseposn at the very beginning
+    # of horseinit_and_sites, hence we auto-correct for that
+    sites_tsp = [sites[idx-1] for idx in idx_vec]
+    
+    tour0    = post_optimizer (sites_tsp                , inithorseposn, phi) 
+    tour1    = post_optimizer (list(reversed(sites_tsp)), inithorseposn, phi) 
+    
+    tour0_length = utils_algo.length_polygonal_chain([inithorseposn] + tour0['site_ordering'])
+    tour1_length = utils_algo.length_polygonal_chain([inithorseposn] + tour1['site_ordering'])
+
+    print Fore.RED, " TSP paths in either direction are ", tour0_length, " ", tour1_length, Style.RESET_ALL
+    
+    if tour0_length < tour1_length:
+        print Fore.RED, "Selecting tour0 ", Style.RESET_ALL
+        return tour0
+    else:
+        print Fore.RED, "Selecting tour1 ", Style.RESET_ALL
+        return tour1
 
 # Lower bounds for classic horsefly
 def compute_phi_prim_mst(sites, inithorseposn,phi):
@@ -876,6 +1374,9 @@ def plotTour(ax,horseflytour, horseflyinit, phi, algo_str, tour_color='#d13131')
                                       facecolor= '#D13131', edgecolor='black'   )  )
     fontsize = 20
 
+
+    plt.rc('text', usetex=True)
+    plt.rc('font', family='serif')
     ax.set_title( r'Algorithm Used: ' + algo_str +  '\nTour Length: ' \
                    + str(tour_length)[:7], fontdict={'fontsize':fontsize})
     ax.set_xlabel(r'Number of sites: ' + str(len(xsites)) + '\nDrone Speed: ' + str(phi) ,

@@ -1,0 +1,52 @@
+\section{\framebox{Algorithm}: TSP ordering}
+\subsection{Algorithmic Overview}
+\subsection{Algorithmic Details}
+
+\newchunk
+Use the TSP ordering for the horsefly tour, irrespective 
+of the speedratio. Useful to see the benefit obtained from 
+the various heurtiustics you will be designing. 
+    
+This will be especially useful for larger ratios of speeds
+
+I use the tsp package for this: \url{https://pypi.org/project/tsp/#files}
+If the tsp ordering has already been pre-computed, then use it. 
+
+%{python-mode}%
+@D Algorithms for classic horsefly @{
+def algo_tsp_ordering(sites, inithorseposn, phi, post_optimizer):
+    import tsp
+    horseinit_and_sites = [inithorseposn] + sites
+
+    _, tsp_idxs = tsp.tsp(horseinit_and_sites)
+
+          
+    # Get the position of the horse in tsp_idxss
+    h = tsp_idxs.index(0) # 0 because the horse was placed first in the above vector
+
+    if h != len(tsp_idxs)-1:
+        idx_vec = tsp_idxs[h+1:] + tsp_idxs[:h]
+    else:
+        idx_vec = tsp_idxs[:h]
+
+    # idx-1 because all the indexes of the sites were pushed forward
+    # by 1 when we tacked on inithorseposn at the very beginning
+    # of horseinit_and_sites, hence we auto-correct for that
+    sites_tsp = [sites[idx-1] for idx in idx_vec]
+    
+    tour0    = post_optimizer (sites_tsp                , inithorseposn, phi) 
+    tour1    = post_optimizer (list(reversed(sites_tsp)), inithorseposn, phi) 
+    
+    tour0_length = utils_algo.length_polygonal_chain([inithorseposn] + tour0['site_ordering'])
+    tour1_length = utils_algo.length_polygonal_chain([inithorseposn] + tour1['site_ordering'])
+
+    print Fore.RED, " TSP paths in either direction are ", tour0_length, " ", tour1_length, Style.RESET_ALL
+    
+    if tour0_length < tour1_length:
+        print Fore.RED, "Selecting tour0 ", Style.RESET_ALL
+        return tour0
+    else:
+        print Fore.RED, "Selecting tour1 ", Style.RESET_ALL
+        return tour1
+@| @}
+%{/python-mode}%
