@@ -505,7 +505,7 @@ axes are adjusted according to the data to be plotted.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtFileDefBy\ \NWlink{nuweb14}{14}\NWlink{nuweb15a}{, 15a}\NWlink{nuweb15b}{b}\NWlink{nuweb16a}{, 16a}.
+\item \NWtxtFileDefBy\ \NWlink{nuweb14}{14}\NWlink{nuweb15a}{, 15a}\NWlink{nuweb15b}{b}\NWlink{nuweb15c}{c}.
 
 \item{}
 \end{list}
@@ -527,21 +527,14 @@ to delete and remove all the graphical objects drawn on it.
 \mbox{}\verb@    for index , patch in zip(range(len(ax.patches)), ax.patches):@\\
 \mbox{}\verb@        if isinstance(patch, mpl.patches.Polygon) == True:@\\
 \mbox{}\verb@            patch.remove()@\\
-\mbox{}\verb@@\\
-\mbox{}\verb@    # Remove line patches. These get inserted during the r=2 case,@\\
-\mbox{}\verb@    # For some strange reason matplotlib does not consider line objects@\\
-\mbox{}\verb@    # as patches.@\\
 \mbox{}\verb@    ax.lines[:]=[]@\\
-\mbox{}\verb@@\\
-\mbox{}\verb@    #pp.pprint (ax.patches) # To verify that none of the patches are@\\
-\mbox{}\verb@    # polyon patches corresponding to clusters.@\\
 \mbox{}\verb@    applyAxCorrection(ax)@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtFileDefBy\ \NWlink{nuweb14}{14}\NWlink{nuweb15a}{, 15a}\NWlink{nuweb15b}{b}\NWlink{nuweb16a}{, 16a}.
+\item \NWtxtFileDefBy\ \NWlink{nuweb14}{14}\NWlink{nuweb15a}{, 15a}\NWlink{nuweb15b}{b}\NWlink{nuweb15c}{c}.
 
 \item{}
 \end{list}
@@ -567,20 +560,14 @@ to delete and remove all the graphical objects drawn on it.
 \mbox{}\verb@    for index , patch in zip(range(len(ax.patches)), ax.patches):@\\
 \mbox{}\verb@        if isinstance(patch, mpl.patches.Polygon) == True:@\\
 \mbox{}\verb@            patch.remove()@\\
-\mbox{}\verb@@\\
-\mbox{}\verb@    # Remove line patches. These get inserted during the r=2 case,@\\
-\mbox{}\verb@    # For some strange reason matplotlib does not consider line objects as patches.@\\
 \mbox{}\verb@    ax.lines[:]=[]@\\
-\mbox{}\verb@@\\
-\mbox{}\verb@    # To verify that none of the patches are polyon patches corresponding to clusters.@\\
-\mbox{}\verb@    #pp.pprint (ax.patches) @\\
 \mbox{}\verb@    applyAxCorrection(ax)@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtFileDefBy\ \NWlink{nuweb14}{14}\NWlink{nuweb15a}{, 15a}\NWlink{nuweb15b}{b}\NWlink{nuweb16a}{, 16a}.
+\item \NWtxtFileDefBy\ \NWlink{nuweb14}{14}\NWlink{nuweb15a}{, 15a}\NWlink{nuweb15b}{b}\NWlink{nuweb15c}{c}.
 
 \item{}
 \end{list}
@@ -605,7 +592,7 @@ for later.}
 
 %{python-mode}%
 \begin{flushleft} \small\label{scrap7}\raggedright\small
-\NWtarget{nuweb16a}{} \verb@"../src/lib/utils_graphics.py"@\nobreak\ {\footnotesize {16a}}$\equiv$
+\NWtarget{nuweb15c}{} \verb@"../src/lib/utils_graphics.py"@\nobreak\ {\footnotesize {15c}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@def wrapperEnterRunPoints(fig, ax, run):@\\
@@ -615,12 +602,12 @@ for later.}
 \mbox{}\verb@            event.dblclick == True and event.xdata  != None and event.ydata  != None:@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@             if event.button == 1:  @\\
-\mbox{}\verb@                 @\hbox{$\langle\,${\itshape Insert blue circle representing a site}\nobreak\ {\footnotesize \NWlink{nuweb16b}{16b}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@                 @\hbox{$\langle\,${\itshape Insert blue circle representing a site}\nobreak\ {\footnotesize \NWlink{nuweb16a}{16a}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@             elif event.button == 3:  @\\
-\mbox{}\verb@                 @\hbox{$\langle\,${\itshape Insert big red circle representing initial position of horse and fly}\nobreak\ {\footnotesize \NWlink{nuweb16c}{16c}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@                 @\hbox{$\langle\,${\itshape Insert big red circle representing initial position of horse and fly}\nobreak\ {\footnotesize \NWlink{nuweb16b}{16b}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@             @\hbox{$\langle\,${\itshape Clear polygon patches and set up last minute \verb|ax| tweaks}\nobreak\ {\footnotesize \NWlink{nuweb16d}{16d}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@             @\hbox{$\langle\,${\itshape Clear polygon patches and set up last minute \verb|ax| tweaks}\nobreak\ {\footnotesize \NWlink{nuweb16c}{16c}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@    return _enterPoints@\\
 \mbox{}\verb@@{\NWsep}
@@ -628,7 +615,7 @@ for later.}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtFileDefBy\ \NWlink{nuweb14}{14}\NWlink{nuweb15a}{, 15a}\NWlink{nuweb15b}{b}\NWlink{nuweb16a}{, 16a}.
+\item \NWtxtFileDefBy\ \NWlink{nuweb14}{14}\NWlink{nuweb15a}{, 15a}\NWlink{nuweb15b}{b}\NWlink{nuweb15c}{c}.
 
 \item{}
 \end{list}
@@ -640,7 +627,7 @@ for later.}
 %{python-mode}%
 \begin{flushleft} \small
 \begin{minipage}{\linewidth}\label{scrap8}\raggedright\small
-\NWtarget{nuweb16b}{} $\langle\,${\itshape Insert blue circle representing a site}\nobreak\ {\footnotesize {16b}}$\,\rangle\equiv$
+\NWtarget{nuweb16a}{} $\langle\,${\itshape Insert blue circle representing a site}\nobreak\ {\footnotesize {16a}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@  @\\
@@ -657,7 +644,7 @@ for later.}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb16a}{16a}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb15c}{15c}.
 
 \item{}
 \end{list}
@@ -669,13 +656,13 @@ for later.}
 %{python-mode}%
 \begin{flushleft} \small
 \begin{minipage}{\linewidth}\label{scrap9}\raggedright\small
-\NWtarget{nuweb16c}{} $\langle\,${\itshape Insert big red circle representing initial position of horse and fly}\nobreak\ {\footnotesize {16c}}$\,\rangle\equiv$
+\NWtarget{nuweb16b}{} $\langle\,${\itshape Insert big red circle representing initial position of horse and fly}\nobreak\ {\footnotesize {16b}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@ @\\
-\mbox{}\verb@inithorseposn = (event.xdata, event.ydata)@\\
+\mbox{}\verb@inithorseposn     = (event.xdata, event.ydata)@\\
 \mbox{}\verb@run.inithorseposn = inithorseposn  @\\
-\mbox{}\verb@patchSize  = (xlim[1]-xlim[0])/70.0@\\
+\mbox{}\verb@patchSize         = (xlim[1]-xlim[0])/70.0@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@ax.add_patch( mpl.patches.Circle( inithorseposn,radius = patchSize,@\\
 \mbox{}\verb@                                  facecolor= '#D13131', edgecolor='black' ))@\\
@@ -684,7 +671,7 @@ for later.}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb16a}{16a}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb15c}{15c}.
 
 \item{}
 \end{list}
@@ -705,7 +692,7 @@ for later.}
 %{python-mode}%
 \begin{flushleft} \small
 \begin{minipage}{\linewidth}\label{scrap10}\raggedright\small
-\NWtarget{nuweb16d}{} $\langle\,${\itshape Clear polygon patches and set up last minute \verb|ax| tweaks}\nobreak\ {\footnotesize {16d}}$\,\rangle\equiv$
+\NWtarget{nuweb16c}{} $\langle\,${\itshape Clear polygon patches and set up last minute \verb|ax| tweaks}\nobreak\ {\footnotesize {16c}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@   @\\
@@ -717,7 +704,7 @@ for later.}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb16a}{16a}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb15c}{15c}.
 
 \item{}
 \end{list}
@@ -734,7 +721,7 @@ for later.}
 
 %{python-mode}%
 \begin{flushleft} \small\label{scrap11}\raggedright\small
-\NWtarget{nuweb17a}{} \verb@"../src/lib/utils_algo.py"@\nobreak\ {\footnotesize {17a}}$\equiv$
+\NWtarget{nuweb16d}{} \verb@"../src/lib/utils_algo.py"@\nobreak\ {\footnotesize {16d}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
@@ -757,7 +744,7 @@ for later.}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtFileDefBy\ \NWlink{nuweb17a}{17a}\NWlink{nuweb17b}{b}\NWlink{nuweb18a}{, 18a}\NWlink{nuweb18b}{b}\NWlink{nuweb18c}{c}\NWlink{nuweb18d}{d}\NWlink{nuweb18e}{e}\NWlink{nuweb18f}{f}.
+\item \NWtxtFileDefBy\ \NWlink{nuweb16d}{16d}\NWlink{nuweb17a}{, 17a}\NWlink{nuweb17b}{b}\NWlink{nuweb18a}{, 18a}\NWlink{nuweb18b}{b}\NWlink{nuweb18c}{c}\NWlink{nuweb18d}{d}\NWlink{nuweb18e}{e}.
 
 \item{}
 \end{list}
@@ -773,7 +760,7 @@ Typically used for computing the length of the horse's and fly's tours.
 
 %{python-mode}%
 \begin{flushleft} \small\label{scrap12}\raggedright\small
-\NWtarget{nuweb17b}{} \verb@"../src/lib/utils_algo.py"@\nobreak\ {\footnotesize {17b}}$\equiv$
+\NWtarget{nuweb17a}{} \verb@"../src/lib/utils_algo.py"@\nobreak\ {\footnotesize {17a}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
@@ -789,7 +776,7 @@ Typically used for computing the length of the horse's and fly's tours.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtFileDefBy\ \NWlink{nuweb17a}{17a}\NWlink{nuweb17b}{b}\NWlink{nuweb18a}{, 18a}\NWlink{nuweb18b}{b}\NWlink{nuweb18c}{c}\NWlink{nuweb18d}{d}\NWlink{nuweb18e}{e}\NWlink{nuweb18f}{f}.
+\item \NWtxtFileDefBy\ \NWlink{nuweb16d}{16d}\NWlink{nuweb17a}{, 17a}\NWlink{nuweb17b}{b}\NWlink{nuweb18a}{, 18a}\NWlink{nuweb18b}{b}\NWlink{nuweb18c}{c}\NWlink{nuweb18d}{d}\NWlink{nuweb18e}{e}.
 
 \item{}
 \end{list}
@@ -808,7 +795,7 @@ $[x_0,x_1,x_2,...x_{2n}] \rarr [[x_0,x_1],[x_2,x_3],,..[x_{2n-1},x_{2n}]]$
 %{python-mode}%
 \begin{flushleft} \small
 \begin{minipage}{\linewidth}\label{scrap13}\raggedright\small
-\NWtarget{nuweb18a}{} \verb@"../src/lib/utils_algo.py"@\nobreak\ {\footnotesize {18a}}$\equiv$
+\NWtarget{nuweb17b}{} \verb@"../src/lib/utils_algo.py"@\nobreak\ {\footnotesize {17b}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@def pointify_vector (x):@\\
@@ -824,7 +811,7 @@ $[x_0,x_1,x_2,...x_{2n}] \rarr [[x_0,x_1],[x_2,x_3],,..[x_{2n-1},x_{2n}]]$
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtFileDefBy\ \NWlink{nuweb17a}{17a}\NWlink{nuweb17b}{b}\NWlink{nuweb18a}{, 18a}\NWlink{nuweb18b}{b}\NWlink{nuweb18c}{c}\NWlink{nuweb18d}{d}\NWlink{nuweb18e}{e}\NWlink{nuweb18f}{f}.
+\item \NWtxtFileDefBy\ \NWlink{nuweb16d}{16d}\NWlink{nuweb17a}{, 17a}\NWlink{nuweb17b}{b}\NWlink{nuweb18a}{, 18a}\NWlink{nuweb18b}{b}\NWlink{nuweb18c}{c}\NWlink{nuweb18d}{d}\NWlink{nuweb18e}{e}.
 
 \item{}
 \end{list}
@@ -840,7 +827,7 @@ e.g. $[[0,1],[2,3],[4,5]] \rarr [0,1,2,3,4,5]$
 %{python-mode}%
 \begin{flushleft} \small
 \begin{minipage}{\linewidth}\label{scrap14}\raggedright\small
-\NWtarget{nuweb18b}{} \verb@"../src/lib/utils_algo.py"@\nobreak\ {\footnotesize {18b}}$\equiv$
+\NWtarget{nuweb18a}{} \verb@"../src/lib/utils_algo.py"@\nobreak\ {\footnotesize {18a}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@def flatten_list_of_lists(l):@\\
@@ -850,7 +837,7 @@ e.g. $[[0,1],[2,3],[4,5]] \rarr [0,1,2,3,4,5]$
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtFileDefBy\ \NWlink{nuweb17a}{17a}\NWlink{nuweb17b}{b}\NWlink{nuweb18a}{, 18a}\NWlink{nuweb18b}{b}\NWlink{nuweb18c}{c}\NWlink{nuweb18d}{d}\NWlink{nuweb18e}{e}\NWlink{nuweb18f}{f}.
+\item \NWtxtFileDefBy\ \NWlink{nuweb16d}{16d}\NWlink{nuweb17a}{, 17a}\NWlink{nuweb17b}{b}\NWlink{nuweb18a}{, 18a}\NWlink{nuweb18b}{b}\NWlink{nuweb18c}{c}\NWlink{nuweb18d}{d}\NWlink{nuweb18e}{e}.
 
 \item{}
 \end{list}
@@ -864,7 +851,7 @@ debugging purposes,  it helps to print a list with one item per line.
 
 %{python-mode}%
 \begin{flushleft} \small\label{scrap15}\raggedright\small
-\NWtarget{nuweb18c}{} \verb@"../src/lib/utils_algo.py"@\nobreak\ {\footnotesize {18c}}$\equiv$
+\NWtarget{nuweb18b}{} \verb@"../src/lib/utils_algo.py"@\nobreak\ {\footnotesize {18b}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@def print_list(xs):@\\
@@ -875,7 +862,7 @@ debugging purposes,  it helps to print a list with one item per line.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtFileDefBy\ \NWlink{nuweb17a}{17a}\NWlink{nuweb17b}{b}\NWlink{nuweb18a}{, 18a}\NWlink{nuweb18b}{b}\NWlink{nuweb18c}{c}\NWlink{nuweb18d}{d}\NWlink{nuweb18e}{e}\NWlink{nuweb18f}{f}.
+\item \NWtxtFileDefBy\ \NWlink{nuweb16d}{16d}\NWlink{nuweb17a}{, 17a}\NWlink{nuweb17b}{b}\NWlink{nuweb18a}{, 18a}\NWlink{nuweb18b}{b}\NWlink{nuweb18c}{c}\NWlink{nuweb18d}{d}\NWlink{nuweb18e}{e}.
 
 \item{}
 \end{list}
@@ -887,24 +874,22 @@ debugging purposes,  it helps to print a list with one item per line.
 \newchunk This chunk just calculates the list of partial sums e.g. $[4,2,3] \rarr [4,6,9]"$
 %{python-mode}%
 \begin{flushleft} \small\label{scrap16}\raggedright\small
-\NWtarget{nuweb18d}{} \verb@"../src/lib/utils_algo.py"@\nobreak\ {\footnotesize {18d}}$\equiv$
+\NWtarget{nuweb18c}{} \verb@"../src/lib/utils_algo.py"@\nobreak\ {\footnotesize {18c}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
-\mbox{}\verb@@\\
 \mbox{}\verb@def partial_sums( xs ):@\\
 \mbox{}\verb@    psum = 0@\\
 \mbox{}\verb@    acc = []@\\
 \mbox{}\verb@    for x in xs:@\\
 \mbox{}\verb@        psum = psum+x@\\
 \mbox{}\verb@        acc.append( psum )@\\
-\mbox{}\verb@@\\
 \mbox{}\verb@    return acc@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtFileDefBy\ \NWlink{nuweb17a}{17a}\NWlink{nuweb17b}{b}\NWlink{nuweb18a}{, 18a}\NWlink{nuweb18b}{b}\NWlink{nuweb18c}{c}\NWlink{nuweb18d}{d}\NWlink{nuweb18e}{e}\NWlink{nuweb18f}{f}.
+\item \NWtxtFileDefBy\ \NWlink{nuweb16d}{16d}\NWlink{nuweb17a}{, 17a}\NWlink{nuweb17b}{b}\NWlink{nuweb18a}{, 18a}\NWlink{nuweb18b}{b}\NWlink{nuweb18c}{c}\NWlink{nuweb18d}{d}\NWlink{nuweb18e}{e}.
 
 \item{}
 \end{list}
@@ -918,7 +903,7 @@ equal or not. We do this by checking the $L^{\infty}$ norm.
 %{python-mode}%
 \begin{flushleft} \small
 \begin{minipage}{\linewidth}\label{scrap17}\raggedright\small
-\NWtarget{nuweb18e}{} \verb@"../src/lib/utils_algo.py"@\nobreak\ {\footnotesize {18e}}$\equiv$
+\NWtarget{nuweb18d}{} \verb@"../src/lib/utils_algo.py"@\nobreak\ {\footnotesize {18d}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@def are_site_orderings_equal(sites1, sites2):@\\
@@ -932,7 +917,7 @@ equal or not. We do this by checking the $L^{\infty}$ norm.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtFileDefBy\ \NWlink{nuweb17a}{17a}\NWlink{nuweb17b}{b}\NWlink{nuweb18a}{, 18a}\NWlink{nuweb18b}{b}\NWlink{nuweb18c}{c}\NWlink{nuweb18d}{d}\NWlink{nuweb18e}{e}\NWlink{nuweb18f}{f}.
+\item \NWtxtFileDefBy\ \NWlink{nuweb16d}{16d}\NWlink{nuweb17a}{, 17a}\NWlink{nuweb17b}{b}\NWlink{nuweb18a}{, 18a}\NWlink{nuweb18b}{b}\NWlink{nuweb18c}{c}\NWlink{nuweb18d}{d}\NWlink{nuweb18e}{e}.
 
 \item{}
 \end{list}
@@ -945,7 +930,7 @@ random points inside the unit-square. According to this scheme, you will often n
 clusters clumped near the border of the unit-square. 
 %{python-mode}%
 \begin{flushleft} \small\label{scrap18}\raggedright\small
-\NWtarget{nuweb18f}{} \verb@"../src/lib/utils_algo.py"@\nobreak\ {\footnotesize {18f}}$\equiv$
+\NWtarget{nuweb18e}{} \verb@"../src/lib/utils_algo.py"@\nobreak\ {\footnotesize {18e}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@def bunch_of_non_uniform_random_points(numpts):@\\
@@ -969,7 +954,7 @@ clusters clumped near the border of the unit-square.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtFileDefBy\ \NWlink{nuweb17a}{17a}\NWlink{nuweb17b}{b}\NWlink{nuweb18a}{, 18a}\NWlink{nuweb18b}{b}\NWlink{nuweb18c}{c}\NWlink{nuweb18d}{d}\NWlink{nuweb18e}{e}\NWlink{nuweb18f}{f}.
+\item \NWtxtFileDefBy\ \NWlink{nuweb16d}{16d}\NWlink{nuweb17a}{, 17a}\NWlink{nuweb17b}{b}\NWlink{nuweb18a}{, 18a}\NWlink{nuweb18b}{b}\NWlink{nuweb18c}{c}\NWlink{nuweb18d}{d}\NWlink{nuweb18e}{e}.
 \item \NWtxtIdentsDefed\nobreak\  \verb@cluster_size@\nobreak\ \NWlink{nuweb19a}{19a}\NWlink{nuweb19b}{b}, \verb@scale,@\nobreak\ \NWlink{nuweb19a}{19a}.
 \item{}
 \end{list}
@@ -997,8 +982,8 @@ in the unit-square. This is reflected in the assignment to \verb|sq_size| below.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb18f}{18f}.
-\item \NWtxtIdentsUsed\nobreak\  \verb@cluster_size@\nobreak\ \NWlink{nuweb18f}{18f}, \verb@scale,@\nobreak\ \NWlink{nuweb18f}{18f}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb18e}{18e}.
+\item \NWtxtIdentsUsed\nobreak\  \verb@cluster_size@\nobreak\ \NWlink{nuweb18e}{18e}, \verb@scale,@\nobreak\ \NWlink{nuweb18e}{18e}.
 \item{}
 \end{list}
 \end{minipage}\vspace{4ex}
@@ -1022,8 +1007,8 @@ in the unit-square. This is reflected in the assignment to \verb|sq_size| below.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb18f}{18f}.
-\item \NWtxtIdentsUsed\nobreak\  \verb@cluster_size@\nobreak\ \NWlink{nuweb18f}{18f}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb18e}{18e}.
+\item \NWtxtIdentsUsed\nobreak\  \verb@cluster_size@\nobreak\ \NWlink{nuweb18e}{18e}.
 \item{}
 \end{list}
 \end{minipage}\vspace{4ex}
@@ -1089,11 +1074,11 @@ experimental or interactive sections of the code.
 \mbox{}\verb@    @\hbox{$\langle\,${\itshape Set up interactive canvas}\nobreak\ {\footnotesize \NWlink{nuweb24b}{24b}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@@\hbox{$\langle\,${\itshape Local data-structures for classic horsefly}\nobreak\ {\footnotesize \NWlink{nuweb25a}{25a}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@@\hbox{$\langle\,${\itshape Local utility functions for classic horsefly}\nobreak\ {\footnotesize \NWlink{nuweb48a}{48a}, \ldots\ }$\,\rangle$}\verb@@\\
+\mbox{}\verb@@\hbox{$\langle\,${\itshape Local utility functions for classic horsefly}\nobreak\ {\footnotesize \NWlink{nuweb49a}{49a}, \ldots\ }$\,\rangle$}\verb@@\\
 \mbox{}\verb@@\hbox{$\langle\,${\itshape Algorithms for classic horsefly}\nobreak\ {\footnotesize \NWlink{nuweb27}{27}, \ldots\ }$\,\rangle$}\verb@@\\
 \mbox{}\verb@@\hbox{$\langle\,${\itshape Lower bounds for classic horsefly}\nobreak\ {\footnotesize \NWlink{nuweb46a}{46a}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@@\hbox{$\langle\,${\itshape Plotting routines for classic horsefly}\nobreak\ {\footnotesize \NWlink{nuweb50a}{50a}, \ldots\ }$\,\rangle$}\verb@@\\
-\mbox{}\verb@@\hbox{$\langle\,${\itshape Animation routines for classic horsefly}\nobreak\ {\footnotesize \NWlink{nuweb52b}{52b}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@@\hbox{$\langle\,${\itshape Plotting routines for classic horsefly}\nobreak\ {\footnotesize \NWlink{nuweb51a}{51a}, \ldots\ }$\,\rangle$}\verb@@\\
+\mbox{}\verb@@\hbox{$\langle\,${\itshape Animation routines for classic horsefly}\nobreak\ {\footnotesize \NWlink{nuweb54}{54}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
@@ -1330,7 +1315,7 @@ about it any further, nor does it need to be broken down.
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \NWtxtMacroRefIn\ \NWlink{nuweb21b}{21b}.
-\item \NWtxtIdentsUsed\nobreak\  \verb@algo_exact_given_specific_ordering@\nobreak\ \NWlink{nuweb30a}{30a}, \verb@algo_greedy_incremental_insertion,@\nobreak\ \NWlink{nuweb34a}{34a}, \verb@computeStructure@\nobreak\ \NWlink{nuweb25d}{25d}, \verb@getTour@\nobreak\ \NWlink{nuweb25c}{25c}, \verb@plotTour@\nobreak\ \NWlink{nuweb50a}{50a}.
+\item \NWtxtIdentsUsed\nobreak\  \verb@algo_exact_given_specific_ordering@\nobreak\ \NWlink{nuweb30a}{30a}, \verb@algo_greedy_incremental_insertion,@\nobreak\ \NWlink{nuweb34a}{34a}, \verb@computeStructure@\nobreak\ \NWlink{nuweb25d}{25d}, \verb@draw_phi_mst@\nobreak\ \NWlink{nuweb53}{53}, \verb@getTour@\nobreak\ \NWlink{nuweb25c}{25c}, \verb@plotTour@\nobreak\ \NWlink{nuweb51a}{51a}.
 \item{}
 \end{list}
 \vspace{4ex}
@@ -1564,7 +1549,7 @@ The output is a dictionary of size 2, containing two lists:
 \begin{list}{}{} \item
 \mbox{}\verb@def  computeStructure(self, structure_func, phi):@\\
 \mbox{}\verb@   print Fore.RED, "Computing the phi-mst", Style.RESET_ALL@\\
-\mbox{}\verb@   structure_func(self.sites, self.inithorseposn, phi)@\\
+\mbox{}\verb@   return structure_func(self.sites, self.inithorseposn, phi)@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
@@ -1673,7 +1658,7 @@ of sites.
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \NWtxtMacroDefBy\ \NWlink{nuweb27}{27}\NWlink{nuweb28}{, 28}\NWlink{nuweb30a}{, 30a}\NWlink{nuweb34a}{, 34a}.
 \item \NWtxtMacroRefIn\ \NWlink{nuweb20a}{20a}.
-\item \NWtxtIdentsUsed\nobreak\  \verb@algo_exact_given_specific_ordering@\nobreak\ \NWlink{nuweb30a}{30a}, \verb@tour_length@\nobreak\ \NWlink{nuweb48a}{48a}.
+\item \NWtxtIdentsUsed\nobreak\  \verb@algo_exact_given_specific_ordering@\nobreak\ \NWlink{nuweb30a}{30a}, \verb@tour_length@\nobreak\ \NWlink{nuweb49a}{49a}.
 \item{}
 \end{list}
 \end{minipage}\vspace{4ex}
@@ -1904,7 +1889,7 @@ are possible, Below I try two possibilities
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \NWtxtMacroDefBy\ \NWlink{nuweb27}{27}\NWlink{nuweb28}{, 28}\NWlink{nuweb30a}{, 30a}\NWlink{nuweb34a}{, 34a}.
 \item \NWtxtMacroRefIn\ \NWlink{nuweb20a}{20a}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@algo_exact_given_specific_ordering@\nobreak\ \NWlink{nuweb22}{22}\NWlink{nuweb27}{, 27}\NWlink{nuweb29a}{, 29a}.\item \NWtxtIdentsUsed\nobreak\  \verb@generate_constraints@\nobreak\ \NWlink{nuweb31}{31}, \verb@tour_length@\nobreak\ \NWlink{nuweb48a}{48a}, \verb@tour_length_with_waiting_time_included@\nobreak\ \NWlink{nuweb48b}{48b}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@algo_exact_given_specific_ordering@\nobreak\ \NWlink{nuweb22}{22}\NWlink{nuweb27}{, 27}\NWlink{nuweb29a}{, 29a}.\item \NWtxtIdentsUsed\nobreak\  \verb@generate_constraints@\nobreak\ \NWlink{nuweb31}{31}, \verb@tour_length@\nobreak\ \NWlink{nuweb49a}{49a}, \verb@tour_length_with_waiting_time_included@\nobreak\ \NWlink{nuweb49b}{49b}.
 \item{}
 \end{list}
 \vspace{4ex}
@@ -2658,7 +2643,7 @@ delivering packages to sites.
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \NWtxtMacroRefIn\ \NWlink{nuweb34a}{34a}.
-\item \NWtxtIdentsUsed\nobreak\  \verb@tour_length_with_waiting_time_included@\nobreak\ \NWlink{nuweb48b}{48b}.
+\item \NWtxtIdentsUsed\nobreak\  \verb@tour_length_with_waiting_time_included@\nobreak\ \NWlink{nuweb49b}{49b}.
 \item{}
 \end{list}
 \vspace{4ex}
@@ -2706,7 +2691,7 @@ only a single site, given by the code-chunk below.
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \NWtxtMacroDefBy\ \NWlink{nuweb40c}{40c}\NWlink{nuweb41a}{, 41a}\NWlink{nuweb41b}{b}.
 \item \NWtxtMacroRefIn\ \NWlink{nuweb34a}{34a}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@single_site_solution@\nobreak\ \NWlink{nuweb41a}{41a}\NWlink{nuweb41b}{b}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@single_site_solution@\nobreak\ \NWlink{nuweb41a}{41a}\NWlink{nuweb41b}{b}\NWlink{nuweb47b}{, 47b}.
 \item{}
 \end{list}
 \vspace{4ex}
@@ -3133,9 +3118,17 @@ each rendezvous point in the partially constructed MST, I will use the \verb|sci
 library (\url{https://scikit-learn.org/stable/modules/neighbors.html}). When porting 
 my codes to C\texttt{++}, I will probably have to switch over to the Boost Graph library and 
 David Mount's ANN for the same purposes(both these libraries have been optmized for speed). 
+
+In the \verb|while| loop below, \verb|node_site_info| stores a tuple for each node in the tree 
+consisting of
+\begin{enumerate}
+\item a node-id (this corresponds to a rendezvous point in the tree)
+\item the index of the closest site in the array sites for the node (the site)
+\item distance of the node to the site with the above index.
+\end{enumerate}
+
 %{python-mode}%
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap69}\raggedright\small
+\begin{flushleft} \small\label{scrap69}\raggedright\small
 \NWtarget{nuweb46a}{} $\langle\,${\itshape Lower bounds for classic horsefly}\nobreak\ {\footnotesize {46a}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
@@ -3143,51 +3136,49 @@ David Mount's ANN for the same purposes(both these libraries have been optmized 
 \mbox{}\verb@@\\
 \mbox{}\verb@     import networkx as nx@\\
 \mbox{}\verb@     from sklearn.neighbors import NearestNeighbors@\\
-\mbox{}\verb@     @\hbox{$\langle\,${\itshape Set \verb|phi_prim_mst| to the singleton graph, with node coordinates set at \verb|inithorseposn|}\nobreak\ {\footnotesize \NWlink{nuweb46b}{46b}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@     @\\
+\mbox{}\verb@     @\hbox{$\langle\,${\itshape Create singleton graph, with node at \verb|inithorseposn|}\nobreak\ {\footnotesize \NWlink{nuweb46b}{46b}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@     unmarked_sites_idxs = range(len(sites))@\\
 \mbox{}\verb@     while unmarked_sites_idxs:@\\
-\mbox{}\verb@          @\hbox{$\langle\,${\itshape For each node in current $\varphi$-Prim-MST compute the closest unmarked site}\nobreak\ {\footnotesize \NWlink{nuweb47a}{47a}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@          @\hbox{$\langle\,${\itshape Get the node $M^{*}$ with the closest unmarked site $S^{*}$ from the previous step}\nobreak\ {\footnotesize \NWlink{nuweb47b}{47b}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@     return phi_prim_mst@\\
+\mbox{}\verb@          node_site_info = []@\\
+\mbox{}\verb@          @\\
+\mbox{}\verb@          @\hbox{$\langle\,${\itshape For each node, find the closest site}\nobreak\ {\footnotesize \NWlink{nuweb47a}{47a}}$\,\rangle$}\verb@    @\\
+\mbox{}\verb@          @\hbox{$\langle\,${\itshape Find the node with the closest site, and generate the next node and edge for the $\varphi$-MST}\nobreak\ {\footnotesize \NWlink{nuweb47b}{47b}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@          @\\
+\mbox{}\verb@          # Marking means removing from unmarked list :-D@\\
+\mbox{}\verb@          unmarked_sites_idxs.remove(next_site_to_mark_idx)@\\
+\mbox{}\verb@          @\\
+\mbox{}\verb@     utils_algo.print_list(G.nodes.data())@\\
+\mbox{}\verb@     utils_algo.print_list(G.edges.data())@\\
+\mbox{}\verb@     return G@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \NWtxtMacroRefIn\ \NWlink{nuweb20a}{20a}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@unmarked_sites_idxs@\nobreak\ \NWlink{nuweb47a}{47a}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@compute_phi_prim_mst,@\nobreak\ \NWtxtIdentsNotUsed, \verb@unmarked_sites_idxs@\nobreak\ \NWlink{nuweb47a}{47a}.
 \item{}
 \end{list}
-\end{minipage}\vspace{4ex}
+\vspace{4ex}
 \end{flushleft}
 %{/python-mode}%
 
-\begin{center}
-\missingfigure[figwidth=6cm]{animating-growth-of-phi-prim-mst}
-\end{center}
-\label{fig:animating-growth-of-phi-prim-mst}
 
-\newchunk \verb|NetworkX| allows me to store attributes associated with each node 
-and edge. For each node, the canonical attribute will be the associated point-coordinates 
-which that node represents. For each edge, a natural attribute is the weight of the 
-euclidean distance between the points corresponding to its nodes. However, since the 
-supporting half-plane through each edge also passes thorough a site(by construction!), 
-we will also store the index of the corresponding site. Note that all the sites are passed 
-as a list of $x$,$y$ coordinates to \verb|compute_phi_prim_mst|. 
+\vspace{-0.8cm} \newchunk Every node in the tree stores its own id as an integer along with 
+its X-Y coordinates and the X-Y coordinates of the sites that it will be joined to with a 
+straight-line segment. At the beginning the single node of the tree at the initial position
+of the horse and fly has not been joined to any sites, and hence is empty. 
 
-Storing these attributes will help later when we experiment with an algorithm where 
-we ``double''this MST
 %{python-mode}%
 \begin{flushleft} \small
 \begin{minipage}{\linewidth}\label{scrap70}\raggedright\small
-\NWtarget{nuweb46b}{} $\langle\,${\itshape Set \verb|phi_prim_mst| to the singleton graph, with node coordinates set at \verb|inithorseposn|}\nobreak\ {\footnotesize {46b}}$\,\rangle\equiv$
+\NWtarget{nuweb46b}{} $\langle\,${\itshape Create singleton graph, with node at \verb|inithorseposn|}\nobreak\ {\footnotesize {46b}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
-\mbox{}\verb@@\\
-\mbox{}\verb@info("Creating singleton graph")@\\
-\mbox{}\verb@phi_prim_mst = nx.Graph()@\\
-\mbox{}\verb@phi_prim_mst.add_node(0, coordinates=inithorseposn)@\\
+\mbox{}\verb@G = nx.Graph()@\\
+\mbox{}\verb@G.add_node(0, mycoordinates=inithorseposn, joined_site_coords=[])@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
@@ -3201,26 +3192,34 @@ we ``double''this MST
 \end{flushleft}
 %{/python-mode}%
 
-\vspace{-0.8cm}\newchunk
+
+
+\vspace{-0.8cm} \newchunk
 %{python-mode}%
 \begin{flushleft} \small
 \begin{minipage}{\linewidth}\label{scrap71}\raggedright\small
-\NWtarget{nuweb47a}{} $\langle\,${\itshape For each node in current $\varphi$-Prim-MST compute the closest unmarked site}\nobreak\ {\footnotesize {47a}}$\,\rangle\equiv$
+\NWtarget{nuweb47a}{} $\langle\,${\itshape For each node, find the closest site}\nobreak\ {\footnotesize {47a}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
+\mbox{}\verb@   @\\
+\mbox{}\verb@for nodeid, nodeval in G.nodes.data():@\\
+\mbox{}\verb@    current_node_coordinates = np.asarray(nodeval['mycoordinates'])@\\
+\mbox{}\verb@    distances_of_current_node_to_sites = []@\\
+\mbox{}\verb@               @\\
+\mbox{}\verb@    # The following loop finds the nearest unmarked site. So far, I am @\\
+\mbox{}\verb@    # using brute force for this, later, I will use sklearn.neighbors.@\\
+\mbox{}\verb@    for j in unmarked_sites_idxs:@\\
+\mbox{}\verb@        site_coordinates = np.asarray(sites[j])@\\
+\mbox{}\verb@        dist             =  np.linalg.norm( site_coordinates - current_node_coordinates )@\\
+\mbox{}\verb@                    @\\
+\mbox{}\verb@        distances_of_current_node_to_sites.append( (j, dist) )@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@for n in phi_prim_mst.nodes:@\\
+\mbox{}\verb@        nearest_site_idx, distance_of_current_node_to_nearest_site = \@\\
+\mbox{}\verb@                        min(distances_of_current_node_to_sites, key=lambda (_, d): d)@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@     print n, phi_prim_mst[n]@\\
-\mbox{}\verb@     #distances_to_sites = []@\\
-\mbox{}\verb@     #for i in unmarked_sites_idxs:@\\
-\mbox{}\verb@          #sc, nc = map (np.asarray, [sites[i], phi_prim_mst[n]['coordinates']]) # the c in sc and nc means 'coordinates'@\\
-\mbox{}\verb@          #dist =  np.linalg.norm(sc-nc)@\\
-\mbox{}\verb@          #print dist@\\
-\mbox{}\verb@          #distances_to_sites.append( (i, dist) )@\\
-\mbox{}\verb@     #nsidx, nsc = min(distances_to_sites, key=lambda (_, d): d )@\\
-\mbox{}\verb@     #print nsidx, nsc@\\
-\mbox{}\verb@sys.exit()@\\
+\mbox{}\verb@        node_site_info.append((nodeid, \@\\
+\mbox{}\verb@                                  nearest_site_idx, \@\\
+\mbox{}\verb@                                  distance_of_current_node_to_nearest_site))@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
@@ -3234,66 +3233,40 @@ we ``double''this MST
 \end{flushleft}
 %{/python-mode}%
 
-\vspace{-0.8cm}\newchunk
+\needspace{3cm}
+\vspace{-0.8cm} \newchunk
 %{python-mode}%
 \begin{flushleft} \small
 \begin{minipage}{\linewidth}\label{scrap72}\raggedright\small
-\NWtarget{nuweb47b}{} $\langle\,${\itshape Get the node $M^{*}$ with the closest unmarked site $S^{*}$ from the previous step}\nobreak\ {\footnotesize {47b}}$\,\rangle\equiv$
+\NWtarget{nuweb47b}{} $\langle\,${\itshape Find the node with the closest site, and generate the next node and edge for the $\varphi$-MST}\nobreak\ {\footnotesize {47b}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
-\mbox{}\verb@   @\\
-\mbox{}\verb@pass@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@opt_node_idx,          \@\\
+\mbox{}\verb@next_site_to_mark_idx, \@\\
+\mbox{}\verb@distance_to_next_site_to_mark = min(node_site_info, key=lambda (h,k,d) : d)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@tmp = sites[next_site_to_mark_idx]@\\
+\mbox{}\verb@G.nodes[opt_node_idx]['joined_site_coords'].append(  tmp   ) @\\
+\mbox{}\verb@(r, h) = single_site_solution(tmp, G.nodes[opt_node_idx]['mycoordinates'], phi) @\\
+\mbox{}\verb@          @\\
+\mbox{}\verb@# Remember! indexing of nodes started at 0, thats why you set@\\
+\mbox{}\verb@# numnodes to the index of the newly inserted node. @\\
+\mbox{}\verb@newnodeid = len(list(G.nodes))@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@# joined_site_coords will be updated in the future iterations of while :@\\
+\mbox{}\verb@G.add_node(newnodeid, mycoordinates=r, joined_site_coords=[]) @\\
+\mbox{}\verb@  @\\
+\mbox{}\verb@# insert the edge weight, will be useful later when @\\
+\mbox{}\verb@# computing sum total of all the edges.@\\
+\mbox{}\verb@G.add_edge(opt_node_idx, newnodeid, weight=h ) @\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \NWtxtMacroRefIn\ \NWlink{nuweb46a}{46a}.
-
-\item{}
-\end{list}
-\end{minipage}\vspace{4ex}
-\end{flushleft}
-%{/python-mode}%
-
-\vspace{-0.8cm} \newchunk
-%{python-mode}%
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap73}\raggedright\small
-\NWtarget{nuweb47c}{} $\langle\,${\itshape Compute the rendezvous point $R$ along $M^{*}S^{*}$}\nobreak\ {\footnotesize {47c}}$\,\rangle\equiv$
-\vspace{-1ex}
-\begin{list}{}{} \item
-\mbox{}\verb@   @\\
-\mbox{}\verb@pass@\\
-\mbox{}\verb@@{\NWsep}
-\end{list}
-\vspace{-1.5ex}
-\footnotesize
-\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item {\NWtxtMacroNoRef}.
-
-\item{}
-\end{list}
-\end{minipage}\vspace{4ex}
-\end{flushleft}
-%{/python-mode}%
-
-\vspace{-0.8cm}\newchunk
-%{python-mode}%
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap74}\raggedright\small
-\NWtarget{nuweb47d}{} $\langle\,${\itshape Mark site $S$, add node $R$ and edge $MR$ to the existing $\varphi$-Prim-MST}\nobreak\ {\footnotesize {47d}}$\,\rangle\equiv$
-\vspace{-1ex}
-\begin{list}{}{} \item
-\mbox{}\verb@   @\\
-\mbox{}\verb@pass@\\
-\mbox{}\verb@@{\NWsep}
-\end{list}
-\vspace{-1.5ex}
-\footnotesize
-\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item {\NWtxtMacroNoRef}.
-
+\item \NWtxtIdentsUsed\nobreak\  \verb@single_site_solution@\nobreak\ \NWlink{nuweb40c}{40c}.
 \item{}
 \end{list}
 \end{minipage}\vspace{4ex}
@@ -3328,8 +3301,8 @@ we ``double''this MST
    This is in other words the objective function. 
 
 %{python-mode}%
-\begin{flushleft} \small\label{scrap75}\raggedright\small
-\NWtarget{nuweb48a}{} $\langle\,${\itshape Local utility functions for classic horsefly}\nobreak\ {\footnotesize {48a}}$\,\rangle\equiv$
+\begin{flushleft} \small\label{scrap73}\raggedright\small
+\NWtarget{nuweb49a}{} $\langle\,${\itshape Local utility functions for classic horsefly}\nobreak\ {\footnotesize {49a}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@def tour_length(horseflyinit):@\\
@@ -3354,9 +3327,9 @@ we ``double''this MST
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroDefBy\ \NWlink{nuweb48a}{48a}\NWlink{nuweb48b}{b}.
+\item \NWtxtMacroDefBy\ \NWlink{nuweb49a}{49a}\NWlink{nuweb49b}{b}.
 \item \NWtxtMacroRefIn\ \NWlink{nuweb20a}{20a}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@tour_length@\nobreak\ \NWlink{nuweb27}{27}\NWlink{nuweb30a}{, 30a}\NWlink{nuweb51b}{, 51b}\NWlink{nuweb51c}{c}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@tour_length@\nobreak\ \NWlink{nuweb27}{27}\NWlink{nuweb30a}{, 30a}\NWlink{nuweb52b}{, 52b}\NWlink{nuweb52c}{c}.
 \item{}
 \end{list}
 \vspace{4ex}
@@ -3371,8 +3344,8 @@ we ``double''this MST
       speed of horse = 1, we can add ``time'' to ``distance''. 
 
 %{python-mode}%
-\begin{flushleft} \small\label{scrap76}\raggedright\small
-\NWtarget{nuweb48b}{} $\langle\,${\itshape Local utility functions for classic horsefly}\nobreak\ {\footnotesize {48b}}$\,\rangle\equiv$
+\begin{flushleft} \small\label{scrap74}\raggedright\small
+\NWtarget{nuweb49b}{} $\langle\,${\itshape Local utility functions for classic horsefly}\nobreak\ {\footnotesize {49b}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@def tour_length_with_waiting_time_included(tour_points, horse_waiting_times, horseflyinit):@\\
@@ -3402,9 +3375,9 @@ we ``double''this MST
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroDefBy\ \NWlink{nuweb48a}{48a}\NWlink{nuweb48b}{b}.
+\item \NWtxtMacroDefBy\ \NWlink{nuweb49a}{49a}\NWlink{nuweb49b}{b}.
 \item \NWtxtMacroRefIn\ \NWlink{nuweb20a}{20a}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@tour_length_with_waiting_time_included@\nobreak\ \NWlink{nuweb30a}{30a}\NWlink{nuweb40b}{, 40b}\NWlink{nuweb51b}{, 51b}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@tour_length_with_waiting_time_included@\nobreak\ \NWlink{nuweb30a}{30a}\NWlink{nuweb40b}{, 40b}\NWlink{nuweb52b}{, 52b}.
 \item{}
 \end{list}
 \vspace{4ex}
@@ -3417,25 +3390,25 @@ we ``double''this MST
 \newchunk 
 
 %{python-mode}%
-\begin{flushleft} \small\label{scrap77}\raggedright\small
-\NWtarget{nuweb50a}{} $\langle\,${\itshape Plotting routines for classic horsefly}\nobreak\ {\footnotesize {50a}}$\,\rangle\equiv$
+\begin{flushleft} \small\label{scrap75}\raggedright\small
+\NWtarget{nuweb51a}{} $\langle\,${\itshape Plotting routines for classic horsefly}\nobreak\ {\footnotesize {51a}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@def plotTour(ax,horseflytour, horseflyinit, phi, algo_str, tour_color='#d13131'):@\\
 \mbox{}\verb@   @\\
-\mbox{}\verb@    @\hbox{$\langle\,${\itshape Get x and y coordinates of the endpoints of segments on the horse-tour}\nobreak\ {\footnotesize \NWlink{nuweb50b}{50b}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@    @\hbox{$\langle\,${\itshape Get x and y coordinates of the sites}\nobreak\ {\footnotesize \NWlink{nuweb50c}{50c}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@    @\hbox{$\langle\,${\itshape Construct the fly-tour from the information about horse tour and sites}\nobreak\ {\footnotesize \NWlink{nuweb50d}{50d}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@    @\hbox{$\langle\,${\itshape Print information about the horse tour}\nobreak\ {\footnotesize \NWlink{nuweb50e}{50e}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@    @\hbox{$\langle\,${\itshape Print information about the fly tour}\nobreak\ {\footnotesize \NWlink{nuweb51a}{51a}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@    @\hbox{$\langle\,${\itshape Print meta-data about the algorithm run}\nobreak\ {\footnotesize \NWlink{nuweb51b}{51b}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@    @\hbox{$\langle\,${\itshape Plot everything}\nobreak\ {\footnotesize \NWlink{nuweb51c}{51c}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@    @\hbox{$\langle\,${\itshape Get x and y coordinates of the endpoints of segments on the horse-tour}\nobreak\ {\footnotesize \NWlink{nuweb51b}{51b}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@    @\hbox{$\langle\,${\itshape Get x and y coordinates of the sites}\nobreak\ {\footnotesize \NWlink{nuweb51c}{51c}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@    @\hbox{$\langle\,${\itshape Construct the fly-tour from the information about horse tour and sites}\nobreak\ {\footnotesize \NWlink{nuweb51d}{51d}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@    @\hbox{$\langle\,${\itshape Print information about the horse tour}\nobreak\ {\footnotesize \NWlink{nuweb51e}{51e}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@    @\hbox{$\langle\,${\itshape Print information about the fly tour}\nobreak\ {\footnotesize \NWlink{nuweb52a}{52a}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@    @\hbox{$\langle\,${\itshape Print meta-data about the algorithm run}\nobreak\ {\footnotesize \NWlink{nuweb52b}{52b}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@    @\hbox{$\langle\,${\itshape Plot everything}\nobreak\ {\footnotesize \NWlink{nuweb52c}{52c}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@    @{\NWsep}
 \end{list}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroDefBy\ \NWlink{nuweb50a}{50a}\NWlink{nuweb52a}{, 52a}.
+\item \NWtxtMacroDefBy\ \NWlink{nuweb51a}{51a}\NWlink{nuweb53}{, 53}.
 \item \NWtxtMacroRefIn\ \NWlink{nuweb20a}{20a}.
 \item \NWtxtIdentsDefed\nobreak\  \verb@plotTour@\nobreak\ \NWlink{nuweb22}{22}.
 \item{}
@@ -3447,8 +3420,8 @@ we ``double''this MST
 \vspace{-0.8cm} \newchunk
 %{python-mode}%
 \begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap78}\raggedright\small
-\NWtarget{nuweb50b}{} $\langle\,${\itshape Get x and y coordinates of the endpoints of segments on the horse-tour}\nobreak\ {\footnotesize {50b}}$\,\rangle\equiv$
+\begin{minipage}{\linewidth}\label{scrap76}\raggedright\small
+\NWtarget{nuweb51b}{} $\langle\,${\itshape Get x and y coordinates of the endpoints of segments on the horse-tour}\nobreak\ {\footnotesize {51b}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@   @\\
@@ -3461,7 +3434,7 @@ we ``double''this MST
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb50a}{50a}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb51a}{51a}.
 
 \item{}
 \end{list}
@@ -3472,8 +3445,8 @@ we ``double''this MST
 \vspace{-0.8cm} \newchunk
 %{python-mode}%
 \begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap79}\raggedright\small
-\NWtarget{nuweb50c}{} $\langle\,${\itshape Get x and y coordinates of the sites}\nobreak\ {\footnotesize {50c}}$\,\rangle\equiv$
+\begin{minipage}{\linewidth}\label{scrap77}\raggedright\small
+\NWtarget{nuweb51c}{} $\langle\,${\itshape Get x and y coordinates of the sites}\nobreak\ {\footnotesize {51c}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@   @\\
@@ -3486,7 +3459,7 @@ we ``double''this MST
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb50a}{50a}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb51a}{51a}.
 
 \item{}
 \end{list}
@@ -3497,8 +3470,8 @@ we ``double''this MST
 \vspace{-0.8cm} \newchunk Route for the fly  keeps alternating between the site and the horse
 %{python-mode}%
 \begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap80}\raggedright\small
-\NWtarget{nuweb50d}{} $\langle\,${\itshape Construct the fly-tour from the information about horse tour and sites}\nobreak\ {\footnotesize {50d}}$\,\rangle\equiv$
+\begin{minipage}{\linewidth}\label{scrap78}\raggedright\small
+\NWtarget{nuweb51d}{} $\langle\,${\itshape Construct the fly-tour from the information about horse tour and sites}\nobreak\ {\footnotesize {51d}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
@@ -3512,7 +3485,7 @@ we ``double''this MST
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb50a}{50a}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb51a}{51a}.
 
 \item{}
 \end{list}
@@ -3522,8 +3495,8 @@ we ``double''this MST
 
 \vspace{-0.8cm} \newchunk  Note that the waiting time at the starting point is 0
 %{python-mode}%
-\begin{flushleft} \small\label{scrap81}\raggedright\small
-\NWtarget{nuweb50e}{} $\langle\,${\itshape Print information about the horse tour}\nobreak\ {\footnotesize {50e}}$\,\rangle\equiv$
+\begin{flushleft} \small\label{scrap79}\raggedright\small
+\NWtarget{nuweb51e}{} $\langle\,${\itshape Print information about the horse tour}\nobreak\ {\footnotesize {51e}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@   @\\
@@ -3537,7 +3510,7 @@ we ``double''this MST
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb50a}{50a}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb51a}{51a}.
 
 \item{}
 \end{list}
@@ -3547,8 +3520,8 @@ we ``double''this MST
 
 \vspace{-0.8cm} \newchunk
 %{python-mode}%
-\begin{flushleft} \small\label{scrap82}\raggedright\small
-\NWtarget{nuweb51a}{} $\langle\,${\itshape Print information about the fly tour}\nobreak\ {\footnotesize {51a}}$\,\rangle\equiv$
+\begin{flushleft} \small\label{scrap80}\raggedright\small
+\NWtarget{nuweb52a}{} $\langle\,${\itshape Print information about the fly tour}\nobreak\ {\footnotesize {52a}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@   @\\
@@ -3564,7 +3537,7 @@ we ``double''this MST
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb50a}{50a}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb51a}{51a}.
 
 \item{}
 \end{list}
@@ -3575,8 +3548,8 @@ we ``double''this MST
 \vspace{-0.8cm} \newchunk
 %{python-mode}%
 \begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap83}\raggedright\small
-\NWtarget{nuweb51b}{} $\langle\,${\itshape Print meta-data about the algorithm run}\nobreak\ {\footnotesize {51b}}$\,\rangle\equiv$
+\begin{minipage}{\linewidth}\label{scrap81}\raggedright\small
+\NWtarget{nuweb52b}{} $\langle\,${\itshape Print meta-data about the algorithm run}\nobreak\ {\footnotesize {52b}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@   @\\
@@ -3592,8 +3565,8 @@ we ``double''this MST
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb50a}{50a}.
-\item \NWtxtIdentsUsed\nobreak\  \verb@tour_length@\nobreak\ \NWlink{nuweb48a}{48a}, \verb@tour_length_with_waiting_time_included@\nobreak\ \NWlink{nuweb48b}{48b}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb51a}{51a}.
+\item \NWtxtIdentsUsed\nobreak\  \verb@tour_length@\nobreak\ \NWlink{nuweb49a}{49a}, \verb@tour_length_with_waiting_time_included@\nobreak\ \NWlink{nuweb49b}{49b}.
 \item{}
 \end{list}
 \end{minipage}\vspace{4ex}
@@ -3603,8 +3576,8 @@ we ``double''this MST
 \vspace{-0.8cm} \newchunk
 %{python-mode}%
 \begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap84}\raggedright\small
-\NWtarget{nuweb51c}{} $\langle\,${\itshape Plot everything}\nobreak\ {\footnotesize {51c}}$\,\rangle\equiv$
+\begin{minipage}{\linewidth}\label{scrap82}\raggedright\small
+\NWtarget{nuweb52c}{} $\langle\,${\itshape Plot everything}\nobreak\ {\footnotesize {52c}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@ @\\
@@ -3615,22 +3588,21 @@ we ``double''this MST
 \mbox{}\verb@ax.plot(xfs,yfs,'g-')@\\
 \mbox{}\verb@ax.plot(xhs, yhs, color=tour_color, marker='s', linewidth=3.0) @\\
 \mbox{}\verb@@\\
-\mbox{}\verb@ax.add_patch( mpl.patches.Circle( horseflyinit, radius = 1/34.0,@\\
+\mbox{}\verb@ax.add_patch( mpl.patches.Circle( horseflyinit, radius = 1/140.0,@\\
 \mbox{}\verb@                                  facecolor= '#D13131', edgecolor='black'   )  )@\\
 \mbox{}\verb@fontsize = 20@\\
-\mbox{}\verb@tnrfont = {'fontname':'Times New Roman'}@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@ax.set_title( r'Algorithm Used: ' + algo_str +  '\nTour Length: ' \@\\
-\mbox{}\verb@               + str(tour_length)[:7], fontdict={'fontsize':fontsize}, **tnrfont)@\\
+\mbox{}\verb@               + str(tour_length)[:7], fontdict={'fontsize':fontsize})@\\
 \mbox{}\verb@ax.set_xlabel(r'Number of sites: ' + str(len(xsites)) + '\nDrone Speed: ' + str(phi) ,@\\
-\mbox{}\verb@                  fontdict={'fontsize':fontsize}, **tnrfont)@\\
+\mbox{}\verb@                  fontdict={'fontsize':fontsize})@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb50a}{50a}.
-\item \NWtxtIdentsUsed\nobreak\  \verb@tour_length@\nobreak\ \NWlink{nuweb48a}{48a}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb51a}{51a}.
+\item \NWtxtIdentsUsed\nobreak\  \verb@tour_length@\nobreak\ \NWlink{nuweb49a}{49a}.
 \item{}
 \end{list}
 \end{minipage}\vspace{4ex}
@@ -3640,22 +3612,39 @@ we ``double''this MST
 \vspace{-0.8cm} \newchunk 
 
 %{python-mode}%
-\begin{flushleft} \small\label{scrap85}\raggedright\small
-\NWtarget{nuweb52a}{} $\langle\,${\itshape Plotting routines for classic horsefly}\nobreak\ {\footnotesize {52a}}$\,\rangle\equiv$
+\begin{flushleft} \small\label{scrap83}\raggedright\small
+\NWtarget{nuweb53}{} $\langle\,${\itshape Plotting routines for classic horsefly}\nobreak\ {\footnotesize {53}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
 \mbox{}\verb@def draw_phi_mst(ax, phi_mst, inithorseposn, phi):@\\
-\mbox{}\verb@     print "Yay! Drawing the tree!"@\\
-\mbox{}\verb@     sys.exit()@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@     # for each tree node draw segments joining to sites (green segs)@\\
+\mbox{}\verb@     for (nodeidx, nodeinfo) in list(phi_mst.nodes.data()):@\\
+\mbox{}\verb@         mycoords           = nodeinfo['mycoordinates']@\\
+\mbox{}\verb@         joined_site_coords = nodeinfo['joined_site_coords'] @\\
+\mbox{}\verb@@\\
+\mbox{}\verb@         for site in joined_site_coords:@\\
+\mbox{}\verb@               ax.plot([mycoords[0],site[0]], [mycoords[1], site[1]], 'g-', linewidth=1.5) @\\
+\mbox{}\verb@               ax.add_patch( mpl.patches.Circle( [site[0],site[1]], radius = 0.007, \@\\
+\mbox{}\verb@                                                 facecolor='blue', edgecolor='black'))@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@     # draw each tree edge (red segs)@\\
+\mbox{}\verb@     edges = list(phi_mst.edges.data())@\\
+\mbox{}\verb@     for (idx1, idx2, edgeinfo) in edges:@\\
+\mbox{}\verb@          (xn1, yn1) =  phi_mst.nodes[idx1]['mycoordinates']@\\
+\mbox{}\verb@          (xn2, yn2) =  phi_mst.nodes[idx2]['mycoordinates']@\\
+\mbox{}\verb@          ax.plot([xn1,xn2],[yn1,yn2], 'ro-' ,linewidth=1.7)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@     ax.set_title(r'$\varphi$-MST', fontdict={'fontsize':30})@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroDefBy\ \NWlink{nuweb50a}{50a}\NWlink{nuweb52a}{, 52a}.
+\item \NWtxtMacroDefBy\ \NWlink{nuweb51a}{51a}\NWlink{nuweb53}{, 53}.
 \item \NWtxtMacroRefIn\ \NWlink{nuweb20a}{20a}.
-
+\item \NWtxtIdentsDefed\nobreak\  \verb@draw_phi_mst@\nobreak\ \NWlink{nuweb22}{22}.
 \item{}
 \end{list}
 \vspace{4ex}
@@ -3692,8 +3681,8 @@ A site that has been serviced is represented by a yellow dot.
 
 %{python-mode}%
 \begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap86}\raggedright\small
-\NWtarget{nuweb52b}{} $\langle\,${\itshape Animation routines for classic horsefly}\nobreak\ {\footnotesize {52b}}$\,\rangle\equiv$
+\begin{minipage}{\linewidth}\label{scrap84}\raggedright\small
+\NWtarget{nuweb54}{} $\langle\,${\itshape Animation routines for classic horsefly}\nobreak\ {\footnotesize {54}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
@@ -3704,10 +3693,10 @@ A site that has been serviced is represented by a yellow dot.
 \mbox{}\verb@     from matplotlib.patches import Circle@\\
 \mbox{}\verb@     import matplotlib.pyplot as plt @\\
 \mbox{}\verb@@\\
-\mbox{}\verb@     @\hbox{$\langle\,${\itshape Set up configurations and parameters for animation and plotting}\nobreak\ {\footnotesize \NWlink{nuweb53a}{53a}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@     @\hbox{$\langle\,${\itshape Parse input-output file and set up required data-structures}\nobreak\ {\footnotesize \NWlink{nuweb53b}{53b}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@     @\hbox{$\langle\,${\itshape Construct and store every frame of the animation in \verb|ims|}\nobreak\ {\footnotesize \NWlink{nuweb54a}{54a}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@     @\hbox{$\langle\,${\itshape Write animation of schedule to disk and display in live window}\nobreak\ {\footnotesize \NWlink{nuweb56b}{56b}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@     @\hbox{$\langle\,${\itshape Set up configurations and parameters for animation and plotting}\nobreak\ {\footnotesize \NWlink{nuweb55a}{55a}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@     @\hbox{$\langle\,${\itshape Parse input-output file and set up required data-structures}\nobreak\ {\footnotesize \NWlink{nuweb55b}{55b}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@     @\hbox{$\langle\,${\itshape Construct and store every frame of the animation in \verb|ims|}\nobreak\ {\footnotesize \NWlink{nuweb56a}{56a}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@     @\hbox{$\langle\,${\itshape Write animation of schedule to disk and display in live window}\nobreak\ {\footnotesize \NWlink{nuweb58b}{58b}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
@@ -3736,8 +3725,8 @@ seems to be DejaVu Sans Mono, which isn't pretty for publications.
 
 %{python-mode}%
 \begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap87}\raggedright\small
-\NWtarget{nuweb53a}{} $\langle\,${\itshape Set up configurations and parameters for animation and plotting}\nobreak\ {\footnotesize {53a}}$\,\rangle\equiv$
+\begin{minipage}{\linewidth}\label{scrap85}\raggedright\small
+\NWtarget{nuweb55a}{} $\langle\,${\itshape Set up configurations and parameters for animation and plotting}\nobreak\ {\footnotesize {55a}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
@@ -3768,7 +3757,7 @@ seems to be DejaVu Sans Mono, which isn't pretty for publications.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb52b}{52b}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb54}{54}.
 
 \item{}
 \end{list}
@@ -3787,8 +3776,8 @@ animating the horse and fly moving along each of their respective legs.
 
 
 %{python-mode}%
-\begin{flushleft} \small\label{scrap88}\raggedright\small
-\NWtarget{nuweb53b}{} $\langle\,${\itshape Parse input-output file and set up required data-structures}\nobreak\ {\footnotesize {53b}}$\,\rangle\equiv$
+\begin{flushleft} \small\label{scrap86}\raggedright\small
+\NWtarget{nuweb55b}{} $\langle\,${\itshape Parse input-output file and set up required data-structures}\nobreak\ {\footnotesize {55b}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@   @\\
@@ -3823,7 +3812,7 @@ animating the horse and fly moving along each of their respective legs.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb52b}{52b}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb54}{54}.
 
 \item{}
 \end{list}
@@ -3838,8 +3827,8 @@ and flies change.
 
 %{python-mode}%
 \begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap89}\raggedright\small
-\NWtarget{nuweb54a}{} $\langle\,${\itshape Construct and store every frame of the animation in \verb|ims|}\nobreak\ {\footnotesize {54a}}$\,\rangle\equiv$
+\begin{minipage}{\linewidth}\label{scrap87}\raggedright\small
+\NWtarget{nuweb56a}{} $\langle\,${\itshape Construct and store every frame of the animation in \verb|ims|}\nobreak\ {\footnotesize {56a}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@ims = []@\\
@@ -3848,7 +3837,7 @@ and flies change.
 \mbox{}\verb@                                       range(len(horse_legs))):@\\
 \mbox{}\verb@     debug(Fore.YELLOW + "Animating leg: "+ str(leg_idx) + Style.RESET_ALL)@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@     @\hbox{$\langle\,${\itshape Define function to place points along a leg}\nobreak\ {\footnotesize \NWlink{nuweb56a}{56a}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@     @\hbox{$\langle\,${\itshape Define function to place points along a leg}\nobreak\ {\footnotesize \NWlink{nuweb58a}{58a}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@     horse_posns = discretize_leg(horse_leg)@\\
 \mbox{}\verb@     fly_posns   = discretize_leg(fly_leg) @\\
@@ -3866,14 +3855,14 @@ and flies change.
 \mbox{}\verb@     for horse_posn, fly_posn, subleg_idx in zip(horse_posns, \@\\
 \mbox{}\verb@                                                 fly_posns,   \@\\
 \mbox{}\verb@                                                 range(len(horse_posns))):@\\
-\mbox{}\verb@          @\hbox{$\langle\,${\itshape Render frame and append it to \verb|ims|}\nobreak\ {\footnotesize \NWlink{nuweb54b}{54b}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@          @\hbox{$\langle\,${\itshape Render frame and append it to \verb|ims|}\nobreak\ {\footnotesize \NWlink{nuweb56b}{56b}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb52b}{52b}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@number_of_sites_serviced@\nobreak\ \NWlink{nuweb54b}{54b}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb54}{54}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@number_of_sites_serviced@\nobreak\ \NWlink{nuweb56b}{56b}.
 \item{}
 \end{list}
 \end{minipage}\vspace{4ex}
@@ -3898,8 +3887,8 @@ job of the \verb|if subleg_idx==9| block in the code-fragment below. The magic-n
 \verb|discretize_leg| function defined later in \autoref{subsec-discretize-leg}. 
 
 %{python-mode}%
-\begin{flushleft} \small\label{scrap90}\raggedright\small
-\NWtarget{nuweb54b}{} $\langle\,${\itshape Render frame and append it to \verb|ims|}\nobreak\ {\footnotesize {54b}}$\,\rangle\equiv$
+\begin{flushleft} \small\label{scrap88}\raggedright\small
+\NWtarget{nuweb56b}{} $\langle\,${\itshape Render frame and append it to \verb|ims|}\nobreak\ {\footnotesize {56b}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@   @\\
@@ -3945,8 +3934,8 @@ job of the \verb|if subleg_idx==9| block in the code-fragment below. The magic-n
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb54a}{54a}.
-\item \NWtxtIdentsUsed\nobreak\  \verb@number_of_sites_serviced@\nobreak\ \NWlink{nuweb54a}{54a}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb56a}{56a}.
+\item \NWtxtIdentsUsed\nobreak\  \verb@number_of_sites_serviced@\nobreak\ \NWlink{nuweb56a}{56a}.
 \item{}
 \end{list}
 \vspace{4ex}
@@ -3976,8 +3965,8 @@ explains the odd-looking \verb|subleg_pts.extend(tmp[:-1])| statement in the cod
 
 %{python-mode}%
 \begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap91}\raggedright\small
-\NWtarget{nuweb56a}{} $\langle\,${\itshape Define function to place points along a leg}\nobreak\ {\footnotesize {56a}}$\,\rangle\equiv$
+\begin{minipage}{\linewidth}\label{scrap89}\raggedright\small
+\NWtarget{nuweb58a}{} $\langle\,${\itshape Define function to place points along a leg}\nobreak\ {\footnotesize {58a}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@   @\\
@@ -4003,7 +3992,7 @@ explains the odd-looking \verb|subleg_pts.extend(tmp[:-1])| statement in the cod
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb54a}{54a}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb56a}{56a}.
 
 \item{}
 \end{list}
@@ -4015,8 +4004,8 @@ explains the odd-looking \verb|subleg_pts.extend(tmp[:-1])| statement in the cod
 
 
 %{python-mode}%
-\begin{flushleft} \small\label{scrap92}\raggedright\small
-\NWtarget{nuweb56b}{} $\langle\,${\itshape Write animation of schedule to disk and display in live window}\nobreak\ {\footnotesize {56b}}$\,\rangle\equiv$
+\begin{flushleft} \small\label{scrap90}\raggedright\small
+\NWtarget{nuweb58b}{} $\langle\,${\itshape Write animation of schedule to disk and display in live window}\nobreak\ {\footnotesize {58b}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@from colorama import Back @\\
@@ -4035,7 +4024,7 @@ explains the odd-looking \verb|subleg_pts.extend(tmp[:-1])| statement in the cod
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb52b}{52b}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb54}{54}.
 
 \item{}
 \end{list}
@@ -4047,14 +4036,14 @@ explains the odd-looking \verb|subleg_pts.extend(tmp[:-1])| statement in the cod
 
 {\small\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item $\langle\,$Algorithms for classic horsefly\nobreak\ {\footnotesize \NWlink{nuweb27}{27}\NWlink{nuweb28}{, 28}\NWlink{nuweb30a}{, 30a}\NWlink{nuweb34a}{, 34a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb20a}{20a}.}
-\item $\langle\,$Animation routines for classic horsefly\nobreak\ {\footnotesize \NWlink{nuweb52b}{52b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb20a}{20a}.}
+\item $\langle\,$Animation routines for classic horsefly\nobreak\ {\footnotesize \NWlink{nuweb54}{54}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb20a}{20a}.}
 \item $\langle\,$Clear canvas and states of all objects\nobreak\ {\footnotesize \NWlink{nuweb24a}{24a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb21b}{21b}.}
 \item $\langle\,$Compute the length of the tour that currently services the visited sites\nobreak\ {\footnotesize \NWlink{nuweb42c}{42c}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb42b}{42b}.}
-\item $\langle\,$Compute the rendezvous point $R$ along $M^{*}S^{*}$\nobreak\ {\footnotesize \NWlink{nuweb47c}{47c}}$\,\rangle$ {\footnotesize {\NWtxtNoRef}.}
-\item $\langle\,$Construct and store every frame of the animation in \verb|ims|\nobreak\ {\footnotesize \NWlink{nuweb54a}{54a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb52b}{52b}.}
-\item $\langle\,$Construct the fly-tour from the information about horse tour and sites\nobreak\ {\footnotesize \NWlink{nuweb50d}{50d}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb50a}{50a}.}
+\item $\langle\,$Construct and store every frame of the animation in \verb|ims|\nobreak\ {\footnotesize \NWlink{nuweb56a}{56a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb54}{54}.}
+\item $\langle\,$Construct the fly-tour from the information about horse tour and sites\nobreak\ {\footnotesize \NWlink{nuweb51d}{51d}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb51a}{51a}.}
+\item $\langle\,$Create singleton graph, with node at \verb|inithorseposn|\nobreak\ {\footnotesize \NWlink{nuweb46b}{46b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb46a}{46a}.}
 \item $\langle\,$Define auxiliary helper functions\nobreak\ {\footnotesize \NWlink{nuweb40c}{40c}\NWlink{nuweb41a}{, 41a}\NWlink{nuweb41b}{b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb34a}{34a}.}
-\item $\langle\,$Define function to place points along a leg\nobreak\ {\footnotesize \NWlink{nuweb56a}{56a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb54a}{54a}.}
+\item $\langle\,$Define function to place points along a leg\nobreak\ {\footnotesize \NWlink{nuweb58a}{58a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb56a}{56a}.}
 \item $\langle\,$Define function \verb|greedy|\nobreak\ {\footnotesize \NWlink{nuweb29b}{29b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb28}{28}.}
 \item $\langle\,$Define function \verb|next_rendezvous_point_for_horse_and_fly|\nobreak\ {\footnotesize \NWlink{nuweb29a}{29a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb28}{28}.}
 \item $\langle\,$Define key-press handler\nobreak\ {\footnotesize \NWlink{nuweb21b}{21b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb20a}{20a}.}
@@ -4062,48 +4051,46 @@ explains the odd-looking \verb|subleg_pts.extend(tmp[:-1])| statement in the cod
 \item $\langle\,$Draw horse and fly-tours\nobreak\ {\footnotesize \NWlink{nuweb38a}{38a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb36b}{36b}.}
 \item $\langle\,$Draw unvisited sites as filled blue circles\nobreak\ {\footnotesize \NWlink{nuweb38c}{38c}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb36b}{36b}.}
 \item $\langle\,$Extract $x$ and $y$ coordinates of the points on the horse, fly tours, visited and unvisited sites\nobreak\ {\footnotesize \NWlink{nuweb37a}{37a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb36b}{36b}.}
+\item $\langle\,$Find the node with the closest site, and generate the next node and edge for the $\varphi$-MST\nobreak\ {\footnotesize \NWlink{nuweb47b}{47b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb46a}{46a}.}
 \item $\langle\,$Find the unvisited site which on insertion increases tour-length by the least amount\nobreak\ {\footnotesize \NWlink{nuweb43c}{43c}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb42b}{42b}.}
-\item $\langle\,$For each node in current $\varphi$-Prim-MST compute the closest unmarked site\nobreak\ {\footnotesize \NWlink{nuweb47a}{47a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb46a}{46a}.}
+\item $\langle\,$For each node, find the closest site\nobreak\ {\footnotesize \NWlink{nuweb47a}{47a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb46a}{46a}.}
 \item $\langle\,$Generate a bunch of uniform or non-uniform random points on the canvas\nobreak\ {\footnotesize \NWlink{nuweb23}{23}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb21b}{21b}.}
-\item $\langle\,$Get the node $M^{*}$ with the closest unmarked site $S^{*}$ from the previous step\nobreak\ {\footnotesize \NWlink{nuweb47b}{47b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb46a}{46a}.}
-\item $\langle\,$Get x and y coordinates of the endpoints of segments on the horse-tour\nobreak\ {\footnotesize \NWlink{nuweb50b}{50b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb50a}{50a}.}
-\item $\langle\,$Get x and y coordinates of the sites\nobreak\ {\footnotesize \NWlink{nuweb50c}{50c}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb50a}{50a}.}
+\item $\langle\,$Get x and y coordinates of the endpoints of segments on the horse-tour\nobreak\ {\footnotesize \NWlink{nuweb51b}{51b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb51a}{51a}.}
+\item $\langle\,$Get x and y coordinates of the sites\nobreak\ {\footnotesize \NWlink{nuweb51c}{51c}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb51a}{51a}.}
 \item $\langle\,$Give metainformation about current picture as headers and footers\nobreak\ {\footnotesize \NWlink{nuweb38d}{38d}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb36b}{36b}.}
 \item $\langle\,$If \texttt{self.sites[u]} is chosen for insertion, find best insertion position and update \texttt{delta\_increase\_least\_table}\nobreak\ {\footnotesize \NWlink{nuweb43b}{43b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb42b}{42b}.}
 \item $\langle\,$Local data-structures for classic horsefly\nobreak\ {\footnotesize \NWlink{nuweb25a}{25a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb20a}{20a}.}
-\item $\langle\,$Local utility functions for classic horsefly\nobreak\ {\footnotesize \NWlink{nuweb48a}{48a}\NWlink{nuweb48b}{b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb20a}{20a}.}
+\item $\langle\,$Local utility functions for classic horsefly\nobreak\ {\footnotesize \NWlink{nuweb49a}{49a}\NWlink{nuweb49b}{b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb20a}{20a}.}
 \item $\langle\,$Lower bounds for classic horsefly\nobreak\ {\footnotesize \NWlink{nuweb46a}{46a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb20a}{20a}.}
 \item $\langle\,$Make an animation of algorithm states, if \verb|write_algo_states_to_disk_p == True|\nobreak\ {\footnotesize \NWlink{nuweb39b}{39b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb34a}{34a}.}
 \item $\langle\,$Make an animation of the schedule, if \verb|animate_schedule_p == True|\nobreak\ {\footnotesize \NWlink{nuweb40a}{40a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb34a}{34a}.}
 \item $\langle\,$Mark initial position of horse and fly boldly on canvas\nobreak\ {\footnotesize \NWlink{nuweb37b}{37b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb36b}{36b}.}
-\item $\langle\,$Mark site $S$, add node $R$ and edge $MR$ to the existing $\varphi$-Prim-MST\nobreak\ {\footnotesize \NWlink{nuweb47d}{47d}}$\,\rangle$ {\footnotesize {\NWtxtNoRef}.}
 \item $\langle\,$Methods for \verb|HorseFlyInput|\nobreak\ {\footnotesize \NWlink{nuweb25b}{25b}\NWlink{nuweb25c}{c}\NWlink{nuweb25d}{d}\NWlink{nuweb26}{, 26}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb25a}{25a}.}
 \item $\langle\,$Methods for \verb|PolicyBestInsertionNaive|\nobreak\ {\footnotesize \NWlink{nuweb42b}{42b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb42a}{42a}.}
-\item $\langle\,$Parse input-output file and set up required data-structures\nobreak\ {\footnotesize \NWlink{nuweb53b}{53b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb52b}{52b}.}
+\item $\langle\,$Parse input-output file and set up required data-structures\nobreak\ {\footnotesize \NWlink{nuweb55b}{55b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb54}{54}.}
 \item $\langle\,$Place numbered markers on visited sites to mark the order of visitation explicitly\nobreak\ {\footnotesize \NWlink{nuweb38b}{38b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb36b}{36b}.}
-\item $\langle\,$Plot everything\nobreak\ {\footnotesize \NWlink{nuweb51c}{51c}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb50a}{50a}.}
-\item $\langle\,$Plotting routines for classic horsefly\nobreak\ {\footnotesize \NWlink{nuweb50a}{50a}\NWlink{nuweb52a}{, 52a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb20a}{20a}.}
-\item $\langle\,$Print information about the fly tour\nobreak\ {\footnotesize \NWlink{nuweb51a}{51a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb50a}{50a}.}
-\item $\langle\,$Print information about the horse tour\nobreak\ {\footnotesize \NWlink{nuweb50e}{50e}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb50a}{50a}.}
-\item $\langle\,$Print meta-data about the algorithm run\nobreak\ {\footnotesize \NWlink{nuweb51b}{51b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb50a}{50a}.}
+\item $\langle\,$Plot everything\nobreak\ {\footnotesize \NWlink{nuweb52c}{52c}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb51a}{51a}.}
+\item $\langle\,$Plotting routines for classic horsefly\nobreak\ {\footnotesize \NWlink{nuweb51a}{51a}\NWlink{nuweb53}{, 53}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb20a}{20a}.}
+\item $\langle\,$Print information about the fly tour\nobreak\ {\footnotesize \NWlink{nuweb52a}{52a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb51a}{51a}.}
+\item $\langle\,$Print information about the horse tour\nobreak\ {\footnotesize \NWlink{nuweb51e}{51e}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb51a}{51a}.}
+\item $\langle\,$Print meta-data about the algorithm run\nobreak\ {\footnotesize \NWlink{nuweb52b}{52b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb51a}{51a}.}
 \item $\langle\,$Relevant imports for classic horsefly\nobreak\ {\footnotesize \NWlink{nuweb20b}{20b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb20a}{20a}.}
 \item $\langle\,$Render current algorithm state to image file\nobreak\ {\footnotesize \NWlink{nuweb36b}{36b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb36a}{36a}.}
-\item $\langle\,$Render frame and append it to \verb|ims|\nobreak\ {\footnotesize \NWlink{nuweb54b}{54b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb54a}{54a}.}
+\item $\langle\,$Render frame and append it to \verb|ims|\nobreak\ {\footnotesize \NWlink{nuweb56b}{56b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb56a}{56a}.}
 \item $\langle\,$Return horsefly tour, along with additional information\nobreak\ {\footnotesize \NWlink{nuweb40b}{40b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb34a}{34a}.}
 \item $\langle\,$Set insertion policy class for current run\nobreak\ {\footnotesize \NWlink{nuweb35a}{35a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb34a}{34a}.}
 \item $\langle\,$Set log, algo-state and input-output files config\nobreak\ {\footnotesize \NWlink{nuweb34b}{34b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb34a}{34a}.}
-\item $\langle\,$Set up configurations and parameters for animation and plotting\nobreak\ {\footnotesize \NWlink{nuweb53a}{53a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb52b}{52b}.}
+\item $\langle\,$Set up configurations and parameters for animation and plotting\nobreak\ {\footnotesize \NWlink{nuweb55a}{55a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb54}{54}.}
 \item $\langle\,$Set up interactive canvas\nobreak\ {\footnotesize \NWlink{nuweb24b}{24b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb20a}{20a}.}
 \item $\langle\,$Set up logging information relevant to this module\nobreak\ {\footnotesize \NWlink{nuweb21a}{21a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb20a}{20a}.}
 \item $\langle\,$Set up plotting area and canvas, fig, ax, and other configs\nobreak\ {\footnotesize \NWlink{nuweb36c}{36c}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb36b}{36b}.}
 \item $\langle\,$Set up tracking variables local to this iteration\nobreak\ {\footnotesize \NWlink{nuweb43a}{43a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb42b}{42b}.}
-\item $\langle\,$Set \verb|phi_prim_mst| to the singleton graph, with node coordinates set at \verb|inithorseposn|\nobreak\ {\footnotesize \NWlink{nuweb46b}{46b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb46a}{46a}.}
 \item $\langle\,$Start entering input from the command-line\nobreak\ {\footnotesize \NWlink{nuweb22}{22}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb21b}{21b}.}
 \item $\langle\,$Update states for \texttt{PolicyBestInsertionNaive}\nobreak\ {\footnotesize \NWlink{nuweb44}{44}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb42b}{42b}.}
 \item $\langle\,$Use insertion policy to find the cheapest site to insert into current tour\nobreak\ {\footnotesize \NWlink{nuweb35b}{35b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb34a}{34a}.}
 \item $\langle\,$Useful functions for \verb|algo_exact_given_specific_ordering|\nobreak\ {\footnotesize \NWlink{nuweb30b}{30b}\NWlink{nuweb31}{, 31}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb30a}{30a}.}
 \item $\langle\,$Write algorithms current state to file\nobreak\ {\footnotesize \NWlink{nuweb36a}{36a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb34a}{34a}.}
-\item $\langle\,$Write animation of schedule to disk and display in live window\nobreak\ {\footnotesize \NWlink{nuweb56b}{56b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb52b}{52b}.}
+\item $\langle\,$Write animation of schedule to disk and display in live window\nobreak\ {\footnotesize \NWlink{nuweb58b}{58b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb54}{54}.}
 \item $\langle\,$Write image file\nobreak\ {\footnotesize \NWlink{nuweb38e}{38e}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb36b}{36b}.}
 \item $\langle\,$Write input and output to file\nobreak\ {\footnotesize \NWlink{nuweb39a}{39a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb34a}{34a}.}
 \end{list}}
@@ -4119,6 +4106,7 @@ explains the odd-looking \verb|subleg_pts.extend(tmp[:-1])| statement in the cod
 \item \verb@current_tour_length@: \underline{\NWlink{nuweb42c}{42c}}\NWlink{nuweb43b}{, 43b}.
 \item \verb@delta_increase_least@: \underline{\NWlink{nuweb43a}{43a}}\NWlink{nuweb43b}{, 43b}.
 \item \verb@delta_increase_least_table@: \underline{\NWlink{nuweb42b}{42b}}\NWlink{nuweb43b}{, 43b}\NWlink{nuweb43c}{c}.
+\item \verb@draw_phi_mst@: \NWlink{nuweb22}{22}, \underline{\NWlink{nuweb53}{53}}.
 \item \verb@generate_constraints@: \NWlink{nuweb30a}{30a}, \underline{\NWlink{nuweb31}{31}}.
 \item \verb@getTour@: \NWlink{nuweb22}{22}, \underline{\NWlink{nuweb25c}{25c}}.
 \item \verb@greedy@: \NWlink{nuweb28}{28}, \underline{\NWlink{nuweb29b}{29b}}\NWlink{nuweb34b}{, 34b}.
@@ -4127,15 +4115,15 @@ explains the odd-looking \verb|subleg_pts.extend(tmp[:-1])| statement in the cod
 \item \verb@io_file_name,@: \underline{\NWlink{nuweb34b}{34b}}\NWlink{nuweb39a}{, 39a}.
 \item \verb@ith_leg_constraint@: \underline{\NWlink{nuweb30b}{30b}}\NWlink{nuweb31}{, 31}.
 \item \verb@logger@: \NWlink{nuweb21a}{21a}, \underline{\NWlink{nuweb34b}{34b}}.
-\item \verb@number_of_sites_serviced@: \underline{\NWlink{nuweb54a}{54a}}\NWlink{nuweb54b}{, 54b}.
-\item \verb@plotTour@: \NWlink{nuweb22}{22}, \underline{\NWlink{nuweb50a}{50a}}.
+\item \verb@number_of_sites_serviced@: \underline{\NWlink{nuweb56a}{56a}}\NWlink{nuweb56b}{, 56b}.
+\item \verb@plotTour@: \NWlink{nuweb22}{22}, \underline{\NWlink{nuweb51a}{51a}}.
 \item \verb@self.horse_tour@: \underline{\NWlink{nuweb42a}{42a}}\NWlink{nuweb44}{, 44}.
 \item \verb@self.inithorseposn,@: \NWlink{nuweb25c}{25c}\NWlink{nuweb25d}{d}, \underline{\NWlink{nuweb42a}{42a}}\NWlink{nuweb42c}{, 42c}\NWlink{nuweb43b}{, 43b}\NWlink{nuweb44}{, 44}.
 \item \verb@self.sites,@: \NWlink{nuweb25c}{25c}\NWlink{nuweb25d}{d}, \underline{\NWlink{nuweb42a}{42a}}.
 \item \verb@self.visited_sites,@: \underline{\NWlink{nuweb42a}{42a}}\NWlink{nuweb42c}{, 42c}\NWlink{nuweb44}{, 44}.
-\item \verb@single_site_solution@: \underline{\NWlink{nuweb40c}{40c}}\NWlink{nuweb41a}{, 41a}\NWlink{nuweb41b}{b}.
-\item \verb@tour_length@: \NWlink{nuweb27}{27}\NWlink{nuweb30a}{, 30a}, \underline{\NWlink{nuweb48a}{48a}}\NWlink{nuweb51b}{, 51b}\NWlink{nuweb51c}{c}.
-\item \verb@tour_length_with_waiting_time_included@: \NWlink{nuweb30a}{30a}\NWlink{nuweb40b}{, 40b}, \underline{\NWlink{nuweb48b}{48b}}\NWlink{nuweb51b}{, 51b}.
+\item \verb@single_site_solution@: \underline{\NWlink{nuweb40c}{40c}}\NWlink{nuweb41a}{, 41a}\NWlink{nuweb41b}{b}\NWlink{nuweb47b}{, 47b}.
+\item \verb@tour_length@: \NWlink{nuweb27}{27}\NWlink{nuweb30a}{, 30a}, \underline{\NWlink{nuweb49a}{49a}}\NWlink{nuweb52b}{, 52b}\NWlink{nuweb52c}{c}.
+\item \verb@tour_length_with_waiting_time_included@: \NWlink{nuweb30a}{30a}\NWlink{nuweb40b}{, 40b}, \underline{\NWlink{nuweb49b}{49b}}\NWlink{nuweb52b}{, 52b}.
 \item \verb@unmarked_sites_idxs@: \underline{\NWlink{nuweb46a}{46a}}\NWlink{nuweb47a}{, 47a}.
 \item \verb@wrapperkeyPressHandler@: \underline{\NWlink{nuweb21b}{21b}}\NWlink{nuweb24b}{, 24b}.
 \item \verb@write_algo_states_to_disk_p@: \underline{\NWlink{nuweb34a}{34a}}\NWlink{nuweb36a}{, 36a}\NWlink{nuweb36b}{b}\NWlink{nuweb39b}{, 39b}.
@@ -4157,9 +4145,9 @@ explains the odd-looking \verb|subleg_pts.extend(tmp[:-1])| statement in the cod
 {\small\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \verb@"../main.py"@ {\footnotesize {\NWtxtDefBy} \NWlink{nuweb12a}{12a}.}
 \item \verb@"../src/lib/problem_classic_horsefly.py"@ {\footnotesize {\NWtxtDefBy} \NWlink{nuweb20a}{20a}.}
-\item \verb@"../src/lib/utils_algo.py"@ {\footnotesize {\NWtxtDefBy} \NWlink{nuweb17a}{17a}\NWlink{nuweb17b}{b}\NWlink{nuweb18a}{, 18a}\NWlink{nuweb18b}{b}\NWlink{nuweb18c}{c}\NWlink{nuweb18d}{d}\NWlink{nuweb18e}{e}\NWlink{nuweb18f}{f}.
+\item \verb@"../src/lib/utils_algo.py"@ {\footnotesize {\NWtxtDefBy} \NWlink{nuweb16d}{16d}\NWlink{nuweb17a}{, 17a}\NWlink{nuweb17b}{b}\NWlink{nuweb18a}{, 18a}\NWlink{nuweb18b}{b}\NWlink{nuweb18c}{c}\NWlink{nuweb18d}{d}\NWlink{nuweb18e}{e}.
 }
-\item \verb@"../src/lib/utils_graphics.py"@ {\footnotesize {\NWtxtDefBy} \NWlink{nuweb14}{14}\NWlink{nuweb15a}{, 15a}\NWlink{nuweb15b}{b}\NWlink{nuweb16a}{, 16a}.
+\item \verb@"../src/lib/utils_graphics.py"@ {\footnotesize {\NWtxtDefBy} \NWlink{nuweb14}{14}\NWlink{nuweb15a}{, 15a}\NWlink{nuweb15b}{b}\NWlink{nuweb15c}{c}.
 }
 \end{list}}
 \chapter{Man-page for \texttt{main.py}}

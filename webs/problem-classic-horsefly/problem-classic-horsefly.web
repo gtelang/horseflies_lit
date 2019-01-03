@@ -383,7 +383,7 @@ The output is a dictionary of size 2, containing two lists:
 @D Methods for \verb|HorseFlyInput|
 @{def  computeStructure(self, structure_func, phi):
    print Fore.RED, "Computing the phi-mst", Style.RESET_ALL
-   structure_func(self.sites, self.inithorseposn, phi)
+   return structure_func(self.sites, self.inithorseposn, phi)
 @| computeStructure @}
 %{/python-mode}%
 
@@ -597,15 +597,14 @@ for x,y,i in zip(xsites, ysites, range(len(xsites))):
 ax.plot(xfs,yfs,'g-')
 ax.plot(xhs, yhs, color=tour_color, marker='s', linewidth=3.0) 
 
-ax.add_patch( mpl.patches.Circle( horseflyinit, radius = 1/34.0,
+ax.add_patch( mpl.patches.Circle( horseflyinit, radius = 1/140.0,
                                   facecolor= '#D13131', edgecolor='black'   )  )
 fontsize = 20
-tnrfont = {'fontname':'Times New Roman'}
 
 ax.set_title( r'Algorithm Used: ' + algo_str +  '\nTour Length: ' \
-               + str(tour_length)[:7], fontdict={'fontsize':fontsize}, **tnrfont)
+               + str(tour_length)[:7], fontdict={'fontsize':fontsize})
 ax.set_xlabel(r'Number of sites: ' + str(len(xsites)) + '\nDrone Speed: ' + str(phi) ,
-                  fontdict={'fontsize':fontsize}, **tnrfont)
+                  fontdict={'fontsize':fontsize})
 @| @}
 %{/python-mode}%
 
@@ -614,9 +613,26 @@ ax.set_xlabel(r'Number of sites: ' + str(len(xsites)) + '\nDrone Speed: ' + str(
 %{python-mode}%
 @D Plotting routines for classic horsefly @{
 def draw_phi_mst(ax, phi_mst, inithorseposn, phi):
-     print "Yay! Drawing the tree!"
-     sys.exit()
-@}
+
+     # for each tree node draw segments joining to sites (green segs)
+     for (nodeidx, nodeinfo) in list(phi_mst.nodes.data()):
+         mycoords           = nodeinfo['mycoordinates']
+         joined_site_coords = nodeinfo['joined_site_coords'] 
+
+         for site in joined_site_coords:
+               ax.plot([mycoords[0],site[0]], [mycoords[1], site[1]], 'g-', linewidth=1.5) 
+               ax.add_patch( mpl.patches.Circle( [site[0],site[1]], radius = 0.007, \
+                                                 facecolor='blue', edgecolor='black'))
+
+     # draw each tree edge (red segs)
+     edges = list(phi_mst.edges.data())
+     for (idx1, idx2, edgeinfo) in edges:
+          (xn1, yn1) =  phi_mst.nodes[idx1]['mycoordinates']
+          (xn2, yn2) =  phi_mst.nodes[idx2]['mycoordinates']
+          ax.plot([xn1,xn2],[yn1,yn2], 'ro-' ,linewidth=1.7)
+
+     ax.set_title(r'$\varphi$-MST', fontdict={'fontsize':30})
+@| draw_phi_mst @}
 %{/python-mode}%
 
 \needspace{7cm}

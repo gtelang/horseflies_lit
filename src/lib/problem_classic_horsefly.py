@@ -214,7 +214,7 @@ class HorseFlyInput:
                 return algo(self.sites, self.inithorseposn, speedratio, k, post_optimizer)
       def  computeStructure(self, structure_func, phi):
          print Fore.RED, "Computing the phi-mst", Style.RESET_ALL
-         structure_func(self.sites, self.inithorseposn, phi)
+         return structure_func(self.sites, self.inithorseposn, phi)
       def __repr__(self):
 
         if self.sites != []:
@@ -750,37 +750,65 @@ def compute_phi_prim_mst(sites, inithorseposn,phi):
 
      import networkx as nx
      from sklearn.neighbors import NearestNeighbors
-     # Set \verb|phi_prim_mst| to the singleton graph, with node coordinates set at \verb|inithorseposn|
      
-     info("Creating singleton graph")
-     phi_prim_mst = nx.Graph()
-     phi_prim_mst.add_node(0, coordinates=inithorseposn)
+     # Create singleton graph, with node at \verb|inithorseposn|
+     G = nx.Graph()
+     G.add_node(0, mycoordinates=inithorseposn, joined_site_coords=[])
      
 
      unmarked_sites_idxs = range(len(sites))
      while unmarked_sites_idxs:
-          # For each node in current $\varphi$-Prim-MST compute the closest unmarked site
+          node_site_info = []
           
-          for n in phi_prim_mst.nodes:
-
-               print n, phi_prim_mst[n]
-               #distances_to_sites = []
-               #for i in unmarked_sites_idxs:
-                    #sc, nc = map (np.asarray, [sites[i], phi_prim_mst[n]['coordinates']]) # the c in sc and nc means 'coordinates'
-                    #dist =  np.linalg.norm(sc-nc)
-                    #print dist
-                    #distances_to_sites.append( (i, dist) )
-               #nsidx, nsc = min(distances_to_sites, key=lambda (_, d): d )
-               #print nsidx, nsc
-          sys.exit()
-          
-          # Get the node $M^{*}$ with the closest unmarked site $S^{*}$ from the previous step
+          # For each node, find the closest site
              
-          pass
+          for nodeid, nodeval in G.nodes.data():
+              current_node_coordinates = np.asarray(nodeval['mycoordinates'])
+              distances_of_current_node_to_sites = []
+                         
+              # The following loop finds the nearest unmarked site. So far, I am 
+              # using brute force for this, later, I will use sklearn.neighbors.
+              for j in unmarked_sites_idxs:
+                  site_coordinates = np.asarray(sites[j])
+                  dist             =  np.linalg.norm( site_coordinates - current_node_coordinates )
+                              
+                  distances_of_current_node_to_sites.append( (j, dist) )
+
+                  nearest_site_idx, distance_of_current_node_to_nearest_site = \
+                                  min(distances_of_current_node_to_sites, key=lambda (_, d): d)
+
+                  node_site_info.append((nodeid, \
+                                            nearest_site_idx, \
+                                            distance_of_current_node_to_nearest_site))
+              
+          # Find the node with the closest site, and generate the next node and edge for the $\varphi$-MST
           
+          opt_node_idx,          \
+          next_site_to_mark_idx, \
+          distance_to_next_site_to_mark = min(node_site_info, key=lambda (h,k,d) : d)
 
+          tmp = sites[next_site_to_mark_idx]
+          G.nodes[opt_node_idx]['joined_site_coords'].append(  tmp   ) 
+          (r, h) = single_site_solution(tmp, G.nodes[opt_node_idx]['mycoordinates'], phi) 
+                    
+          # Remember! indexing of nodes started at 0, thats why you set
+          # numnodes to the index of the newly inserted node. 
+          newnodeid = len(list(G.nodes))
 
-     return phi_prim_mst
+          # joined_site_coords will be updated in the future iterations of while :
+          G.add_node(newnodeid, mycoordinates=r, joined_site_coords=[]) 
+            
+          # insert the edge weight, will be useful later when 
+          # computing sum total of all the edges.
+          G.add_edge(opt_node_idx, newnodeid, weight=h ) 
+          
+          
+          # Marking means removing from unmarked list :-D
+          unmarked_sites_idxs.remove(next_site_to_mark_idx)
+          
+     utils_algo.print_list(G.nodes.data())
+     utils_algo.print_list(G.edges.data())
+     return G
 
 # Plotting routines for classic horsefly
 def plotTour(ax,horseflytour, horseflyinit, phi, algo_str, tour_color='#d13131'):
@@ -844,20 +872,36 @@ def plotTour(ax,horseflytour, horseflyinit, phi, algo_str, tour_color='#d13131')
     ax.plot(xfs,yfs,'g-')
     ax.plot(xhs, yhs, color=tour_color, marker='s', linewidth=3.0) 
 
-    ax.add_patch( mpl.patches.Circle( horseflyinit, radius = 1/34.0,
+    ax.add_patch( mpl.patches.Circle( horseflyinit, radius = 1/140.0,
                                       facecolor= '#D13131', edgecolor='black'   )  )
     fontsize = 20
-    tnrfont = {'fontname':'Times New Roman'}
 
     ax.set_title( r'Algorithm Used: ' + algo_str +  '\nTour Length: ' \
-                   + str(tour_length)[:7], fontdict={'fontsize':fontsize}, **tnrfont)
+                   + str(tour_length)[:7], fontdict={'fontsize':fontsize})
     ax.set_xlabel(r'Number of sites: ' + str(len(xsites)) + '\nDrone Speed: ' + str(phi) ,
-                      fontdict={'fontsize':fontsize}, **tnrfont)
+                      fontdict={'fontsize':fontsize})
     
     
 def draw_phi_mst(ax, phi_mst, inithorseposn, phi):
-     print "Yay! Drawing the tree!"
-     sys.exit()
+
+     # for each tree node draw segments joining to sites (green segs)
+     for (nodeidx, nodeinfo) in list(phi_mst.nodes.data()):
+         mycoords           = nodeinfo['mycoordinates']
+         joined_site_coords = nodeinfo['joined_site_coords'] 
+
+         for site in joined_site_coords:
+               ax.plot([mycoords[0],site[0]], [mycoords[1], site[1]], 'g-', linewidth=1.5) 
+               ax.add_patch( mpl.patches.Circle( [site[0],site[1]], radius = 0.007, \
+                                                 facecolor='blue', edgecolor='black'))
+
+     # draw each tree edge (red segs)
+     edges = list(phi_mst.edges.data())
+     for (idx1, idx2, edgeinfo) in edges:
+          (xn1, yn1) =  phi_mst.nodes[idx1]['mycoordinates']
+          (xn2, yn2) =  phi_mst.nodes[idx2]['mycoordinates']
+          ax.plot([xn1,xn2],[yn1,yn2], 'ro-' ,linewidth=1.7)
+
+     ax.set_title(r'$\varphi$-MST', fontdict={'fontsize':30})
 
 # Animation routines for classic horsefly
 

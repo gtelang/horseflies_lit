@@ -29,14 +29,7 @@ def clearPatches(ax):
     for index , patch in zip(range(len(ax.patches)), ax.patches):
         if isinstance(patch, mpl.patches.Polygon) == True:
             patch.remove()
-
-    # Remove line patches. These get inserted during the r=2 case,
-    # For some strange reason matplotlib does not consider line objects
-    # as patches.
     ax.lines[:]=[]
-
-    #pp.pprint (ax.patches) # To verify that none of the patches are
-    # polyon patches corresponding to clusters.
     applyAxCorrection(ax)
 
 def clearAxPolygonPatches(ax):
@@ -45,13 +38,7 @@ def clearAxPolygonPatches(ax):
     for index , patch in zip(range(len(ax.patches)), ax.patches):
         if isinstance(patch, mpl.patches.Polygon) == True:
             patch.remove()
-
-    # Remove line patches. These get inserted during the r=2 case,
-    # For some strange reason matplotlib does not consider line objects as patches.
     ax.lines[:]=[]
-
-    # To verify that none of the patches are polyon patches corresponding to clusters.
-    #pp.pprint (ax.patches) 
     applyAxCorrection(ax)
 def wrapperEnterRunPoints(fig, ax, run):
     def _enterPoints(event):
@@ -75,9 +62,9 @@ def wrapperEnterRunPoints(fig, ax, run):
              elif event.button == 3:  
                  # Insert big red circle representing initial position of horse and fly
                   
-                 inithorseposn = (event.xdata, event.ydata)
+                 inithorseposn     = (event.xdata, event.ydata)
                  run.inithorseposn = inithorseposn  
-                 patchSize  = (xlim[1]-xlim[0])/70.0
+                 patchSize         = (xlim[1]-xlim[0])/70.0
 
                  ax.add_patch( mpl.patches.Circle( inithorseposn,radius = patchSize,
                                                    facecolor= '#D13131', edgecolor='black' ))

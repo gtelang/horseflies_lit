@@ -34,14 +34,12 @@ def flatten_list_of_lists(l):
 def print_list(xs):
     for x in xs:
         print x
-
 def partial_sums( xs ):
     psum = 0
     acc = []
     for x in xs:
         psum = psum+x
         acc.append( psum )
-
     return acc
 def are_site_orderings_equal(sites1, sites2):
 
