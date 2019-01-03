@@ -69,7 +69,7 @@ def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
 
       @<Write input and output to file@>
       @<Make an animation of the schedule, if \verb|animate_schedule_p == True| @>
-      sys.exit()
+      #sys.exit()
       @<Make an animation of algorithm states, if \verb|write_algo_states_to_disk_p == True|  @>
       @<Return horsefly tour, along with additional information@>
 @| algo_greedy_incremental_insertion, write_algo_states_to_disk_p @}

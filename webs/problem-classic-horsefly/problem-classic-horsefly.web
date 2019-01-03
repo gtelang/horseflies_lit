@@ -219,7 +219,7 @@ elif input_str == 'gl':
 elif input_str == 'ginc':
       horseflytour = \
              run.getTour( algo_greedy_incremental_insertion,
-                          phi )
+                          phi, post_optimizer= algo_exact_given_specific_ordering)
 
 elif input_str == 'phi-mst':
       phi_mst = \
@@ -371,9 +371,9 @@ The output is a dictionary of size 2, containing two lists:
     if k==None and post_optimizer==None:
           return algo(self.sites, self.inithorseposn, speedratio)
     elif k == None:
-          return algo(self.sites, self.inithorseposn, speedratio, post_optimizer)
+          return algo(self.sites, self.inithorseposn, speedratio, post_optimizer=post_optimizer)
     else:
-          return algo(self.sites, self.inithorseposn, speedratio, k, post_optimizer)
+          return algo(self.sites, self.inithorseposn, speedratio, k, post_optimizer=post_optimizer)
 @| getTour @}
 %{/python-mode}%
 
@@ -909,13 +909,13 @@ def discretize_leg(pts):
 @{from colorama import Back 
 
 debug(Fore.BLACK + Back.WHITE + "\nStarted constructing ani object"+ Style.RESET_ALL)
-ani = animation.ArtistAnimation(fig, ims, interval=80, blit=True, repeat_delay=1000)
+ani = animation.ArtistAnimation(fig, ims, interval=50, blit=True, repeat_delay=1000)
 debug(Fore.BLACK + Back.WHITE + "\nFinished constructing ani object"+ Style.RESET_ALL)
 
-plt.show() # For displaying the animation in a live window. 
+#plt.show() # For displaying the animation in a live window. 
 
 debug(Fore.MAGENTA + "\nStarted writing animation to disk"+ Style.RESET_ALL)
-ani.save(schedule_file_name+'.avi', dpi=250)
+ani.save(schedule_file_name+'.avi', dpi=150)
 debug(Fore.MAGENTA + "\nFinished writing animation to disk"+ Style.RESET_ALL)
 @| @}
 %{/python-mode}%

@@ -210,9 +210,9 @@ class HorseFlyInput:
           if k==None and post_optimizer==None:
                 return algo(self.sites, self.inithorseposn, speedratio)
           elif k == None:
-                return algo(self.sites, self.inithorseposn, speedratio, post_optimizer)
+                return algo(self.sites, self.inithorseposn, speedratio, post_optimizer=post_optimizer)
           else:
-                return algo(self.sites, self.inithorseposn, speedratio, k, post_optimizer)
+                return algo(self.sites, self.inithorseposn, speedratio, k, post_optimizer=post_optimizer)
       def  computeStructure(self, structure_func, phi):
          print Fore.RED, "Computing the phi-mst", Style.RESET_ALL
          return structure_func(self.sites, self.inithorseposn, phi)
@@ -297,8 +297,38 @@ def algo_dumb(sites, horseflyinit, phi):
     #print Fore.RED + "\nHorse Waiting times are ", best_tour['horse_waiting_times'] , Style.RESET_ALL
     return best_tour
    
-def algo_greedy(sites, inithorseposn, phi, post_optimizer):
+def algo_greedy(sites, inithorseposn, phi, 
+                write_algo_states_to_disk_p = True   ,
+                animate_schedule_p          = True   , 
+                post_optimizer              = None):
 
+      # Set log, algo-state and input-output files config for \verb|algo_greedy|
+        
+      import sys, logging, datetime, os, errno
+
+      algo_name     = 'algo-greedy-nearest-neighbor'
+      time_stamp    = datetime.datetime.now().strftime('Day-%Y-%m-%d_ClockTime-%H:%M:%S')
+      dir_name      = algo_name + '---' + time_stamp
+      log_file_name = dir_name + '/' + 'run.log'
+      io_file_name  = 'input_and_output.yml'
+
+      # Create directory for writing data-files and logs to for 
+      # current run of this algorithm
+      try:
+          os.makedirs(dir_name)
+      except OSError as e:
+          if e.errno != errno.EEXIST:
+              raise
+
+      logging.basicConfig( filename = log_file_name,
+                           level    = logging.DEBUG,
+                           format   = '%(asctime)s: %(levelname)s: %(message)s',
+                           filemode = 'w' )
+      #logger = logging.getLogger()
+      info("Started running greedy_nearest_neighbor for classic horsefly")
+
+      algo_state_counter = 0 
+      
       # Define function \verb|next_rendezvous_point_for_horse_and_fly|
          
       def next_rendezvous_point_for_horse_and_fly(horseposn, site):
@@ -329,6 +359,26 @@ def algo_greedy(sites, inithorseposn, phi, post_optimizer):
       sites1                  = sites[:]
       sites_ordered_by_greedy = greedy(inithorseposn, remaining_sites=sites1)
       answer                  = post_optimizer(sites_ordered_by_greedy, inithorseposn, phi)
+    
+      # Write input and output of \verb|algo_greedy| to file
+      
+      data = {'visited_sites'  : answer['site_ordering'] ,
+              'horse_tour'     : [inithorseposn] + answer['tour_points']   , 
+              'phi'            : phi                     , 
+              'inithorseposn'  : inithorseposn}
+
+      import yaml
+      with open(dir_name + '/' + io_file_name, 'w') as outfile:
+           yaml.dump( data, \
+                      outfile, \
+                      default_flow_style=False)
+      debug("Dumped input and output to " + io_file_name)
+      
+      # Make an animation of the schedule computed by \verb|algo_greedy|, if \verb|animate_schedule_p == True|
+      
+      if animate_schedule_p : 
+           animateSchedule(dir_name + '/' + io_file_name)
+      
       return answer
 def algo_exact_given_specific_ordering (sites, horseflyinit, phi):
 
@@ -907,7 +957,7 @@ def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
       if animate_schedule_p : 
            animateSchedule(dir_name + '/' + io_file_name)
       
-      sys.exit()
+      #sys.exit()
       # Make an animation of algorithm states, if \verb|write_algo_states_to_disk_p == True|
       if write_algo_states_to_disk_p:
            import subprocess, os
@@ -1556,13 +1606,13 @@ def animateSchedule(schedule_file_name):
      from colorama import Back 
 
      debug(Fore.BLACK + Back.WHITE + "\nStarted constructing ani object"+ Style.RESET_ALL)
-     ani = animation.ArtistAnimation(fig, ims, interval=80, blit=True, repeat_delay=1000)
+     ani = animation.ArtistAnimation(fig, ims, interval=50, blit=True, repeat_delay=1000)
      debug(Fore.BLACK + Back.WHITE + "\nFinished constructing ani object"+ Style.RESET_ALL)
 
-     plt.show() # For displaying the animation in a live window. 
+     #plt.show() # For displaying the animation in a live window. 
 
      debug(Fore.MAGENTA + "\nStarted writing animation to disk"+ Style.RESET_ALL)
-     ani.save(schedule_file_name+'.avi', dpi=250)
+     ani.save(schedule_file_name+'.avi', dpi=150)
      debug(Fore.MAGENTA + "\nFinished writing animation to disk"+ Style.RESET_ALL)
      
 

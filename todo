@@ -1,0 +1,63 @@
+---------------------------------
+Technically boring but important
+---------------------------------
+
+The display code is becoming too long, and complicated, and unorganized. 
+It needs to be broked down and refactored. So far most of the code for 
+doing this is concentrated in plotTour and animateSchedule. This will 
+require a weekends work. 
+
+For the display of the algorithms, we should have 
+1. one axes object for displaying the final solution
+2. one axes object for animating the progress of the algorithm
+3. one axes object for animating the process of delivery itslef. 
+
+These three things are necessary: for understanding the algorithms 
+being built. I would like three independent Axes objects doing their 
+things, alternatively, we can have one axes object, that displays 
+objects under certain modes:
+
+Mode 0: Static Display of schedule     --- useful for inserting into papers
+Mode 1: Algorithms progress            --- again useful for displaying in papers, 
+	                                   each individual frame, but played back
+				           to back.
+Mode 2: Animation of the computed tour --- This is for project demos in talks. 
+
+This latter seems the way to go! To go into the various modes, you will do 
+`ms`, `mp` , `ma`, if the second key-press is not recognized, display a menu option
+to remind the user of what he needs to press. Also update the help menu, when program
+is simply run as `python main.py` This should be the documentation of how to run the
+code. The current mode should be displayed in small letters near the bottom corner
+of the window. 
+
+It is best, if I make each algorithm a class. Each algorithm, should have its own
+way of animating its progress. Other useful displays about the previous run of the 
+algorithm can be stashed away for later retrieval for more plots, such as run-times
+etc. Thus there should be a specific memeber field called last-run-info, and possibly 
+some methods associated with it. As you can see, each algorithm is storing its own 
+local logs, and supporting methods to understand the 
+
+However, the static display of the schedule, and animation of the comuted tour
+is very much problem specific, so they need not be installed as methods, above. 
+
+This leads to a deeper understanding of why we start with a class, in OOP.
+For me as an algorithm designer, you begin at the class level, and have supporting 
+functions for understanding the implementation too. You would do the same thing 
+not just in Python but in C++ too. Not all functions need to be ``classified'' 
+though, only the important ones. This latter is a matter of taste. 
+
+You also need to explain the architecture of the source code with a schematic 
+diagram at the beginning of the book, specifically in section 3.2.1 of the pdf.
+
+And by this I mean, what each `problem_` file consits off. What does an algorithm
+mean in terms of the source code, and how the visualization routines are arranged. 
+This schematic diagram should be given in section 3.2.2 before defining the 
+main function. Maybe just after the main function? Hmmm maybe....................
+
+----------------------------------------------------------------------------------------------------------
+
+- We need to display the weight of the phi-mst at the top
+- We need to display the weight of the greedy incremental insertion 
+  and the finalized schedule at the top. 
+- Get back the deleted code, which solved the post-optimizer to ginc 
+  exactly. Goddamn I lost the code when I deleted it last night. 

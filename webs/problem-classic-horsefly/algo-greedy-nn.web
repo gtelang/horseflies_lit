@@ -35,17 +35,56 @@ computed ordering of sites by greedy.
 
 %{python-mode}%
 @D Algorithms for classic horsefly @{   
-def algo_greedy(sites, inithorseposn, phi, post_optimizer):
+def algo_greedy(sites, inithorseposn, phi, 
+                write_algo_states_to_disk_p = True   ,
+                animate_schedule_p          = True   , 
+                post_optimizer              = None):
 
+      @<Set log, algo-state and input-output files config for \verb|algo_greedy| @>
       @<Define function \verb|next_rendezvous_point_for_horse_and_fly|@>
       @<Define function \verb|greedy| @>
 
       sites1                  = sites[:]
       sites_ordered_by_greedy = greedy(inithorseposn, remaining_sites=sites1)
       answer                  = post_optimizer(sites_ordered_by_greedy, inithorseposn, phi)
+    
+      @<Write input and output of \verb|algo_greedy| to file@>
+      @<Make an animation of the schedule computed by \verb|algo_greedy|, if \verb|animate_schedule_p == True| @>
       return answer
 @| @}
 %{/python-mode}%
+
+
+%{python-mode}%
+@D Set log, algo-state and input-output files config for \verb|algo_greedy| @{  
+import sys, logging, datetime, os, errno
+
+algo_name     = 'algo-greedy-nearest-neighbor'
+time_stamp    = datetime.datetime.now().strftime('Day-%Y-%m-%d_ClockTime-%H:%M:%S')
+dir_name      = algo_name + '---' + time_stamp
+log_file_name = dir_name + '/' + 'run.log'
+io_file_name  = 'input_and_output.yml'
+
+# Create directory for writing data-files and logs to for 
+# current run of this algorithm
+try:
+    os.makedirs(dir_name)
+except OSError as e:
+    if e.errno != errno.EEXIST:
+        raise
+
+logging.basicConfig( filename = log_file_name,
+                     level    = logging.DEBUG,
+                     format   = '%(asctime)s: %(levelname)s: %(message)s',
+                     filemode = 'w' )
+#logger = logging.getLogger()
+info("Started running greedy_nearest_neighbor for classic horsefly")
+
+algo_state_counter = 0 
+@}
+
+%{/python-mode}%
+
 
 \needspace{5cm}
 \vspace{-0.8cm} \newchunk   When there is a single site, the meeting point of horse and fly
@@ -105,6 +144,44 @@ def greedy(current_horse_posn, remaining_sites):
           return [next_site] + greedy(current_horse_posn = next_horse_posn, remaining_sites = remaining_sites)
 @| greedy @}
 %{/python-mode}%
+
+
+
+
+\vspace{-0.8cm}\newchunk The final answer is written to disk in the form of a YAML file. It lists the input sites 
+in the order of visitation computed by the algorithm and gives the tour of the horse. 
+Note that the number of points on the horse's tour is 1 more than the number of given sites. 
+%{python-mode}%
+@D Write input and output  of \verb|algo_greedy| to file 
+@{
+data = {'visited_sites'  : answer['site_ordering'] ,
+        'horse_tour'     : [inithorseposn] + answer['tour_points']   , 
+        'phi'            : phi                     , 
+        'inithorseposn'  : inithorseposn}
+
+import yaml
+with open(dir_name + '/' + io_file_name, 'w') as outfile:@%
+     yaml.dump( data, \
+                outfile, \
+                default_flow_style=False)
+debug("Dumped input and output to " + io_file_name)
+@| @}
+%{/python-mode}%
+
+
+
+\vspace{-0.8cm} \newchunk
+%{python-mode}%
+@d  Make an animation of the schedule computed by \verb|algo_greedy|, if \verb|animate_schedule_p == True| @{
+if animate_schedule_p : 
+     animateSchedule(dir_name + '/' + io_file_name)
+@| @}
+%{/python-mode}%
+
+
+
+
+
 
 
 
