@@ -1,1 +1,353 @@
+@s 
 \chapter{One Horse, Multiple Flies}
+\label{chap:one-horse-multiple-flies}
+
+\section{Module Overview}
+If one fly wasn't exciting enough for you, how about multiple flies?! The added complexity
+in the problem comes from finding which sites need to be serviced by each of the flies 
+\textit{and} the order in which these sites need to be serviced. To play around with the 
+algorithms in interactive mode, run \texttt{main.py} as 
+
+\begin{center}
+\texttt{python main.py --problem-one-horse-multiple-flies}. 
+\end{center}
+
+The structure of this chapter is similar to \autoref{chap:classic-horsefly}. In fact, 
+we will be using some of the algorithms from that chapter as black-box routines in 
+the algorithms to be described here. 
+
+
+All algorithms to solve the multiple flies 
+\footnote{For the rest of this chapter we will refer to the one horse, 
+multiple flies problem simply as the multiple flies problem.} 
+problem have been implemented in \texttt{problem\_one\_horse\_multiple\_flies.py}. 
+As bfore, the \verb|run_handler| function acts as a kind of main function for this module. 
+It is called from \verb|main.py| to process the command-line arguments and run the 
+experimental or interactive sections of the code. 
+
+%{python-mode}%
+@O ../src/lib/problem_one_horse_multiple_flies.py -cp
+@{    
+@< Relevant imports  @>
+@< Set up logging information relevant to this module @>
+def run_handler():
+    @< Define key-press handler  @>
+    @< Set up interactive canvas @>
+
+@< Local data-structures  @>
+@% @< Local utility functions  @>
+@< Algorithms for multiple flies @>
+@% @< Lower bounds for multiple flies  @>
+@% @< Plotting routines  @>
+@% @< Animation routines  @>
+@| @}
+%{/python-mode}%
+
+
+\newpage
+
+\section{Module Details}
+\newchunk 
+%{python-mode}%
+@d Relevant imports 
+@{from colorama import Fore, Style
+from matplotlib import rc
+from scipy.optimize import minimize
+from sklearn.cluster import KMeans
+import argparse
+import inspect 
+import itertools
+import logging
+import math
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+# plt.style.use('seaborn-poster')
+import numpy as np
+import os
+import pprint as pp
+import randomcolor 
+import sys
+import time
+import utils_algo
+import utils_graphics
+
+import problem_classic_horsefly as chf
+@| @}
+%{/python-mode}%
+
+
+\vspace{-0.8cm}\newchunk The logger variable becomes becomes global in scope to this module. This allows
+me to write customized \texttt{debug} and \texttt{info} functions that let's me format 
+the log messages according to the frame level. I learned this trick from the following 
+Stack Overflow post \url{https://stackoverflow.com/a/5500099/505306}. 
+%{python-mode}%
+@d  Set up logging information relevant to this module 
+@{logger=logging.getLogger(__name__)
+logging.basicConfig(level=logging.DEBUG)
+
+def debug(msg):
+    frame,filename,line_number,function_name,lines,index=inspect.getouterframes(
+        inspect.currentframe())[1]
+    line=lines[0]
+    indentation_level=line.find(line.lstrip())
+    logger.debug('{i} [{m}]'.format(
+        i='.'*indentation_level, m=msg))
+
+def info(msg):
+    frame,filename,line_number,function_name,lines,index=inspect.getouterframes(
+        inspect.currentframe())[1]
+    line=lines[0]
+    indentation_level=line.find(line.lstrip())
+    logger.info('{i} [{m}]'.format(
+        i='.'*indentation_level, m=msg))
+@| @}
+%{/python-mode}%
+
+\vspace{-0.8cm}\newchunk The key-press handler function detects the keys pressed by the user when the canvas
+is in active focus. This function allows you to set some of the input parameters like 
+speed ratio $\varphi$, or selecting an algorithm interactively at the command-line, 
+generating a bunch of uniform or non-uniformly distributed points on the canvas, 
+or just plain clearing the canvas for inserting a fresh input set of points. 
+
+%{python-mode}%
+@d Define key-press handler
+@{   
+# The key-stack argument is mutable! I am using this hack to my advantage.
+def wrapperkeyPressHandler(fig,ax, run): 
+       def _keyPressHandler(event):
+           if event.key in ['i', 'I']:  
+                @< Start entering input from the command-line @>
+           elif event.key in ['n', 'N', 'u', 'U']: 
+                @< Generate a bunch of uniform or non-uniform random points on the canvas @>
+           elif event.key in ['c', 'C']: 
+                @< Clear canvas and states of all objects @>
+       return _keyPressHandler
+@| wrapperkeyPressHandler @}
+%{/python-mode}%
+
+
+
+\vspace{-0.8cm}\newchunk Before running an algorithm, the user needs to select through 
+a menu displayed at the terminal, which one to run. Each algorithm itself, may be 
+run under different conditions, so depending on the key-pressed(and thus algorithm chosen) 
+further sub-menus will be generated at the command-line. 
+
+After running the appropriate algorithm, we render the structure computed to a matplotlib canvas/window
+along with possibly some meta data about the run at the terminal. 
+
+%{python-mode}%
+
+@D Start entering input from the command-line
+@{@<Set speed and number of flies@>
+@<Select algorithm to execute@>
+@| @}
+%{/python-mode}%
+
+
+\vspace{-0.8cm} \newchunk We assume that all flies have the same velocity
+%{python-mode}%
+@d Set speed and number of flies 
+@{nof_str = raw_input(Fore.YELLOW + "How many flies do you want me to assign to the horse? : " + Style.RESET_ALL)
+phi_str = raw_input(Fore.YELLOW + "What should I set the speed of the flies to be (should be >1)? : " + Style.RESET_ALL)
+
+phi = float(phi_str)
+nof = int(nof_str)
+@| phi, nof@}
+%{/python-mode}%
+
+
+
+\vspace{-0.8cm} \newchunk Each of the algorithms can have several tuning strategies. 
+Depending on the algorithm selected, further sub-menus will have to be generated for 
+selecting these sub-strategies. It is best, if all these strategies, are all set 
+through a configuration file, like say YAML, rather than have to generate the menus. 
+
+What configurations are valid or not will have to be set later. However, for now, I 
+will only implement a simple menu ala classic horsefly to get something working. 
+For now, I am implementing the super-drone heuristic with the greedy-incremental 
+strategy for the super-drone. For the super-drone category, we will also have 
+to specify a partitioning scheme of which sites get assigned to which drones. 
+
+Also the post-optimizer for the super-drone will have to be specified. Too....many....flags! 
+Needs a careful documenting in terms of tables of what is allowed and what is not allowed
+that is available for ready-reference for the user, and hopefully one that is updated
+automatically when the combination is made. Maybe this can be useful for the defense.  
+
+For now, we just stick to super-drones
+
+%{python-mode}%
+@d Select algorithm to execute @{
+algo_str = raw_input(Fore.YELLOW                                             +\
+        "Enter algorithm to be used to compute the tour:\n Options are:\n"   +\
+        " (sdgi)   Super-drone \n"                                           +\
+        Style.RESET_ALL)
+
+algo_str = algo_str.lstrip()
+ 
+# Incase there are patches present from the previous clustering, just clear them
+utils_graphics.clearAxPolygonPatches(ax)
+
+if   algo_str == 'sdgi':
+      tour = run.getTour( algo_sdgi, phi, \
+                          number_of_flies = nof, \
+                          post_optimizer = chf.algo_exact_given_specific_ordering )
+else:
+      print "Unknown option. No horsefly for you! ;-D "
+      sys.exit()
+
+
+utils_graphics.applyAxCorrection(ax)
+fig.canvas.draw()
+@| @}
+%{/python-mode}%
+
+\vspace{-0.8cm}\newchunk This chunk generates points uniformly or non-uniformly distributed in the 
+unit square $[0,1]^2$ in the Matplotlib canvas. I will document the schemes used for 
+generating the non-uniformly distributed points later. These schemes are important to test the effectiveness of 
+the horsefly algorithms. Uniform point clouds do no highlight the weaknesses of 
+sequencing algorithms as David Johnson implies in his article on how to write 
+experimental algorithm papers when he talks about algorithms for the TSP. 
+
+Note that the option keys \verb|'n'| or \verb|'N'| for entering in non-uniform random-points is just 
+incase the caps-lock key has been pressed on by the user accidentally. Similarly for the \verb|'u'|
+and \verb|'U'| keys.  
+
+%{python-mode}%
+@D  Generate a bunch of uniform or non-uniform random points on the canvas
+@{numpts = int(raw_input("\n" + Fore.YELLOW+\
+                       "How many points should I generate?: "+\
+                       Style.RESET_ALL)) 
+run.clearAllStates()
+ax.cla()
+               
+utils_graphics.applyAxCorrection(ax)
+ax.set_xticks([])
+ax.set_yticks([])
+                
+fig.texts = []
+                 
+import scipy
+if event.key in ['n', 'N']: 
+        run.sites = utils_algo.bunch_of_non_uniform_random_points(numpts)
+else : 
+        run.sites = scipy.rand(numpts,2).tolist()
+
+patchSize  = (utils_graphics.xlim[1]-utils_graphics.xlim[0])/140.0
+
+for site in run.sites:      
+    ax.add_patch(mpl.patches.Circle(site, radius = patchSize, \
+                 facecolor='blue',edgecolor='black' ))
+
+ax.set_title('Points : ' + str(len(run.sites)), fontdict={'fontsize':40})
+fig.canvas.draw()
+@| @}
+%{/python-mode}%
+
+\vspace{-0.8cm}\newchunk Clearing the canvas and states of all objects is essential when we want to test out the algorithm on a fresh
+new point-set; the program need not be shut-down and rerun. 
+%{python-mode}%
+@D Clear canvas and states of all objects
+@{run.clearAllStates()
+ax.cla()
+              
+utils_graphics.applyAxCorrection(ax)
+ax.set_xticks([])
+ax.set_yticks([])
+                 
+fig.texts = []
+fig.canvas.draw()
+@| @}
+%{/python-mode}%
+
+%{python-mode}%
+\vspace{-0.8cm}\newchunk 
+@D Set up interactive canvas
+@{fig, ax =  plt.subplots()
+run = MultipleFliesInput()
+#print run
+    
+ax.set_xlim([utils_graphics.xlim[0], utils_graphics.xlim[1]])
+ax.set_ylim([utils_graphics.ylim[0], utils_graphics.ylim[1]])
+ax.set_aspect(1.0)
+ax.set_xticks([])
+ax.set_yticks([])
+      
+mouseClick   = utils_graphics.wrapperEnterRunPoints (fig,ax, run)
+fig.canvas.mpl_connect('button_press_event' , mouseClick )
+      
+keyPress     = wrapperkeyPressHandler(fig,ax, run)
+fig.canvas.mpl_connect('key_press_event', keyPress   )
+plt.show()
+@| @}
+%{/python-mode}%
+
+\needspace{7cm}
+\section{Local Data Structures}
+
+
+\newchunk This class manages the input and the output of the result of 
+calling various horsefly algorithms. 
+
+%{python-mode}%
+@d Local data-structures 
+@{class MultipleFliesInput:
+      def __init__(self, sites=[], inithorseposn=()):
+           self.sites           = sites
+           self.inithorseposn   = inithorseposn
+
+      @<Methods for \verb|MultipleFliesInput|@>
+@| HorseFlyInput @}
+%{/python-mode}%
+
+
+
+
+
+
+\vspace{-0.8cm}
+\newchunk Set the sites to an empty list and initial horse position to the empty tuple.
+%{python-mode}%
+@D Methods for \verb|MultipleFliesInput|
+@{def clearAllStates (self):
+   self.sites = []
+   self.inithorseposn = ()
+@| clearAllStates @}
+%{/python-mode}%
+
+
+\vspace{-0.8cm} \newchunk 
+This method sets an algorithm for calculating
+a multiple flies tour. The name of the algorithm is passed as a command-line argument.  
+The list of possible algorithms are typically prefixed with \verb|algo_|. 
+          
+%{python-mode}%
+@D Methods for \verb|MultipleFliesInput|
+@{def getTour(self, algo, speedratio, number_of_flies, post_optimizer=None):
+ 
+      return algo(self.sites, self.inithorseposn, speedratio, \
+                  number_of_flies, post_optimizer=post_optimizer)
+@| getTour @}
+%{/python-mode}%
+
+
+@i problem-one-horse-multiple-flies/algo-super-drone-greedy-incremental.web
+
+
+
+
+\section{Plotting Routines}
+\section{Animation routines}
+
+
+
+\needspace{17cm}
+\section{Local Utility Functions}
+\blindtext
+\section{Chapter Index of Fragments}
+@m
+\section{Chapter Index of Identifiers}
+@u 
+%------------------------------------------------------
+@S
+%------------------------------------------------------
+\newpage

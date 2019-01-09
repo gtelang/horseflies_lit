@@ -1,0 +1,34 @@
+\section{\framebox{Algorithm:} Super Drone, Greedy Incremental}
+
+\newchunk 
+%{python-mode}%
+@D Algorithms for multiple flies @{
+@% @<Define auxiliary helper functions@>
+@% @<Define various insertion policy classes@>
+def algo_sdgi(sites, inithorseposn, phi, number_of_flies,
+              insertion_policy_name       = "naive",
+              write_algo_states_to_disk_p = True   ,
+              animate_schedule_p          = True   , 
+              post_optimizer              = None):
+    # Get super-drone tour
+    # Chunkify successsive sites along the tour
+    # Iterate through the chunks making the normal drones service each chunk
+    #     Each chunk is treated as a reverse-horsefly problem
+    #            There are multiple strategies for solving reverse-horsefly. 
+    #            Simplest strategy, is to head for closest non-picked up drone
+    #            Another one, is that all drones first head for the center of the meb
+    #                          and then head together towards the horse. This strategy
+    #                          is good, when processing drones is costly. For this 
+    #                          the velocity needs to be adjusted accordingly, at each stage. 
+    #                          this is a natural generalization of collinear-horseflies
+    #                          A natural optimization question here, is that of orienting 
+    #                          the direction of the horse to rendezvous with all the flies. 
+    #                          how bad is just heading for the center of mass, or the 
+    #                          center of the minimum enclosing ball? That helps in implementation
+    #                          of various calculus expressions. This fits the pattern of setup 
+    #                          a calculation and solve. Will be nice to know if we can approximate
+    #                          this with the L1 metric, and how much worse off OPT is for this 
+    #                          strategy compared to opt for multiple horseflies. 
+    #     At the end of each chunk, update the horse position and process the next-chunk
+@| algo_sdgi, animate_schedule_p, write_algo_states_to_disk_p @}
+%{/python-mode}%
