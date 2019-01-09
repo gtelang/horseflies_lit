@@ -179,6 +179,44 @@ fig.canvas.draw()
 @| @}
 %{/python-mode}%
 
+\newchunk We also need a function to be able to generate visually distinct colors. 
+The HSV color model is particularly suitable for this. The following function has been 
+adapted from \url{https://martin.ankerl.com/2009/12/09/how-to-create-random-colors-programmatically/}. 
+
+To generate a random color the function uses a random hue but fixed values of the saturation 
+and value (both lying in the interval $[0,1)$). 
+ 
+%{python-mode}%
+@O ../src/lib/utils_graphics.py  -cp 
+@{def get_random_color(sat=0.7,val=0.7):
+    def hsv_to_rgb(h, s, v):
+          h_i = int((h*6))
+          f   = h*6 - h_i
+          p   = v * (1 - s)
+          q   = v * (1 - f*s)
+          t   = v * (1 - (1 - f) * s)
+  
+          if h_i==0:
+               r, g, b = v, t, p 
+          elif h_i==1:  
+               r, g, b = q, v, p 
+          elif h_i==2:
+               r, g, b = p, v, t 
+          elif h_i==3:
+               r, g, b = p, q, v 
+          elif h_i==4: 
+               r, g, b = t, p, v 
+          elif h_i==5:
+               r, g, b = v, p, q 
+
+          return [int(r*256), int(g*256), int(b*256)]
+    return hsv_to_rgb(np.random.rand(), sat, val)
+@|  @}
+%{/python-mode}%
+
+
+
+
 \section{Algorithmic Utilities}
 
 \newchunk Given a list of  points $[p_0,p_1,p_2,....p_{n-1}]$. 

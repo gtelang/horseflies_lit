@@ -113,7 +113,7 @@ def run_handler():
                     elif input_str == 'ginc':
                           horseflytour = \
                                  run.getTour( algo_greedy_incremental_insertion,
-                                              phi )
+                                              phi, post_optimizer= algo_exact_given_specific_ordering)
 
                     elif input_str == 'phi-mst':
                           phi_mst = \

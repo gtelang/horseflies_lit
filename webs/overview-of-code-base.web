@@ -42,6 +42,9 @@ using \texttt{weave-tangle.sh}.
 command-line arguments and pass relevant information to the handler 
 functions for each problem and experiment. 
 
+\TODO{Add an item containing the interface files. Do this for the Haskell files that 
+you will ultimately add in later.}
+
 \item \crunchy{Algorithmic Code} All such files are in the directory \texttt{src/lib/}.
   Each of the files with prefix ``\verb|problem_*|'' contain implmentations of 
   algorithms for one specific problem. For instance \verb|problem_watchman_horsefly.py| 
@@ -96,11 +99,8 @@ if __name__=="__main__":
      elif sys.argv[1] == "--problem-classic-horsefly":
           chf.run_handler()
 
-     elif sys.argv[1] == "--problem-segment-horsefly":
-          shf.run_handler()
-
-     elif sys.argv[1] == "--problem-one-horse-two-flies":
-          oh2f.run_handler()
+     elif sys.argv[1] == "--problem-one-horse-multiple-flies":
+          ohmf.run_handler()
 
      else:
           print "Option not recognized"
@@ -110,7 +110,8 @@ if __name__=="__main__":
 
 \newchunk On my customized Ubuntu container, Matplotlib produces tons of DEBUG log messages because  
 it recently switched to the \verb|logging| library for...well...logging. 
-The lines in this chunk were suggested by the link \url{http://matplotlib.1069221.n5.nabble.com/How-to-turn-off-matplotlib-DEBUG-msgs-td48822.html} 
+The lines in this chunk were suggested by the link 
+\url{http://matplotlib.1069221.n5.nabble.com/How-to-turn-off-matplotlib-DEBUG-msgs-td48822.html} 
 for quietening down Matplotlib.  
 
 
@@ -127,8 +128,7 @@ mpl_logger.setLevel(logging.WARNING)
 import sys
 sys.path.append('src/lib')
 import problem_classic_horsefly as chf
-#import problem_segment_horsefly as shf
-#import problem_one_horse_two_flies as oh2f
+import problem_one_horse_multiple_flies as ohmf
 @| @}
 
 %{/python-mode}%

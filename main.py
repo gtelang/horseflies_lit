@@ -9,8 +9,7 @@ mpl_logger.setLevel(logging.WARNING)
 import sys
 sys.path.append('src/lib')
 import problem_classic_horsefly as chf
-#import problem_segment_horsefly as shf
-#import problem_one_horse_two_flies as oh2f
+import problem_one_horse_multiple_flies as ohmf
 
 
 if __name__=="__main__":
@@ -22,11 +21,8 @@ if __name__=="__main__":
      elif sys.argv[1] == "--problem-classic-horsefly":
           chf.run_handler()
 
-     elif sys.argv[1] == "--problem-segment-horsefly":
-          shf.run_handler()
-
-     elif sys.argv[1] == "--problem-one-horse-two-flies":
-          oh2f.run_handler()
+     elif sys.argv[1] == "--problem-one-horse-multiple-flies":
+          ohmf.run_handler()
 
      else:
           print "Option not recognized"
