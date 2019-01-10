@@ -57,8 +57,8 @@ benchmark the quality and speed of implementation of future insertion policies.
 @<Define various insertion policy classes@>
 def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
                                       insertion_policy_name       = "naive",
-                                      write_algo_states_to_disk_p = True   ,
-                                      animate_schedule_p          = True   , 
+                                      write_algo_states_to_disk_p = False   ,
+                                      animate_schedule_p          = False   , 
                                       post_optimizer              = None):
       @<Set log, algo-state and input-output files config@>
       @<Set insertion policy class for current run@>
@@ -383,7 +383,7 @@ debug("Dumped input and output to " + io_file_name)
 %{/python-mode}%
 
 \vspace{-0.8cm}\newchunk If algorithm states have been rendered to files in the run-folder, we stitch them together using \verb|ffmpeg|
-and make an \verb|.mp4| animation of the changing states of the algorithms. The \verb|.mp4| file will be in the algorithm's
+and make an \verb|.avi| animation of the changing states of the algorithms. The \verb|.avi| file will be in the algorithm's
 run folder. I used the  tutorial given on \url{https://en.wikibooks.org/wiki/FFMPEG_An_Intermediate_Guide/image_sequence}
 for choosing the particular command-line options to \verb|ffmpeg| below. The options \texttt{-hide\_banner -loglevel panic} 
 to quieten \verb|ffmpeg|'s output were suggested by  \url{https://superuser.com/a/1045060/102371} 

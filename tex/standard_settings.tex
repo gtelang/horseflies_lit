@@ -1,5 +1,5 @@
 %\usepackage[a4paper, left=2cm, right=2cm, top=2cm]{geometry}
-\usepackage[text={19.0cm,24cm}]{geometry}
+\usepackage[text={19.0cm,24.5cm}]{geometry}
 \usepackage{marginnote}
 
 % https://stackoverflow.com/a/27243065/505306
@@ -45,6 +45,21 @@
      }
      
 %-------------------------------------------------------------------------------
+
+
+% Useful for breaking long lines of text https://tex.stackexchange.com/a/176780
+% in a table
+
+\usepackage{fourier} 
+\usepackage{array}
+\usepackage{makecell}
+
+\renewcommand\theadalign{bc}
+\renewcommand\theadfont{\bfseries}
+\renewcommand\theadgape{\Gape[4pt]}
+\renewcommand\cellgape{\Gape[4pt]}
+\usepackage{makecell}
+
 
 \definecolor{theocol}{RGB}{255, 222, 228}
 \newtheorem{theo}{Theorem}

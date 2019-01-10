@@ -1,34 +1,119 @@
-\section{\framebox{Algorithm:} Super Drone, Greedy Incremental}
+\section{\framebox{Algorithm:} Super Drone}
 
-\newchunk 
+
+\subsection{Algorithmic Overview} \hspace{0.2cm}
+In the super-drone family of strategies, we replace the fleet of drones with a single drone 
+whose speed $\varphi^{*}$ is the sum of all the drone speeds. We then solve the classic horsefly problem
+for the given initial horse position, set of sites and this super-drone speed $\varphi^{*}$
+For the resulting order of sites obtained, we partition the sites among the drones; 
+the order in which each drone serves \textit{its} assigned sites, is the same 
+as the order in which they are served along the super-drone classic horsefly tour. 
+Finally, we extract a tour for the horse from the above site partition. 
+
+From this description, we see there are three ``axes of flexibility'' for algorithmic 
+experiments. Each of these are encoded as policy functions that are passed in as arguments 
+to the super-drone algorithm. We list them in the following table:
+\begin{description}
+\item[] 
+\item[] 
+\item[] 
+\end{description}
+
+\begin{center}
+\begin{tabular}{ l l }
+  \textbf{\texttt{chf\_solver}} & Choice of solver for classic horsefly to get super-drone tour   \\
+   \textbf{\texttt{partitioning\_scheme}} &  Partitioning scheme for the sites 
+                                             among the drones once the horsefly 
+                                             tour is obtained \\
+  \textbf{\texttt{ohmf\_tour\_calculator\_given\_site\_partition}} & Calculation of good tours for the
+                                             horse and flies a given site partition and ordering.   
+\end{tabular}
+\end{center}
+
+\TODO{I will implement the \texttt{partitioning\_scheme} argument later. For getting a working version ready, 
+things are already becomging too parameterzied for my tastes. right now, I will just parametrized along
+the tour calculator functions to make sure they all follow the same interface. }
+
+
+
+
+\subsection{Algorithm Details}
+
+\newchunk The following fragment just encapsulates in code what was stated in the algorithmic
+overview section. A point to note is that currying would be so useful here, so that policy functions can be passed in with the appropriate
+parameters gummed in. Python does have some functional programming features which provide
+this, I will use them here later. 
+
 %{python-mode}%
-@D Algorithms for multiple flies @{
-@% @<Define auxiliary helper functions@>
-@% @<Define various insertion policy classes@>
-def algo_sdgi(sites, inithorseposn, phi, number_of_flies,
-              insertion_policy_name       = "naive",
-              write_algo_states_to_disk_p = True   ,
-              animate_schedule_p          = True   , 
-              post_optimizer              = None):
-    # Get super-drone tour
-    # Chunkify successsive sites along the tour
-    # Iterate through the chunks making the normal drones service each chunk
-    #     Each chunk is treated as a reverse-horsefly problem
-    #            There are multiple strategies for solving reverse-horsefly. 
-    #            Simplest strategy, is to head for closest non-picked up drone
-    #            Another one, is that all drones first head for the center of the meb
-    #                          and then head together towards the horse. This strategy
-    #                          is good, when processing drones is costly. For this 
-    #                          the velocity needs to be adjusted accordingly, at each stage. 
-    #                          this is a natural generalization of collinear-horseflies
-    #                          A natural optimization question here, is that of orienting 
-    #                          the direction of the horse to rendezvous with all the flies. 
-    #                          how bad is just heading for the center of mass, or the 
-    #                          center of the minimum enclosing ball? That helps in implementation
-    #                          of various calculus expressions. This fits the pattern of setup 
-    #                          a calculation and solve. Will be nice to know if we can approximate
-    #                          this with the L1 metric, and how much worse off OPT is for this 
-    #                          strategy compared to opt for multiple horseflies. 
-    #     At the end of each chunk, update the horse position and process the next-chunk
-@| algo_sdgi, animate_schedule_p, write_algo_states_to_disk_p @}
+@d Algorithms for multiple flies @{
+@<Helper functions for \verb|algo_super_drone|@>
+def algo_super_drone(sites, inithorseposn, phi, number_of_flies,
+                     chf_solver                                = chf.algo_greedy_incremental_insertion,
+                     partitioning_scheme                       = None
+                     ohmf_tour_calculator_given_site_partition = None   ,
+                     animate_schedule_p                        = True  ):
+    
+    ordered_sites = chf_solver(sites, inithorseposn, phi = number_of_flies*phi,      \
+                               insertion_policy_name = "naive",                      \
+                               post_optimizer = chf.algo_exact_given_specific_ordering )['site_ordering']
+
+    ordered_sites_partition = chunkify(ordered_sites, max_group_size = number_of_flies)
+    
+    utils_algo.print_list(ordered_sites_partition)
+    @<Calculate and return tour for horse and flies@>
+@| algo_super_drone @}
 %{/python-mode}%
+
+
+\vspace{-0.8cm} \newchunk The \verb|chunkify| function simply groups successive elements in an array 
+in groups of maximum size \verb|maxgroupsize|. For instance \verb|chunkify([1,2,3,4,5,6,7,8,9,10], max_group_size=4)|
+evaluates to \verb|[[1, 2, 3, 4], [5, 6, 7, 8], [9, 10]]|
+%{python-mode}%
+@d Helper functions for \verb|algo_super_drone| @{ 
+def chunkify(xs, max_group_size):
+
+    import math
+
+    pxs = []
+    for i in range(int(math.ceil(float(len(xs))/float(max_group_size)))):
+       pxs.append(xs[i*max_group_size:(i+1)*max_group_size])
+    
+    return pxs
+@| chunkify @}
+%{/python-mode}%
+
+
+\vspace{-0.8cm} \newchunk Now that the sites have been partitioned, we begin the most interesting
+part of the calculation: calculating the tour for the horse and flies. There are several possible 
+approaches. Here I will try out one simple heuristic that does not involve any waiting, while also 
+guaranteeing polygonal paths for each of the horse and flies. This heuristic also directly generalizes
+\verb|collinear_horseflies|. It keeps heading towards the drone that it can service earliest. 
+The rest of the drones keep heading towards the meeting point of the truck and the drone $d^{*}$
+
+It should certainly be enough for a good visual demonstration that ``seems'' locally optimal. 
+We will need to investigate the algorithmic properties too. 
+%{python-mode}%
+@d Calculate and return tour for horse and flies @{  
+@| @}
+%{/python-mode}%
+
+%    # Chunkify successsive sites along the tour
+%    # Iterate through the chunks making the normal drones service each chunk
+%    #     Each chunk is treated as a reverse-horsefly problem
+%    #            There are multiple strategies for solving reverse-horsefly. 
+%    #            Simplest strategy, is to head for closest non-picked up drone
+%    #            Another one, is that all drones first head for the center of the meb
+%    #                          and then head together towards the horse. This strategy
+%    #                          is good, when processing drones is costly. For this 
+%    #                          the velocity needs to be adjusted accordingly, at each stage. 
+%    #                          this is a natural generalization of collinear-horseflies
+%    #                          A natural optimization question here, is that of orienting 
+%    #                          the direction of the horse to rendezvous with all the flies. 
+%    #                          how bad is just heading for the center of mass, or the 
+%    #                          center of the minimum enclosing ball? That helps in implementation
+%    #                          of various calculus expressions. This fits the pattern of setup 
+%    #                          a calculation and solve. Will be nice to know if we can approximate
+%    #                          this with the L1 metric, and how much worse off OPT is for this 
+%    #                          strategy compared to opt for multiple horseflies. 
+%    #     At the end of each chunk, update the horse position and process the next-chunk
+

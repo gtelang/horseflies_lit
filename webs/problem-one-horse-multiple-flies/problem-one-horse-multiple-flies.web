@@ -147,12 +147,13 @@ along with possibly some meta data about the run at the terminal.
 \vspace{-0.8cm} \newchunk We assume that all flies have the same velocity
 %{python-mode}%
 @d Set speed and number of flies 
-@{nof_str = raw_input(Fore.YELLOW + "How many flies do you want me to assign to the horse? : " + Style.RESET_ALL)
-phi_str = raw_input(Fore.YELLOW + "What should I set the speed of the flies to be (should be >1)? : " + Style.RESET_ALL)
+@{
+phi_str = raw_input(Fore.YELLOW + "What should I set the speed of each of the flies to be (should be >1)? : " + Style.RESET_ALL)
+nof_str = raw_input(Fore.YELLOW + "How many flies do you want me to assign to the horse? : " + Style.RESET_ALL)
 
 phi = float(phi_str)
 nof = int(nof_str)
-@| phi, nof@}
+@| @}
 %{/python-mode}%
 
 
@@ -179,7 +180,7 @@ For now, we just stick to super-drones
 @d Select algorithm to execute @{
 algo_str = raw_input(Fore.YELLOW                                             +\
         "Enter algorithm to be used to compute the tour:\n Options are:\n"   +\
-        " (sdgi)   Super-drone \n"                                           +\
+        " (sd)   Super-drone \n"                                           +\
         Style.RESET_ALL)
 
 algo_str = algo_str.lstrip()
@@ -187,10 +188,9 @@ algo_str = algo_str.lstrip()
 # Incase there are patches present from the previous clustering, just clear them
 utils_graphics.clearAxPolygonPatches(ax)
 
-if   algo_str == 'sdgi':
-      tour = run.getTour( algo_sdgi, phi, \
-                          number_of_flies = nof, \
-                          post_optimizer = chf.algo_exact_given_specific_ordering )
+if   algo_str == 'sd':
+      tour = run.getTour( algo_super_drone, phi, \
+                          number_of_flies = nof)
 else:
       print "Unknown option. No horsefly for you! ;-D "
       sys.exit()
@@ -322,10 +322,9 @@ The list of possible algorithms are typically prefixed with \verb|algo_|.
           
 %{python-mode}%
 @D Methods for \verb|MultipleFliesInput|
-@{def getTour(self, algo, speedratio, number_of_flies, post_optimizer=None):
- 
-      return algo(self.sites, self.inithorseposn, speedratio, \
-                  number_of_flies, post_optimizer=post_optimizer)
+@{
+def getTour(self, algo, speedratio, number_of_flies):
+      return algo(self.sites, self.inithorseposn, speedratio, number_of_flies)
 @| getTour @}
 %{/python-mode}%
 

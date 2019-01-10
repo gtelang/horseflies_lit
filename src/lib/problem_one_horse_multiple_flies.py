@@ -52,8 +52,9 @@ def run_handler():
                if event.key in ['i', 'I']:  
                     # Start entering input from the command-line
                     # Set speed and number of flies
+                    
+                    phi_str = raw_input(Fore.YELLOW + "What should I set the speed of each of the flies to be (should be >1)? : " + Style.RESET_ALL)
                     nof_str = raw_input(Fore.YELLOW + "How many flies do you want me to assign to the horse? : " + Style.RESET_ALL)
-                    phi_str = raw_input(Fore.YELLOW + "What should I set the speed of the flies to be (should be >1)? : " + Style.RESET_ALL)
 
                     phi = float(phi_str)
                     nof = int(nof_str)
@@ -62,7 +63,7 @@ def run_handler():
 
                     algo_str = raw_input(Fore.YELLOW                                             +\
                             "Enter algorithm to be used to compute the tour:\n Options are:\n"   +\
-                            " (sdgi)   Super-drone \n"                                           +\
+                            " (sd)   Super-drone \n"                                           +\
                             Style.RESET_ALL)
 
                     algo_str = algo_str.lstrip()
@@ -70,10 +71,9 @@ def run_handler():
                     # Incase there are patches present from the previous clustering, just clear them
                     utils_graphics.clearAxPolygonPatches(ax)
 
-                    if   algo_str == 'sdgi':
-                          tour = run.getTour( algo_sdgi, phi, \
-                                              number_of_flies = nof, \
-                                              post_optimizer = chf.algo_exact_given_specific_ordering )
+                    if   algo_str == 'sd':
+                          tour = run.getTour( algo_super_drone, phi, \
+                                              number_of_flies = nof)
                     else:
                           print "Unknown option. No horsefly for you! ;-D "
                           sys.exit()
@@ -155,25 +155,42 @@ class MultipleFliesInput:
       def clearAllStates (self):
          self.sites = []
          self.inithorseposn = ()
-      def getTour(self, algo, speedratio, number_of_flies, post_optimizer=None):
-       
-            return algo(self.sites, self.inithorseposn, speedratio, \
-                        number_of_flies, post_optimizer=post_optimizer)
+      
+      def getTour(self, algo, speedratio, number_of_flies):
+            return algo(self.sites, self.inithorseposn, speedratio, number_of_flies)
       
 
 
 # Algorithms for multiple flies
 
+# Helper functions for \verb|algo_super_drone|
+ 
+def chunkify(xs, max_group_size):
 
+    import math
 
-def algo_sdgi(sites, inithorseposn, phi, number_of_flies,
-              insertion_policy_name       = "naive",
-              write_algo_states_to_disk_p = True   ,
-              animate_schedule_p          = True   , 
-              post_optimizer              = None):
-    print "Hello World!", number_of_flies
-    ## Now the fun begins. 
+    pxs = []
+    for i in range(int(math.ceil(float(len(xs))/float(max_group_size)))):
+       pxs.append(xs[i*max_group_size:(i+1)*max_group_size])
+    
+    return pxs
 
+def algo_super_drone(sites, inithorseposn, phi, number_of_flies,
+                     chf_solver                                = chf.algo_greedy_incremental_insertion,
+                     partitioning_scheme                       = None
+                     ohmf_tour_calculator_given_site_partition = None   ,
+                     animate_schedule_p                        = True  ):
+    
+    ordered_sites = chf_solver(sites, inithorseposn, phi = number_of_flies*phi,      \
+                               insertion_policy_name = "naive",                      \
+                               post_optimizer = chf.algo_exact_given_specific_ordering )['site_ordering']
+
+    ordered_sites_partition = chunkify(ordered_sites, max_group_size = number_of_flies)
+    
+    utils_algo.print_list(ordered_sites_partition)
+    # Calculate and return tour for horse and flies
+      
+    
 
 
 
