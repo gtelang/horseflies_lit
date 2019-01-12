@@ -63,7 +63,7 @@ def run_handler():
 
                     algo_str = raw_input(Fore.YELLOW                                             +\
                             "Enter algorithm to be used to compute the tour:\n Options are:\n"   +\
-                            " (sd)   Super-drone \n"                                           +\
+                            " (ec)   Earliest Capture \n"                                        +\
                             Style.RESET_ALL)
 
                     algo_str = algo_str.lstrip()
@@ -71,8 +71,8 @@ def run_handler():
                     # Incase there are patches present from the previous clustering, just clear them
                     utils_graphics.clearAxPolygonPatches(ax)
 
-                    if   algo_str == 'sd':
-                          tour = run.getTour( algo_super_drone, phi, \
+                    if   algo_str == 'ec':
+                          tour = run.getTour( algo_greedy_earliest_capture, phi, \
                                               number_of_flies = nof)
                     else:
                           print "Unknown option. No horsefly for you! ;-D "
@@ -163,34 +163,205 @@ class MultipleFliesInput:
 
 # Algorithms for multiple flies
 
-# Helper functions for \verb|algo_super_drone|
+# Helper functions for \verb|algo_greedy_earliest_capture|
+   
+def meeting_time_horse_fly_opp_dir(horseposn, flyposn, flyspeed):
+    horseposn = np.asarray(horseposn)
+    flyposn   = np.asarray(flyposn)
+    return 1/(flyspeed+1) * np.linalg.norm(horseposn-flyposn)
+    
+# Definition of the \verb|FlyState| class
+class FlyState:
+    def __init__(self, idx, initflyposn, site, flyspeed):
+
+         self.idx                                = idx
+         self._flytraj                           = [ np.asarray(initflyposn) ]
+         self._current_assigned_site             = np.asarray(site)
+         self._speed                             = flyspeed
+         self._current_assigned_site_serviced_p  = False
+         self._fly_retired_p                     = False
+    
+    def retire_fly(self):
+         self._fly_retired_p = True
  
-def chunkify(xs, max_group_size):
+    def redeploy_to_site(self,site):
+         self._current_assigned_site            = np.asarray(site)
+         self._current_assigned_site_serviced_p = False 
 
-    import math
+    def is_retired(self):
+         return self._fly_retired_p
 
-    pxs = []
-    for i in range(int(math.ceil(float(len(xs))/float(max_group_size)))):
-       pxs.append(xs[i*max_group_size:(i+1)*max_group_size])
+    def is_current_assigned_site_serviced(self):
+         return self._current_assigned_site_serviced_p
+
+    def get_current_fly_position(self):
+         return self._flytraj[-1]
+
+    # Definition of method \verb|update_fly_trajectory|
     
-    return pxs
+    def update_fly_trajectory(self, dt, rendezvous_pt):
 
-def algo_super_drone(sites, inithorseposn, phi, number_of_flies,
-                     chf_solver                                = chf.algo_greedy_incremental_insertion,
-                     partitioning_scheme                       = None
-                     ohmf_tour_calculator_given_site_partition = None   ,
-                     animate_schedule_p                        = True  ):
-    
-    ordered_sites = chf_solver(sites, inithorseposn, phi = number_of_flies*phi,      \
-                               insertion_policy_name = "naive",                      \
-                               post_optimizer = chf.algo_exact_given_specific_ordering )['site_ordering']
+         if self.is_retired():
+            return 
 
-    ordered_sites_partition = chunkify(ordered_sites, max_group_size = number_of_flies)
+         dx = self._speed * dt
+
+         if self._current_assigned_site_serviced_p or \
+                     (dx < np.linalg.norm( self._current_assigned_site -\
+                                           self.get_current_fly_position())):   
+
+              heading  = self.fly_traj[-1] - self.fly_traj[-2]
+              uheading = heading / np.linalg.norm(heading) 
+              newpt = self.fly_traj[-1] + dx * uheading
+              self.fly_traj.append(newpt)
+
+         else: # the fly needs to ``uturn'' at the site
+              dx_reduced = dx - np.linalg.norm(self._current_assigned_site -\
+                                               self.get_current_fly_position())
+              assert(dx_reduced >= 0, "dx_reduced should be >= 0")
+              heading  = rendezvous_pt - self._current_assigned_site
+              uheading = heading/np.linalg.norm(heading)
+
+              newpt = self._current_assigned_site + uheading * dx_reduced
+              self.fly_traj.extend([self._current_assigned_site, newpt])
     
-    utils_algo.print_list(ordered_sites_partition)
-    # Calculate and return tour for horse and flies
+    # Definition of method \verb|rendezvous_time_and_point_if_selected_by_horse|
+    
+    def rendezvous_time_and_point_if_selected_by_horse(self, horseposn):
+       assert(self._fly_retired_p != True)
       
+       if self._current_assigned_site_serviced_p:
+           rt = meeting_time_horse_fly_opp_dir(horseposn, \
+                                               self.get_current_fly_position(),\
+                                               self._speed)
+           horseheading = self.get_current_fly_position()
+       else:
+          distance_to_site    = np.linalg.norm(self.get_current_fly_position() -\
+                                               self._current_assigned_site)
+          time_of_fly_to_site = 1/self._speed * distance_to_site
+
+          horse_site_vec   = np.linalg.norm(self._current_assigned_site - horseposn) 
+          displacement_vec = time_of_fly_to_site * horse_site_vec/np.linalg.norm(horse_site_vec)
+          horse_posn_tmp   = horse_posn + displacement_vec
+
+          time_of_fly_from_site = meeting_time_horse_fly_opp_dir(  \
+                                      horseposn_tmp,               \
+                                      self._current_assigned_site, \
+                                      self._speed)
+
+          rt = time_of_fly_to_site + time_of_fly_from_site
+          horseheading = self._current_assigned_site
+
+       uhorseheading = horseheading/np.linalg.norm(uhorseheading)
+       return rt, horseposn + uhorseheading * rt
+
     
+    # Definition of method \verb|print_current_state|
+    
+    def print_current_state(self):
+        fly_speed_str = "Fly Speed is " + str(self._speed)                             
+        fly_traj_str  = "Fly trajectory is " + ''.join(map(str, self._flytraj))             
+        current_assigned_site_str = "Current assigned site is " +\
+                                     str(self._current_assigned_site)             
+        current_assigned_site_serviced_p_str = "Assigned site serviced: " +\
+                                                str(self._current_assigned_site_serviced_p) 
+        fly_retired_p_str = "Fly retired: " +  str(self._fly_retired_p)
+        
+        print '...................................................................'
+        print Fore.BLUE    , fly_speed_str             , Style.RESET_ALL
+        print Fore.MAGENTA , fly_traj_str              , Style.RESET_ALL
+        print Fore.YELLOW  , current_assigned_site_str , Style.RESET_ALL
+        print Fore.GREEN   , current_assigned_site_serviced_p_str, Style.RESET_ALL
+        print Fore.RED     , fly_retired_p_str         , Style.RESET_ALL
+    
+
+def algo_greedy_earliest_capture(sites, inithorseposn, phi, number_of_flies,\
+                                 write_algo_states_to_disk_p = True,\
+                                 write_io_p                  = True,\
+                                 animate_schedule_p          = True):
+
+    if number_of_flies > len(sites):
+          number_of_flies = len(sites)
+
+    current_horse_posn = np.asarray(inithorseposn)
+    horse_traj         = [current_horse_posn]
+
+    # Find the $k$-nearest sites to \verb|inithorseposn| for $k=$\verb|number_of_flies| and claim them
+    from sklearn.neighbors import NearestNeighbors
+
+    neigh = NearestNeighbors(n_neighbors=number_of_flies)
+    neigh.fit(sites)
+
+    _, knn_idxss = neigh.kneighbors([inithorseposn])
+    knn_idxs     = knn_idxss.tolist()[0]
+    knns         = [sites[i] for i in knn_idxs]
+    unclaimed_sites_idxs = list(set(range(len(sites))) - set(knn_idxs)) # https://stackoverflow.com/a/3462160
+    
+    # Initialize one \verb|FlyState| object per fly for all flies
+    flystates = []
+    for i in range(number_of_flies):
+        flystates.append(FlyState(inithorseposn, knns[i], phi))
+    
+
+    all_flies_retired_p = False
+
+    while (not all_flies_retired_p):
+       # Find the index of the fly \bm{F} which can meet the horse at the earliest, the rendezvous point $R$, and time till rendezvous
+       imin  = 0
+       rtmin = np.inf
+       rptmin= None
+       for i in range(number_of_flies):
+            if flystates[i].is_retired():
+                continue
+            else:
+                rt, rpt = flystates[i].rendezvous_time_and_point_if_selected_by_horse(current_horse_posn)
+                if rt < rtmin:
+                    imin   = i
+                    rtmin  = rt
+                    rptmin = rpt
+       
+       # Update fly trajectory in each \verb|FlyState| object till \bm{F} meets the horse at $R$
+       for flystate in flystates:
+           flystate.update_fly_trajectory(rtmin, rptmin)
+        
+       # Update \verb|current_horse_posn| and horse trajectory
+       current_horse_posn = rptmin
+       horse_traj.append(np.asarray(rptmin))
+       
+       # Deploy \bm{F} to an unclaimed site if one exists and claim that site, otherwise retire \bm{F}
+         
+       if  unclaimed_sites_idxs:
+           unclaimed_sites = [sites[i] for i in unclaimed_sites_idxs]
+
+           neigh = NearestNeighbors(n_neighbors=1)
+           neigh.fit(unclaimed_sites)
+
+           _, nn_idxss = neigh.kneighbors([current_horse_posn])
+           nn_idx      = nn_idxss.tolist()[0][0]
+
+           assert( np.linalg.norm ( sites[unclaimed_sites_idxs[nn_idx]]  - \
+                                    unclaimed_sites[nn_idx]  ) < 1e-8, \
+                   "Assertion failure in deployment step" )
+
+           flystates[imin].redeploy_to_site(unclaimed_sites[nn_idx])
+           unclaimed_sites_idxs = list(set(unclaimed_sites_idxs) - \
+                                       set([unclaimed_sites_idxs[nn_idx]]))
+
+       else: # All sites have been claimed by some drone. There is no need for the fly anymore
+           flystates[imin].retire_fly()
+        
+       # Calculate value of \verb|all_flies_retired_p|
+       
+       acc = True # accumulator variabvle
+       for i in range(number_of_flies):
+            acc and flystates[i].is_retired()
+       all_flies_retired_p = tmp
+       
+       @<Write algorithms current state to file, if \verb|write_algo_states_to_disk_p == True|@> 
+    
+    @<Write input and output to file if \verb|write_io_p == True|@>
+    @<Make an animation of the schedule if \verb|animate_schedule_p == True|@>
+
 
 
 

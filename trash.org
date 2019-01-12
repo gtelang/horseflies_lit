@@ -1,4 +1,3 @@
-\section{\framebox{Algorithm:} Super Drone}
 
 
 \subsection{Algorithmic Overview} \hspace{0.2cm}
@@ -13,11 +12,6 @@ Finally, we extract a tour for the horse from the above site partition.
 From this description, we see there are three ``axes of flexibility'' for algorithmic 
 experiments. Each of these are encoded as policy functions that are passed in as arguments 
 to the super-drone algorithm. We list them in the following table:
-\begin{description}
-\item[] 
-\item[] 
-\item[] 
-\end{description}
 
 \begin{center}
 \begin{tabular}{ l l }
@@ -39,10 +33,13 @@ the tour calculator functions to make sure they all follow the same interface. }
 
 \subsection{Algorithm Details}
 
+
+
+
 \newchunk The following fragment just encapsulates in code what was stated in the algorithmic
-overview section. A point to note is that currying would be so useful here, so that policy functions can be passed in with the appropriate
-parameters gummed in. Python does have some functional programming features which provide
-this, I will use them here later. 
+overview section. A point to note is that currying would be so useful here, so that policy 
+functions can be passed in with the appropriate parameters gummed in. Python does have some 
+functional programming features which provide this, I will use them here later. 
 
 %{python-mode}%
 @d Algorithms for multiple flies @{
@@ -66,8 +63,8 @@ def algo_super_drone(sites, inithorseposn, phi, number_of_flies,
 
 
 \vspace{-0.8cm} \newchunk The \verb|chunkify| function simply groups successive elements in an array 
-in groups of maximum size \verb|maxgroupsize|. For instance \verb|chunkify([1,2,3,4,5,6,7,8,9,10], max_group_size=4)|
-evaluates to \verb|[[1, 2, 3, 4], [5, 6, 7, 8], [9, 10]]|
+in groups of maximum size \verb|maxgroupsize|. For instance 
+\verb|chunkify([1,2,3,4,5,6,7,8,9,10], max_group_size=4)| evaluates to \verb|[[1, 2, 3, 4], [5, 6, 7, 8], [9, 10]]|
 %{python-mode}%
 @d Helper functions for \verb|algo_super_drone| @{ 
 def chunkify(xs, max_group_size):
@@ -85,17 +82,50 @@ def chunkify(xs, max_group_size):
 
 \vspace{-0.8cm} \newchunk Now that the sites have been partitioned, we begin the most interesting
 part of the calculation: calculating the tour for the horse and flies. There are several possible 
-approaches. Here I will try out one simple heuristic that does not involve any waiting, while also 
+approaches. Here I will try out just one simple heuristic that does not involve any waiting, while also 
 guaranteeing polygonal paths for each of the horse and flies. This heuristic also directly generalizes
-\verb|collinear_horseflies|. It keeps heading towards the drone that it can service earliest. 
-The rest of the drones keep heading towards the meeting point of the truck and the drone $d^{*}$
-
+\verb|collinear_horseflies|. In essence, it keeps heading towards the drone that it can rendezvous with at 
+the earliest. The rest of the drones keep heading towards the meeting point of the truck and this drone 
 It should certainly be enough for a good visual demonstration that ``seems'' locally optimal. 
-We will need to investigate the algorithmic properties too. 
+
 %{python-mode}%
-@d Calculate and return tour for horse and flies @{  
+@d Local data-structures @{   
+class FlyArc: 
+      def __init__(self, fly_position, site, service_status):
+           self.fly_trail     = [fly_position]
+           self.assigned_site = site
+           self.serviced_p    = service_status
 @| @}
 %{/python-mode}%
+
+
+
+%{python-mode}%
+@d Calculate and return tour for horse and flies @{
+@<Write schedule to disk and return answer@>
+@| @}
+%{/python-mode}%
+
+\newchunk  Now that the schedule has been computed we write it to disk, and then 
+read it back for the purposes of animation (if the \verb|animate_schedule_p|) flag 
+has been set. 
+
+How do we represent a generic multiple flies tour? The representation is more involved than classic
+horsefly, since the flies meet up with the horse at various times, and each of the fly paths 
+can contain one or more turn points. I will just store the paths of the horse and flies explicitly, 
+with an identifier within the flies tours whether a given point is a turn point, rendezvous point or 
+a site. This would be a perfect place for an algebraic data-type. 
+
+%{python-mode}%
+@d Write schedule to disk and return answer 
+@{
+return ohmf_tour
+@| @}
+%{/python-mode}%
+
+This algorithm can also be generalized to neighborhoods, and should be used for a demo, 
+but after following oop principles. Do we really need the super-drone heuristic? Why not 
+calculate the thing on the fly. 
 
 %    # Chunkify successsive sites along the tour
 %    # Iterate through the chunks making the normal drones service each chunk

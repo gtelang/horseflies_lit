@@ -180,7 +180,7 @@ For now, we just stick to super-drones
 @d Select algorithm to execute @{
 algo_str = raw_input(Fore.YELLOW                                             +\
         "Enter algorithm to be used to compute the tour:\n Options are:\n"   +\
-        " (sd)   Super-drone \n"                                           +\
+        " (ec)   Earliest Capture \n"                                        +\
         Style.RESET_ALL)
 
 algo_str = algo_str.lstrip()
@@ -188,8 +188,8 @@ algo_str = algo_str.lstrip()
 # Incase there are patches present from the previous clustering, just clear them
 utils_graphics.clearAxPolygonPatches(ax)
 
-if   algo_str == 'sd':
-      tour = run.getTour( algo_super_drone, phi, \
+if   algo_str == 'ec':
+      tour = run.getTour( algo_greedy_earliest_capture, phi, \
                           number_of_flies = nof)
 else:
       print "Unknown option. No horsefly for you! ;-D "
@@ -329,11 +329,9 @@ def getTour(self, algo, speedratio, number_of_flies):
 %{/python-mode}%
 
 
-@i problem-one-horse-multiple-flies/algo-super-drone-greedy-incremental.web
+@i problem-one-horse-multiple-flies/algo-greedy-earliest-capture.web
 
-
-
-
+\newpage
 \section{Plotting Routines}
 \section{Animation routines}
 
