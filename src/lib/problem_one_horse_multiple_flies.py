@@ -483,15 +483,15 @@ def animate_tour(sites, inithorseposn, phi, horse_trajectory, fly_trajectories,a
      # Visually distinct colors for displaying each flys trajectory in a different color 
      number_of_flies = len(fly_trajectories)
      colors = utils_graphics.get_colors(number_of_flies)
-     
-     # Parse \verb|horse_trajectory| and \verb|fly_trajectories| and set up required data-structures
+
      ax.set_title("Number of sites: " + str(len(sites)), fontsize=25)
      ax.set_xlabel(r"$\varphi$ = " + str(phi), fontsize=20)
-
+     
+     # Parse \verb|horse_trajectory| and \verb|fly_trajectories| and extract \verb|x| and \verb|y| coordinates along trajectories
+     
      xhs = [ horse_trajectory[i][0][0] for i in range(len(horse_trajectory))]    
      yhs = [ horse_trajectory[i][0][1] for i in range(len(horse_trajectory))]    
 
-     # x and y coordinates of each recorded vertex on every fly trajectory
      xfss = [[point['coordinates'][0] for point in fly_trajectories[i]] for i in range(len(fly_trajectories))]
      yfss = [[point['coordinates'][1] for point in fly_trajectories[i]] for i in range(len(fly_trajectories))]
      
@@ -499,10 +499,98 @@ def animate_tour(sites, inithorseposn, phi, horse_trajectory, fly_trajectories,a
      
      # Extract the list of horse and fly legs along the horse and fly trajectories respectively
         
+     horse_legs = zip(zip(xhs,yhs), zip(xhs,yhs)[1:])
+     flies_legs = []
+
+     for flytraj in fly_trajectories:
+         print ".................................................................."
+         utils_algo.print_list(flytraj)
+
+         fly_legs = []
+         
+         for i in range(len(flytraj)-1):
+               if flytraj[i]['type'] == 'site': 
+                   continue                                  # a flyleg never begins with a site, so skip
+               else:
+                   if flytraj[i+1]['type'] == 'site':
+                       leg = [flytraj[i]['coordinates'],     # gen_pt
+                              flytraj[i+1]['coordinates'],   # site
+                              flytraj[i+2]['coordinates']]   # gen_pt
+                   else:
+                       leg = [flytraj[i]['coordinates'],     # gen_pt
+                              flytraj[i+1]['coordinates']]   # gen_pt
+                   fly_legs.append(leg)
+
+         flies_legs.append(fly_legs)
+
+     # Pad each flylegs with None
+     # so that all flylegs have the same 
+     # length. This makes it convenient for animation
+     maxnumlegs = max(map(len,flies_legs))
+
+     for fly_legs in flies_legs:
+         numlegs   = len(fly_legs)
+         emptylegs = [None for i in range(maxnumlegs-numlegs)] 
+         fly_legs.extend(emptylegs)
+
+     # make sure number of horse legs and number of fly legs are the same
+     num_horse_legs = len(horse_legs)
+     num_flies_legs = [len(fly_legs) for fly_legs in flies_legs]
+
+     # From https://stackoverflow.com/a/3844948 which mentions the efficient list method `.count` on 
+     # how to check if all elements in a list are identical
+     assert(num_flies_legs.count(num_horse_legs) == len(num_flies_legs), \
+            "Some fly trajectory does not have the same number of legs as the horse trajectory")
      
      ims = []
-     for horse_leg, leg_idx in zip(horse_legs, range(len(horse_legs))):
-          debug(Fore.YELLOW + "Animating leg: "+ str(leg_idx) + Style.RESET_ALL)
+     for leg_idx in range(len(horse_legs)):
+         
+          # Define function to place points along a leg
+          def discretize_leg(pts):
+             subleg_pts = []
+
+             if pts == None:
+                return None
+             else:
+                numpts = len(pts)
+
+                if numpts == 2:   # horse leg or fly-leg of type gg
+                     k  = 19 
+                elif numpts == 3: # fly leg of type gsg 
+                     k  = 10 
+
+                pts = map(np.asarray, pts)
+                for p,q in zip(pts, pts[1:]):
+                    tmp = []
+                    for t in np.linspace(0,1,k): 
+                        tmp.append((1-t)*p + t*q) 
+                    subleg_pts.extend(tmp[:-1])
+
+                subleg_pts.append(pts[-1])
+                return subleg_pts
+          
+
+          horse_leg = horse_legs[leg_idx]
+          flies_leg = [fly_legs[leg_idx] for fly_legs in flies_legs   ]
+
+          horse_posns = discretize_leg(horse_legs[leg_idx]) 
+          flies_posns = map(discretize_leg, flies_leg) 
+         
+          # all points on horse trajectory uptil the beginning of the current-leg
+          hxs = [xhs[i] for i in range(0,leg_idx+1) ]
+          hys = [yhs[i] for i in range(0,leg_idx+1) ]
+      
+          # all points on fly trajectories uptil the beginning of the current-leg
+          fxss = []
+          fyss = []
+          for i in range(number_of_flies):
+             fxss.extend( [ fly_leg[0][0] for fly_leg, j in zip(flies_legs[i], range(0, leg_idx+1)) if fly_leg != None] )
+             fyss.extend( [ fly_leg[0][1] for fly_leg, j in zip(flies_legs[i], range(0, leg_idx+1)) if fly_leg != None] )
+
+          
+          
+     print "Fuck you"
+     sys.exit()
      
      # Write animation of tour to disk and display in live window
      from colorama import Back 

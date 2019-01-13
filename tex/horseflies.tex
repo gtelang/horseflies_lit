@@ -6252,9 +6252,9 @@ window, and also saved to disk in the provided directory as an \verb|.avi| file.
 \mbox{}\verb@     import matplotlib.pyplot as plt @\\
 \mbox{}\verb@@\\
 \mbox{}\verb@     @\hbox{$\langle\,${\itshape Set up configurations and parameters for animation and plotting}\nobreak\ {\footnotesize \NWlink{nuweb84b}{84b}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@     @\hbox{$\langle\,${\itshape Parse \verb|horse_trajectory| and \verb|fly_trajectories| and set up required data-structures}\nobreak\ {\footnotesize \NWlink{nuweb85a}{85a}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@     @\hbox{$\langle\,${\itshape Parse \verb|horse_trajectory| and \verb|fly_trajectories| and extract \verb|x| and \verb|y| coordinates along trajectories}\nobreak\ {\footnotesize \NWlink{nuweb85a}{85a}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@     @\hbox{$\langle\,${\itshape Construct and store every frame of the animation in \verb|ims|}\nobreak\ {\footnotesize \NWlink{nuweb85b}{85b}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@     @\hbox{$\langle\,${\itshape Write animation of tour to disk and display in live window}\nobreak\ {\footnotesize \NWlink{nuweb85d}{85d}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@     @\hbox{$\langle\,${\itshape Write animation of tour to disk and display in live window}\nobreak\ {\footnotesize \NWlink{nuweb87c}{87c}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
@@ -6304,6 +6304,9 @@ window, and also saved to disk in the provided directory as an \verb|.avi| file.
 \mbox{}\verb@# Visually distinct colors for displaying each flys trajectory in a different color @\\
 \mbox{}\verb@number_of_flies = len(fly_trajectories)@\\
 \mbox{}\verb@colors = utils_graphics.get_colors(number_of_flies)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@ax.set_title("Number of sites: " + str(len(sites)), fontsize=25)@\\
+\mbox{}\verb@ax.set_xlabel(r"$\varphi$ = " + str(phi), fontsize=20)@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
@@ -6322,16 +6325,13 @@ window, and also saved to disk in the provided directory as an \verb|.avi| file.
 %{python-mode}%
 \begin{flushleft} \small
 \begin{minipage}{\linewidth}\label{scrap136}\raggedright\small
-\NWtarget{nuweb85a}{} $\langle\,${\itshape Parse \verb|horse_trajectory| and \verb|fly_trajectories| and set up required data-structures}\nobreak\ {\footnotesize {85a}}$\,\rangle\equiv$
+\NWtarget{nuweb85a}{} $\langle\,${\itshape Parse \verb|horse_trajectory| and \verb|fly_trajectories| and extract \verb|x| and \verb|y| coordinates along trajectories}\nobreak\ {\footnotesize {85a}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
-\mbox{}\verb@ax.set_title("Number of sites: " + str(len(sites)), fontsize=25)@\\
-\mbox{}\verb@ax.set_xlabel(r"$\varphi$ = " + str(phi), fontsize=20)@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@xhs = [ horse_trajectory[i][0][0] for i in range(len(horse_trajectory))]    @\\
 \mbox{}\verb@yhs = [ horse_trajectory[i][0][1] for i in range(len(horse_trajectory))]    @\\
 \mbox{}\verb@@\\
-\mbox{}\verb@# x and y coordinates of each recorded vertex on every fly trajectory@\\
 \mbox{}\verb@xfss = [[point['coordinates'][0] for point in fly_trajectories[i]] for i in range(len(fly_trajectories))]@\\
 \mbox{}\verb@yfss = [[point['coordinates'][1] for point in fly_trajectories[i]] for i in range(len(fly_trajectories))]@\\
 \mbox{}\verb@@{\NWsep}
@@ -6354,16 +6354,12 @@ various ``artist'' objects \footnote{This is Matplotlib terminology} (e.g. circl
 which change dynamically as the positions of the horse and flies change. 
 
 For the animation, we need to generalize the notion of fly-legs from that of the chapter on the Classic
-Horsefly problem. 
-
-A recorded point on a fly's trajectory is marked as either of type ``genpt''(\verb|g|) or ``site''(\verb|s|). 
-Then a fly-leg is either a sequence of points of type ``\verb|gg|'' or ``\verb|gsg|''.  
+Horsefly problem. A recorded point on a fly's trajectory is marked as either of type ``genpt''(\verb|g|) 
+or ``site''(\verb|s|). Then a fly-leg is either a sequence of points of type ``\verb|gg|'' or ``\verb|gsg|''.  
 
 A horse-leg is, as before, is  a tuple of two successive points along its trajectory. 
 
-For both the horse and flies, their trajectories consist of their corresponding legs joined end-to-end. An important
-invariant for constructing the animation is that every fly's trajectory has the same number of legs as the
-horse's trajectory.
+For both the horse and flies, their trajectories consist of their corresponding legs joined end-to-end. 
 
 \TODO{Draw a picture here illustrating the concept of a fly-leg, make light all parts of a trajectory 
 that are not part of a fly's leg. You can do all this in the same picture, again constructed with asymptote}
@@ -6375,10 +6371,30 @@ that are not part of a fly's leg. You can do all this in the same picture, again
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
-\mbox{}\verb@@\hbox{$\langle\,${\itshape Extract the list of horse and fly legs along the horse and fly trajectories respectively}\nobreak\ {\footnotesize \NWlink{nuweb85c}{85c}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@@\hbox{$\langle\,${\itshape Extract the list of horse and fly legs along the horse and fly trajectories respectively}\nobreak\ {\footnotesize \NWlink{nuweb86}{86}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@ims = []@\\
-\mbox{}\verb@for horse_leg, leg_idx in zip(horse_legs, range(len(horse_legs))):@\\
-\mbox{}\verb@     debug(Fore.YELLOW + "Animating leg: "+ str(leg_idx) + Style.RESET_ALL)@\\
+\mbox{}\verb@for leg_idx in range(len(horse_legs)):@\\
+\mbox{}\verb@    @\\
+\mbox{}\verb@     @\hbox{$\langle\,${\itshape Define function to place points along a leg}\nobreak\ {\footnotesize \NWlink{nuweb87a}{87a}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@     horse_leg = horse_legs[leg_idx]@\\
+\mbox{}\verb@     flies_leg = [fly_legs[leg_idx] for fly_legs in flies_legs   ]@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@     horse_posns = discretize_leg(horse_legs[leg_idx]) @\\
+\mbox{}\verb@     flies_posns = map(discretize_leg(fly_leg)) @\\
+\mbox{}\verb@    @\\
+\mbox{}\verb@     # all points on horse trajectory uptil the beginning of the current-leg@\\
+\mbox{}\verb@     hxs = [xhs[i] for i in range(0,leg_idx+1) ]@\\
+\mbox{}\verb@     hys = [yhs[i] for i in range(0,leg_idx+1) ]@\\
+\mbox{}\verb@ @\\
+\mbox{}\verb@     # all points on fly trajectories uptil the beginning of the current-leg@\\
+\mbox{}\verb@     fxss = []@\\
+\mbox{}\verb@     fyss = []@\\
+\mbox{}\verb@     for i in range(number_of_flies):@\\
+\mbox{}\verb@        fxss.extend( [ fly_leg[0][0] for fly_leg, j in zip(flies_legs[i], range(0, leg_idx+1)) if fly_leg != None] )@\\
+\mbox{}\verb@        fyss.extend( [ fly_leg[0][1] for fly_leg, j in zip(flies_legs[i], range(0, leg_idx+1)) if fly_leg != None] )@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@          sys.exit()@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
@@ -6398,10 +6414,52 @@ that are not part of a fly's leg. You can do all this in the same picture, again
 %{python-mode}%
 \begin{flushleft} \small
 \begin{minipage}{\linewidth}\label{scrap138}\raggedright\small
-\NWtarget{nuweb85c}{} $\langle\,${\itshape Extract the list of horse and fly legs along the horse and fly trajectories respectively}\nobreak\ {\footnotesize {85c}}$\,\rangle\equiv$
+\NWtarget{nuweb86}{} $\langle\,${\itshape Extract the list of horse and fly legs along the horse and fly trajectories respectively}\nobreak\ {\footnotesize {86}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@   @\\
+\mbox{}\verb@horse_legs = zip(zip(xhs,yhs), zip(xhs,yhs)[1:])@\\
+\mbox{}\verb@flies_legs = []@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@for flytraj in fly_trajectories:@\\
+\mbox{}\verb@    print ".................................................................."@\\
+\mbox{}\verb@    utils_algo.print_list(flytraj)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    fly_legs = []@\\
+\mbox{}\verb@    @\\
+\mbox{}\verb@    for i in range(len(flytraj)-1):@\\
+\mbox{}\verb@          if flytraj[i]['type'] == 'site': @\\
+\mbox{}\verb@              continue                                  # a flyleg never begins with a site, so skip@\\
+\mbox{}\verb@          else:@\\
+\mbox{}\verb@              if flytraj[i+1]['type'] == 'site':@\\
+\mbox{}\verb@                  leg = [flytraj[i]['coordinates'],     # gen_pt@\\
+\mbox{}\verb@                         flytraj[i+1]['coordinates'],   # site@\\
+\mbox{}\verb@                         flytraj[i+2]['coordinates']]   # gen_pt@\\
+\mbox{}\verb@              else:@\\
+\mbox{}\verb@                  leg = [flytraj[i]['coordinates'],     # gen_pt@\\
+\mbox{}\verb@                         flytraj[i+1]['coordinates']]   # gen_pt@\\
+\mbox{}\verb@              fly_legs.append(leg)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    flies_legs.append(fly_legs)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@# Pad each flylegs with None@\\
+\mbox{}\verb@# so that all flylegs have the same @\\
+\mbox{}\verb@# length. This makes it convenient for animation@\\
+\mbox{}\verb@maxnumlegs = max(map(len,flies_legs))@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@for fly_legs in flies_legs:@\\
+\mbox{}\verb@    numlegs   = len(fly_legs)@\\
+\mbox{}\verb@    emptylegs = [None for i in range(maxnumlegs-numlegs)] @\\
+\mbox{}\verb@    fly_legs.extend(emptylegs)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@# make sure number of horse legs and number of fly legs are the same@\\
+\mbox{}\verb@num_horse_legs = len(horse_legs)@\\
+\mbox{}\verb@num_flies_legs = [len(fly_legs) for fly_legs in flies_legs]@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@# From https://stackoverflow.com/a/3844948 which mentions the efficient list method `.count` on @\\
+\mbox{}\verb@# how to check if all elements in a list are identical@\\
+\mbox{}\verb@assert(num_flies_legs.count(num_horse_legs) == len(num_flies_legs), \@\\
+\mbox{}\verb@       "Some fly trajectory does not have the same number of legs as the horse trajectory")@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
@@ -6416,10 +6474,78 @@ that are not part of a fly's leg. You can do all this in the same picture, again
 %{/python-mode}%
 
 
+%{python-mode}%
+\begin{flushleft} \small
+\begin{minipage}{\linewidth}\label{scrap139}\raggedright\small
+\NWtarget{nuweb87a}{} $\langle\,${\itshape Define function to place points along a leg}\nobreak\ {\footnotesize {87a}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@   @\\
+\mbox{}\verb@def discretize_leg(pts):@\\
+\mbox{}\verb@   print Fore.YELLOW, pts, Style.RESET_ALL@\\
+\mbox{}\verb@   subleg_pts = []@\\
+\mbox{}\verb@   numpts     = len(pts)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@   if numpts == 2:   # horse leg or fly-leg of type gg@\\
+\mbox{}\verb@       k  = 19 @\\
+\mbox{}\verb@   elif numpts == 3: # fly leg of type gsg @\\
+\mbox{}\verb@       k  = 10 @\\
+\mbox{}\verb@   else: # pts is None@\\
+\mbox{}\verb@       return None  # fly-leg is empty, nothing to discretize@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@   for p,q in zip(pts, pts[1:]):@\\
+\mbox{}\verb@    print Fore.RED, p, q, Style.RESET_ALL@\\
+\mbox{}\verb@       tmp = []@\\
+\mbox{}\verb@       for t in np.linspace(0,1,k): @\\
+\mbox{}\verb@           tmp.append( (1-t)*p + t*q ) @\\
+\mbox{}\verb@       subleg_pts.extend(tmp[:-1])@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@   subleg_pts.append(pts[-1])@\\
+\mbox{}\verb@   return subleg_pts@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb85b}{85b}.
+
+\item{}
+\end{list}
+\end{minipage}\vspace{4ex}
+\end{flushleft}
+%{/python-mode}%
+
+
+
+
 \vspace{-0.8cm} \newchunk
 %{python-mode}%
-\begin{flushleft} \small\label{scrap139}\raggedright\small
-\NWtarget{nuweb85d}{} $\langle\,${\itshape Write animation of tour to disk and display in live window}\nobreak\ {\footnotesize {85d}}$\,\rangle\equiv$
+\begin{flushleft} \small
+\begin{minipage}{\linewidth}\label{scrap140}\raggedright\small
+\NWtarget{nuweb87b}{} $\langle\,${\itshape Render frame and append it to \verb|ims|}\nobreak\ {\footnotesize {87b}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@@\\
+\mbox{}\verb@pass@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item {\NWtxtMacroNoRef}.
+
+\item{}
+\end{list}
+\end{minipage}\vspace{4ex}
+\end{flushleft}
+%{/python-mode}%
+
+
+
+\vspace{-0.8cm} \newchunk
+%{python-mode}%
+\begin{flushleft} \small\label{scrap141}\raggedright\small
+\NWtarget{nuweb87c}{} $\langle\,${\itshape Write animation of tour to disk and display in live window}\nobreak\ {\footnotesize {87c}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@from colorama import Back @\\
@@ -6462,12 +6588,13 @@ that are not part of a fly's leg. You can do all this in the same picture, again
 \item $\langle\,$Clear canvas and states of all objects\nobreak\ {\footnotesize \NWlink{nuweb73a}{73a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb71a}{71a}.}
 \item $\langle\,$Construct and store every frame of the animation in \verb|ims|\nobreak\ {\footnotesize \NWlink{nuweb85b}{85b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb84a}{84a}.}
 \item $\langle\,$Continue moving towards the site\nobreak\ {\footnotesize \NWlink{nuweb80a}{80a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb79c}{79c}.}
+\item $\langle\,$Define function to place points along a leg\nobreak\ {\footnotesize \NWlink{nuweb87a}{87a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb85b}{85b}.}
 \item $\langle\,$Define key-press handler\nobreak\ {\footnotesize \NWlink{nuweb71a}{71a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb69}{69}.}
 \item $\langle\,$Definition of method \verb|rendezvous_time_and_point_if_selected_by_horse|\nobreak\ {\footnotesize \NWlink{nuweb78b}{78b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb76b}{76b}.}
 \item $\langle\,$Definition of method \verb|update_fly_trajectory|\nobreak\ {\footnotesize \NWlink{nuweb79c}{79c}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb76b}{76b}.}
 \item $\langle\,$Definition of the \verb|FlyState| class\nobreak\ {\footnotesize \NWlink{nuweb76b}{76b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb76a}{76a}.}
 \item $\langle\,$Deploy \bm{F} to an unclaimed site if one exists and claim that site, otherwise retire \bm{F}\nobreak\ {\footnotesize \NWlink{nuweb80d}{80d}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb76a}{76a}.}
-\item $\langle\,$Extract the list of horse and fly legs along the horse and fly trajectories respectively\nobreak\ {\footnotesize \NWlink{nuweb85c}{85c}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb85b}{85b}.}
+\item $\langle\,$Extract the list of horse and fly legs along the horse and fly trajectories respectively\nobreak\ {\footnotesize \NWlink{nuweb86}{86}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb85b}{85b}.}
 \item $\langle\,$Find the $k$-nearest sites to \verb|inithorseposn| for $k=$\verb|number_of_flies| and claim them\nobreak\ {\footnotesize \NWlink{nuweb77a}{77a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb76a}{76a}.}
 \item $\langle\,$Find the index of the fly \bm{F} which can meet the horse at the earliest, the rendezvous point $R$, and time till rendezvous\nobreak\ {\footnotesize \NWlink{nuweb78a}{78a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb76a}{76a}.}
 \item $\langle\,$Generate a bunch of uniform or non-uniform random points on the canvas\nobreak\ {\footnotesize \NWlink{nuweb72b}{72b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb71a}{71a}.}
@@ -6477,9 +6604,10 @@ that are not part of a fly's leg. You can do all this in the same picture, again
 \item $\langle\,$Methods for \verb|MultipleFliesInput|\nobreak\ {\footnotesize \NWlink{nuweb74b}{74b}\NWlink{nuweb74c}{c}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb74a}{74a}.}
 \item $\langle\,$Move towards the provided rendezvous point\nobreak\ {\footnotesize \NWlink{nuweb79d}{79d}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb79c}{79c}.}
 \item $\langle\,$Move towards the site mark site as serviced and then head towards rendezvous point\nobreak\ {\footnotesize \NWlink{nuweb80b}{80b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb79c}{79c}.}
-\item $\langle\,$Parse \verb|horse_trajectory| and \verb|fly_trajectories| and set up required data-structures\nobreak\ {\footnotesize \NWlink{nuweb85a}{85a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb84a}{84a}.}
+\item $\langle\,$Parse \verb|horse_trajectory| and \verb|fly_trajectories| and extract \verb|x| and \verb|y| coordinates along trajectories\nobreak\ {\footnotesize \NWlink{nuweb85a}{85a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb84a}{84a}.}
 \item $\langle\,$Plotting routines\nobreak\ {\footnotesize \NWlink{nuweb83}{83}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb69}{69}.}
 \item $\langle\,$Relevant imports\nobreak\ {\footnotesize \NWlink{nuweb70a}{70a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb69}{69}.}
+\item $\langle\,$Render frame and append it to \verb|ims|\nobreak\ {\footnotesize \NWlink{nuweb87b}{87b}}$\,\rangle$ {\footnotesize {\NWtxtNoRef}.}
 \item $\langle\,$Return multiple flies tour\nobreak\ {\footnotesize \NWlink{nuweb82c}{82c}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb76a}{76a}.}
 \item $\langle\,$Select algorithm to execute\nobreak\ {\footnotesize \NWlink{nuweb72a}{72a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb71b}{71b}.}
 \item $\langle\,$Set algo-state and input-output files config\nobreak\ {\footnotesize \NWlink{nuweb81b}{81b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb76a}{76a}.}
@@ -6491,7 +6619,7 @@ that are not part of a fly's leg. You can do all this in the same picture, again
 \item $\langle\,$Update fly trajectory in each \verb|FlyState| object till \bm{F} meets the horse at $R$\nobreak\ {\footnotesize \NWlink{nuweb79b}{79b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb76a}{76a}.}
 \item $\langle\,$Update \verb|current_horse_posn| and horse trajectory\nobreak\ {\footnotesize \NWlink{nuweb80c}{80c}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb76a}{76a}.}
 \item $\langle\,$Write algorithms current state to file, if \verb|write_algo_states_to_disk_p == True|\nobreak\ {\footnotesize \NWlink{nuweb81c}{81c}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb76a}{76a}.}
-\item $\langle\,$Write animation of tour to disk and display in live window\nobreak\ {\footnotesize \NWlink{nuweb85d}{85d}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb84a}{84a}.}
+\item $\langle\,$Write animation of tour to disk and display in live window\nobreak\ {\footnotesize \NWlink{nuweb87c}{87c}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb84a}{84a}.}
 \item $\langle\,$Write input and output to file if \verb|write_io_p == True|\nobreak\ {\footnotesize \NWlink{nuweb82a}{82a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb76a}{76a}.}
 \end{list}}
 \section{Chapter Index of Identifiers}
