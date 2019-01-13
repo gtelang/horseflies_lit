@@ -116,7 +116,7 @@ logging.basicConfig( filename = log_file_name,
 #logger = logging.getLogger()
 info("Started running greedy_incremental_insertion for classic horsefly")
 
-algo_state_counter = 0 
+algo_state_counter = 1 
 @| io_file_name, logger @}
 
 %{/python-mode}%

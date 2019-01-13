@@ -796,7 +796,7 @@ def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
       #logger = logging.getLogger()
       info("Started running greedy_incremental_insertion for classic horsefly")
 
-      algo_state_counter = 0 
+      algo_state_counter = 1 
       
       # Set insertion policy class for current run
       

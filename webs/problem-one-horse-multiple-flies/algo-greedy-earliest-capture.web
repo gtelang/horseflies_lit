@@ -13,7 +13,7 @@ the next site that fly should be deployed to. We again follow a greedy strategy 
 it to the nearest ``unclaimed'' site \footnote{There might be several interesting
 algorithmic questions lurking on how to select the next unclaimed site that the fly should be deployed to. 
 Can we do some analogue of incremental? Fast methods for detecting the best place of insertion would be eminently 
-interesting, and fun to implement via literate programming!}. The next chunk introduces the necessary terminology 
+interesting}. The next chunk introduces the necessary terminology 
 and a detailed algorithmic implementation of the earliest capture heuristic. See Figure?? for an illustration of the 
 progress of the algorithm for 2 drones and 6 sites. 
 
@@ -26,7 +26,7 @@ and that site. The horse keeps moving along this segment until it meets the fly.
 
 As the horse moves towards this site, the remaining flies, if they are returning from sites that they have just serviced, 
 change their direction of motion and move towards the rendezvous point of the horse and selected fly. 
-On meeting up with a fly, the horse redeploys it to an unclaimed site, if one exists and updates the corresponding \verb|FlyState|
+On meeting up with a fly, the horse deploys it to an unclaimed site, if one exists and updates the corresponding \verb|FlyState|
 object. We keep repeating this process until all sites have been serviced and all flies have been retired. 
 
 A fly is deemed ``retired'' when it returns to the horse and will no longer be deployed to \textit{any} site 
@@ -48,7 +48,7 @@ meeting them midway and handing off packages to them then of course having the e
 handoff situation will need to be explored in detail later. 
 
 %{python-mode}%
-@d Algorithms for multiple flies 
+@D Algorithms for multiple flies 
 @{
 @<Helper functions for \verb|algo_greedy_earliest_capture|@>    
 @<Definition of the \verb|FlyState| class @>
@@ -56,6 +56,8 @@ def algo_greedy_earliest_capture(sites, inithorseposn, phi, number_of_flies,\
                                  write_algo_states_to_disk_p = True,\
                                  write_io_p                  = True,\
                                  animate_schedule_p          = True):
+
+    @<Set algo-state and input-output files config@>
 
     if number_of_flies > len(sites):
           number_of_flies = len(sites)
@@ -69,6 +71,7 @@ def algo_greedy_earliest_capture(sites, inithorseposn, phi, number_of_flies,\
     all_flies_retired_p = False
 
     while (not all_flies_retired_p):
+       print "Algorithm State Number: ", algo_state_counter
        @<Find the index of the fly \bm{F} which can meet the horse at the earliest, the rendezvous point $R$, and time till rendezvous@>
        @<Update fly trajectory in each \verb|FlyState| object till \bm{F} meets the horse at $R$@> 
        @<Update \verb|current_horse_posn| and horse trajectory@>
@@ -77,31 +80,14 @@ def algo_greedy_earliest_capture(sites, inithorseposn, phi, number_of_flies,\
        @<Write algorithms current state to file, if \verb|write_algo_states_to_disk_p == True|@> 
     
     @<Write input and output to file if \verb|write_io_p == True|@>
-    @<Make an animation of the schedule if \verb|animate_schedule_p == True| @>
+    sys.exit()
+@%    @<Make an animation of the schedule if \verb|animate_schedule_p == True| @>
 @%    @<Return multiple flies tour with additional information @>
 @| @}
 %{/python-mode}%
 \section{Algorithmic Details}
-% This particular algorithm will scale nicely on the computer to a 1000 sites very easily, without any 
-% fancy convex optimization solvers and what not. Besides it is a natural analogue of greedy-collinear 
-% nearest neighbor horseflies. Wonder what nearest neighbor insertion will look like here? There is 
-% an analogue indeed, but it will involve expensive recalculation naively, but place it somewhere inside
-% within the fingers. Which fly to reassign to and in what order, that is a separate and nice question in
-% of itself. 
 
-\newchunk If a horse with speed 1.0 and fly with speed $\varphi$ are present at opposite endpoints of a segment 
-of length $L$ it takes time $\frac{L}{\varphi+1}$ to meet up if they travel towards each other along the segment. 
- 
-%{python-mode}%
-@d Helper functions for \verb|algo_greedy_earliest_capture| @{   
-def meeting_time_horse_fly_opp_dir(horseposn, flyposn, flyspeed):
-    horseposn = np.asarray(horseposn)
-    flyposn   = np.asarray(flyposn)
-    return 1/(flyspeed+1) * np.linalg.norm(horseposn-flyposn)
-@| meeting_time_horse_fly_opp_dir @}
-%{/python-mode}%
-
-\vspace{-0.8cm} \newchunk 
+\newchunk 
 %{python-mode}%
 @D Definition of the \verb|FlyState| class 
 @{class FlyState:
@@ -117,7 +103,7 @@ def meeting_time_horse_fly_opp_dir(horseposn, flyposn, flyspeed):
     def retire_fly(self):
          self._fly_retired_p = True
  
-    def redeploy_to_site(self,site):
+    def deploy_to_site(self,site):
          self._current_assigned_site            = np.asarray(site)
          self._current_assigned_site_serviced_p = False 
 
@@ -129,73 +115,15 @@ def meeting_time_horse_fly_opp_dir(horseposn, flyposn, flyspeed):
 
     def get_current_fly_position(self):
          return self._flytraj[-1]['coordinates']
+   
+    def get_trajectory(self):
+         return self._flytraj
 
     @<Definition of method \verb|update_fly_trajectory|@>
     @<Definition of method \verb|rendezvous_time_and_point_if_selected_by_horse|@>
-    @<Definition of method \verb|print_current_state|@>
 @| @}
 %{/python-mode}%
 
-
-\newchunk  
-\TODO{Describe a diagram here via asymptote, exactly what calculation is being performed here, 
-divide into two cases of a fly returning after service, and a fly headed towards the site it is supposed to service}
-%{python-mode}%
-@d Definition of method \verb|rendezvous_time_and_point_if_selected_by_horse| @{
-def rendezvous_time_and_point_if_selected_by_horse(self, horseposn):
-   assert(self._fly_retired_p != True)
-  
-   if self._current_assigned_site_serviced_p:
-       rt = meeting_time_horse_fly_opp_dir(horseposn, \
-                                           self.get_current_fly_position(),\
-                                           self._speed)
-       horseheading = self.get_current_fly_position()
-   else:
-      distance_to_site    = np.linalg.norm(self.get_current_fly_position() -\
-                                           self._current_assigned_site)
-      time_of_fly_to_site = 1/self._speed * distance_to_site
-
-      horse_site_vec   = np.linalg.norm(self._current_assigned_site - horseposn) 
-      displacement_vec = time_of_fly_to_site * horse_site_vec/np.linalg.norm(horse_site_vec)
-      horse_posn_tmp   = horse_posn + displacement_vec
-
-      time_of_fly_from_site = meeting_time_horse_fly_opp_dir(  \
-                                  horseposn_tmp,               \
-                                  self._current_assigned_site, \
-                                  self._speed)
-
-      rt = time_of_fly_to_site + time_of_fly_from_site
-      horseheading = self._current_assigned_site
-
-   uhorseheading = horseheading/np.linalg.norm(uhorseheading)
-   return rt, horseposn + uhorseheading * rt
-
-@| rendezvous_time_and_point_if_selected_by_horse@}
-%{/python-mode}%
-
-
-
-
-\vspace{-0.8cm} \newchunk
-%{python-mode}%
-@D Definition of method \verb|print_current_state| @{
-def print_current_state(self):
-    fly_speed_str = "Fly Speed is " + str(self._speed)                             
-    fly_traj_str  = "Fly trajectory is " + ''.join(map(str, self._flytraj))             
-    current_assigned_site_str = "Current assigned site is " +\
-                                 str(self._current_assigned_site)             
-    current_assigned_site_serviced_p_str = "Assigned site serviced: " +\
-                                            str(self._current_assigned_site_serviced_p) 
-    fly_retired_p_str = "Fly retired: " +  str(self._fly_retired_p)
-    
-    print '...................................................................'
-    print Fore.BLUE    , fly_speed_str             , Style.RESET_ALL
-    print Fore.MAGENTA , fly_traj_str              , Style.RESET_ALL
-    print Fore.YELLOW  , current_assigned_site_str , Style.RESET_ALL
-    print Fore.GREEN   , current_assigned_site_serviced_p_str, Style.RESET_ALL
-    print Fore.RED     , fly_retired_p_str         , Style.RESET_ALL
-@| @}
-%{/python-mode}%
 
 
 \vspace{-0.8cm} \newchunk At the beginning of the algorithm, if the horse has $k$ flies, 
@@ -203,7 +131,7 @@ the $k$ nearest sites to the initial position of the horse will be claimed by th
 for service. 
 
 %{python-mode}%
-@d Find the $k$-nearest sites to \verb|inithorseposn| for $k=$\verb|number_of_flies| and claim them
+@D Find the $k$-nearest sites to \verb|inithorseposn| for $k=$\verb|number_of_flies| and claim them
 @{from sklearn.neighbors import NearestNeighbors
 
 neigh = NearestNeighbors(n_neighbors=number_of_flies)
@@ -223,7 +151,7 @@ unclaimed_sites_idxs = list(set(range(len(sites))) - set(knn_idxs)) # https://st
 @d Initialize one \verb|FlyState| object per fly for all flies 
 @{flystates = []
 for i in range(number_of_flies):
-    flystates.append(FlyState(inithorseposn, knns[i], phi))
+    flystates.append(FlyState(i,inithorseposn, knns[i], phi))
 @| @}
 %{/python-mode}%
 
@@ -250,8 +178,59 @@ for i in range(number_of_flies):
 @| @}
 %{/python-mode}%
 
-\vspace{-0.8cm} \newchunk
+\vspace{-0.8cm} \newchunk  
+\TODO{Describe a diagram here via asymptote, exactly what calculation is being performed here, 
+divide into two cases of a fly returning after service, and a fly headed towards the site it is supposed to service}
 %{python-mode}%
+@D Definition of method \verb|rendezvous_time_and_point_if_selected_by_horse| @{
+def rendezvous_time_and_point_if_selected_by_horse(self, horseposn):
+   assert(self._fly_retired_p != True)
+  
+   if self._current_assigned_site_serviced_p:
+       rt = meeting_time_horse_fly_opp_dir(horseposn, self.get_current_fly_position(), self._speed)
+       horseheading = self.get_current_fly_position() - horseposn
+   else:
+      distance_to_site    = np.linalg.norm(self.get_current_fly_position() -\
+                                           self._current_assigned_site)
+      time_of_fly_to_site = 1/self._speed * distance_to_site
+
+      horse_site_vec   = self._current_assigned_site - horseposn 
+      displacement_vec = time_of_fly_to_site * horse_site_vec/np.linalg.norm(horse_site_vec)
+      horseposn_tmp   = horseposn + displacement_vec
+
+      time_of_fly_from_site = \
+               meeting_time_horse_fly_opp_dir(horseposn_tmp, self._current_assigned_site, self._speed)
+
+      rt = time_of_fly_to_site + time_of_fly_from_site
+      horseheading = self._current_assigned_site - horseposn
+
+   uhorseheading = horseheading/np.linalg.norm(horseheading)
+   return rt, horseposn + uhorseheading * rt
+
+@| rendezvous_time_and_point_if_selected_by_horse@}
+%{/python-mode}%
+
+
+\vspace{-0.8cm} \newchunk This fragment defines the function \verb|meeting_time_horse_fly_opp_dir| that was
+used in the previous fragment. If a horse with speed 1.0 and fly with speed $\varphi$ are present at opposite 
+endpoints of a segment of length $L$ it takes time $\frac{L}{\varphi+1}$ to meet up if they travel towards 
+each other along the segment.
+ 
+%{python-mode}%
+@d Helper functions for \verb|algo_greedy_earliest_capture| @{   
+def meeting_time_horse_fly_opp_dir(horseposn, flyposn, flyspeed):
+    horseposn = np.asarray(horseposn)
+    flyposn   = np.asarray(flyposn)
+    return 1/(flyspeed+1) * np.linalg.norm(horseposn-flyposn)
+@| meeting_time_horse_fly_opp_dir @}
+%{/python-mode}%
+
+
+
+\vspace{-0.8cm} \newchunk
+%{python-mode}% 
+Now that we know the rendezvous point for the horse with one of the flies and the time it takes
+for the horse to get there, update the trajectories of all the flies accordingly. 
 @d Update fly trajectory in each \verb|FlyState| object till \bm{F} meets the horse at $R$ 
 @{for flystate in flystates:
     flystate.update_fly_trajectory(rtmin, rptmin)
@@ -259,9 +238,21 @@ for i in range(number_of_flies):
 %{/python-mode}%
 
 
-\vspace{-0.8cm} \newchunk \TODO{You need to insert a diagram here explaining exactly what is happening. Divide into two 
-cases (a) and (b), and divide each case into two separate chunks with their own individual figures. Don't make the figures
-too big} 
+\vspace{-0.8cm} \newchunk Depending on the position of the rendezvous point, the time it will take for the horse
+to get there and the current position of a non-retired fly \footnote{If the fly has been retired there is no need 
+for an update to its trajectory}, we update its state according to one of three mutually exclusive cases (also 
+illustrated graphically in the next three fragments.)
+
+\begin{enumerate}
+ \item The site currently assigned to the fly been serviced and the fly is headed back for picking up 
+       its next package from the horse
+ \item The fly is headed towards its currently assigned site, but won't be able to make it to the site in 
+       the time $dt$ it takes for the horse to reach the rendezvous point. 
+ \item The site assigned to the fly has not yet been serviced, but \underline{will} reach
+       to the site within time $dt$. In this case, once the fly reaches the site it needs to make 
+       a sort of ``u-turn'' at the site and head towards the rendezvous point. 
+\end{enumerate}
+
 %{python-mode}%
 @d Definition of method \verb|update_fly_trajectory| @{
 def update_fly_trajectory(self, dt, rendezvous_pt):
@@ -271,30 +262,60 @@ def update_fly_trajectory(self, dt, rendezvous_pt):
 
      dx = self._speed * dt
 
-     if self._current_assigned_site_serviced_p or \
-                 (dx < np.linalg.norm( self._current_assigned_site -\
-                                       self.get_current_fly_position())):   
+     if self._current_assigned_site_serviced_p :
+        @<Move towards the provided rendezvous point@>
 
-          heading  = self.fly_traj[-1]['coordinates'] - self.fly_traj[-2]['coordinates']
-          uheading = heading / np.linalg.norm(heading) 
-          newpt = self.fly_traj[-1] + dx * uheading
-          self.fly_traj.append(  {'coordinates': newpt, 'type': 'gen_pt'}  )
+     elif dx < np.linalg.norm(self._current_assigned_site - self.get_current_fly_position()) :
+        @<Continue moving towards the site@>
+     else: 
+        @<Move towards the site mark site as serviced and then head towards rendezvous point@>
+ @| @}
+%{/python-mode}%
 
-     else: # the fly needs to ``uturn'' at the site
-          dx_reduced = dx - np.linalg.norm(self._current_assigned_site -\
-                                           self.get_current_fly_position())
-          assert(dx_reduced >= 0, "dx_reduced should be >= 0")
-          heading  = rendezvous_pt - self._current_assigned_site
-          uheading = heading/np.linalg.norm(heading)
 
-          newpt = self._current_assigned_site + uheading * dx_reduced
-          self.fly_traj.extend([{'coordinates':self._current_assigned_site, 'type':'site'}, 
-                                {'coordinates':newpt,                       'type':'gen_pt'}])
+
+\vspace{-0.8cm} \newchunk \TODO{Insert figure here}
+%{python-mode}%
+@d Move towards the provided rendezvous point @{   
+heading  = rendezvous_pt - self.get_current_fly_position()
+uheading = heading / np.linalg.norm(heading) 
+newpt    = self.get_current_fly_position() + dx * uheading
+self._flytraj.append(  {'coordinates': newpt, 'type': 'gen_pt'}  )
 @| @}
 %{/python-mode}%
 
 
-\vspace{-0.8cm} \newchunk
+\vspace{-0.8cm} \newchunk \TODO{Insert figure here}
+%{python-mode}%
+@d Continue moving towards the site @{
+heading  = self._current_assigned_site - self.get_current_fly_position()
+uheading = heading / np.linalg.norm(heading) 
+newpt    = self.get_current_fly_position() + dx * uheading
+self._flytraj.append(  {'coordinates': newpt, 'type': 'gen_pt'}  )
+@| @}
+%{/python-mode}%
+
+
+
+\vspace{-0.8cm} \newchunk \TODO{Insert figure here}
+%{python-mode}%
+@d Move towards the site mark site as serviced and then head towards rendezvous point @{
+dx_reduced = dx - np.linalg.norm(self._current_assigned_site -\
+                                 self.get_current_fly_position())
+heading  = rendezvous_pt - self._current_assigned_site
+uheading = heading/np.linalg.norm(heading)
+
+newpt = self._current_assigned_site + uheading * dx_reduced
+self._current_assigned_site_serviced_p = True
+self._flytraj.extend([{'coordinates':self._current_assigned_site, 'type':'site'}, 
+                      {'coordinates':newpt,                       'type':'gen_pt'}])
+@| @}
+%{/python-mode}%
+
+
+
+\vspace{-0.8cm} \newchunk Now that the horse has reached the rendezvous point and met \bm{F}, 
+we need to update the horse's trajectory and decide which unclaimed site \bm{F} should go to next. 
 %{python-mode}%
 @d Update \verb|current_horse_posn| and horse trajectory 
 @{current_horse_posn = rptmin
@@ -302,10 +323,7 @@ horse_traj.append(np.asarray(rptmin))
 @| @}
 %{/python-mode}%
 
-
-
-\vspace{-0.8cm} \newchunk Now that $F$ has just rendezvoused we need to make a decision of which site it should sent to 
-next. 
+\vspace{-0.8cm} \newchunk
 %{python-mode}%
 @d Deploy \bm{F} to an unclaimed site if one exists and claim that site, otherwise retire \bm{F} @{  
 if  unclaimed_sites_idxs:
@@ -317,39 +335,126 @@ if  unclaimed_sites_idxs:
     _, nn_idxss = neigh.kneighbors([current_horse_posn])
     nn_idx      = nn_idxss.tolist()[0][0]
 
-    assert( np.linalg.norm ( sites[unclaimed_sites_idxs[nn_idx]]  - \
-                             unclaimed_sites[nn_idx]  ) < 1e-8, \
-            "Assertion failure in deployment step" )
-
-    flystates[imin].redeploy_to_site(unclaimed_sites[nn_idx])
+    flystates[imin].deploy_to_site(unclaimed_sites[nn_idx])
     unclaimed_sites_idxs = list(set(unclaimed_sites_idxs) - \
                                 set([unclaimed_sites_idxs[nn_idx]]))
 
-else: # All sites have been claimed by some drone. There is no need for the fly anymore
+else: 
     flystates[imin].retire_fly()
 @| @}
 %{/python-mode}%
 
-\vspace{-0.8cm} \newchunk
+\vspace{-0.8cm} \newchunk This chunk just loops through all flies and checks if all flies have been retired or not. 
+The algorithm stops when all flies have been retired which indicates all sites have been serviced and all flies have 
+returned back to the horse.
 %{python-mode}%
-@d Calculate value of \verb|all_flies_retired_p| @{
-acc = True # accumulator variabvle
+@d Calculate value of \verb|all_flies_retired_p| 
+@{acc = True 
 for i in range(number_of_flies):
-     acc and flystates[i].is_retired()
-all_flies_retired_p = tmp
+     acc = acc and flystates[i].is_retired()
+all_flies_retired_p = acc
 @| @}
 %{/python-mode}%
 
+\vspace{-0.8cm}\newchunk As before, for the purposes of algorithmic analysis, we will need to write to disk 
+the algorithm's state at the end of each iteration of the \verb|while| loop. Each algorithm 
+state will consist of 
 
+\begin{enumerate}
+  \item The coordinates of the sites serviced so far, and the index of the fly that serviced each of them
+  \item The coordinates unserviced sites
+  \item The trajectory of each fly stored as a list of points. We also mark each point on the trajectory as either 
+      \begin{itemize}
+          \item a site serviced by a fly
+          \item a rendezvous point with the horse or
+          \item a generic turn-point where the fly-changes direction
+       \end{itemize}
+  \item The trajectory of the horse, which consists of a sequence of rendezvous points with the flies, 
+        one fly for each rendezvous point, whose index we store along the rendezvous point's coordinates. 
+\end{enumerate}
 
-\vspace{-0.8cm} \newchunk The algorithm's current state is simply the horse trajectory and the list of all the flystates. 
+Finally, we write out the input provided (sites, initial horse position, number of flies and $\varphi$) and 
+the trajectories of the horse and flies (in the format described in the a above list) to reconstruct a 
+problem exactly and to animate the trajectories. The animation is constructed as an \verb|.avi| file
+
+All these files are written to a folder named after the
+algorithm and the time-stamp of the algorithm's run. 
+
 %{python-mode}%
-@d Write algorithms current state to file, if \verb|write_algo_states_to_disk_p == True| @{   
-if write_algo_states_to_disk_p:
-    data = ['horse_traj':horse_traj, 'fly_states': flystates]
-    import yaml, io
+@D Set algo-state and input-output files config 
+@{import sys, datetime, os, errno
+algo_name     = 'algo-greedy-earliest-capture'
+time_stamp    = datetime.datetime.now().strftime('Day-%Y-%m-%d_ClockTime-%H:%M:%S')
+dir_name      = algo_name + '---' + time_stamp
+io_file_name  = 'input_and_output.yml'
 
-    with io.open('input_and_output.yaml', 'w') as outfile:
-         yaml.dump(data, outfile, default_flow_style=False)
+try:
+    os.makedirs(dir_name)
+except OSError as e:
+    if e.errno != errno.EEXIST:
+        raise
+algo_state_counter = 1 
+@|  @}
+
+%{/python-mode}%
+
+\vspace{-0.8cm} \newchunk \blindtext
+%{python-mode}%
+@d Write algorithms current state to file, if \verb|write_algo_states_to_disk_p == True| @{
+if write_algo_states_to_disk_p:
+     import yaml
+     algo_state_file_name = 'algo_state_' + str(algo_state_counter).zfill(5) + '.yml'
+
+     data = {'horse_trajectory' : horse_traj, \
+             'fly_trajectories' : [flystates[i].get_trajectory() 
+                                   for i in range(number_of_flies)] }
+
+     with open(dir_name + '/' + algo_state_file_name, 'w') as outfile:
+          yaml.dump( data, outfile, default_flow_style = False)
+     algo_state_counter += 1
+@| @}
+%{/python-mode}%
+
+\vspace{-0.8cm} \newchunk 
+%{python-mode}%
+@d Write input and output to file if \verb|write_io_p == True|
+@{if write_io_p:
+    print Fore.GREEN, "Horse Trajectory is ", Style.RESET_ALL
+    utils_algo.print_list(horse_traj)
+    for i in range(number_of_flies):
+           print "Trajectory of Fly", i
+           utils_algo.print_list(flystates[i].get_trajectory())
+           print "----------------------------------------------"
+
+    fig, ax =  plt.subplots()
+    ax.set_xlim([utils_graphics.xlim[0], utils_graphics.xlim[1]])
+    ax.set_ylim([utils_graphics.ylim[0], utils_graphics.ylim[1]])
+    ax.set_aspect(1.0)
+    ax.set_xticks([])
+    ax.set_yticks([])
+  
+    # Plot the fly trajectories
+    # Place graphical elements in reverse order,
+    # i.e. from answer, all the way upto question. 
+    colors = utils_graphics.get_colors(number_of_flies)
+    for i in range(number_of_flies):
+       print i
+       xfs = [pt['coordinates'][0] for pt in flystates[i].get_trajectory()]
+       yfs = [pt['coordinates'][1] for pt in flystates[i].get_trajectory()]
+       ax.plot(xfs,yfs, '-', linewidth=1.0, color=colors[i])
+  
+    # Plot the horse trajectory
+    xhs = [ pt[0] for pt in horse_traj  ]
+    yhs = [ pt[1] for pt in horse_traj  ]
+    ax.plot(xhs,yhs, 'ro-',linewidth=3.0)
+
+    # Plot sites
+    xsites = [site[0] for site in sites]
+    ysites = [site[1] for site in sites]
+    ax.plot(xsites, ysites, 'bo')
+
+    # Plot initial horseposition
+    ax.plot([inithorseposn[0]], [inithorseposn[1]], 'ks', markersize=10.0)
+    plt.show()
 @| @}
 %{/python-mode}%

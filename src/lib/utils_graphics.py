@@ -78,26 +78,16 @@ def wrapperEnterRunPoints(fig, ax, run):
              
 
     return _enterPoints
-def get_random_color(sat=0.7,val=0.7):
-    def hsv_to_rgb(h, s, v):
-          h_i = int((h*6))
-          f   = h*6 - h_i
-          p   = v * (1 - s)
-          q   = v * (1 - f*s)
-          t   = v * (1 - (1 - f) * s)
-  
-          if h_i==0:
-               r, g, b = v, t, p 
-          elif h_i==1:  
-               r, g, b = q, v, p 
-          elif h_i==2:
-               r, g, b = p, v, t 
-          elif h_i==3:
-               r, g, b = p, q, v 
-          elif h_i==4: 
-               r, g, b = t, p, v 
-          elif h_i==5:
-               r, g, b = v, p, q 
 
-          return [int(r*256), int(g*256), int(b*256)]
-    return hsv_to_rgb(np.random.rand(), sat, val)
+# Borrowed from https://stackoverflow.com/a/9701141
+import numpy as np
+import colorsys
+
+def get_colors(num_colors):
+    colors=[]
+    for i in np.arange(60., 360., 300. / num_colors):
+        hue        = i/360.0
+        lightness  = 0.3
+        saturation = 0.9
+        colors.append(colorsys.hls_to_rgb(hue, lightness, saturation))
+    return colors

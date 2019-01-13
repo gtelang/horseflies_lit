@@ -11,7 +11,7 @@ import logging
 import math
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-# plt.style.use('seaborn-poster')
+#plt.style.use('seaborn-poster')
 import numpy as np
 import os
 import pprint as pp
@@ -175,7 +175,7 @@ class FlyState:
     def __init__(self, idx, initflyposn, site, flyspeed):
 
          self.idx                                = idx
-         self._flytraj                           = [ np.asarray(initflyposn) ]
+         self._flytraj                           = [ {'coordinates': np.asarray(initflyposn), 'type':'gen_pt'} ]
          self._current_assigned_site             = np.asarray(site)
          self._speed                             = flyspeed
          self._current_assigned_site_serviced_p  = False
@@ -184,7 +184,7 @@ class FlyState:
     def retire_fly(self):
          self._fly_retired_p = True
  
-    def redeploy_to_site(self,site):
+    def deploy_to_site(self,site):
          self._current_assigned_site            = np.asarray(site)
          self._current_assigned_site_serviced_p = False 
 
@@ -195,7 +195,10 @@ class FlyState:
          return self._current_assigned_site_serviced_p
 
     def get_current_fly_position(self):
-         return self._flytraj[-1]
+         return self._flytraj[-1]['coordinates']
+   
+    def get_trajectory(self):
+         return self._flytraj
 
     # Definition of method \verb|update_fly_trajectory|
     
@@ -206,79 +209,84 @@ class FlyState:
 
          dx = self._speed * dt
 
-         if self._current_assigned_site_serviced_p or \
-                     (dx < np.linalg.norm( self._current_assigned_site -\
-                                           self.get_current_fly_position())):   
+         if self._current_assigned_site_serviced_p :
+            # Move towards the provided rendezvous point
+               
+            heading  = rendezvous_pt - self.get_current_fly_position()
+            uheading = heading / np.linalg.norm(heading) 
+            newpt    = self.get_current_fly_position() + dx * uheading
+            self._flytraj.append(  {'coordinates': newpt, 'type': 'gen_pt'}  )
+            
 
-              heading  = self.fly_traj[-1] - self.fly_traj[-2]
-              uheading = heading / np.linalg.norm(heading) 
-              newpt = self.fly_traj[-1] + dx * uheading
-              self.fly_traj.append(newpt)
+         elif dx < np.linalg.norm(self._current_assigned_site - self.get_current_fly_position()) :
+            # Continue moving towards the site
+            
+            heading  = self._current_assigned_site - self.get_current_fly_position()
+            uheading = heading / np.linalg.norm(heading) 
+            newpt    = self.get_current_fly_position() + dx * uheading
+            self._flytraj.append(  {'coordinates': newpt, 'type': 'gen_pt'}  )
+            
+         else: 
+            # Move towards the site mark site as serviced and then head towards rendezvous point
+            
+            dx_reduced = dx - np.linalg.norm(self._current_assigned_site -\
+                                             self.get_current_fly_position())
+            heading  = rendezvous_pt - self._current_assigned_site
+            uheading = heading/np.linalg.norm(heading)
 
-         else: # the fly needs to ``uturn'' at the site
-              dx_reduced = dx - np.linalg.norm(self._current_assigned_site -\
-                                               self.get_current_fly_position())
-              assert(dx_reduced >= 0, "dx_reduced should be >= 0")
-              heading  = rendezvous_pt - self._current_assigned_site
-              uheading = heading/np.linalg.norm(heading)
-
-              newpt = self._current_assigned_site + uheading * dx_reduced
-              self.fly_traj.extend([self._current_assigned_site, newpt])
-    
+            newpt = self._current_assigned_site + uheading * dx_reduced
+            self._current_assigned_site_serviced_p = True
+            self._flytraj.extend([{'coordinates':self._current_assigned_site, 'type':'site'}, 
+                                  {'coordinates':newpt,                       'type':'gen_pt'}])
+            
+     
     # Definition of method \verb|rendezvous_time_and_point_if_selected_by_horse|
     
     def rendezvous_time_and_point_if_selected_by_horse(self, horseposn):
        assert(self._fly_retired_p != True)
       
        if self._current_assigned_site_serviced_p:
-           rt = meeting_time_horse_fly_opp_dir(horseposn, \
-                                               self.get_current_fly_position(),\
-                                               self._speed)
-           horseheading = self.get_current_fly_position()
+           rt = meeting_time_horse_fly_opp_dir(horseposn, self.get_current_fly_position(), self._speed)
+           horseheading = self.get_current_fly_position() - horseposn
        else:
           distance_to_site    = np.linalg.norm(self.get_current_fly_position() -\
                                                self._current_assigned_site)
           time_of_fly_to_site = 1/self._speed * distance_to_site
 
-          horse_site_vec   = np.linalg.norm(self._current_assigned_site - horseposn) 
+          horse_site_vec   = self._current_assigned_site - horseposn 
           displacement_vec = time_of_fly_to_site * horse_site_vec/np.linalg.norm(horse_site_vec)
-          horse_posn_tmp   = horse_posn + displacement_vec
+          horseposn_tmp   = horseposn + displacement_vec
 
-          time_of_fly_from_site = meeting_time_horse_fly_opp_dir(  \
-                                      horseposn_tmp,               \
-                                      self._current_assigned_site, \
-                                      self._speed)
+          time_of_fly_from_site = \
+                   meeting_time_horse_fly_opp_dir(horseposn_tmp, self._current_assigned_site, self._speed)
 
           rt = time_of_fly_to_site + time_of_fly_from_site
-          horseheading = self._current_assigned_site
+          horseheading = self._current_assigned_site - horseposn
 
-       uhorseheading = horseheading/np.linalg.norm(uhorseheading)
+       uhorseheading = horseheading/np.linalg.norm(horseheading)
        return rt, horseposn + uhorseheading * rt
 
-    
-    # Definition of method \verb|print_current_state|
-    
-    def print_current_state(self):
-        fly_speed_str = "Fly Speed is " + str(self._speed)                             
-        fly_traj_str  = "Fly trajectory is " + ''.join(map(str, self._flytraj))             
-        current_assigned_site_str = "Current assigned site is " +\
-                                     str(self._current_assigned_site)             
-        current_assigned_site_serviced_p_str = "Assigned site serviced: " +\
-                                                str(self._current_assigned_site_serviced_p) 
-        fly_retired_p_str = "Fly retired: " +  str(self._fly_retired_p)
-        
-        print '...................................................................'
-        print Fore.BLUE    , fly_speed_str             , Style.RESET_ALL
-        print Fore.MAGENTA , fly_traj_str              , Style.RESET_ALL
-        print Fore.YELLOW  , current_assigned_site_str , Style.RESET_ALL
-        print Fore.GREEN   , current_assigned_site_serviced_p_str, Style.RESET_ALL
-        print Fore.RED     , fly_retired_p_str         , Style.RESET_ALL
     
 
 def algo_greedy_earliest_capture(sites, inithorseposn, phi, number_of_flies,\
                                  write_algo_states_to_disk_p = True,\
                                  write_io_p                  = True,\
                                  animate_schedule_p          = True):
+
+    # Set algo-state and input-output files config
+    import sys, datetime, os, errno
+    algo_name     = 'algo-greedy-earliest-capture'
+    time_stamp    = datetime.datetime.now().strftime('Day-%Y-%m-%d_ClockTime-%H:%M:%S')
+    dir_name      = algo_name + '---' + time_stamp
+    io_file_name  = 'input_and_output.yml'
+
+    try:
+        os.makedirs(dir_name)
+    except OSError as e:
+        if e.errno != errno.EEXIST:
+            raise
+    algo_state_counter = 1 
+    
 
     if number_of_flies > len(sites):
           number_of_flies = len(sites)
@@ -300,12 +308,13 @@ def algo_greedy_earliest_capture(sites, inithorseposn, phi, number_of_flies,\
     # Initialize one \verb|FlyState| object per fly for all flies
     flystates = []
     for i in range(number_of_flies):
-        flystates.append(FlyState(inithorseposn, knns[i], phi))
+        flystates.append(FlyState(i,inithorseposn, knns[i], phi))
     
 
     all_flies_retired_p = False
 
     while (not all_flies_retired_p):
+       print "Algorithm State Number: ", algo_state_counter
        # Find the index of the fly \bm{F} which can meet the horse at the earliest, the rendezvous point $R$, and time till rendezvous
        imin  = 0
        rtmin = np.inf
@@ -339,28 +348,76 @@ def algo_greedy_earliest_capture(sites, inithorseposn, phi, number_of_flies,\
            _, nn_idxss = neigh.kneighbors([current_horse_posn])
            nn_idx      = nn_idxss.tolist()[0][0]
 
-           assert( np.linalg.norm ( sites[unclaimed_sites_idxs[nn_idx]]  - \
-                                    unclaimed_sites[nn_idx]  ) < 1e-8, \
-                   "Assertion failure in deployment step" )
-
-           flystates[imin].redeploy_to_site(unclaimed_sites[nn_idx])
+           flystates[imin].deploy_to_site(unclaimed_sites[nn_idx])
            unclaimed_sites_idxs = list(set(unclaimed_sites_idxs) - \
                                        set([unclaimed_sites_idxs[nn_idx]]))
 
-       else: # All sites have been claimed by some drone. There is no need for the fly anymore
+       else: 
            flystates[imin].retire_fly()
         
        # Calculate value of \verb|all_flies_retired_p|
-       
-       acc = True # accumulator variabvle
+       acc = True 
        for i in range(number_of_flies):
-            acc and flystates[i].is_retired()
-       all_flies_retired_p = tmp
+            acc = acc and flystates[i].is_retired()
+       all_flies_retired_p = acc
        
-       @<Write algorithms current state to file, if \verb|write_algo_states_to_disk_p == True|@> 
+       # Write algorithms current state to file, if \verb|write_algo_states_to_disk_p == True|
+       
+       if write_algo_states_to_disk_p:
+            import yaml
+            algo_state_file_name = 'algo_state_' + str(algo_state_counter).zfill(5) + '.yml'
+
+            data = {'horse_trajectory' : horse_traj, \
+                    'fly_trajectories' : [flystates[i].get_trajectory() 
+                                          for i in range(number_of_flies)] }
+
+            with open(dir_name + '/' + algo_state_file_name, 'w') as outfile:
+                 yaml.dump( data, outfile, default_flow_style = False)
+            algo_state_counter += 1
+        
     
-    @<Write input and output to file if \verb|write_io_p == True|@>
-    @<Make an animation of the schedule if \verb|animate_schedule_p == True|@>
+    # Write input and output to file if \verb|write_io_p == True|
+    if write_io_p:
+        print Fore.GREEN, "Horse Trajectory is ", Style.RESET_ALL
+        utils_algo.print_list(horse_traj)
+        for i in range(number_of_flies):
+               print "Trajectory of Fly", i
+               utils_algo.print_list(flystates[i].get_trajectory())
+               print "----------------------------------------------"
+
+        fig, ax =  plt.subplots()
+        ax.set_xlim([utils_graphics.xlim[0], utils_graphics.xlim[1]])
+        ax.set_ylim([utils_graphics.ylim[0], utils_graphics.ylim[1]])
+        ax.set_aspect(1.0)
+        ax.set_xticks([])
+        ax.set_yticks([])
+      
+        # Plot the fly trajectories
+        # Place graphical elements in reverse order,
+        # i.e. from answer, all the way upto question. 
+        colors = utils_graphics.get_colors(number_of_flies)
+        for i in range(number_of_flies):
+           print i
+           xfs = [pt['coordinates'][0] for pt in flystates[i].get_trajectory()]
+           yfs = [pt['coordinates'][1] for pt in flystates[i].get_trajectory()]
+           ax.plot(xfs,yfs, '-', linewidth=1.0, color=colors[i])
+      
+        # Plot the horse trajectory
+        xhs = [ pt[0] for pt in horse_traj  ]
+        yhs = [ pt[1] for pt in horse_traj  ]
+        ax.plot(xhs,yhs, 'ro-',linewidth=3.0)
+
+        # Plot sites
+        xsites = [site[0] for site in sites]
+        ysites = [site[1] for site in sites]
+        ax.plot(xsites, ysites, 'bo')
+
+        # Plot initial horseposition
+        ax.plot([inithorseposn[0]], [inithorseposn[1]], 'ks', markersize=10.0)
+        plt.show()
+    
+    sys.exit()
+
 
 
 

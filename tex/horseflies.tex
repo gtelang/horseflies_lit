@@ -712,41 +712,29 @@ for later.}
 \end{flushleft}
 %{/python-mode}%
 
-\newchunk We also need a function to be able to generate visually distinct colors. 
-The HSV color model is particularly suitable for this. The following function has been 
-adapted from \url{https://martin.ankerl.com/2009/12/09/how-to-create-random-colors-programmatically/}. 
 
-To generate a random color the function uses a random hue but fixed values of the saturation 
-and value (both lying in the interval $[0,1)$). 
- 
+
+\newchunk  We also need a function to generate a specified number of visually distinct colors, especially
+when dealing with  multiple flies. 
+
 %{python-mode}%
 \begin{flushleft} \small\label{scrap11}\raggedright\small
 \NWtarget{nuweb16d}{} \verb@"../src/lib/utils_graphics.py"@\nobreak\ {\footnotesize {16d}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
-\mbox{}\verb@def get_random_color(sat=0.7,val=0.7):@\\
-\mbox{}\verb@    def hsv_to_rgb(h, s, v):@\\
-\mbox{}\verb@          h_i = int((h*6))@\\
-\mbox{}\verb@          f   = h*6 - h_i@\\
-\mbox{}\verb@          p   = v * (1 - s)@\\
-\mbox{}\verb@          q   = v * (1 - f*s)@\\
-\mbox{}\verb@          t   = v * (1 - (1 - f) * s)@\\
-\mbox{}\verb@  @\\
-\mbox{}\verb@          if h_i==0:@\\
-\mbox{}\verb@               r, g, b = v, t, p @\\
-\mbox{}\verb@          elif h_i==1:  @\\
-\mbox{}\verb@               r, g, b = q, v, p @\\
-\mbox{}\verb@          elif h_i==2:@\\
-\mbox{}\verb@               r, g, b = p, v, t @\\
-\mbox{}\verb@          elif h_i==3:@\\
-\mbox{}\verb@               r, g, b = p, q, v @\\
-\mbox{}\verb@          elif h_i==4: @\\
-\mbox{}\verb@               r, g, b = t, p, v @\\
-\mbox{}\verb@          elif h_i==5:@\\
-\mbox{}\verb@               r, g, b = v, p, q @\\
 \mbox{}\verb@@\\
-\mbox{}\verb@          return [int(r*256), int(g*256), int(b*256)]@\\
-\mbox{}\verb@    return hsv_to_rgb(np.random.rand(), sat, val)@\\
+\mbox{}\verb@# Borrowed from https://stackoverflow.com/a/9701141@\\
+\mbox{}\verb@import numpy as np@\\
+\mbox{}\verb@import colorsys@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@def get_colors(num_colors):@\\
+\mbox{}\verb@    colors=[]@\\
+\mbox{}\verb@    for i in np.arange(60., 360., 300. / num_colors):@\\
+\mbox{}\verb@        hue        = i/360.0@\\
+\mbox{}\verb@        lightness  = 0.3@\\
+\mbox{}\verb@        saturation = 0.9@\\
+\mbox{}\verb@        colors.append(colorsys.hls_to_rgb(hue, lightness, saturation))@\\
+\mbox{}\verb@    return colors@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
@@ -759,8 +747,6 @@ and value (both lying in the interval $[0,1)$).
 \vspace{4ex}
 \end{flushleft}
 %{/python-mode}%
-
-
 
 
 \section{Algorithmic Utilities}
@@ -2508,7 +2494,7 @@ an \underline{input-output file}.
 \mbox{}\verb@#logger = logging.getLogger()@\\
 \mbox{}\verb@info("Started running greedy_incremental_insertion for classic horsefly")@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@algo_state_counter = 0 @\\
+\mbox{}\verb@algo_state_counter = 1 @\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
@@ -4956,7 +4942,7 @@ experimental or interactive sections of the code.
 \mbox{}\verb@    @\hbox{$\langle\,${\itshape Set up interactive canvas}\nobreak\ {\footnotesize \NWlink{nuweb73b}{73b}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@@\hbox{$\langle\,${\itshape Local data-structures}\nobreak\ {\footnotesize \NWlink{nuweb74a}{74a}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@@\hbox{$\langle\,${\itshape Algorithms for multiple flies}\nobreak\ {\footnotesize \NWlink{nuweb76a}{76a}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@@\hbox{$\langle\,${\itshape Algorithms for multiple flies}\nobreak\ {\footnotesize \NWlink{nuweb75}{75}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
@@ -4991,7 +4977,7 @@ experimental or interactive sections of the code.
 \mbox{}\verb@import math@\\
 \mbox{}\verb@import matplotlib as mpl@\\
 \mbox{}\verb@import matplotlib.pyplot as plt@\\
-\mbox{}\verb@# plt.style.use('seaborn-poster')@\\
+\mbox{}\verb@#plt.style.use('seaborn-poster')@\\
 \mbox{}\verb@import numpy as np@\\
 \mbox{}\verb@import os@\\
 \mbox{}\verb@import pprint as pp@\\
@@ -5435,7 +5421,7 @@ the next site that fly should be deployed to. We again follow a greedy strategy 
 it to the nearest ``unclaimed'' site \footnote{There might be several interesting
 algorithmic questions lurking on how to select the next unclaimed site that the fly should be deployed to. 
 Can we do some analogue of incremental? Fast methods for detecting the best place of insertion would be eminently 
-interesting, and fun to implement via literate programming!}. The next chunk introduces the necessary terminology 
+interesting}. The next chunk introduces the necessary terminology 
 and a detailed algorithmic implementation of the earliest capture heuristic. See Figure?? for an illustration of the 
 progress of the algorithm for 2 drones and 6 sites. 
 
@@ -5448,7 +5434,7 @@ and that site. The horse keeps moving along this segment until it meets the fly.
 
 As the horse moves towards this site, the remaining flies, if they are returning from sites that they have just serviced, 
 change their direction of motion and move towards the rendezvous point of the horse and selected fly. 
-On meeting up with a fly, the horse redeploys it to an unclaimed site, if one exists and updates the corresponding \verb|FlyState|
+On meeting up with a fly, the horse deploys it to an unclaimed site, if one exists and updates the corresponding \verb|FlyState|
 object. We keep repeating this process until all sites have been serviced and all flies have been retired. 
 
 A fly is deemed ``retired'' when it returns to the horse and will no longer be deployed to \textit{any} site 
@@ -5470,18 +5456,19 @@ meeting them midway and handing off packages to them then of course having the e
 handoff situation will need to be explored in detail later. 
 
 %{python-mode}%
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap112}\raggedright\small
-\NWtarget{nuweb76a}{} $\langle\,${\itshape Algorithms for multiple flies}\nobreak\ {\footnotesize {76a}}$\,\rangle\equiv$
+\begin{flushleft} \small\label{scrap112}\raggedright\small
+\NWtarget{nuweb75}{} $\langle\,${\itshape Algorithms for multiple flies}\nobreak\ {\footnotesize {75}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
-\mbox{}\verb@@\hbox{$\langle\,${\itshape Helper functions for \verb|algo_greedy_earliest_capture|}\nobreak\ {\footnotesize \NWlink{nuweb76b}{76b}}$\,\rangle$}\verb@    @\\
-\mbox{}\verb@@\hbox{$\langle\,${\itshape Definition of the \verb|FlyState| class}\nobreak\ {\footnotesize \NWlink{nuweb76c}{76c}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@@\hbox{$\langle\,${\itshape Helper functions for \verb|algo_greedy_earliest_capture|}\nobreak\ {\footnotesize \NWlink{nuweb78a}{78a}}$\,\rangle$}\verb@    @\\
+\mbox{}\verb@@\hbox{$\langle\,${\itshape Definition of the \verb|FlyState| class}\nobreak\ {\footnotesize \NWlink{nuweb76}{76}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@def algo_greedy_earliest_capture(sites, inithorseposn, phi, number_of_flies,\@\\
 \mbox{}\verb@                                 write_algo_states_to_disk_p = True,\@\\
 \mbox{}\verb@                                 write_io_p                  = True,\@\\
 \mbox{}\verb@                                 animate_schedule_p          = True):@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    @\hbox{$\langle\,${\itshape Set algo-state and input-output files config}\nobreak\ {\footnotesize \NWlink{nuweb80d}{80d}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@    if number_of_flies > len(sites):@\\
 \mbox{}\verb@          number_of_flies = len(sites)@\\
@@ -5489,21 +5476,22 @@ handoff situation will need to be explored in detail later.
 \mbox{}\verb@    current_horse_posn = np.asarray(inithorseposn)@\\
 \mbox{}\verb@    horse_traj         = [current_horse_posn]@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@    @\hbox{$\langle\,${\itshape Find the $k$-nearest sites to \verb|inithorseposn| for $k=$\verb|number_of_flies| and claim them}\nobreak\ {\footnotesize \NWlink{nuweb78b}{78b}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@    @\hbox{$\langle\,${\itshape Initialize one \verb|FlyState| object per fly for all flies}\nobreak\ {\footnotesize \NWlink{nuweb78c}{78c}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@    @\hbox{$\langle\,${\itshape Find the $k$-nearest sites to \verb|inithorseposn| for $k=$\verb|number_of_flies| and claim them}\nobreak\ {\footnotesize \NWlink{nuweb77a}{77a}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@    @\hbox{$\langle\,${\itshape Initialize one \verb|FlyState| object per fly for all flies}\nobreak\ {\footnotesize \NWlink{nuweb77b}{77b}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@    all_flies_retired_p = False@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@    while (not all_flies_retired_p):@\\
-\mbox{}\verb@       @\hbox{$\langle\,${\itshape Find the index of the fly \bm{F} which can meet the horse at the earliest, the rendezvous point $R$, and time till rendezvous}\nobreak\ {\footnotesize \NWlink{nuweb79a}{79a}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@       @\hbox{$\langle\,${\itshape Update fly trajectory in each \verb|FlyState| object till \bm{F} meets the horse at $R$}\nobreak\ {\footnotesize \NWlink{nuweb79b}{79b}}$\,\rangle$}\verb@ @\\
-\mbox{}\verb@       @\hbox{$\langle\,${\itshape Update \verb|current_horse_posn| and horse trajectory}\nobreak\ {\footnotesize \NWlink{nuweb79d}{79d}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@       @\hbox{$\langle\,${\itshape Deploy \bm{F} to an unclaimed site if one exists and claim that site, otherwise retire \bm{F}}\nobreak\ {\footnotesize \NWlink{nuweb80a}{80a}}$\,\rangle$}\verb@ @\\
-\mbox{}\verb@       @\hbox{$\langle\,${\itshape Calculate value of \verb|all_flies_retired_p|}\nobreak\ {\footnotesize \NWlink{nuweb80b}{80b}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@       @\hbox{$\langle\,${\itshape Write algorithms current state to file, if \verb|write_algo_states_to_disk_p == True|}\nobreak\ {\footnotesize ?}$\,\rangle$}\verb@ @\\
+\mbox{}\verb@       print "Algorithm State Number: ", algo_state_counter@\\
+\mbox{}\verb@       @\hbox{$\langle\,${\itshape Find the index of the fly \bm{F} which can meet the horse at the earliest, the rendezvous point $R$, and time till rendezvous}\nobreak\ {\footnotesize \NWlink{nuweb77c}{77c}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@       @\hbox{$\langle\,${\itshape Update fly trajectory in each \verb|FlyState| object till \bm{F} meets the horse at $R$}\nobreak\ {\footnotesize \NWlink{nuweb78b}{78b}}$\,\rangle$}\verb@ @\\
+\mbox{}\verb@       @\hbox{$\langle\,${\itshape Update \verb|current_horse_posn| and horse trajectory}\nobreak\ {\footnotesize \NWlink{nuweb80a}{80a}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@       @\hbox{$\langle\,${\itshape Deploy \bm{F} to an unclaimed site if one exists and claim that site, otherwise retire \bm{F}}\nobreak\ {\footnotesize \NWlink{nuweb80b}{80b}}$\,\rangle$}\verb@ @\\
+\mbox{}\verb@       @\hbox{$\langle\,${\itshape Calculate value of \verb|all_flies_retired_p|}\nobreak\ {\footnotesize \NWlink{nuweb80c}{80c}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@       @\hbox{$\langle\,${\itshape Write algorithms current state to file, if \verb|write_algo_states_to_disk_p == True|}\nobreak\ {\footnotesize \NWlink{nuweb81}{81}}$\,\rangle$}\verb@ @\\
 \mbox{}\verb@    @\\
-\mbox{}\verb@    @\hbox{$\langle\,${\itshape Write input and output to file if \verb|write_io_p == True|}\nobreak\ {\footnotesize ?}$\,\rangle$}\verb@@\\
-\mbox{}\verb@    @\hbox{$\langle\,${\itshape Make an animation of the schedule if \verb|animate_schedule_p == True|}\nobreak\ {\footnotesize ?}$\,\rangle$}\verb@@\\
+\mbox{}\verb@    @\hbox{$\langle\,${\itshape Write input and output to file if \verb|write_io_p == True|}\nobreak\ {\footnotesize \NWlink{nuweb82}{82}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@    sys.exit()@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
@@ -5513,55 +5501,22 @@ handoff situation will need to be explored in detail later.
 
 \item{}
 \end{list}
-\end{minipage}\vspace{4ex}
+\vspace{4ex}
 \end{flushleft}
 %{/python-mode}%
 \section{Algorithmic Details}
-% This particular algorithm will scale nicely on the computer to a 1000 sites very easily, without any 
-% fancy convex optimization solvers and what not. Besides it is a natural analogue of greedy-collinear 
-% nearest neighbor horseflies. Wonder what nearest neighbor insertion will look like here? There is 
-% an analogue indeed, but it will involve expensive recalculation naively, but place it somewhere inside
-% within the fingers. Which fly to reassign to and in what order, that is a separate and nice question in
-% of itself. 
 
-\newchunk If a horse with speed 1.0 and fly with speed $\varphi$ are present at opposite endpoints of a segment 
-of length $L$ it takes time $\frac{L}{\varphi+1}$ to meet up if they travel towards each other along the segment. 
- 
+\newchunk 
 %{python-mode}%
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap113}\raggedright\small
-\NWtarget{nuweb76b}{} $\langle\,${\itshape Helper functions for \verb|algo_greedy_earliest_capture|}\nobreak\ {\footnotesize {76b}}$\,\rangle\equiv$
-\vspace{-1ex}
-\begin{list}{}{} \item
-\mbox{}\verb@   @\\
-\mbox{}\verb@def meeting_time_horse_fly_opp_dir(horseposn, flyposn, flyspeed):@\\
-\mbox{}\verb@    horseposn = np.asarray(horseposn)@\\
-\mbox{}\verb@    flyposn   = np.asarray(flyposn)@\\
-\mbox{}\verb@    return 1/(flyspeed+1) * np.linalg.norm(horseposn-flyposn)@\\
-\mbox{}\verb@@{\NWsep}
-\end{list}
-\vspace{-1.5ex}
-\footnotesize
-\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb76a}{76a}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@meeting_time_horse_fly_opp_dir@\nobreak\ \NWlink{nuweb77}{77}.
-\item{}
-\end{list}
-\end{minipage}\vspace{4ex}
-\end{flushleft}
-%{/python-mode}%
-
-\vspace{-0.8cm} \newchunk 
-%{python-mode}%
-\begin{flushleft} \small\label{scrap114}\raggedright\small
-\NWtarget{nuweb76c}{} $\langle\,${\itshape Definition of the \verb|FlyState| class}\nobreak\ {\footnotesize {76c}}$\,\rangle\equiv$
+\begin{flushleft} \small\label{scrap113}\raggedright\small
+\NWtarget{nuweb76}{} $\langle\,${\itshape Definition of the \verb|FlyState| class}\nobreak\ {\footnotesize {76}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@class FlyState:@\\
 \mbox{}\verb@    def __init__(self, idx, initflyposn, site, flyspeed):@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@         self.idx                                = idx@\\
-\mbox{}\verb@         self._flytraj                           = [ np.asarray(initflyposn) ]@\\
+\mbox{}\verb@         self._flytraj                           = [ {'coordinates': np.asarray(initflyposn), 'type':'gen_pt'} ]@\\
 \mbox{}\verb@         self._current_assigned_site             = np.asarray(site)@\\
 \mbox{}\verb@         self._speed                             = flyspeed@\\
 \mbox{}\verb@         self._current_assigned_site_serviced_p  = False@\\
@@ -5570,7 +5525,7 @@ of length $L$ it takes time $\frac{L}{\varphi+1}$ to meet up if they travel towa
 \mbox{}\verb@    def retire_fly(self):@\\
 \mbox{}\verb@         self._fly_retired_p = True@\\
 \mbox{}\verb@ @\\
-\mbox{}\verb@    def redeploy_to_site(self,site):@\\
+\mbox{}\verb@    def deploy_to_site(self,site):@\\
 \mbox{}\verb@         self._current_assigned_site            = np.asarray(site)@\\
 \mbox{}\verb@         self._current_assigned_site_serviced_p = False @\\
 \mbox{}\verb@@\\
@@ -5581,17 +5536,19 @@ of length $L$ it takes time $\frac{L}{\varphi+1}$ to meet up if they travel towa
 \mbox{}\verb@         return self._current_assigned_site_serviced_p@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@    def get_current_fly_position(self):@\\
-\mbox{}\verb@         return self._flytraj[-1]@\\
+\mbox{}\verb@         return self._flytraj[-1]['coordinates']@\\
+\mbox{}\verb@   @\\
+\mbox{}\verb@    def get_trajectory(self):@\\
+\mbox{}\verb@         return self._flytraj@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@    @\hbox{$\langle\,${\itshape Definition of method \verb|update_fly_trajectory|}\nobreak\ {\footnotesize \NWlink{nuweb79c}{79c}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@    @\hbox{$\langle\,${\itshape Definition of method \verb|rendezvous_time_and_point_if_selected_by_horse|}\nobreak\ {\footnotesize \NWlink{nuweb77}{77}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@    @\hbox{$\langle\,${\itshape Definition of method \verb|print_current_state|}\nobreak\ {\footnotesize \NWlink{nuweb78a}{78a}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@    @\hbox{$\langle\,${\itshape Definition of method \verb|update_fly_trajectory|}\nobreak\ {\footnotesize \NWlink{nuweb79a}{79a}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@    @\hbox{$\langle\,${\itshape Definition of method \verb|rendezvous_time_and_point_if_selected_by_horse|}\nobreak\ {\footnotesize \NWlink{nuweb77d}{77d}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb76a}{76a}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb75}{75}.
 
 \item{}
 \end{list}
@@ -5599,95 +5556,6 @@ of length $L$ it takes time $\frac{L}{\varphi+1}$ to meet up if they travel towa
 \end{flushleft}
 %{/python-mode}%
 
-
-\newchunk  
-\TODO{Describe a diagram here via asymptote, exactly what calculation is being performed here, 
-divide into two cases of a fly returning after service, and a fly headed towards the site it is supposed to service}
-%{python-mode}%
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap115}\raggedright\small
-\NWtarget{nuweb77}{} $\langle\,${\itshape Definition of method \verb|rendezvous_time_and_point_if_selected_by_horse|}\nobreak\ {\footnotesize {77}}$\,\rangle\equiv$
-\vspace{-1ex}
-\begin{list}{}{} \item
-\mbox{}\verb@@\\
-\mbox{}\verb@def rendezvous_time_and_point_if_selected_by_horse(self, horseposn):@\\
-\mbox{}\verb@   assert(self._fly_retired_p != True)@\\
-\mbox{}\verb@  @\\
-\mbox{}\verb@   if self._current_assigned_site_serviced_p:@\\
-\mbox{}\verb@       rt = meeting_time_horse_fly_opp_dir(horseposn, \@\\
-\mbox{}\verb@                                           self.get_current_fly_position(),\@\\
-\mbox{}\verb@                                           self._speed)@\\
-\mbox{}\verb@       horseheading = self.get_current_fly_position()@\\
-\mbox{}\verb@   else:@\\
-\mbox{}\verb@      distance_to_site    = np.linalg.norm(self.get_current_fly_position() -\@\\
-\mbox{}\verb@                                           self._current_assigned_site)@\\
-\mbox{}\verb@      time_of_fly_to_site = 1/self._speed * distance_to_site@\\
-\mbox{}\verb@@\\
-\mbox{}\verb@      horse_site_vec   = np.linalg.norm(self._current_assigned_site - horseposn) @\\
-\mbox{}\verb@      displacement_vec = time_of_fly_to_site * horse_site_vec/np.linalg.norm(horse_site_vec)@\\
-\mbox{}\verb@      horse_posn_tmp   = horse_posn + displacement_vec@\\
-\mbox{}\verb@@\\
-\mbox{}\verb@      time_of_fly_from_site = meeting_time_horse_fly_opp_dir(  \@\\
-\mbox{}\verb@                                  horseposn_tmp,               \@\\
-\mbox{}\verb@                                  self._current_assigned_site, \@\\
-\mbox{}\verb@                                  self._speed)@\\
-\mbox{}\verb@@\\
-\mbox{}\verb@      rt = time_of_fly_to_site + time_of_fly_from_site@\\
-\mbox{}\verb@      horseheading = self._current_assigned_site@\\
-\mbox{}\verb@@\\
-\mbox{}\verb@   uhorseheading = horseheading/np.linalg.norm(uhorseheading)@\\
-\mbox{}\verb@   return rt, horseposn + uhorseheading * rt@\\
-\mbox{}\verb@@\\
-\mbox{}\verb@@{\NWsep}
-\end{list}
-\vspace{-1.5ex}
-\footnotesize
-\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb76c}{76c}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@rendezvous_time_and_point_if_selected_by_horse@\nobreak\ \NWlink{nuweb79a}{79a}.\item \NWtxtIdentsUsed\nobreak\  \verb@meeting_time_horse_fly_opp_dir@\nobreak\ \NWlink{nuweb76b}{76b}.
-\item{}
-\end{list}
-\end{minipage}\vspace{4ex}
-\end{flushleft}
-%{/python-mode}%
-
-
-
-
-\vspace{-0.8cm} \newchunk
-%{python-mode}%
-\begin{flushleft} \small\label{scrap116}\raggedright\small
-\NWtarget{nuweb78a}{} $\langle\,${\itshape Definition of method \verb|print_current_state|}\nobreak\ {\footnotesize {78a}}$\,\rangle\equiv$
-\vspace{-1ex}
-\begin{list}{}{} \item
-\mbox{}\verb@@\\
-\mbox{}\verb@def print_current_state(self):@\\
-\mbox{}\verb@    fly_speed_str = "Fly Speed is " + str(self._speed)                             @\\
-\mbox{}\verb@    fly_traj_str  = "Fly trajectory is " + ''.join(map(str, self._flytraj))             @\\
-\mbox{}\verb@    current_assigned_site_str = "Current assigned site is " +\@\\
-\mbox{}\verb@                                 str(self._current_assigned_site)             @\\
-\mbox{}\verb@    current_assigned_site_serviced_p_str = "Assigned site serviced: " +\@\\
-\mbox{}\verb@                                            str(self._current_assigned_site_serviced_p) @\\
-\mbox{}\verb@    fly_retired_p_str = "Fly retired: " +  str(self._fly_retired_p)@\\
-\mbox{}\verb@    @\\
-\mbox{}\verb@    print '...................................................................'@\\
-\mbox{}\verb@    print Fore.BLUE    , fly_speed_str             , Style.RESET_ALL@\\
-\mbox{}\verb@    print Fore.MAGENTA , fly_traj_str              , Style.RESET_ALL@\\
-\mbox{}\verb@    print Fore.YELLOW  , current_assigned_site_str , Style.RESET_ALL@\\
-\mbox{}\verb@    print Fore.GREEN   , current_assigned_site_serviced_p_str, Style.RESET_ALL@\\
-\mbox{}\verb@    print Fore.RED     , fly_retired_p_str         , Style.RESET_ALL@\\
-\mbox{}\verb@@{\NWsep}
-\end{list}
-\vspace{-1.5ex}
-\footnotesize
-\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb76c}{76c}.
-
-\item{}
-\end{list}
-\vspace{4ex}
-\end{flushleft}
-%{/python-mode}%
 
 
 \vspace{-0.8cm} \newchunk At the beginning of the algorithm, if the horse has $k$ flies, 
@@ -5695,9 +5563,8 @@ the $k$ nearest sites to the initial position of the horse will be claimed by th
 for service. 
 
 %{python-mode}%
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap117}\raggedright\small
-\NWtarget{nuweb78b}{} $\langle\,${\itshape Find the $k$-nearest sites to \verb|inithorseposn| for $k=$\verb|number_of_flies| and claim them}\nobreak\ {\footnotesize {78b}}$\,\rangle\equiv$
+\begin{flushleft} \small\label{scrap114}\raggedright\small
+\NWtarget{nuweb77a}{} $\langle\,${\itshape Find the $k$-nearest sites to \verb|inithorseposn| for $k=$\verb|number_of_flies| and claim them}\nobreak\ {\footnotesize {77a}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@from sklearn.neighbors import NearestNeighbors@\\
@@ -5714,11 +5581,11 @@ for service.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb76a}{76a}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb75}{75}.
 
 \item{}
 \end{list}
-\end{minipage}\vspace{4ex}
+\vspace{4ex}
 \end{flushleft}
 %{/python-mode}%
 
@@ -5727,19 +5594,19 @@ for service.
 \vspace{-0.8cm} \newchunk
 %{python-mode}%
 \begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap118}\raggedright\small
-\NWtarget{nuweb78c}{} $\langle\,${\itshape Initialize one \verb|FlyState| object per fly for all flies}\nobreak\ {\footnotesize {78c}}$\,\rangle\equiv$
+\begin{minipage}{\linewidth}\label{scrap115}\raggedright\small
+\NWtarget{nuweb77b}{} $\langle\,${\itshape Initialize one \verb|FlyState| object per fly for all flies}\nobreak\ {\footnotesize {77b}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@flystates = []@\\
 \mbox{}\verb@for i in range(number_of_flies):@\\
-\mbox{}\verb@    flystates.append(FlyState(inithorseposn, knns[i], phi))@\\
+\mbox{}\verb@    flystates.append(FlyState(i,inithorseposn, knns[i], phi))@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb76a}{76a}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb75}{75}.
 
 \item{}
 \end{list}
@@ -5755,8 +5622,8 @@ for this. This \textbf{is} an interesting little data-structural problem in its 
 
 %{python-mode}%
 \begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap119}\raggedright\small
-\NWtarget{nuweb79a}{} $\langle\,${\itshape Find the index of the fly \bm{F} which can meet the horse at the earliest, the rendezvous point $R$, and time till rendezvous}\nobreak\ {\footnotesize {79a}}$\,\rangle\equiv$
+\begin{minipage}{\linewidth}\label{scrap116}\raggedright\small
+\NWtarget{nuweb77c}{} $\langle\,${\itshape Find the index of the fly \bm{F} which can meet the horse at the earliest, the rendezvous point $R$, and time till rendezvous}\nobreak\ {\footnotesize {77c}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@imin  = 0@\\
@@ -5776,19 +5643,99 @@ for this. This \textbf{is} an interesting little data-structural problem in its 
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb76a}{76a}.
-\item \NWtxtIdentsUsed\nobreak\  \verb@rendezvous_time_and_point_if_selected_by_horse@\nobreak\ \NWlink{nuweb77}{77}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb75}{75}.
+\item \NWtxtIdentsUsed\nobreak\  \verb@rendezvous_time_and_point_if_selected_by_horse@\nobreak\ \NWlink{nuweb77d}{77d}.
 \item{}
 \end{list}
 \end{minipage}\vspace{4ex}
 \end{flushleft}
 %{/python-mode}%
 
-\vspace{-0.8cm} \newchunk
+\vspace{-0.8cm} \newchunk  
+\TODO{Describe a diagram here via asymptote, exactly what calculation is being performed here, 
+divide into two cases of a fly returning after service, and a fly headed towards the site it is supposed to service}
+%{python-mode}%
+\begin{flushleft} \small\label{scrap117}\raggedright\small
+\NWtarget{nuweb77d}{} $\langle\,${\itshape Definition of method \verb|rendezvous_time_and_point_if_selected_by_horse|}\nobreak\ {\footnotesize {77d}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@@\\
+\mbox{}\verb@def rendezvous_time_and_point_if_selected_by_horse(self, horseposn):@\\
+\mbox{}\verb@   assert(self._fly_retired_p != True)@\\
+\mbox{}\verb@  @\\
+\mbox{}\verb@   if self._current_assigned_site_serviced_p:@\\
+\mbox{}\verb@       rt = meeting_time_horse_fly_opp_dir(horseposn, self.get_current_fly_position(), self._speed)@\\
+\mbox{}\verb@       horseheading = self.get_current_fly_position() - horseposn@\\
+\mbox{}\verb@   else:@\\
+\mbox{}\verb@      distance_to_site    = np.linalg.norm(self.get_current_fly_position() -\@\\
+\mbox{}\verb@                                           self._current_assigned_site)@\\
+\mbox{}\verb@      time_of_fly_to_site = 1/self._speed * distance_to_site@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@      horse_site_vec   = self._current_assigned_site - horseposn @\\
+\mbox{}\verb@      displacement_vec = time_of_fly_to_site * horse_site_vec/np.linalg.norm(horse_site_vec)@\\
+\mbox{}\verb@      horseposn_tmp   = horseposn + displacement_vec@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@      time_of_fly_from_site = \@\\
+\mbox{}\verb@               meeting_time_horse_fly_opp_dir(horseposn_tmp, self._current_assigned_site, self._speed)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@      rt = time_of_fly_to_site + time_of_fly_from_site@\\
+\mbox{}\verb@      horseheading = self._current_assigned_site - horseposn@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@   uhorseheading = horseheading/np.linalg.norm(horseheading)@\\
+\mbox{}\verb@   return rt, horseposn + uhorseheading * rt@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb76}{76}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@rendezvous_time_and_point_if_selected_by_horse@\nobreak\ \NWlink{nuweb77c}{77c}.\item \NWtxtIdentsUsed\nobreak\  \verb@meeting_time_horse_fly_opp_dir@\nobreak\ \NWlink{nuweb78a}{78a}.
+\item{}
+\end{list}
+\vspace{4ex}
+\end{flushleft}
+%{/python-mode}%
+
+
+\vspace{-0.8cm} \newchunk This fragment defines the function \verb|meeting_time_horse_fly_opp_dir| that was
+used in the previous fragment. If a horse with speed 1.0 and fly with speed $\varphi$ are present at opposite 
+endpoints of a segment of length $L$ it takes time $\frac{L}{\varphi+1}$ to meet up if they travel towards 
+each other along the segment.
+ 
 %{python-mode}%
 \begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap120}\raggedright\small
-\NWtarget{nuweb79b}{} $\langle\,${\itshape Update fly trajectory in each \verb|FlyState| object till \bm{F} meets the horse at $R$}\nobreak\ {\footnotesize {79b}}$\,\rangle\equiv$
+\begin{minipage}{\linewidth}\label{scrap118}\raggedright\small
+\NWtarget{nuweb78a}{} $\langle\,${\itshape Helper functions for \verb|algo_greedy_earliest_capture|}\nobreak\ {\footnotesize {78a}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@   @\\
+\mbox{}\verb@def meeting_time_horse_fly_opp_dir(horseposn, flyposn, flyspeed):@\\
+\mbox{}\verb@    horseposn = np.asarray(horseposn)@\\
+\mbox{}\verb@    flyposn   = np.asarray(flyposn)@\\
+\mbox{}\verb@    return 1/(flyspeed+1) * np.linalg.norm(horseposn-flyposn)@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb75}{75}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@meeting_time_horse_fly_opp_dir@\nobreak\ \NWlink{nuweb77d}{77d}.
+\item{}
+\end{list}
+\end{minipage}\vspace{4ex}
+\end{flushleft}
+%{/python-mode}%
+
+
+
+\vspace{-0.8cm} \newchunk
+%{python-mode}% 
+Now that we know the rendezvous point for the horse with one of the flies and the time it takes
+for the horse to get there, update the trajectories of all the flies accordingly. 
+\begin{flushleft} \small
+\begin{minipage}{\linewidth}\label{scrap119}\raggedright\small
+\NWtarget{nuweb78b}{} $\langle\,${\itshape Update fly trajectory in each \verb|FlyState| object till \bm{F} meets the horse at $R$}\nobreak\ {\footnotesize {78b}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@for flystate in flystates:@\\
@@ -5798,7 +5745,7 @@ for this. This \textbf{is} an interesting little data-structural problem in its 
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb76a}{76a}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb75}{75}.
 
 \item{}
 \end{list}
@@ -5807,13 +5754,25 @@ for this. This \textbf{is} an interesting little data-structural problem in its 
 %{/python-mode}%
 
 
-\vspace{-0.8cm} \newchunk \TODO{You need to insert a diagram here explaining exactly what is happening. Divide into two 
-cases (a) and (b), and divide each case into two separate chunks with their own individual figures. Don't make the figures
-too big} 
+\vspace{-0.8cm} \newchunk Depending on the position of the rendezvous point, the time it will take for the horse
+to get there and the current position of a non-retired fly \footnote{If the fly has been retired there is no need 
+for an update to its trajectory}, we update its state according to one of three mutually exclusive cases (also 
+illustrated graphically in the next three fragments.)
+
+\begin{enumerate}
+ \item The site currently assigned to the fly been serviced and the fly is headed back for picking up 
+       its next package from the horse
+ \item The fly is headed towards its currently assigned site, but won't be able to make it to the site in 
+       the time $dt$ it takes for the horse to reach the rendezvous point. 
+ \item The site assigned to the fly has not yet been serviced, but \underline{will} reach
+       to the site within time $dt$. In this case, once the fly reaches the site it needs to make 
+       a sort of ``u-turn'' at the site and head towards the rendezvous point. 
+\end{enumerate}
+
 %{python-mode}%
 \begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap121}\raggedright\small
-\NWtarget{nuweb79c}{} $\langle\,${\itshape Definition of method \verb|update_fly_trajectory|}\nobreak\ {\footnotesize {79c}}$\,\rangle\equiv$
+\begin{minipage}{\linewidth}\label{scrap120}\raggedright\small
+\NWtarget{nuweb79a}{} $\langle\,${\itshape Definition of method \verb|update_fly_trajectory|}\nobreak\ {\footnotesize {79a}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
@@ -5824,30 +5783,19 @@ too big}
 \mbox{}\verb@@\\
 \mbox{}\verb@     dx = self._speed * dt@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@     if self._current_assigned_site_serviced_p or \@\\
-\mbox{}\verb@                 (dx < np.linalg.norm( self._current_assigned_site -\@\\
-\mbox{}\verb@                                       self.get_current_fly_position())):   @\\
+\mbox{}\verb@     if self._current_assigned_site_serviced_p :@\\
+\mbox{}\verb@        @\hbox{$\langle\,${\itshape Move towards the provided rendezvous point}\nobreak\ {\footnotesize \NWlink{nuweb79b}{79b}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@          heading  = self.fly_traj[-1] - self.fly_traj[-2]@\\
-\mbox{}\verb@          uheading = heading / np.linalg.norm(heading) @\\
-\mbox{}\verb@          newpt = self.fly_traj[-1] + dx * uheading@\\
-\mbox{}\verb@          self.fly_traj.append(newpt)@\\
-\mbox{}\verb@@\\
-\mbox{}\verb@     else: # the fly needs to ``uturn'' at the site@\\
-\mbox{}\verb@          dx_reduced = dx - np.linalg.norm(self._current_assigned_site -\@\\
-\mbox{}\verb@                                           self.get_current_fly_position())@\\
-\mbox{}\verb@          assert(dx_reduced >= 0, "dx_reduced should be >= 0")@\\
-\mbox{}\verb@          heading  = rendezvous_pt - self._current_assigned_site@\\
-\mbox{}\verb@          uheading = heading/np.linalg.norm(heading)@\\
-\mbox{}\verb@@\\
-\mbox{}\verb@          newpt = self._current_assigned_site + uheading * dx_reduced@\\
-\mbox{}\verb@          self.fly_traj.extend([self._current_assigned_site, newpt])@\\
-\mbox{}\verb@@{\NWsep}
+\mbox{}\verb@     elif dx < np.linalg.norm(self._current_assigned_site - self.get_current_fly_position()) :@\\
+\mbox{}\verb@        @\hbox{$\langle\,${\itshape Continue moving towards the site}\nobreak\ {\footnotesize \NWlink{nuweb79c}{79c}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@     else: @\\
+\mbox{}\verb@        @\hbox{$\langle\,${\itshape Move towards the site mark site as serviced and then head towards rendezvous point}\nobreak\ {\footnotesize \NWlink{nuweb79d}{79d}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@ @{\NWsep}
 \end{list}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb76c}{76c}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb76}{76}.
 
 \item{}
 \end{list}
@@ -5856,11 +5804,98 @@ too big}
 %{/python-mode}%
 
 
-\vspace{-0.8cm} \newchunk
+
+\vspace{-0.8cm} \newchunk \TODO{Insert figure here}
+%{python-mode}%
+\begin{flushleft} \small
+\begin{minipage}{\linewidth}\label{scrap121}\raggedright\small
+\NWtarget{nuweb79b}{} $\langle\,${\itshape Move towards the provided rendezvous point}\nobreak\ {\footnotesize {79b}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@   @\\
+\mbox{}\verb@heading  = rendezvous_pt - self.get_current_fly_position()@\\
+\mbox{}\verb@uheading = heading / np.linalg.norm(heading) @\\
+\mbox{}\verb@newpt    = self.get_current_fly_position() + dx * uheading@\\
+\mbox{}\verb@self._flytraj.append(  {'coordinates': newpt, 'type': 'gen_pt'}  )@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb79a}{79a}.
+
+\item{}
+\end{list}
+\end{minipage}\vspace{4ex}
+\end{flushleft}
+%{/python-mode}%
+
+
+\vspace{-0.8cm} \newchunk \TODO{Insert figure here}
 %{python-mode}%
 \begin{flushleft} \small
 \begin{minipage}{\linewidth}\label{scrap122}\raggedright\small
-\NWtarget{nuweb79d}{} $\langle\,${\itshape Update \verb|current_horse_posn| and horse trajectory}\nobreak\ {\footnotesize {79d}}$\,\rangle\equiv$
+\NWtarget{nuweb79c}{} $\langle\,${\itshape Continue moving towards the site}\nobreak\ {\footnotesize {79c}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@@\\
+\mbox{}\verb@heading  = self._current_assigned_site - self.get_current_fly_position()@\\
+\mbox{}\verb@uheading = heading / np.linalg.norm(heading) @\\
+\mbox{}\verb@newpt    = self.get_current_fly_position() + dx * uheading@\\
+\mbox{}\verb@self._flytraj.append(  {'coordinates': newpt, 'type': 'gen_pt'}  )@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb79a}{79a}.
+
+\item{}
+\end{list}
+\end{minipage}\vspace{4ex}
+\end{flushleft}
+%{/python-mode}%
+
+
+
+\vspace{-0.8cm} \newchunk \TODO{Insert figure here}
+%{python-mode}%
+\begin{flushleft} \small
+\begin{minipage}{\linewidth}\label{scrap123}\raggedright\small
+\NWtarget{nuweb79d}{} $\langle\,${\itshape Move towards the site mark site as serviced and then head towards rendezvous point}\nobreak\ {\footnotesize {79d}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@@\\
+\mbox{}\verb@dx_reduced = dx - np.linalg.norm(self._current_assigned_site -\@\\
+\mbox{}\verb@                                 self.get_current_fly_position())@\\
+\mbox{}\verb@heading  = rendezvous_pt - self._current_assigned_site@\\
+\mbox{}\verb@uheading = heading/np.linalg.norm(heading)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@newpt = self._current_assigned_site + uheading * dx_reduced@\\
+\mbox{}\verb@self._current_assigned_site_serviced_p = True@\\
+\mbox{}\verb@self._flytraj.extend([{'coordinates':self._current_assigned_site, 'type':'site'}, @\\
+\mbox{}\verb@                      {'coordinates':newpt,                       'type':'gen_pt'}])@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb79a}{79a}.
+
+\item{}
+\end{list}
+\end{minipage}\vspace{4ex}
+\end{flushleft}
+%{/python-mode}%
+
+
+
+\vspace{-0.8cm} \newchunk Now that the horse has reached the rendezvous point and met \bm{F}, 
+we need to update the horse's trajectory and decide which unclaimed site \bm{F} should go to next. 
+%{python-mode}%
+\begin{flushleft} \small
+\begin{minipage}{\linewidth}\label{scrap124}\raggedright\small
+\NWtarget{nuweb80a}{} $\langle\,${\itshape Update \verb|current_horse_posn| and horse trajectory}\nobreak\ {\footnotesize {80a}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@current_horse_posn = rptmin@\\
@@ -5870,7 +5905,7 @@ too big}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb76a}{76a}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb75}{75}.
 
 \item{}
 \end{list}
@@ -5878,14 +5913,11 @@ too big}
 \end{flushleft}
 %{/python-mode}%
 
-
-
-\vspace{-0.8cm} \newchunk Now that $F$ has just rendezvoused we need to make a decision of which site it should sent to 
-next. 
+\vspace{-0.8cm} \newchunk
 %{python-mode}%
 \begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap123}\raggedright\small
-\NWtarget{nuweb80a}{} $\langle\,${\itshape Deploy \bm{F} to an unclaimed site if one exists and claim that site, otherwise retire \bm{F}}\nobreak\ {\footnotesize {80a}}$\,\rangle\equiv$
+\begin{minipage}{\linewidth}\label{scrap125}\raggedright\small
+\NWtarget{nuweb80b}{} $\langle\,${\itshape Deploy \bm{F} to an unclaimed site if one exists and claim that site, otherwise retire \bm{F}}\nobreak\ {\footnotesize {80b}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@  @\\
@@ -5898,22 +5930,18 @@ next.
 \mbox{}\verb@    _, nn_idxss = neigh.kneighbors([current_horse_posn])@\\
 \mbox{}\verb@    nn_idx      = nn_idxss.tolist()[0][0]@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@    assert( np.linalg.norm ( sites[unclaimed_sites_idxs[nn_idx]]  - \@\\
-\mbox{}\verb@                             unclaimed_sites[nn_idx]  ) < 1e-8, \@\\
-\mbox{}\verb@            "Assertion failure in deployment step" )@\\
-\mbox{}\verb@@\\
-\mbox{}\verb@    flystates[imin].redeploy_to_site(unclaimed_sites[nn_idx])@\\
+\mbox{}\verb@    flystates[imin].deploy_to_site(unclaimed_sites[nn_idx])@\\
 \mbox{}\verb@    unclaimed_sites_idxs = list(set(unclaimed_sites_idxs) - \@\\
 \mbox{}\verb@                                set([unclaimed_sites_idxs[nn_idx]]))@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@else: # All sites have been claimed by some drone. There is no need for the fly anymore@\\
+\mbox{}\verb@else: @\\
 \mbox{}\verb@    flystates[imin].retire_fly()@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb76a}{76a}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb75}{75}.
 
 \item{}
 \end{list}
@@ -5921,26 +5949,25 @@ next.
 \end{flushleft}
 %{/python-mode}%
 
-
-
-\vspace{-0.8cm} \newchunk
+\vspace{-0.8cm} \newchunk This chunk just loops through all flies and checks if all flies have been retired or not. 
+The algorithm stops when all flies have been retired which indicates all sites have been serviced and all flies have 
+returned back to the horse.
 %{python-mode}%
 \begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap124}\raggedright\small
-\NWtarget{nuweb80b}{} $\langle\,${\itshape Calculate value of \verb|all_flies_retired_p|}\nobreak\ {\footnotesize {80b}}$\,\rangle\equiv$
+\begin{minipage}{\linewidth}\label{scrap126}\raggedright\small
+\NWtarget{nuweb80c}{} $\langle\,${\itshape Calculate value of \verb|all_flies_retired_p|}\nobreak\ {\footnotesize {80c}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
-\mbox{}\verb@@\\
-\mbox{}\verb@acc = True # accumulator variabvle@\\
+\mbox{}\verb@acc = True @\\
 \mbox{}\verb@for i in range(number_of_flies):@\\
-\mbox{}\verb@     acc and flystates[i].is_retired()@\\
-\mbox{}\verb@all_flies_retired_p = tmp@\\
+\mbox{}\verb@     acc = acc and flystates[i].is_retired()@\\
+\mbox{}\verb@all_flies_retired_p = acc@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb76a}{76a}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb75}{75}.
 
 \item{}
 \end{list}
@@ -5948,6 +5975,149 @@ next.
 \end{flushleft}
 %{/python-mode}%
 
+\vspace{-0.8cm}\newchunk As before, for the purposes of algorithmic analysis, we will need to write to disk 
+the algorithm's state at the end of each iteration of the \verb|while| loop. Each algorithm 
+state will consist of 
+
+\begin{enumerate}
+  \item The coordinates of the sites serviced so far, and the index of the fly that serviced each of them
+  \item The coordinates unserviced sites
+  \item The trajectory of each fly stored as a list of points. We also mark each point on the trajectory as either 
+      \begin{itemize}
+          \item a site serviced by a fly
+          \item a rendezvous point with the horse or
+          \item a generic turn-point where the fly-changes direction
+       \end{itemize}
+  \item The trajectory of the horse, which consists of a sequence of rendezvous points with the flies, 
+        one fly for each rendezvous point, whose index we store along the rendezvous point's coordinates. 
+\end{enumerate}
+
+Finally, we write out the input provided (sites, initial horse position, number of flies and $\varphi$) and 
+the trajectories of the horse and flies (in the format described in the a above list) to reconstruct a 
+problem exactly and to animate the trajectories. The animation is constructed as an \verb|.avi| file
+
+All these files are written to a folder named after the
+algorithm and the time-stamp of the algorithm's run. 
+
+%{python-mode}%
+\begin{flushleft} \small\label{scrap127}\raggedright\small
+\NWtarget{nuweb80d}{} $\langle\,${\itshape Set algo-state and input-output files config}\nobreak\ {\footnotesize {80d}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@import sys, datetime, os, errno@\\
+\mbox{}\verb@algo_name     = 'algo-greedy-earliest-capture'@\\
+\mbox{}\verb@time_stamp    = datetime.datetime.now().strftime('Day-%Y-%m-%d_ClockTime-%H:%M:%S')@\\
+\mbox{}\verb@dir_name      = algo_name + '---' + time_stamp@\\
+\mbox{}\verb@io_file_name  = 'input_and_output.yml'@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@try:@\\
+\mbox{}\verb@    os.makedirs(dir_name)@\\
+\mbox{}\verb@except OSError as e:@\\
+\mbox{}\verb@    if e.errno != errno.EEXIST:@\\
+\mbox{}\verb@        raise@\\
+\mbox{}\verb@algo_state_counter = 1 @\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb75}{75}.
+
+\item{}
+\end{list}
+\vspace{4ex}
+\end{flushleft}
+%{/python-mode}%
+
+\vspace{-0.8cm} \newchunk \blindtext
+%{python-mode}%
+\begin{flushleft} \small
+\begin{minipage}{\linewidth}\label{scrap128}\raggedright\small
+\NWtarget{nuweb81}{} $\langle\,${\itshape Write algorithms current state to file, if \verb|write_algo_states_to_disk_p == True|}\nobreak\ {\footnotesize {81}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@@\\
+\mbox{}\verb@if write_algo_states_to_disk_p:@\\
+\mbox{}\verb@     import yaml@\\
+\mbox{}\verb@     algo_state_file_name = 'algo_state_' + str(algo_state_counter).zfill(5) + '.yml'@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@     data = {'horse_trajectory' : horse_traj, \@\\
+\mbox{}\verb@             'fly_trajectories' : [flystates[i].get_trajectory() @\\
+\mbox{}\verb@                                   for i in range(number_of_flies)] }@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@     with open(dir_name + '/' + algo_state_file_name, 'w') as outfile:@\\
+\mbox{}\verb@          yaml.dump( data, outfile, default_flow_style = False)@\\
+\mbox{}\verb@     algo_state_counter += 1@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb75}{75}.
+
+\item{}
+\end{list}
+\end{minipage}\vspace{4ex}
+\end{flushleft}
+%{/python-mode}%
+
+\vspace{-0.8cm} \newchunk 
+%{python-mode}%
+\begin{flushleft} \small
+\begin{minipage}{\linewidth}\label{scrap129}\raggedright\small
+\NWtarget{nuweb82}{} $\langle\,${\itshape Write input and output to file if \verb|write_io_p == True|}\nobreak\ {\footnotesize {82}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@if write_io_p:@\\
+\mbox{}\verb@    print Fore.GREEN, "Horse Trajectory is ", Style.RESET_ALL@\\
+\mbox{}\verb@    utils_algo.print_list(horse_traj)@\\
+\mbox{}\verb@    for i in range(number_of_flies):@\\
+\mbox{}\verb@           print "Trajectory of Fly", i@\\
+\mbox{}\verb@           utils_algo.print_list(flystates[i].get_trajectory())@\\
+\mbox{}\verb@           print "----------------------------------------------"@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    fig, ax =  plt.subplots()@\\
+\mbox{}\verb@    ax.set_xlim([utils_graphics.xlim[0], utils_graphics.xlim[1]])@\\
+\mbox{}\verb@    ax.set_ylim([utils_graphics.ylim[0], utils_graphics.ylim[1]])@\\
+\mbox{}\verb@    ax.set_aspect(1.0)@\\
+\mbox{}\verb@    ax.set_xticks([])@\\
+\mbox{}\verb@    ax.set_yticks([])@\\
+\mbox{}\verb@  @\\
+\mbox{}\verb@    # Plot the fly trajectories@\\
+\mbox{}\verb@    # Place graphical elements in reverse order,@\\
+\mbox{}\verb@    # i.e. from answer, all the way upto question. @\\
+\mbox{}\verb@    colors = utils_graphics.get_colors(number_of_flies)@\\
+\mbox{}\verb@    for i in range(number_of_flies):@\\
+\mbox{}\verb@       print i@\\
+\mbox{}\verb@       xfs = [pt['coordinates'][0] for pt in flystates[i].get_trajectory()]@\\
+\mbox{}\verb@       yfs = [pt['coordinates'][1] for pt in flystates[i].get_trajectory()]@\\
+\mbox{}\verb@       ax.plot(xfs,yfs, '-', linewidth=1.0, color=colors[i])@\\
+\mbox{}\verb@  @\\
+\mbox{}\verb@    # Plot the horse trajectory@\\
+\mbox{}\verb@    xhs = [ pt[0] for pt in horse_traj  ]@\\
+\mbox{}\verb@    yhs = [ pt[1] for pt in horse_traj  ]@\\
+\mbox{}\verb@    ax.plot(xhs,yhs, 'ro-',linewidth=3.0)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    # Plot sites@\\
+\mbox{}\verb@    xsites = [site[0] for site in sites]@\\
+\mbox{}\verb@    ysites = [site[1] for site in sites]@\\
+\mbox{}\verb@    ax.plot(xsites, ysites, 'bo')@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    # Plot initial horseposition@\\
+\mbox{}\verb@    ax.plot([inithorseposn[0]], [inithorseposn[1]], 'ks', markersize=10.0)@\\
+\mbox{}\verb@    plt.show()@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb75}{75}.
+
+\item{}
+\end{list}
+\end{minipage}\vspace{4ex}
+\end{flushleft}
+%{/python-mode}%
 \newpage
 \section{Plotting Routines}
 \section{Animation routines}
@@ -5960,41 +6130,43 @@ next.
 \section{Chapter Index of Fragments}
 
 {\small\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item $\langle\,$Algorithms for multiple flies\nobreak\ {\footnotesize \NWlink{nuweb76a}{76a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb69}{69}.}
-\item $\langle\,$Calculate value of \verb|all_flies_retired_p|\nobreak\ {\footnotesize \NWlink{nuweb80b}{80b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb76a}{76a}.}
+\item $\langle\,$Algorithms for multiple flies\nobreak\ {\footnotesize \NWlink{nuweb75}{75}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb69}{69}.}
+\item $\langle\,$Calculate value of \verb|all_flies_retired_p|\nobreak\ {\footnotesize \NWlink{nuweb80c}{80c}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb75}{75}.}
 \item $\langle\,$Clear canvas and states of all objects\nobreak\ {\footnotesize \NWlink{nuweb73a}{73a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb71a}{71a}.}
+\item $\langle\,$Continue moving towards the site\nobreak\ {\footnotesize \NWlink{nuweb79c}{79c}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb79a}{79a}.}
 \item $\langle\,$Define key-press handler\nobreak\ {\footnotesize \NWlink{nuweb71a}{71a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb69}{69}.}
-\item $\langle\,$Definition of method \verb|print_current_state|\nobreak\ {\footnotesize \NWlink{nuweb78a}{78a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb76c}{76c}.}
-\item $\langle\,$Definition of method \verb|rendezvous_time_and_point_if_selected_by_horse|\nobreak\ {\footnotesize \NWlink{nuweb77}{77}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb76c}{76c}.}
-\item $\langle\,$Definition of method \verb|update_fly_trajectory|\nobreak\ {\footnotesize \NWlink{nuweb79c}{79c}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb76c}{76c}.}
-\item $\langle\,$Definition of the \verb|FlyState| class\nobreak\ {\footnotesize \NWlink{nuweb76c}{76c}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb76a}{76a}.}
-\item $\langle\,$Deploy \bm{F} to an unclaimed site if one exists and claim that site, otherwise retire \bm{F}\nobreak\ {\footnotesize \NWlink{nuweb80a}{80a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb76a}{76a}.}
-\item $\langle\,$Find the $k$-nearest sites to \verb|inithorseposn| for $k=$\verb|number_of_flies| and claim them\nobreak\ {\footnotesize \NWlink{nuweb78b}{78b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb76a}{76a}.}
-\item $\langle\,$Find the index of the fly \bm{F} which can meet the horse at the earliest, the rendezvous point $R$, and time till rendezvous\nobreak\ {\footnotesize \NWlink{nuweb79a}{79a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb76a}{76a}.}
+\item $\langle\,$Definition of method \verb|rendezvous_time_and_point_if_selected_by_horse|\nobreak\ {\footnotesize \NWlink{nuweb77d}{77d}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb76}{76}.}
+\item $\langle\,$Definition of method \verb|update_fly_trajectory|\nobreak\ {\footnotesize \NWlink{nuweb79a}{79a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb76}{76}.}
+\item $\langle\,$Definition of the \verb|FlyState| class\nobreak\ {\footnotesize \NWlink{nuweb76}{76}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb75}{75}.}
+\item $\langle\,$Deploy \bm{F} to an unclaimed site if one exists and claim that site, otherwise retire \bm{F}\nobreak\ {\footnotesize \NWlink{nuweb80b}{80b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb75}{75}.}
+\item $\langle\,$Find the $k$-nearest sites to \verb|inithorseposn| for $k=$\verb|number_of_flies| and claim them\nobreak\ {\footnotesize \NWlink{nuweb77a}{77a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb75}{75}.}
+\item $\langle\,$Find the index of the fly \bm{F} which can meet the horse at the earliest, the rendezvous point $R$, and time till rendezvous\nobreak\ {\footnotesize \NWlink{nuweb77c}{77c}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb75}{75}.}
 \item $\langle\,$Generate a bunch of uniform or non-uniform random points on the canvas\nobreak\ {\footnotesize \NWlink{nuweb72b}{72b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb71a}{71a}.}
-\item $\langle\,$Helper functions for \verb|algo_greedy_earliest_capture|\nobreak\ {\footnotesize \NWlink{nuweb76b}{76b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb76a}{76a}.}
-\item $\langle\,$Initialize one \verb|FlyState| object per fly for all flies\nobreak\ {\footnotesize \NWlink{nuweb78c}{78c}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb76a}{76a}.}
+\item $\langle\,$Helper functions for \verb|algo_greedy_earliest_capture|\nobreak\ {\footnotesize \NWlink{nuweb78a}{78a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb75}{75}.}
+\item $\langle\,$Initialize one \verb|FlyState| object per fly for all flies\nobreak\ {\footnotesize \NWlink{nuweb77b}{77b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb75}{75}.}
 \item $\langle\,$Local data-structures\nobreak\ {\footnotesize \NWlink{nuweb74a}{74a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb69}{69}.}
-\item $\langle\,$Make an animation of the schedule if \verb|animate_schedule_p == True|\nobreak\ {\footnotesize ?}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb76a}{76a}.}
 \item $\langle\,$Methods for \verb|MultipleFliesInput|\nobreak\ {\footnotesize \NWlink{nuweb74b}{74b}\NWlink{nuweb74c}{c}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb74a}{74a}.}
+\item $\langle\,$Move towards the provided rendezvous point\nobreak\ {\footnotesize \NWlink{nuweb79b}{79b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb79a}{79a}.}
+\item $\langle\,$Move towards the site mark site as serviced and then head towards rendezvous point\nobreak\ {\footnotesize \NWlink{nuweb79d}{79d}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb79a}{79a}.}
 \item $\langle\,$Relevant imports\nobreak\ {\footnotesize \NWlink{nuweb70a}{70a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb69}{69}.}
 \item $\langle\,$Select algorithm to execute\nobreak\ {\footnotesize \NWlink{nuweb72a}{72a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb71b}{71b}.}
+\item $\langle\,$Set algo-state and input-output files config\nobreak\ {\footnotesize \NWlink{nuweb80d}{80d}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb75}{75}.}
 \item $\langle\,$Set speed and number of flies\nobreak\ {\footnotesize \NWlink{nuweb71c}{71c}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb71b}{71b}.}
 \item $\langle\,$Set up interactive canvas\nobreak\ {\footnotesize \NWlink{nuweb73b}{73b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb69}{69}.}
 \item $\langle\,$Set up logging information relevant to this module\nobreak\ {\footnotesize \NWlink{nuweb70b}{70b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb69}{69}.}
 \item $\langle\,$Start entering input from the command-line\nobreak\ {\footnotesize \NWlink{nuweb71b}{71b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb71a}{71a}.}
-\item $\langle\,$Update fly trajectory in each \verb|FlyState| object till \bm{F} meets the horse at $R$\nobreak\ {\footnotesize \NWlink{nuweb79b}{79b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb76a}{76a}.}
-\item $\langle\,$Update \verb|current_horse_posn| and horse trajectory\nobreak\ {\footnotesize \NWlink{nuweb79d}{79d}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb76a}{76a}.}
-\item $\langle\,$Write algorithms current state to file, if \verb|write_algo_states_to_disk_p == True|\nobreak\ {\footnotesize ?}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb76a}{76a}.}
-\item $\langle\,$Write input and output to file if \verb|write_io_p == True|\nobreak\ {\footnotesize ?}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb76a}{76a}.}
+\item $\langle\,$Update fly trajectory in each \verb|FlyState| object till \bm{F} meets the horse at $R$\nobreak\ {\footnotesize \NWlink{nuweb78b}{78b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb75}{75}.}
+\item $\langle\,$Update \verb|current_horse_posn| and horse trajectory\nobreak\ {\footnotesize \NWlink{nuweb80a}{80a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb75}{75}.}
+\item $\langle\,$Write algorithms current state to file, if \verb|write_algo_states_to_disk_p == True|\nobreak\ {\footnotesize \NWlink{nuweb81}{81}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb75}{75}.}
+\item $\langle\,$Write input and output to file if \verb|write_io_p == True|\nobreak\ {\footnotesize \NWlink{nuweb82}{82}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb75}{75}.}
 \end{list}}
 \section{Chapter Index of Identifiers}
 
 {\small\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \verb@clearAllStates@: \NWlink{nuweb72b}{72b}\NWlink{nuweb73a}{, 73a}, \underline{\NWlink{nuweb74b}{74b}}.
 \item \verb@getTour@: \NWlink{nuweb72a}{72a}, \underline{\NWlink{nuweb74c}{74c}}.
-\item \verb@meeting_time_horse_fly_opp_dir@: \underline{\NWlink{nuweb76b}{76b}}\NWlink{nuweb77}{, 77}.
-\item \verb@rendezvous_time_and_point_if_selected_by_horse@: \underline{\NWlink{nuweb77}{77}}\NWlink{nuweb79a}{, 79a}.
+\item \verb@meeting_time_horse_fly_opp_dir@: \NWlink{nuweb77d}{77d}, \underline{\NWlink{nuweb78a}{78a}}.
+\item \verb@rendezvous_time_and_point_if_selected_by_horse@: \NWlink{nuweb77c}{77c}, \underline{\NWlink{nuweb77d}{77d}}.
 \item \verb@wrapperkeyPressHandler@: \underline{\NWlink{nuweb71a}{71a}}\NWlink{nuweb73b}{, 73b}.
 \end{list}} 
 %------------------------------------------------------
