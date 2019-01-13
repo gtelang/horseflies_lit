@@ -64,7 +64,7 @@ def wrapperEnterRunPoints(fig, ax, run):
                   
                  inithorseposn     = (event.xdata, event.ydata)
                  run.inithorseposn = inithorseposn  
-                 patchSize         = (xlim[1]-xlim[0])/70.0
+                 patchSize         = (xlim[1]-xlim[0])/100.0
 
                  ax.add_patch( mpl.patches.Circle( inithorseposn,radius = patchSize,
                                                    facecolor= '#D13131', edgecolor='black' ))
@@ -83,11 +83,10 @@ def wrapperEnterRunPoints(fig, ax, run):
 import numpy as np
 import colorsys
 
-def get_colors(num_colors):
+def get_colors(num_colors, lightness=0.2):
     colors=[]
     for i in np.arange(60., 360., 300. / num_colors):
         hue        = i/360.0
-        lightness  = 0.3
-        saturation = 0.9
+        saturation = 0.95
         colors.append(colorsys.hls_to_rgb(hue, lightness, saturation))
     return colors

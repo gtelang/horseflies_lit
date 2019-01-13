@@ -78,8 +78,8 @@ def run_handler():
                           print "Unknown option. No horsefly for you! ;-D "
                           sys.exit()
 
-
                     utils_graphics.applyAxCorrection(ax)
+                    plot_tour(ax, tour)
                     fig.canvas.draw()
                     
                     
@@ -155,7 +155,6 @@ class MultipleFliesInput:
       def clearAllStates (self):
          self.sites = []
          self.inithorseposn = ()
-      
       def getTour(self, algo, speedratio, number_of_flies):
             return algo(self.sites, self.inithorseposn, speedratio, number_of_flies)
       
@@ -271,7 +270,7 @@ class FlyState:
 def algo_greedy_earliest_capture(sites, inithorseposn, phi, number_of_flies,\
                                  write_algo_states_to_disk_p = True,\
                                  write_io_p                  = True,\
-                                 animate_schedule_p          = True):
+                                 animate_tour_p              = True) :
 
     # Set algo-state and input-output files config
     import sys, datetime, os, errno
@@ -292,7 +291,7 @@ def algo_greedy_earliest_capture(sites, inithorseposn, phi, number_of_flies,\
           number_of_flies = len(sites)
 
     current_horse_posn = np.asarray(inithorseposn)
-    horse_traj         = [current_horse_posn]
+    horse_traj         = [(current_horse_posn, None)]
 
     # Find the $k$-nearest sites to \verb|inithorseposn| for $k=$\verb|number_of_flies| and claim them
     from sklearn.neighbors import NearestNeighbors
@@ -314,7 +313,6 @@ def algo_greedy_earliest_capture(sites, inithorseposn, phi, number_of_flies,\
     all_flies_retired_p = False
 
     while (not all_flies_retired_p):
-       print "Algorithm State Number: ", algo_state_counter
        # Find the index of the fly \bm{F} which can meet the horse at the earliest, the rendezvous point $R$, and time till rendezvous
        imin  = 0
        rtmin = np.inf
@@ -335,7 +333,7 @@ def algo_greedy_earliest_capture(sites, inithorseposn, phi, number_of_flies,\
         
        # Update \verb|current_horse_posn| and horse trajectory
        current_horse_posn = rptmin
-       horse_traj.append(np.asarray(rptmin))
+       horse_traj.append((np.asarray(rptmin),imin))
        
        # Deploy \bm{F} to an unclaimed site if one exists and claim that site, otherwise retire \bm{F}
          
@@ -363,63 +361,161 @@ def algo_greedy_earliest_capture(sites, inithorseposn, phi, number_of_flies,\
        
        # Write algorithms current state to file, if \verb|write_algo_states_to_disk_p == True|
        
+       print "Algorithm State Number: ", algo_state_counter
        if write_algo_states_to_disk_p:
-            import yaml
             algo_state_file_name = 'algo_state_' + str(algo_state_counter).zfill(5) + '.yml'
 
             data = {'horse_trajectory' : horse_traj, \
-                    'fly_trajectories' : [flystates[i].get_trajectory() 
-                                          for i in range(number_of_flies)] }
-
-            with open(dir_name + '/' + algo_state_file_name, 'w') as outfile:
-                 yaml.dump( data, outfile, default_flow_style = False)
-            algo_state_counter += 1
+                    'fly_trajectories' : [flystates[i].get_trajectory() for i in range(number_of_flies)] }
+            utils_algo.write_to_yaml_file(data, dir_name=dir_name, file_name=algo_state_file_name)
+       algo_state_counter += 1
         
     
     # Write input and output to file if \verb|write_io_p == True|
     if write_io_p:
-        print Fore.GREEN, "Horse Trajectory is ", Style.RESET_ALL
-        utils_algo.print_list(horse_traj)
-        for i in range(number_of_flies):
-               print "Trajectory of Fly", i
-               utils_algo.print_list(flystates[i].get_trajectory())
-               print "----------------------------------------------"
-
-        fig, ax =  plt.subplots()
-        ax.set_xlim([utils_graphics.xlim[0], utils_graphics.xlim[1]])
-        ax.set_ylim([utils_graphics.ylim[0], utils_graphics.ylim[1]])
-        ax.set_aspect(1.0)
-        ax.set_xticks([])
-        ax.set_yticks([])
-      
-        # Plot the fly trajectories
-        # Place graphical elements in reverse order,
-        # i.e. from answer, all the way upto question. 
-        colors = utils_graphics.get_colors(number_of_flies)
-        for i in range(number_of_flies):
-           print i
-           xfs = [pt['coordinates'][0] for pt in flystates[i].get_trajectory()]
-           yfs = [pt['coordinates'][1] for pt in flystates[i].get_trajectory()]
-           ax.plot(xfs,yfs, '-', linewidth=1.0, color=colors[i])
-      
-        # Plot the horse trajectory
-        xhs = [ pt[0] for pt in horse_traj  ]
-        yhs = [ pt[1] for pt in horse_traj  ]
-        ax.plot(xhs,yhs, 'ro-',linewidth=3.0)
-
-        # Plot sites
-        xsites = [site[0] for site in sites]
-        ysites = [site[1] for site in sites]
-        ax.plot(xsites, ysites, 'bo')
-
-        # Plot initial horseposition
-        ax.plot([inithorseposn[0]], [inithorseposn[1]], 'ks', markersize=10.0)
-        plt.show()
+         data = { 'sites' : sites, \
+                  'inithorseposn' : inithorseposn,\
+                  'phi':phi,\
+                  'horse_trajectory' : horse_traj, \
+                  'fly_trajectories' : [flystates[i].get_trajectory() 
+                                       for i in range(number_of_flies)] }
+         utils_algo.write_to_yaml_file(data, dir_name = dir_name, file_name = io_file_name)
     
-    sys.exit()
+    # Animate compute tour if \verb|animate_tour_p == True|
+    if animate_tour_p:
+        animate_tour(sites            = sites, 
+                     inithorseposn    = inithorseposn, 
+                     phi              = phi, 
+                     horse_trajectory = horse_traj, 
+                     fly_trajectories = [flystates[i].get_trajectory() for i in range(number_of_flies)],
+                     animation_file_name_prefix = dir_name + '/' + io_file_name)
+    
+    # Return multiple flies tour
+    return {'sites' : sites, \
+              'inithorseposn' : inithorseposn,\
+              'phi':phi,\
+              'horse_trajectory': horse_traj, \
+              'fly_trajectories': [flystates[i].get_trajectory() for i in range(number_of_flies)]}
+    
 
 
+# Plotting routines
+
+def plot_tour(ax, tour):
+
+    sites            = tour['sites']
+    inithorseposn    = tour['inithorseposn']
+    phi              = tour['phi']
+    horse_trajectory = tour['horse_trajectory']
+    fly_trajectories = tour['fly_trajectories']
+
+    xhs = [ horse_trajectory[i][0][0] for i in range(len(horse_trajectory))]    
+    yhs = [ horse_trajectory[i][0][1] for i in range(len(horse_trajectory))]    
+
+    number_of_flies = len(fly_trajectories)
+    colors          = utils_graphics.get_colors(number_of_flies, lightness=0.5)
+
+    ax.cla()
+    utils_graphics.applyAxCorrection(ax)
+    ax.set_xticks([])
+    ax.set_yticks([])
+
+    # Plot fly trajectories
+    xfss = [[point['coordinates'][0] for point in fly_trajectories[i]] for i in range(len(fly_trajectories))]
+    yfss = [[point['coordinates'][1] for point in fly_trajectories[i]] for i in range(len(fly_trajectories))]
+ 
+    for xfs, yfs,i in zip(xfss,yfss,range(number_of_flies)):
+        ax.plot(xfs,yfs,color=colors[i], alpha=0.5)
+
+    # Plot sites along each flys tour
+    xfsitess = [ [point['coordinates'][0] for point in fly_trajectories[i] if point['type'] == 'site'] 
+                for i in range(len(fly_trajectories))]
+    yfsitess = [ [point['coordinates'][1] for point in fly_trajectories[i] if point['type'] == 'site'] 
+                for i in range(len(fly_trajectories))]
+    
+    for xfsites, yfsites, i in zip(xfsitess, yfsitess, range(number_of_flies)):
+        for xsite, ysite, j in zip(xfsites, yfsites, range(len(xfsites))):
+              ax.add_patch(mpl.patches.Circle((xsite,ysite), radius = 1.0/140, \
+                                              facecolor=colors[i], edgecolor='black'))
+              ax.text(xsite, ysite, str(j+1), horizontalalignment='center', 
+                                              verticalalignment='center'  , 
+                                              bbox=dict(facecolor=colors[i], alpha=1.0)) 
+    # Plot horse tour
+    ax.plot(xhs,yhs,'o-',markersize=5.0, linewidth=2.5, color='#D13131') 
+    
+    # Plot initial horseposn 
+    ax.add_patch( mpl.patches.Circle( inithorseposn,radius = 1.0/100,
+                                    facecolor= '#D13131', edgecolor='black'))
 
 
+# Animation routines
+def animate_tour(sites, inithorseposn, phi, horse_trajectory, fly_trajectories,animation_file_name_prefix):
+     import numpy as np
+     import matplotlib.animation as animation
+     from   matplotlib.patches import Circle
+     import matplotlib.pyplot as plt 
+
+     # Set up configurations and parameters for animation and plotting
+     
+     plt.rc('text', usetex=True)
+     plt.rc('font', family='serif')
+
+     fig, ax = plt.subplots()
+     ax.set_xlim([0,1])
+     ax.set_ylim([0,1])
+     ax.set_aspect('equal')
+
+     ax.set_xticks(np.arange(0, 1, 0.1))
+     ax.set_yticks(np.arange(0, 1, 0.1))
+
+     # Turn on the minor TICKS, which are required for the minor GRID
+     ax.minorticks_on()
+
+     # customize the major grid
+     ax.grid(which='major', linestyle='--', linewidth='0.3', color='red')
+
+     # Customize the minor grid
+     ax.grid(which='minor', linestyle=':', linewidth='0.3', color='black')
+
+     ax.get_xaxis().set_ticklabels([])
+     ax.get_yaxis().set_ticklabels([])
+
+     # Visually distinct colors for displaying each flys trajectory in a different color 
+     number_of_flies = len(fly_trajectories)
+     colors = utils_graphics.get_colors(number_of_flies)
+     
+     # Parse \verb|horse_trajectory| and \verb|fly_trajectories| and set up required data-structures
+     ax.set_title("Number of sites: " + str(len(sites)), fontsize=25)
+     ax.set_xlabel(r"$\varphi$ = " + str(phi), fontsize=20)
+
+     xhs = [ horse_trajectory[i][0][0] for i in range(len(horse_trajectory))]    
+     yhs = [ horse_trajectory[i][0][1] for i in range(len(horse_trajectory))]    
+
+     # x and y coordinates of each recorded vertex on every fly trajectory
+     xfss = [[point['coordinates'][0] for point in fly_trajectories[i]] for i in range(len(fly_trajectories))]
+     yfss = [[point['coordinates'][1] for point in fly_trajectories[i]] for i in range(len(fly_trajectories))]
+     
+     # Construct and store every frame of the animation in \verb|ims|
+     
+     # Extract the list of horse and fly legs along the horse and fly trajectories respectively
+        
+     
+     ims = []
+     for horse_leg, leg_idx in zip(horse_legs, range(len(horse_legs))):
+          debug(Fore.YELLOW + "Animating leg: "+ str(leg_idx) + Style.RESET_ALL)
+     
+     # Write animation of tour to disk and display in live window
+     from colorama import Back 
+
+     debug(Fore.BLACK + Back.WHITE + "\nStarted constructing ani object"+ Style.RESET_ALL)
+     ani = animation.ArtistAnimation(fig, ims, interval=50, blit=True, repeat_delay=1000)
+     debug(Fore.BLACK + Back.WHITE + "\nFinished constructing ani object"+ Style.RESET_ALL)
+
+     plt.show() # For displaying the animation in a live window. 
+
+     debug(Fore.MAGENTA + "\nStarted writing animation to disk"+ Style.RESET_ALL)
+     ani.save(animation_file_name_prefix+'.avi', dpi=150)
+     debug(Fore.MAGENTA + "\nFinished writing animation to disk"+ Style.RESET_ALL)
+     
 
 

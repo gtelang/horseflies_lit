@@ -74,3 +74,8 @@ def bunch_of_non_uniform_random_points(numpts):
     
 
     return points
+    
+def write_to_yaml_file(data, dir_name, file_name):
+   import yaml
+   with open(dir_name + '/' + file_name, 'w') as outfile:
+     yaml.dump( data, outfile, default_flow_style = False)

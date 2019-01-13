@@ -147,3 +147,47 @@ calculate the thing on the fly.
 %    #                          strategy compared to opt for multiple horseflies. 
 %    #     At the end of each chunk, update the horse position and process the next-chunk
 
+##################################################################################
+
+
+if write_io_p:
+    
+
+
+
+    #print Fore.GREEN, "Horse Trajectory is ", Style.RESET_ALL
+    #utils_algo.print_list(horse_traj)
+    #for i in range(number_of_flies):
+    #       print "Trajectory of Fly", i
+    #       utils_algo.print_list(flystates[i].get_trajectory())
+    #       print "----------------------------------------------"
+    fig, ax =  plt.subplots()
+    ax.set_xlim([utils_graphics.xlim[0], utils_graphics.xlim[1]])
+    ax.set_ylim([utils_graphics.ylim[0], utils_graphics.ylim[1]])
+    ax.set_aspect(1.0)
+    ax.set_xticks([])
+    ax.set_yticks([])
+  
+    # Plot the fly trajectories
+    # Place graphical elements in reverse order,
+    # i.e. from answer, all the way upto question. 
+    colors = utils_graphics.get_colors(number_of_flies)
+    for i in range(number_of_flies):
+       print i
+       xfs = [pt['coordinates'][0] for pt in flystates[i].get_trajectory()]
+       yfs = [pt['coordinates'][1] for pt in flystates[i].get_trajectory()]
+       ax.plot(xfs,yfs, '-', linewidth=1.0, color=colors[i])
+  
+    # Plot the horse trajectory
+    xhs = [ pt[0] for pt in horse_traj  ]
+    yhs = [ pt[1] for pt in horse_traj  ]
+    ax.plot(xhs,yhs, 'ro-',linewidth=3.0)
+
+    # Plot sites
+    xsites = [site[0] for site in sites]
+    ysites = [site[1] for site in sites]
+    ax.plot(xsites, ysites, 'bo')
+
+    # Plot initial horseposition
+    ax.plot([inithorseposn[0]], [inithorseposn[1]], 'ks', markersize=10.0)
+    plt.show()

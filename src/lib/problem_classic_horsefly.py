@@ -769,7 +769,7 @@ class PolicyBestInsertionNaive:
 def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
                                       insertion_policy_name       = "naive",
                                       write_algo_states_to_disk_p = False   ,
-                                      animate_schedule_p          = False   , 
+                                      animate_schedule_p          = True   , 
                                       post_optimizer              = None):
       # Set log, algo-state and input-output files config
         
@@ -1609,7 +1609,7 @@ def animateSchedule(schedule_file_name):
      ani = animation.ArtistAnimation(fig, ims, interval=50, blit=True, repeat_delay=1000)
      debug(Fore.BLACK + Back.WHITE + "\nFinished constructing ani object"+ Style.RESET_ALL)
 
-     #plt.show() # For displaying the animation in a live window. 
+     plt.show() # For displaying the animation in a live window. 
 
      debug(Fore.MAGENTA + "\nStarted writing animation to disk"+ Style.RESET_ALL)
      ani.save(schedule_file_name+'.avi', dpi=150)

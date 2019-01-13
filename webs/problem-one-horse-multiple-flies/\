@@ -80,7 +80,7 @@ def algo_greedy_earliest_capture(sites, inithorseposn, phi, number_of_flies,\
     
     @<Write input and output to file if \verb|write_io_p == True|@>
     @<Animate compute tour if \verb|animate_tour_p == True|@>
-    @<Return multiple flies tour@>
+    @<Return multiple flies tour with additional information @>
 @| @}
 %{/python-mode}%
 \section{Algorithmic Details}
@@ -405,13 +405,14 @@ if write_algo_states_to_disk_p:
      algo_state_file_name = 'algo_state_' + str(algo_state_counter).zfill(5) + '.yml'
 
      data = {'horse_trajectory' : horse_traj, \
-             'fly_trajectories' : [flystates[i].get_trajectory() for i in range(number_of_flies)] }
+             'fly_trajectories' : [flystates[i].get_trajectory() 
+                                   for i in range(number_of_flies)] }
      utils_algo.write_to_yaml_file(data, dir_name=dir_name, file_name=algo_state_file_name)
 algo_state_counter += 1
 @| @}
 %{/python-mode}%
 
-\vspace{-0.8cm} \newchunk Store input and output data for post analyses and plotting. 
+\vspace{-0.8cm} \newchunk Store input and output data for post analyses
 %{python-mode}%
 @D Write input and output to file if \verb|write_io_p == True|
 @{if write_io_p:
@@ -419,7 +420,7 @@ algo_state_counter += 1
               'inithorseposn' : inithorseposn,\
               'phi':phi,\
               'horse_trajectory' : horse_traj, \
-              'fly_trajectories' : [flystates[i].get_trajectory() 
+             'fly_trajectories' : [flystates[i].get_trajectory() 
                                    for i in range(number_of_flies)] }
      utils_algo.write_to_yaml_file(data, dir_name = dir_name, file_name = io_file_name)
 @| @}
@@ -429,22 +430,17 @@ algo_state_counter += 1
 %{python-mode}%
 @d Animate compute tour if \verb|animate_tour_p == True| 
 @{if animate_tour_p:
-    animate_tour(sites            = sites, 
-                 inithorseposn    = inithorseposn, 
-                 phi              = phi, 
-                 horse_trajectory = horse_traj, 
-                 fly_trajectories = [flystates[i].get_trajectory() for i in range(number_of_flies)],
-                 animation_file_name_prefix = dir_name + '/' + io_file_name)
+    animate_tour(horse_traj, [flystates[i].get_trajectory() for i in range(number_of_flies)]   )
 @| @}
 %{/python-mode}%
 
+
+
+
+
 \vspace{-0.8cm} \newchunk
 %{python-mode}%
-@d Return multiple flies tour 
-@{return {'sites' : sites, \
-          'inithorseposn' : inithorseposn,\
-          'phi':phi,\
-          'horse_trajectory': horse_traj, \
-          'fly_trajectories': [flystates[i].get_trajectory() for i in range(number_of_flies)]}
+@d Return multiple flies tour with additional information @{
+sys.exit()
 @| @}
 %{/python-mode}%
