@@ -486,6 +486,7 @@ def animate_tour(sites, inithorseposn, phi, horse_trajectory, fly_trajectories,a
 
      ax.set_title("Number of sites: " + str(len(sites)), fontsize=25)
      ax.set_xlabel(r"$\varphi$ = " + str(phi), fontsize=20)
+
      
      # Parse \verb|horse_trajectory| and \verb|fly_trajectories| and extract \verb|x| and \verb|y| coordinates along trajectories
      
@@ -573,9 +574,10 @@ def animate_tour(sites, inithorseposn, phi, horse_trajectory, fly_trajectories,a
           horse_leg = horse_legs[leg_idx]
           flies_leg = [fly_legs[leg_idx] for fly_legs in flies_legs   ]
 
+          # positions of the horse and flies within the current leg
           horse_posns = discretize_leg(horse_legs[leg_idx]) 
-          flies_posns = map(discretize_leg, flies_leg) 
-         
+          flies_posns = map(discretize_leg, flies_leg)
+          
           # all points on horse trajectory uptil the beginning of the current-leg
           hxs = [xhs[i] for i in range(0,leg_idx+1) ]
           hys = [yhs[i] for i in range(0,leg_idx+1) ]
@@ -584,13 +586,47 @@ def animate_tour(sites, inithorseposn, phi, horse_trajectory, fly_trajectories,a
           fxss = []
           fyss = []
           for i in range(number_of_flies):
-             fxss.extend( [ fly_leg[0][0] for fly_leg, j in zip(flies_legs[i], range(0, leg_idx+1)) if fly_leg != None] )
-             fyss.extend( [ fly_leg[0][1] for fly_leg, j in zip(flies_legs[i], range(0, leg_idx+1)) if fly_leg != None] )
+             fxss.append( [ fly_leg[0][0] for fly_leg, j in zip(flies_legs[i], range(0, leg_idx+1)) if fly_leg != None] )
+             fyss.append( [ fly_leg[0][1] for fly_leg, j in zip(flies_legs[i], range(0, leg_idx+1)) if fly_leg != None] )
 
-          
-          
-     print "Fuck you"
-     sys.exit()
+          for horse_posn, subleg_idx in zip(horse_posns,range(len(horse_posns))):
+               # Render frame and append it to \verb|ims|
+               
+               debug(Fore.RED + "Rendering subleg "+ str(subleg_idx) + Style.RESET_ALL)
+               hxs1 = hxs + [horse_posn[0]]
+               hys1 = hys + [horse_posn[1]]
+               horseline, = ax.plot(hxs1,hys1,'ro-', linewidth=5.0, markersize=6, alpha=1.00)
+
+               current_positions_of_flies = []
+               for i in range(number_of_flies):
+                   if flies_posns[i] != None :
+                       current_positions_of_flies.append(flies_posns[i][subleg_idx])
+                   else:
+                       current_positions_of_flies.append(fly_trajectories[i][-1]['coordinates'])
+
+               flylines = []
+               for fxs, fys, i in zip(fxss, fyss, range(len(fxss))):
+                   fxs1 = fxs + [current_positions_of_flies[i][0]]
+                   fys1 = fys + [current_positions_of_flies[i][1]]
+                   flyline, = ax.plot(fxs1,fys1,'o-', linewidth=1.0, markersize=3, color=colors[i])
+                   flylines.append(flyline)
+
+               objs = [horseline] 
+               objs.extend(flylines)
+
+
+               for site in sites:
+                   circle = Circle((site[0], site[1]), 0.02, \
+                                   facecolor = 'y'   , \
+                                   edgecolor = 'black'     , \
+                                   linewidth=1.4)
+                   sitepatch = ax.add_patch(circle)
+                   objs.append(sitepatch)
+
+
+               debug(Fore.CYAN + "Appending to ims "+ Style.RESET_ALL)
+               ims.append(objs[::-1])
+               
      
      # Write animation of tour to disk and display in live window
      from colorama import Back 
