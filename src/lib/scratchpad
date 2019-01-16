@@ -1,0 +1,43 @@
+trajectory_bundle     ---> Replaced
+active_legs_in_bundle
+
+fly_trajectory
+current_fly_leg
+
+This algorithm meets up with exactly one fly at each instance. 
+I will later have to generalize this to the case when it meets
+with multiple flies at once. 
+
+There are two "for" loops. 
+
+
+ims = [] is here. 
+- Iteration over all horse_legs
+- Iteration over all horse_posns 
+  within a particular leg.
+
+For each fly, keep a global partial array containing the trajectory 
+points covered so far. Have a dedicated function for rendering the 
+fly-trajectories. 
+
+if a fly-leg has three points, we know exactly at which position,
+within the leg the site will occur, based on the discretization function, 
+the moment you cross that boundary, make updates to the global partial array. 
+so make sure you keep track of the index of the current fly-position too. 
+I think that will be part of zipping in the header of a for loop. 
+
+Before passing the partial array, tack on the current position. 
+Then render those partial trajectories, insert the lines into the 
+ims array. Keeping partial trajectories, should also make the code
+much faster. 
+
+so all in all for rendering a trajectory just keep track of the 
+current position and the index within a leg. use the index 
+when you detect that the fly-leg has three points this will 
+correspond to a service leg. 
+
+Make initial site color a black circle, so that you can see who has 
+been serviced, because you are making dark points see the light,
+by spreading the bibles to each site. hahahahahaha...............
+
+

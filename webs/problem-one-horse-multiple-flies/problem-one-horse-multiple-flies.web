@@ -449,9 +449,6 @@ ax.set_xlabel(r"$\varphi$ = " + str(phi), fontsize=20)
 @{
 xhs = [ horse_trajectory[i][0][0] for i in range(len(horse_trajectory))]    
 yhs = [ horse_trajectory[i][0][1] for i in range(len(horse_trajectory))]    
-
-xfss = [[point['coordinates'][0] for point in fly_trajectories[i]] for i in range(len(fly_trajectories))]
-yfss = [[point['coordinates'][1] for point in fly_trajectories[i]] for i in range(len(fly_trajectories))]
 @| @}
 %{/python-mode}%
 
@@ -491,68 +488,40 @@ for leg_idx in range(len(horse_legs)):
      hxs = [xhs[i] for i in range(0,leg_idx+1) ]
      hys = [yhs[i] for i in range(0,leg_idx+1) ]
  
-     # all points on fly trajectories uptil the beginning of the current-leg
-     fxss = []
-     fyss = []
+     ###############################################################################################################
+     # All points on fly trajectories uptil the beginning of the current-leg or last site which ever is first
+     fxss, fyss = [], []
      for i in range(number_of_flies):
-        fxss.append( [ fly_leg[0][0] for fly_leg, j in zip(flies_legs[i], range(0, leg_idx+1)) if fly_leg != None] )
-        fyss.append( [ fly_leg[0][1] for fly_leg, j in zip(flies_legs[i], range(0, leg_idx+1)) if fly_leg != None] )
+         tmpx, tmpy = [], []
+         for fly_leg, j in zip(flies_legs[i], range(0,leg_idx+1)):
+              if fly_leg == None:
+                   break
+
+              elif len(fly_leg) == 2: 
+                   tmpx.append(fly_leg[0][0])
+                   tmpy.append(fly_leg[0][1])
+
+              elif len(fly_leg) == 3:
+                   tmpx.append(fly_leg[0][0])
+                   tmpy.append(fly_leg[0][1])
+                   # this is the site
+                   tmpx.append(fly_leg[1][0])
+                   tmpy.append(fly_leg[1][1])
+
+         fxss.append(tmpx)
+         fyss.append(tmpy)
+     #continue
+     #fxss = []
+     #fyss = []
+     #for i in range(number_of_flies):
+     #   fxss.append( [ fly_leg[0][0] for fly_leg, j in zip(flies_legs[i], range(0, leg_idx+1)) if fly_leg != None] )
+     #   fyss.append( [ fly_leg[0][1] for fly_leg, j in zip(flies_legs[i], range(0, leg_idx+1)) if fly_leg != None] )
+     ################################################################################################################
 
      for horse_posn, subleg_idx in zip(horse_posns,range(len(horse_posns))):
           @<Render frame and append it to \verb|ims|@>
 @| @}
 %{/python-mode}%
-
-
-
-\vspace{-0.8cm} \newchunk
-%{python-mode}%
-@d Render frame and append it to \verb|ims| @{
-debug(Fore.RED + "Rendering subleg "+ str(subleg_idx) + Style.RESET_ALL)
-hxs1 = hxs + [horse_posn[0]]
-hys1 = hys + [horse_posn[1]]
-horseline, = ax.plot(hxs1,hys1,'ro-', linewidth=5.0, markersize=6, alpha=1.00)
-
-current_positions_of_flies = []
-for i in range(number_of_flies):
-    if flies_posns[i] != None :
-        current_positions_of_flies.append(flies_posns[i][subleg_idx])
-    else:
-        current_positions_of_flies.append(fly_trajectories[i][-1]['coordinates'])
-
-flylines = []
-for fxs, fys, i in zip(fxss, fyss, range(len(fxss))):
-    fxs1 = fxs + [current_positions_of_flies[i][0]]
-    fys1 = fys + [current_positions_of_flies[i][1]]
-    
-    ################################################################
-    # Tack on a site to fxs, fys, if it has just serviced it, note that 
-    # .append will modify the element in place
-
-    
-    ################################################################
-    flyline, = ax.plot(fxs1,fys1,'o-', linewidth=1.0, markersize=3, color=colors[i])
-    flylines.append(flyline)
-
-objs = [horseline] 
-objs.extend(flylines)
-
-
-for site in sites:
-    circle = Circle((site[0], site[1]), 0.02, \
-                    facecolor = 'y'   , \
-                    edgecolor = 'black'     , \
-                    linewidth=1.4)
-    sitepatch = ax.add_patch(circle)
-    objs.append(sitepatch)
-
-
-debug(Fore.CYAN + "Appending to ims "+ Style.RESET_ALL)
-ims.append(objs[::-1])
-@| @}
-%{/python-mode}%
-
-
 
 
 \vspace{-0.8cm} \newchunk
@@ -604,6 +573,50 @@ assert(num_flies_legs.count(num_horse_legs) == len(num_flies_legs), \
 %{/python-mode}%
 
 
+\vspace{-0.8cm} \newchunk
+%{python-mode}%
+@d Render frame and append it to \verb|ims| @{
+debug(Fore.RED + "Rendering subleg "+ str(subleg_idx) + Style.RESET_ALL)
+hxs1 = hxs + [horse_posn[0]]
+hys1 = hys + [horse_posn[1]]
+horseline, = ax.plot(hxs1,hys1,'ro-', linewidth=5.0, markersize=6, alpha=1.00)
+
+current_positions_of_flies = []
+for i in range(number_of_flies):
+    if flies_posns[i] != None :
+        current_positions_of_flies.append(flies_posns[i][subleg_idx])
+    else:
+        current_positions_of_flies.append(fly_trajectories[i][-1]['coordinates'])
+
+flylines = []
+for fxs, fys, i in zip(fxss, fyss, range(len(fxss))):
+    fxs1 = fxs + [current_positions_of_flies[i][0]]
+    fys1 = fys + [current_positions_of_flies[i][1]]
+    
+    flyline, = ax.plot(fxs1,fys1,'o-', linewidth=1.0, markersize=3, color=colors[i])
+    flylines.append(flyline)
+
+objs = [horseline] 
+
+for site in sites:
+    circle = Circle((site[0], site[1]), 0.02, \
+                    facecolor = 'y'   , \
+                    edgecolor = 'black'     , \
+                    linewidth=1.4)
+    sitepatch = ax.add_patch(circle)
+    objs.append(sitepatch)
+
+objs.extend(flylines)
+
+debug(Fore.CYAN + "Appending to ims "+ Style.RESET_ALL)
+ims.append(objs[::-1])
+@| @}
+%{/python-mode}%
+
+
+
+
+
 %{python-mode}%
 @d Define function to place points along a leg 
 @{def discretize_leg(pts):
@@ -642,11 +655,11 @@ debug(Fore.BLACK + Back.WHITE + "\nStarted constructing ani object"+ Style.RESET
 ani = animation.ArtistAnimation(fig, ims, interval=50, blit=True, repeat_delay=1000)
 debug(Fore.BLACK + Back.WHITE + "\nFinished constructing ani object"+ Style.RESET_ALL)
 
-plt.show() # For displaying the animation in a live window. 
-
 debug(Fore.MAGENTA + "\nStarted writing animation to disk"+ Style.RESET_ALL)
 ani.save(animation_file_name_prefix+'.avi', dpi=150)
 debug(Fore.MAGENTA + "\nFinished writing animation to disk"+ Style.RESET_ALL)
+
+plt.show() # For displaying the animation in a live window. 
 @| @}
 %{/python-mode}%
 

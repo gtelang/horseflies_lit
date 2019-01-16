@@ -1,0 +1,27 @@
+There are several greedy strategies we can try, and since all are 
+reasonable give a detailed classificaiton of which scheme does better
+when, and rather than give an approximation algorithm for OPT, 
+
+just say withing how much distance two greedy strategies come within
+each other. 
+
+Note that my greedy strategy is better than the convex optimization
+of John in the sense, that if points are greedily revealed only along
+the way and nothing is revealed at once, you still have a way 
+to do somethiung without doing the global steps of solving TSP before
+and then the post-run convex optimization. 
+
+Another thing is to give bounds on how increasing the number of drones 
+in your strategy decreases the tour length. Again you don't need to do 
+this for OPT which might actually be very very difficuly. 
+
+You only need to do this for each of the greedy strategies. We will need 
+some sort of bounds involving only say the drones and the well-separated pair
+decomposition. 
+
+Also you might want to ask, by how much performing the convex optimization
+improve the length of the tour. 
+
+starbursts will be critical in the analysis of multiple drone heuristics. 
+can you reorganize the nearest neighbor computations and speed them up
+given the peculia nature of your operations, repeated as they are?
