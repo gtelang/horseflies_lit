@@ -386,62 +386,29 @@ def plot_tour(ax, tour):
 %{/python-mode}%
 
 \section{Animation routines}
-
-It is even more important to animate a multiple horseflies tour than for classic horsefly
-since it will yield greater geometric understanding of the heuristics implemented. With multiple
-flies the final result is just a mess of lines, with the final horse and flies tours together
-resembling a kindergarterner's immitation of a Jackson Pollock painting. 
-
-Here are the goal for the animation
-
-\begin{itemize}
-\item The path of the horse is rendered in a bold shade of red. 
-\item Unserviced sites are marked by black dots
-\item Each drone is assigned a color for its trajectory. The trajectory 
-      lines are all polygonal curves and are rendered with a somewhat transparent shade 
-      of its assigned color
-\item Serviced sites have a face-color which is the same assigned to the drone that served it. 
-      The face-colors are delibertely chosen using the HSV or HSL colorschemes; the colors 
-      chosen are on the brighter side. 
-\end{itemize}
-
-Ideally, I would like the animation to look like as if all the black dots (the circles) are
-disappearing one-by-one. Further one can also see which site was serviced by which drone. 
-
-A feature you might also want to add, is that at a key-press, you can focus only on the 
-tours of the horse and a particular fly along with the ordering chosen for that fly. 
-Thus for instance pressing ``a 4 12'' would animate the motion of drones 4 and 12, if there 
-are say 20 drones being used. Similarly, ``p 4 12'' would just plot the tour of the 4th 12th
-drone. i.e. we just specify a list of indices after ``a'' or ``p''. If one of the numbers in the 
-list is more than the number of drones, then we bleep a message at the command-line terminal
-to enter the corrected drone list again. 
-
-Now that the plan has been outlined, it is time to get down the nitty-gritties of the
-implementation. 
-
-\newchunk 
+\newchunk The following routine reads the tour in the io file written to disk by the various
+algorithms and animates the computed tour. The resulting animation is displayed in a separate 
+window, and also saved to disk in the provided directory as an \verb|.avi| file. 
 %{python-mode}%
-@d Animation routines @{   
-def animate_tour (sites, inithorseposn, phi, horse_trajectory, fly_trajectories, animation_file_name_prefix):
-    import numpy as np
-    import matplotlib.animation as animation
-    from   matplotlib.patches import Circle
-    import matplotlib.pyplot as plt 
+@d Animation routines 
+@{def animate_tour(sites, inithorseposn, phi, horse_trajectory, fly_trajectories,animation_file_name_prefix):
+     import numpy as np
+     import matplotlib.animation as animation
+     from   matplotlib.patches import Circle
+     import matplotlib.pyplot as plt 
 
-    @<Set up configurations and parameters for all necessary graphics@>
-    @<Parse trajectory information and convert trajectory representation to leg list form @>
-    @<Construct and store every frame of the animation in the \verb|ims| array@>
-    @<Write animation of tour to disk and display in live window@>
-@| @}
+     @<Set up configurations and parameters for animation and plotting@>
+     @<Parse \verb|horse_trajectory| and \verb|fly_trajectories| and extract \verb|x| and \verb|y| coordinates along trajectories@>
+     @<Construct and store every frame of the animation in \verb|ims| @>
+     @<Write animation of tour to disk and display in live window@>
+
+@| animate_tour @}
 %{/python-mode}%
 
 
-\vspace{-0.8cm} \newchunk It is important that we have a background grid (both a major and a minor) one for tracking the motion of the horse and drones to get a rough sense of 
-estimation of the distances involved while looking at the motion. Since multiple drones are used 
-I set up a \verb|colors| array containig the rgb values of colors that are chromatically distinct
-when viewed against a white canvas. 
+\vspace{-0.8cm} \newchunk 
 %{python-mode}%
-@D Set up configurations and parameters for all necessary graphics @{   
+@d Set up configurations and parameters for animation and plotting@{
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
 
@@ -467,70 +434,10 @@ ax.get_yaxis().set_ticklabels([])
 
 # Visually distinct colors for displaying each flys trajectory in a different color 
 number_of_flies = len(fly_trajectories)
-colors          = utils_graphics.get_colors(number_of_flies)
+colors = utils_graphics.get_colors(number_of_flies)
 
 ax.set_title("Number of sites: " + str(len(sites)), fontsize=25)
-ax.set_xlabel(r"$\varphi$ = " + str(phi) + "  Number of drones is " + str(number_of_flies), 
-              fontsize=20)
-@| @}
-%{/python-mode}%
-
-
-\vspace{-0.8cm} \newchunk For the purposes of animation it is most convenient to represent
-a trajectory not as a list of points, but as a list of ``legs''. In the case of the horse
-a leg is simply a single straight line segment joining two consecutive points on the tour. 
-
-For the fly a leg is either a single segment joining two successive points on the tour 
-of type \verb|genpt| or two successive segments whose vertices are respectively of type
-\verb|genpt|, \verb|site| and \verb|genpt|. \TODO{Insert diagram for representing what a leg is}
-
-To make the programming convenient, we will enforce the condition that all fly trajectories
-flies have the same number of legs as that of the horse's by padding \verb|None|
-elements at the end of each fly trajectory's ``leg-list'' representation. Legs of type 
-\verb|None| on a fly's trajectory indicate that the fly has been retired and hence has 
-stopped moving. 
-
-The leg list version of the horse and fly trajectories are respectively named 
-\verb|horse_traj_ll| and \verb|fly_trajs_ll|. 
-
-Note that the segment corresponding to each horse-leg also stores the index of the fly
-it meets up with at the head of the corresponding segment vector. 
-
-%{python-mode}%
-@d Parse trajectory information and convert trajectory representation to leg list form @{ 
-# Leg list form for all horse trajectories
-horse_traj_ll = []
-for i in range(len(horse_trajectory)-1):
-    horse_traj_ll.append((horse_trajectory[i][0], horse_trajectory[i+1][0], 
-                          horse_trajectory[i+1][1]))
-
-# Leg list form for all fly trajectories
-fly_trajs_ll = []
-for fly_traj in fly_trajectories:
-    fly_traj_ll = []
-    for i in range(len(fly_traj)-1):
-        if fly_traj[i]['type'] == 'gen_pt':
- 
-             if fly_traj[i+1]['type'] == 'gen_pt':
-                  fly_traj_ll.append((fly_traj[i], 
-                                      fly_traj[i+1]))
-                  
-    
-             elif fly_traj[i+1]['type'] == 'site':
-                  fly_traj_ll.append((fly_traj[i], \
-                                      fly_traj[i+1], \
-                                      fly_traj[i+2]))
-    fly_trajs_ll.append(fly_traj_ll)
-
-num_horse_legs = len(horse_traj_ll)
-
-# Append empty legs to fly trajectories so that leg counts 
-# for all fly trajectories are the same as that of the horse
-# trajectory
-for fly_traj in fly_trajs_ll:
-    m = len(fly_traj)
-    empty_legs = [None for i in range(num_horse_legs-len(fly_traj))]
-    fly_traj.extend(empty_legs)
+ax.set_xlabel(r"$\varphi$ = " + str(phi), fontsize=20)
 
 @| @}
 %{/python-mode}%
@@ -538,130 +445,218 @@ for fly_traj in fly_trajs_ll:
 
 \vspace{-0.8cm} \newchunk
 %{python-mode}%
-@D  Construct and store every frame of the animation in the \verb|ims| array @{   
-@<Define discretization function for a leg of the horse or fly tour@>
-ims               = []
-fly_sites_so_far  = [[] for i in range(number_of_flies)] # list of sites for each fly that have been covered so far
-
-for idx in range(len(horse_traj_ll)):
-    horse_leg = (horse_traj_ll[idx][0], horse_traj_ll[idx][1])
-    fly_legs  = [fly_trajs_ll[i][idx] for i in range(len(fly_trajs_ll)) ]
-
-    horse_leg_pts = horse_leg
-    fly_legs_pts  = []
-    for fly_leg in fly_legs:
-       if fly_leg != None:
-            coods = []
-            for pt in fly_leg:
-                 coods.append(pt['coordinates'])
-            fly_legs_pts.append(coods)
-       else:
-            fly_legs_pts.append(None)
-
-    horse_leg_disc = discretize_leg(horse_leg_pts)   # list of points 
-    fly_legs_disc  = map(discretize_leg, fly_legs_pts) # list of list of points 
-
-    # Each iteration of the following loop tacks on a new frame to ims
-    for k in range(len(horse_leg_disc['points'])):
-        current_horse_posn = horse_leg_disc['points'][k]
-        current_fly_posns  = []  # updated in the for loop below.
-        for j in range(len(fly_legs_disc)):
-              if fly_legs_disc[j] != None:
-                    print "********************"
-                    print Fore.RED, "Type of leg: ", fly_legs_disc[j]['legtype']
-                    print Fore.GREEN
-                    utils_algo.print_list(fly_legs_disc[j]['points'])
-                    print Style.RESET_ALL
-                    current_fly_posns.append(fly_legs_disc[j]['points'][k])
-                    # update the fly_points_so_far thing here depending on legtype
-                    print Fore.RED, j, " ", k, Style.RESET_ALL
-                    if fly_legs_disc[j]['legtype'] == 'gsg' and k==9:
-                          fly_sites_so_far[j].append(fly_legs_disc[j]['points'][k])
-              else: 
-                    current_fly_posns.append(None)
-        print "................................................."
-        print "Current horse position is", (current_horse_posn)
-        print "Current positions of flies are "
-        utils_algo.print_list(current_fly_posns)
-
-        ####----------------------------------------------------------------
-        ####.................... Graphics code goes here ...................
-        ####----------------------------------------------------------------
-        # Plot sites as black circles
-        # Plot trajectory of horse
-        # Plot trajectory of flies (no markers)
-        # Plot the end points of trajectories 
-        # Plot currently covered sites as colored circles
-
-
-print "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
-utils_algo.print_list(fly_sites_so_far)
-print "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
-utils_algo.print_list(sites)
-sys.exit()
+@d Parse \verb|horse_trajectory| and \verb|fly_trajectories| and extract \verb|x| and \verb|y| coordinates along trajectories
+@{
+xhs = [ horse_trajectory[i][0][0] for i in range(len(horse_trajectory))]    
+yhs = [ horse_trajectory[i][0][1] for i in range(len(horse_trajectory))]    
 @| @}
 %{/python-mode}%
 
 
 
-\vspace{-0.8cm} \newchunk This function just places a fixed number of points along each segment
-of a leg for both the horse and flies. This causes the horse and flies to move slowly along 
-short segments and faster on longer segments. To make the animation more uniform, you might 
-actually want to place the discretization points along the leg segments by a scheme of dividing 
-the length of the longest segment by the shortest segment, and then taking a multiple of 
-the answer's floor. For multiple flies, I would then take the greatest common divisor of these
-numbers and place points every so often along them. 
+\vspace{-0.8cm} \newchunk The \verb|ims| array stores each frame of the animation. Every frame consists of 
+various ``artist'' objects \footnote{This is Matplotlib terminology} (e.g. circles and segments) 
+which change dynamically as the positions of the horse and flies change. 
 
-But this scheme will take more time ti implement and not worth the extra work for now. 
+For the animation, we need to generalize the notion of fly-legs from that of the chapter on the Classic
+Horsefly problem. A recorded point on a fly's trajectory is marked as either of type ``genpt''(\verb|g|) 
+or ``site''(\verb|s|). Then a fly-leg is either a sequence of points of type ``\verb|gg|'' or ``\verb|gsg|''.  
+
+A horse-leg is, as before, is  a tuple of two successive points along its trajectory. 
+
+For both the horse and flies, their trajectories consist of their corresponding legs joined end-to-end. 
+
+\TODO{Draw a picture here illustrating the concept of a fly-leg, make light all parts of a trajectory 
+that are not part of a fly's leg. You can do all this in the same picture, again constructed with asymptote}
+
+%{python-mode}%
+@d Construct and store every frame of the animation in \verb|ims|@{
+@<Extract the list of horse and fly legs along the horse and fly trajectories respectively@>
+ims = []
+for leg_idx in range(len(horse_legs)):
+    
+     @<Define function to place points along a leg@>
+
+     horse_leg = horse_legs[leg_idx]
+     flies_leg = [fly_legs[leg_idx] for fly_legs in flies_legs   ]
+
+     # positions of the horse and flies within the current leg
+     horse_posns = discretize_leg(horse_legs[leg_idx]) 
+     flies_posns = map(discretize_leg, flies_leg)
+     
+     # all points on horse trajectory uptil the beginning of the current-leg
+     hxs = [xhs[i] for i in range(0,leg_idx+1) ]
+     hys = [yhs[i] for i in range(0,leg_idx+1) ]
  
+     ###############################################################################################################
+     # All points on fly trajectories uptil the beginning of the current-leg or last site which ever is first
+     fxss, fyss = [], []
+     for i in range(number_of_flies):
+         tmpx, tmpy = [], []
+         for fly_leg, j in zip(flies_legs[i], range(0,leg_idx+1)):
+              if fly_leg == None:
+                   break
+
+              elif len(fly_leg) == 2: 
+                   tmpx.append(fly_leg[0][0])
+                   tmpy.append(fly_leg[0][1])
+
+              elif len(fly_leg) == 3:
+                   tmpx.append(fly_leg[0][0])
+                   tmpy.append(fly_leg[0][1])
+                   # this is the site
+                   tmpx.append(fly_leg[1][0])
+                   tmpy.append(fly_leg[1][1])
+
+         fxss.append(tmpx)
+         fyss.append(tmpy)
+     #continue
+     #fxss = []
+     #fyss = []
+     #for i in range(number_of_flies):
+     #   fxss.append( [ fly_leg[0][0] for fly_leg, j in zip(flies_legs[i], range(0, leg_idx+1)) if fly_leg != None] )
+     #   fyss.append( [ fly_leg[0][1] for fly_leg, j in zip(flies_legs[i], range(0, leg_idx+1)) if fly_leg != None] )
+     ################################################################################################################
+
+     for horse_posn, subleg_idx in zip(horse_posns,range(len(horse_posns))):
+          @<Render frame and append it to \verb|ims|@>
+@| @}
+%{/python-mode}%
+
+
+\vspace{-0.8cm} \newchunk
 %{python-mode}%
-@d Define discretization function for a leg of the horse or fly tour @{
-def discretize_leg(pts):
-    subleg_pts = []
+@d Extract the list of horse and fly legs along the horse and fly trajectories respectively @{   
+horse_legs = zip(zip(xhs,yhs), zip(xhs,yhs)[1:])
+flies_legs = []
 
-    if pts == None:
-         return None
+for flytraj in fly_trajectories:
+    print ".................................................................."
+    utils_algo.print_list(flytraj)
+
+    fly_legs = []
+    
+    for i in range(len(flytraj)-1):
+          if flytraj[i]['type'] == 'site': 
+              continue                                  # a flyleg never begins with a site, so skip
+          else:
+              if flytraj[i+1]['type'] == 'site':
+                  leg = [flytraj[i]['coordinates'],     # gen_pt
+                         flytraj[i+1]['coordinates'],   # site
+                         flytraj[i+2]['coordinates']]   # gen_pt
+              else:
+                  leg = [flytraj[i]['coordinates'],     # gen_pt
+                         flytraj[i+1]['coordinates']]   # gen_pt
+              fly_legs.append(leg)
+
+    flies_legs.append(fly_legs)
+
+# Pad each flylegs with None
+# so that all flylegs have the same 
+# length. This makes it convenient for animation
+maxnumlegs = max(map(len,flies_legs))
+
+for fly_legs in flies_legs:
+    numlegs   = len(fly_legs)
+    emptylegs = [None for i in range(maxnumlegs-numlegs)] 
+    fly_legs.extend(emptylegs)
+
+# make sure number of horse legs and number of fly legs are the same
+num_horse_legs = len(horse_legs)
+num_flies_legs = [len(fly_legs) for fly_legs in flies_legs]
+
+# From https://stackoverflow.com/a/3844948 which mentions the efficient list method `.count` on 
+# how to check if all elements in a list are identical
+assert(num_flies_legs.count(num_horse_legs) == len(num_flies_legs), \
+       "Some fly trajectory does not have the same number of legs as the horse trajectory")
+@| @}
+%{/python-mode}%
+
+
+\vspace{-0.8cm} \newchunk
+%{python-mode}%
+@d Render frame and append it to \verb|ims| @{
+debug(Fore.RED + "Rendering subleg "+ str(subleg_idx) + Style.RESET_ALL)
+hxs1 = hxs + [horse_posn[0]]
+hys1 = hys + [horse_posn[1]]
+horseline, = ax.plot(hxs1,hys1,'ro-', linewidth=5.0, markersize=6, alpha=1.00)
+
+current_positions_of_flies = []
+for i in range(number_of_flies):
+    if flies_posns[i] != None :
+        current_positions_of_flies.append(flies_posns[i][subleg_idx])
     else:
-         numpts = len(pts)
+        current_positions_of_flies.append(fly_trajectories[i][-1]['coordinates'])
 
-         if numpts == 2:   # horse leg or fly-leg of type gg
-             k  = 19 
-             legtype = 'gg'
-         elif numpts == 3: # fly leg of type gsg 
-             k  = 10 
-             legtype = 'gsg'
+flylines = []
+for fxs, fys, i in zip(fxss, fyss, range(len(fxss))):
+    fxs1 = fxs + [current_positions_of_flies[i][0]]
+    fys1 = fys + [current_positions_of_flies[i][1]]
+    
+    flyline, = ax.plot(fxs1,fys1,'o-', linewidth=1.0, markersize=3, color=colors[i])
+    flylines.append(flyline)
 
-         pts = map(np.asarray, pts)
-         for p,q in zip(pts, pts[1:]):
-             tmp = []
-             for t in np.linspace(0,1,k): 
-                   tmp.append((1-t)*p + t*q) 
-             subleg_pts.extend(tmp[:-1])
+objs = [horseline] 
 
-         subleg_pts.append(pts[-1])
-         return {'points': subleg_pts, 
-                 'legtype'  : legtype}
+for site in sites:
+    circle = Circle((site[0], site[1]), 0.02, \
+                    facecolor = 'y'   , \
+                    edgecolor = 'black'     , \
+                    linewidth=1.4)
+    sitepatch = ax.add_patch(circle)
+    objs.append(sitepatch)
+
+objs.extend(flylines)
+
+debug(Fore.CYAN + "Appending to ims "+ Style.RESET_ALL)
+ims.append(objs[::-1])
 @| @}
 %{/python-mode}%
 
 
 
-\vspace{-0.8cm} \newchunk It is important that I save the the animation to disk before 
-I render the animation into a live window. If I do \verb|plt.show()| first, then after closing 
-the live-window the animation does not seem to get saved to disk and everything just hangs. 
 
-Not sure if this is only an Ubuntu thing. For the purposes of experiments, you just need to 
-comment the \verb|plt.show()| line, at the end of the block. 
+
 %{python-mode}%
-@d Write animation of tour to disk and display in live window @{   
-from colorama import Back 
+@d Define function to place points along a leg 
+@{def discretize_leg(pts):
+   subleg_pts = []
+
+   if pts == None:
+      return None
+   else:
+      numpts = len(pts)
+
+      if numpts == 2:   # horse leg or fly-leg of type gg
+           k  = 19 
+      elif numpts == 3: # fly leg of type gsg 
+           k  = 10 
+
+      pts = map(np.asarray, pts)
+      for p,q in zip(pts, pts[1:]):
+          tmp = []
+          for t in np.linspace(0,1,k): 
+              tmp.append((1-t)*p + t*q) 
+          subleg_pts.extend(tmp[:-1])
+
+      subleg_pts.append(pts[-1])
+      return subleg_pts
+@| @}
+%{/python-mode}%
+
+
+
+\vspace{-0.8cm} \newchunk
+%{python-mode}%
+@D Write animation of tour to disk and display in live window
+@{from colorama import Back 
 
 debug(Fore.BLACK + Back.WHITE + "\nStarted constructing ani object"+ Style.RESET_ALL)
 ani = animation.ArtistAnimation(fig, ims, interval=50, blit=True, repeat_delay=1000)
 debug(Fore.BLACK + Back.WHITE + "\nFinished constructing ani object"+ Style.RESET_ALL)
 
 debug(Fore.MAGENTA + "\nStarted writing animation to disk"+ Style.RESET_ALL)
-ani.save(animation_file_name_prefix+'.avi', dpi=250)
+ani.save(animation_file_name_prefix+'.avi', dpi=150)
 debug(Fore.MAGENTA + "\nFinished writing animation to disk"+ Style.RESET_ALL)
 
 plt.show() # For displaying the animation in a live window. 
