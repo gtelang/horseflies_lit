@@ -348,7 +348,7 @@ def plot_tour(ax, tour):
     yhs = [ horse_trajectory[i][0][1] for i in range(len(horse_trajectory))]    
 
     number_of_flies = len(fly_trajectories)
-    colors          = utils_graphics.get_colors(number_of_flies, lightness=0.5)
+    colors          = utils_graphics.get_colors(number_of_flies, lightness=0.4)
 
     ax.cla()
     utils_graphics.applyAxCorrection(ax)
@@ -360,7 +360,7 @@ def plot_tour(ax, tour):
     yfss = [[point['coordinates'][1] for point in fly_trajectories[i]] for i in range(len(fly_trajectories))]
  
     for xfs, yfs,i in zip(xfss,yfss,range(number_of_flies)):
-        ax.plot(xfs,yfs,color=colors[i], alpha=0.5)
+        ax.plot(xfs,yfs,color=colors[i], alpha=0.7)
 
     # Plot sites along each flys tour
     xfsitess = [ [point['coordinates'][0] for point in fly_trajectories[i] if point['type'] == 'site'] 
@@ -467,11 +467,10 @@ ax.get_yaxis().set_ticklabels([])
 
 # Visually distinct colors for displaying each flys trajectory in a different color 
 number_of_flies = len(fly_trajectories)
-colors          = utils_graphics.get_colors(number_of_flies)
+colors          = utils_graphics.get_colors(number_of_flies, lightness=0.5)
 
 ax.set_title("Number of sites: " + str(len(sites)), fontsize=25)
-ax.set_xlabel(r"$\varphi$ = " + str(phi) + "  Number of drones is " + str(number_of_flies), 
-              fontsize=20)
+ax.set_xlabel(r"$\varphi=$ " + str(phi) + "\nNumber of flies: " + str(number_of_flies), fontsize=20)
 @| @}
 %{/python-mode}%
 
@@ -540,67 +539,111 @@ for fly_traj in fly_trajs_ll:
 %{python-mode}%
 @D  Construct and store every frame of the animation in the \verb|ims| array @{   
 @<Define discretization function for a leg of the horse or fly tour@>
-ims               = []
-fly_sites_so_far  = [[] for i in range(number_of_flies)] # list of sites for each fly that have been covered so far
-
+ims                = []
+horse_points_so_far = []
+fly_points_so_far   = [[] for i in range(number_of_flies)] 
+fly_sites_so_far    = [[] for i in range(number_of_flies)] # each list is definitely a sublist of corresponding list in fly_points_so_far
 for idx in range(len(horse_traj_ll)):
+    # Get current horse-leg and update the list of points covered so far by the horse
     horse_leg = (horse_traj_ll[idx][0], horse_traj_ll[idx][1])
-    fly_legs  = [fly_trajs_ll[i][idx] for i in range(len(fly_trajs_ll)) ]
-
+    horse_points_so_far.append(horse_leg[0]) # attach the beginning point of the horse leg
     horse_leg_pts = horse_leg
+    #utils_algo.print_list(horse_points_so_far)
+    #print "....................................................."
+
+    fly_legs  = [fly_trajs_ll[i][idx] for i in range(len(fly_trajs_ll)) ]
     fly_legs_pts  = []
-    for fly_leg in fly_legs:
+    for fly_leg, i in zip(fly_legs, range(len(fly_legs))):
        if fly_leg != None:
             coods = []
             for pt in fly_leg:
                  coods.append(pt['coordinates'])
             fly_legs_pts.append(coods)
+            fly_points_so_far[i].append(coods[0]) # attaching the beginning point of the leg. Extension only 
+                                                  # happens for legs wqhich are not of type None, meshing well 
+                                                  # with the fact that fly has stopped moving. 
        else:
             fly_legs_pts.append(None)
 
+    # discretize current leg, for horse and fly, and for each point in the discretization
+    # render the frame. If a fly crosses a site, update the fly_points_so_far list
     horse_leg_disc = discretize_leg(horse_leg_pts)   # list of points 
     fly_legs_disc  = map(discretize_leg, fly_legs_pts) # list of list of points 
 
     # Each iteration of the following loop tacks on a new frame to ims
+    # this outer level for loop is just proceeding through each position
+    # in the discretized horse legs. This is the motion which coordinates
+    # the fly's motions
     for k in range(len(horse_leg_disc['points'])):
         current_horse_posn = horse_leg_disc['points'][k]
         current_fly_posns  = []  # updated in the for loop below.
         for j in range(len(fly_legs_disc)):
               if fly_legs_disc[j] != None:
-                    print "********************"
-                    print Fore.RED, "Type of leg: ", fly_legs_disc[j]['legtype']
-                    print Fore.GREEN
-                    utils_algo.print_list(fly_legs_disc[j]['points'])
-                    print Style.RESET_ALL
                     current_fly_posns.append(fly_legs_disc[j]['points'][k])
-                    # update the fly_points_so_far thing here depending on legtype
-                    print Fore.RED, j, " ", k, Style.RESET_ALL
-                    if fly_legs_disc[j]['legtype'] == 'gsg' and k==9:
+
+                    if fly_legs_disc[j]['legtype'] == 'gsg' and k==9: # yay, we just hit a site!
+                          fly_points_so_far[j].append(fly_legs_disc[j]['points'][k])
                           fly_sites_so_far[j].append(fly_legs_disc[j]['points'][k])
               else: 
                     current_fly_posns.append(None)
-        print "................................................."
-        print "Current horse position is", (current_horse_posn)
-        print "Current positions of flies are "
-        utils_algo.print_list(current_fly_posns)
-
-        ####----------------------------------------------------------------
-        ####.................... Graphics code goes here ...................
-        ####----------------------------------------------------------------
+        objs = []
         # Plot sites as black circles
+        for site in sites:
+             circle = Circle((site[0], site[1]), 0.01, \
+                              facecolor = 'k'   , \
+                              edgecolor = 'black'     , \
+                              linewidth=1.0)
+             sitepatch = ax.add_patch(circle)
+             objs.append(sitepatch)
+
         # Plot trajectory of horse
+        xhs = [pt[0] for pt in horse_points_so_far] + [current_horse_posn[0]]
+        yhs = [pt[1] for pt in horse_points_so_far] + [current_horse_posn[1]]
+        horseline, = ax.plot(xhs,yhs,'r-',linewidth=5.0, markersize=6, alpha=1.00)
+        objs.append(horseline)
         # Plot trajectory of flies (no markers)
-        # Plot the end points of trajectories 
+        assert(len(fly_points_so_far) == number_of_flies)
+        for ptraj, i in zip(fly_points_so_far, range(number_of_flies)):
+             print current_fly_posns[i]
+             if current_fly_posns[i] is None:
+                   xfs = [pt[0] for pt in ptraj]
+                   yfs = [pt[1] for pt in ptraj] 
+             else:
+                   xfs = [pt[0] for pt in ptraj] + [current_fly_posns[i][0]]
+                   yfs = [pt[1] for pt in ptraj] + [current_fly_posns[i][1]]
+
+             flyline, = ax.plot(xfs, yfs, '-', linewidth=2.5, alpha=0.30, color=colors[i])
+             objs.append(flyline)
+        # Plot the end points of trajectories only
         # Plot currently covered sites as colored circles
+        for sitelist, i in zip(fly_sites_so_far, range(number_of_flies)):
+           for site in sitelist:
+                 circle = Circle((site[0], site[1]), 0.015, \
+                                  facecolor = colors[i]   , \
+                                  edgecolor = 'black'     , \
+                                  linewidth=1.0)
+                 sitepatch = ax.add_patch(circle)
+                 objs.append(sitepatch)
 
 
-print "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
-utils_algo.print_list(fly_sites_so_far)
-print "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
-utils_algo.print_list(sites)
-sys.exit()
+        #debug(Fore.CYAN + "Appending to ims "+ Style.RESET_ALL)
+        ims.append(objs) # [::-1] means reverse the list
+
+# Write animation of tour to disk and display in live window
+from colorama import Back 
+
+debug(Fore.BLACK + Back.WHITE + "\nStarted constructing ani object"+ Style.RESET_ALL)
+ani = animation.ArtistAnimation(fig, ims, interval=40, blit=True, repeat_delay=1000)
+debug(Fore.BLACK + Back.WHITE + "\nFinished constructing ani object"+ Style.RESET_ALL)
+
+#debug(Fore.MAGENTA + "\nStarted writing animation to disk"+ Style.RESET_ALL)
+#ani.save(animation_file_name_prefix+'.avi', dpi=150)
+#debug(Fore.MAGENTA + "\nFinished writing animation to disk"+ Style.RESET_ALL)
+
+plt.show() # For displaying the animation in a live window. 
 @| @}
 %{/python-mode}%
+
 
 
 
