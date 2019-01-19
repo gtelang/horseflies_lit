@@ -573,7 +573,7 @@ for idx in range(len(horse_traj_ll)):
     # Each iteration of the following loop tacks on a new frame to ims
     # this outer level for loop is just proceeding through each position
     # in the discretized horse legs. This is the motion which coordinates
-    # the fly's motions
+    # the flys motions
     for k in range(len(horse_leg_disc['points'])):
         current_horse_posn = horse_leg_disc['points'][k]
         current_fly_posns  = []  # updated in the for loop below.
@@ -596,25 +596,24 @@ for idx in range(len(horse_traj_ll)):
              sitepatch = ax.add_patch(circle)
              objs.append(sitepatch)
 
-        # Plot trajectory of horse
-        xhs = [pt[0] for pt in horse_points_so_far] + [current_horse_posn[0]]
-        yhs = [pt[1] for pt in horse_points_so_far] + [current_horse_posn[1]]
-        horseline, = ax.plot(xhs,yhs,'r-',linewidth=5.0, markersize=6, alpha=1.00)
-        objs.append(horseline)
-        # Plot trajectory of flies (no markers)
+        # Plot trajectory of flies 
         assert(len(fly_points_so_far) == number_of_flies)
         for ptraj, i in zip(fly_points_so_far, range(number_of_flies)):
              print current_fly_posns[i]
              if current_fly_posns[i] is None:
                    xfs = [pt[0] for pt in ptraj]
                    yfs = [pt[1] for pt in ptraj] 
+    
              else:
                    xfs = [pt[0] for pt in ptraj] + [current_fly_posns[i][0]]
                    yfs = [pt[1] for pt in ptraj] + [current_fly_posns[i][1]]
 
              flyline, = ax.plot(xfs, yfs, '-', linewidth=2.5, alpha=0.30, color=colors[i])
+             flyloc   = Circle((xfs[-1], yfs[-1]), 0.01, facecolor = colors[i], alpha=0.7)
+             flypatch = ax.add_patch(flyloc)
+             objs.append(flypatch)
              objs.append(flyline)
-        # Plot the end points of trajectories only
+
         # Plot currently covered sites as colored circles
         for sitelist, i in zip(fly_sites_so_far, range(number_of_flies)):
            for site in sitelist:
@@ -625,22 +624,17 @@ for idx in range(len(horse_traj_ll)):
                  sitepatch = ax.add_patch(circle)
                  objs.append(sitepatch)
 
+        # Plot trajectory of horse
+        xhs = [pt[0] for pt in horse_points_so_far] + [current_horse_posn[0]]
+        yhs = [pt[1] for pt in horse_points_so_far] + [current_horse_posn[1]]
+        horseline, = ax.plot(xhs,yhs,'-',linewidth=5.0, markersize=6, alpha=1.00, color='#D13131')
+        horseloc   = Circle((current_horse_posn[0], current_horse_posn[1]), 0.01, facecolor = '#D13131', alpha=1.00)
+        horsepatch = ax.add_patch(horseloc)
+        objs.append(horsepatch)
+        objs.append(horseline)
 
-        #debug(Fore.CYAN + "Appending to ims "+ Style.RESET_ALL)
+        debug(Fore.CYAN + "Appending to ims "+ Style.RESET_ALL)
         ims.append(objs) # [::-1] means reverse the list
-
-# Write animation of tour to disk and display in live window
-from colorama import Back 
-
-debug(Fore.BLACK + Back.WHITE + "\nStarted constructing ani object"+ Style.RESET_ALL)
-ani = animation.ArtistAnimation(fig, ims, interval=40, blit=True, repeat_delay=1000)
-debug(Fore.BLACK + Back.WHITE + "\nFinished constructing ani object"+ Style.RESET_ALL)
-
-#debug(Fore.MAGENTA + "\nStarted writing animation to disk"+ Style.RESET_ALL)
-#ani.save(animation_file_name_prefix+'.avi', dpi=150)
-#debug(Fore.MAGENTA + "\nFinished writing animation to disk"+ Style.RESET_ALL)
-
-plt.show() # For displaying the animation in a live window. 
 @| @}
 %{/python-mode}%
 
@@ -703,9 +697,10 @@ debug(Fore.BLACK + Back.WHITE + "\nStarted constructing ani object"+ Style.RESET
 ani = animation.ArtistAnimation(fig, ims, interval=50, blit=True, repeat_delay=1000)
 debug(Fore.BLACK + Back.WHITE + "\nFinished constructing ani object"+ Style.RESET_ALL)
 
-debug(Fore.MAGENTA + "\nStarted writing animation to disk"+ Style.RESET_ALL)
-ani.save(animation_file_name_prefix+'.avi', dpi=250)
-debug(Fore.MAGENTA + "\nFinished writing animation to disk"+ Style.RESET_ALL)
+print "Mike testing, mike testing"
+#debug(Fore.MAGENTA + "\nStarted writing animation to disk"+ Style.RESET_ALL)
+#ani.save(animation_file_name_prefix+'.avi', dpi=250)
+#debug(Fore.MAGENTA + "\nFinished writing animation to disk"+ Style.RESET_ALL)
 
 plt.show() # For displaying the animation in a live window. 
 @| @}
