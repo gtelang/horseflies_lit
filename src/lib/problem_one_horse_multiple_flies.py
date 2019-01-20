@@ -486,7 +486,7 @@ def animate_tour (sites, inithorseposn, phi, horse_trajectory, fly_trajectories,
     colors          = utils_graphics.get_colors(number_of_flies, lightness=0.5)
 
     ax.set_title("Number of sites: " + str(len(sites)), fontsize=25)
-    ax.set_xlabel(r"$\varphi=$ " + str(phi) + "\nNumber of flies: " + str(number_of_flies), fontsize=20)
+    ax.set_xlabel(r"$\varphi=$ " + str(phi) + "\nNumber of drones: " + str(number_of_flies), fontsize=20)
     
     # Parse trajectory information and convert trajectory representation to leg list form
      
@@ -661,9 +661,9 @@ def animate_tour (sites, inithorseposn, phi, horse_trajectory, fly_trajectories,
     debug(Fore.BLACK + Back.WHITE + "\nFinished constructing ani object"+ Style.RESET_ALL)
 
     print "Mike testing, mike testing"
-    #debug(Fore.MAGENTA + "\nStarted writing animation to disk"+ Style.RESET_ALL)
-    #ani.save(animation_file_name_prefix+'.avi', dpi=250)
-    #debug(Fore.MAGENTA + "\nFinished writing animation to disk"+ Style.RESET_ALL)
+    debug(Fore.MAGENTA + "\nStarted writing animation to disk"+ Style.RESET_ALL)
+    ani.save(animation_file_name_prefix+'.avi', dpi=150)
+    debug(Fore.MAGENTA + "\nFinished writing animation to disk"+ Style.RESET_ALL)
 
     plt.show() # For displaying the animation in a live window. 
     

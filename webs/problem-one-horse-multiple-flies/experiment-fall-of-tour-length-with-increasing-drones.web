@@ -1,0 +1,132 @@
+\section{\framebox{Experiment}: Decrease  in Tour Length with a Larger Number of Drones} 
+
+\newchunk The point of using multiple drones is to get a further decrease in the tour-length of
+the horse. Being a super-difficult NP-hard problem, answering this question might seem 
+intractable. 
+
+However, as a proxy we study the drop in the tour length of the horse as the number of drones
+increases for the different heuristics. This might give us some kind of insight 
+into the rate of decrease for the original problem. My hope is that the decrease in tour
+length is linear (doubling the number of drones should decrease the tour-length by half)
+Different algorithms might give different rates of decrease and it would be a good idea to 
+compare them on this axis too.  Another point of interest would be if the rate of the fall
+of the tour length depends somehow on the speed ratio $\varphi$. All this looks like a job 
+for the design of experiments which I will study later exactly for this purpose of divising 
+good computational experiments. 
+
+\newchunk Thus far, only one algorithm has been implemented i.e. the earliest capture 
+heuristic. Whatever experimental setup, I do for this experiment will be equally valid 
+for other algorithms and for experiments in other chapters. 
+
+\newchunk How should the experiment be run? Well, all experiments go into a dedicated folder. 
+Each file has a dedicated main function, that coordinates the input and output required for 
+the experiment. All experimental output data will be stored as YAML files, for the sake of 
+later plotting. The resulting data-files will be written as run folders in the same \verb|expts|
+directory. The directory will be stamped with the time of the experiments. You might want to 
+keep a \verb|clean.sh| script to remove unnecessary folders and data-files. But the nature of the
+script will be revealed as I do the coding, not right now.... 
+
+\newchunk A point to note is that there will be no interative canvas involved here. Everything 
+will be dictated at the terminal. Further, many of the parameters under which the experiment 
+must be run will be dictated by command-line arguments. Examples of parameters relevant to this 
+particular experiment are 
+
+\begin{itemize}
+\item The speed-ratio $\varphi$. 
+\item The number $N$ of points chosen. 
+\item The initial position of the horse and flies (what I have been terming \verb|inithorseposn| in the codes). 
+\item The number $k$ of flies to be used in each run of the algorithm. 
+\item Other considerations that will come up during the run of the algorithm, that I will keep documenting above this line. 
+\end{itemize}
+
+There are lots of factors and lots of responses, indeed some consideration will have to be given to 
+the design of experiments for the comparison of various algorithms and giving algorithmic recommendations. 
+
+\newchunk Here is the layout of the experiment file. It will be good to have a 
+sophisticated parser to read command-line input as a python code especially for 
+lists when trying to specify the number of drones used as a list as a list 
+comprehension. 
+%{python-mode}%
+@o ../src/expts/expt_decrease_in_tour_length_with_larger_number_of_drones.py -cp 
+@{import sys, os
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib import rc
+from colorama import Fore, Back, Style
+import argparse 
+sys.path.append('../lib')
+import problem_one_horse_multiple_flies as ohmf
+import utils_graphics
+import utils_algo
+import scipy
+
+def expt(number_of_sites, scheme, inithorseposn, phi):
+    @<Set up a run data-struture for one horse multiple flies@>
+    @<Generate a point set of size $N$@>
+    @<Set up an list of $k$s which we will loop through and measure the corresponding tour-length@>
+    @<Run the selected algorithms for the various $k$s and generate plots of the tours @>
+    @<Plot lengths of tours against the number of drones@>
+
+if __name__ == "__main__":
+    expt(number_of_sites=10, scheme='uniform', inithorseposn=(0.2,0.5), phi=3)
+@|  @}
+%{/python-mode}%
+
+
+
+
+\vspace{-0.8cm} \newchunk This just sets up an empty data-structure whose members will be populated
+in the succeeding chunks. The \verb|MultipleFliesInput| data-structure stores the list of sites and 
+the initial horse position. 
+
+%{python-mode}%
+@d Set up a run data-struture for one horse multiple flies 
+@{run = ohmf.MultipleFliesInput()
+@| @}
+%{/python-mode}%
+
+
+\vspace{-0.8cm} \newchunk It makes sense to run an experiment against both uniform and non-uniform sets of sites. 
+%{python-mode}%
+@d Generate a point set of size $N$ 
+@{if scheme == 'nonuniform': 
+    run.sites = utils_algo.bunch_of_non_uniform_random_points(number_of_sites)
+elif scheme == 'uniform' : 
+    run.sites = scipy.rand(number_of_sites,2).tolist()
+else:
+    print "scheme not recognized"
+    sys.exit()
+
+run.inithorseposn = inithorseposn
+print run.sites
+@| @}
+%{/python-mode}%
+
+\vspace{-0.8cm} \newchunk It will be sufficient to test the decrease in the tour-length for values of 
+ks upto a small number say 20. Maybe for going to bigger and bigger data-sets it will make sense
+to increase the number of $k$s. 
+%{python-mode}%
+@d Set up an list of $k$s which we will loop through and measure the corresponding tour-length 
+@{#ks = range(1,20,2)   
+ks = [2,4]
+@| @}
+%{/python-mode}%
+
+\vspace{-0.8cm} \newchunk This is the main loop for genereating data. For different numbers of drones, we get the corresponding tour-lengths. These will be plotted in a succeeding chunk. 
+%{python-mode}%
+@d Run the selected algorithms for the various $k$s and generate plots of the tours 
+@{tour_lengths = []
+for k in ks:
+    tour = run.getTour(ohmf.algo_greedy_earliest_capture, phi, number_of_flies=k)
+    print tour
+    #tour_lengths.append(pass)
+@| @}
+%{/python-mode}%
+
+
+\vspace{-0.8cm} \newchunk
+%{python-mode}%
+@d Plot lengths of tours against the number of drones 
+@{fig, ax = plt.subplots()
+@| @}
+%{/python-mode}%

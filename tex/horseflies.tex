@@ -5425,7 +5425,7 @@ The list of possible algorithms are typically prefixed with \verb|algo_|.
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \NWtxtMacroDefBy\ \NWlink{nuweb74b}{74b}\NWlink{nuweb74c}{c}.
 \item \NWtxtMacroRefIn\ \NWlink{nuweb74a}{74a}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@getTour@\nobreak\ \NWlink{nuweb72a}{72a}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@getTour@\nobreak\ \NWlink{nuweb72a}{72a}\NWlink{nuweb92a}{, 92a}.
 \item{}
 \end{list}
 \vspace{4ex}
@@ -6286,7 +6286,7 @@ implementation.
 \mbox{}\verb@    @\hbox{$\langle\,${\itshape Set up configurations and parameters for all necessary graphics}\nobreak\ {\footnotesize \NWlink{nuweb84b}{84b}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@    @\hbox{$\langle\,${\itshape Parse trajectory information and convert trajectory representation to leg list form}\nobreak\ {\footnotesize \NWlink{nuweb86a}{86a}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@    @\hbox{$\langle\,${\itshape Construct and store every frame of the animation in the \verb|ims| array}\nobreak\ {\footnotesize \NWlink{nuweb86b}{86b}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@    @\hbox{$\langle\,${\itshape Write animation of tour to disk and display in live window}\nobreak\ {\footnotesize \NWlink{nuweb89b}{89b}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@    @\hbox{$\langle\,${\itshape Write animation of tour to disk and display in live window}\nobreak\ {\footnotesize \NWlink{nuweb89}{89}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
@@ -6436,7 +6436,7 @@ it meets up with at the head of the corresponding segment vector.
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@   @\\
-\mbox{}\verb@@\hbox{$\langle\,${\itshape Define discretization function for a leg of the horse or fly tour}\nobreak\ {\footnotesize \NWlink{nuweb89a}{89a}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@@\hbox{$\langle\,${\itshape Define discretization function for a leg of the horse or fly tour}\nobreak\ {\footnotesize \NWlink{nuweb88}{88}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@ims                = []@\\
 \mbox{}\verb@horse_points_so_far = []@\\
 \mbox{}\verb@fly_points_so_far   = [[] for i in range(number_of_flies)] @\\
@@ -6533,19 +6533,6 @@ it meets up with at the head of the corresponding segment vector.
 \mbox{}\verb@@\\
 \mbox{}\verb@        debug(Fore.CYAN + "Appending to ims "+ Style.RESET_ALL)@\\
 \mbox{}\verb@        ims.append(objs) # [::-1] means reverse the list@\\
-\mbox{}\verb@@\\
-\mbox{}\verb@# Write animation of tour to disk and display in live window@\\
-\mbox{}\verb@from colorama import Back @\\
-\mbox{}\verb@@\\
-\mbox{}\verb@debug(Fore.BLACK + Back.WHITE + "\nStarted constructing ani object"+ Style.RESET_ALL)@\\
-\mbox{}\verb@ani = animation.ArtistAnimation(fig, ims, interval=40, blit=True, repeat_delay=1000)@\\
-\mbox{}\verb@debug(Fore.BLACK + Back.WHITE + "\nFinished constructing ani object"+ Style.RESET_ALL)@\\
-\mbox{}\verb@@\\
-\mbox{}\verb@debug(Fore.MAGENTA + "\nStarted writing animation to disk"+ Style.RESET_ALL)@\\
-\mbox{}\verb@ani.save(animation_file_name_prefix+'.avi', dpi=250)@\\
-\mbox{}\verb@debug(Fore.MAGENTA + "\nFinished writing animation to disk"+ Style.RESET_ALL)@\\
-\mbox{}\verb@@\\
-\mbox{}\verb@plt.show() # For displaying the animation in a live window. @\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
@@ -6575,7 +6562,7 @@ But this scheme will take more time ti implement and not worth the extra work fo
 %{python-mode}%
 \begin{flushleft} \small
 \begin{minipage}{\linewidth}\label{scrap138}\raggedright\small
-\NWtarget{nuweb89a}{} $\langle\,${\itshape Define discretization function for a leg of the horse or fly tour}\nobreak\ {\footnotesize {89a}}$\,\rangle\equiv$
+\NWtarget{nuweb88}{} $\langle\,${\itshape Define discretization function for a leg of the horse or fly tour}\nobreak\ {\footnotesize {88}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
@@ -6628,7 +6615,7 @@ comment the \verb|plt.show()| line, at the end of the block.
 %{python-mode}%
 \begin{flushleft} \small
 \begin{minipage}{\linewidth}\label{scrap139}\raggedright\small
-\NWtarget{nuweb89b}{} $\langle\,${\itshape Write animation of tour to disk and display in live window}\nobreak\ {\footnotesize {89b}}$\,\rangle\equiv$
+\NWtarget{nuweb89}{} $\langle\,${\itshape Write animation of tour to disk and display in live window}\nobreak\ {\footnotesize {89}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@   @\\
@@ -6657,12 +6644,223 @@ comment the \verb|plt.show()| line, at the end of the block.
 \end{flushleft}
 %{/python-mode}%
 
+\newpage
+\section{\framebox{Experiment}: Decrease  in Tour Length with a Larger Number of Drones} 
+
+\newchunk The point of using multiple drones is to get a further decrease in the tour-length of
+the horse. Being a super-difficult NP-hard problem, answering this question might seem 
+intractable. 
+
+However, as a proxy we study the drop in the tour length of the horse as the number of drones
+increases for the different heuristics. This might give us some kind of insight 
+into the rate of decrease for the original problem. My hope is that the decrease in tour
+length is linear (doubling the number of drones should decrease the tour-length by half)
+Different algorithms might give different rates of decrease and it would be a good idea to 
+compare them on this axis too.  Another point of interest would be if the rate of the fall
+of the tour length depends somehow on the speed ratio $\varphi$. All this looks like a job 
+for the design of experiments which I will study later exactly for this purpose of divising 
+good computational experiments. 
+
+\newchunk Thus far, only one algorithm has been implemented i.e. the earliest capture 
+heuristic. Whatever experimental setup, I do for this experiment will be equally valid 
+for other algorithms and for experiments in other chapters. 
+
+\newchunk How should the experiment be run? Well, all experiments go into a dedicated folder. 
+Each file has a dedicated main function, that coordinates the input and output required for 
+the experiment. All experimental output data will be stored as YAML files, for the sake of 
+later plotting. The resulting data-files will be written as run folders in the same \verb|expts|
+directory. The directory will be stamped with the time of the experiments. You might want to 
+keep a \verb|clean.sh| script to remove unnecessary folders and data-files. But the nature of the
+script will be revealed as I do the coding, not right now.... 
+
+\newchunk A point to note is that there will be no interative canvas involved here. Everything 
+will be dictated at the terminal. Further, many of the parameters under which the experiment 
+must be run will be dictated by command-line arguments. Examples of parameters relevant to this 
+particular experiment are 
+
+\begin{itemize}
+\item The speed-ratio $\varphi$. 
+\item The number $N$ of points chosen. 
+\item The initial position of the horse and flies (what I have been terming \verb|inithorseposn| in the codes). 
+\item The number $k$ of flies to be used in each run of the algorithm. 
+\item Other considerations that will come up during the run of the algorithm, that I will keep documenting above this line. 
+\end{itemize}
+
+There are lots of factors and lots of responses, indeed some consideration will have to be given to 
+the design of experiments for the comparison of various algorithms and giving algorithmic recommendations. 
+
+\newchunk Here is the layout of the experiment file. It will be good to have a 
+sophisticated parser to read command-line input as a python code especially for 
+lists when trying to specify the number of drones used as a list as a list 
+comprehension. 
+%{python-mode}%
+\begin{flushleft} \small
+\begin{minipage}{\linewidth}\label{scrap140}\raggedright\small
+\NWtarget{nuweb91a}{} \verb@"../src/expts/expt_decrease_in_tour_length_with_larger_number_of_drones.py"@\nobreak\ {\footnotesize {91a}}$\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@import sys, os@\\
+\mbox{}\verb@import numpy as np@\\
+\mbox{}\verb@import matplotlib.pyplot as plt@\\
+\mbox{}\verb@from matplotlib import rc@\\
+\mbox{}\verb@from colorama import Fore, Back, Style@\\
+\mbox{}\verb@import argparse @\\
+\mbox{}\verb@sys.path.append('../lib')@\\
+\mbox{}\verb@import problem_one_horse_multiple_flies as ohmf@\\
+\mbox{}\verb@import utils_graphics@\\
+\mbox{}\verb@import utils_algo@\\
+\mbox{}\verb@import scipy@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@def expt(number_of_sites, scheme, inithorseposn, phi):@\\
+\mbox{}\verb@    @\hbox{$\langle\,${\itshape Set up a run data-struture for one horse multiple flies}\nobreak\ {\footnotesize \NWlink{nuweb91b}{91b}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@    @\hbox{$\langle\,${\itshape Generate a point set of size $N$}\nobreak\ {\footnotesize \NWlink{nuweb91c}{91c}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@    @\hbox{$\langle\,${\itshape Set up an list of $k$s which we will loop through and measure the corresponding tour-length}\nobreak\ {\footnotesize \NWlink{nuweb91d}{91d}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@    @\hbox{$\langle\,${\itshape Run the selected algorithms for the various $k$s and generate plots of the tours}\nobreak\ {\footnotesize \NWlink{nuweb92a}{92a}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@    @\hbox{$\langle\,${\itshape Plot lengths of tours against the number of drones}\nobreak\ {\footnotesize \NWlink{nuweb92b}{92b}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@if __name__ == "__main__":@\\
+\mbox{}\verb@    expt(number_of_sites=10, scheme='uniform', inithorseposn=(0.2,0.5), phi=3)@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+
+\item{}
+\end{list}
+\end{minipage}\vspace{4ex}
+\end{flushleft}
+%{/python-mode}%
 
 
 
-\needspace{17cm}
-\section{Local Utility Functions}
-\blindtext
+
+\vspace{-0.8cm} \newchunk This just sets up an empty data-structure whose members will be populated
+in the succeeding chunks. The \verb|MultipleFliesInput| data-structure stores the list of sites and 
+the initial horse position. 
+
+%{python-mode}%
+\begin{flushleft} \small
+\begin{minipage}{\linewidth}\label{scrap141}\raggedright\small
+\NWtarget{nuweb91b}{} $\langle\,${\itshape Set up a run data-struture for one horse multiple flies}\nobreak\ {\footnotesize {91b}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@run = ohmf.MultipleFliesInput()@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb91a}{91a}.
+
+\item{}
+\end{list}
+\end{minipage}\vspace{4ex}
+\end{flushleft}
+%{/python-mode}%
+
+
+\vspace{-0.8cm} \newchunk It makes sense to run an experiment against both uniform and non-uniform sets of sites. 
+%{python-mode}%
+\begin{flushleft} \small
+\begin{minipage}{\linewidth}\label{scrap142}\raggedright\small
+\NWtarget{nuweb91c}{} $\langle\,${\itshape Generate a point set of size $N$}\nobreak\ {\footnotesize {91c}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@if scheme == 'nonuniform': @\\
+\mbox{}\verb@    run.sites = utils_algo.bunch_of_non_uniform_random_points(number_of_sites)@\\
+\mbox{}\verb@elif scheme == 'uniform' : @\\
+\mbox{}\verb@    run.sites = scipy.rand(number_of_sites,2).tolist()@\\
+\mbox{}\verb@else:@\\
+\mbox{}\verb@    print "scheme not recognized"@\\
+\mbox{}\verb@    sys.exit()@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@run.inithorseposn = inithorseposn@\\
+\mbox{}\verb@print run.sites@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb91a}{91a}.
+
+\item{}
+\end{list}
+\end{minipage}\vspace{4ex}
+\end{flushleft}
+%{/python-mode}%
+
+\vspace{-0.8cm} \newchunk It will be sufficient to test the decrease in the tour-length for values of 
+ks upto a small number say 20. Maybe for going to bigger and bigger data-sets it will make sense
+to increase the number of $k$s. 
+%{python-mode}%
+\begin{flushleft} \small
+\begin{minipage}{\linewidth}\label{scrap143}\raggedright\small
+\NWtarget{nuweb91d}{} $\langle\,${\itshape Set up an list of $k$s which we will loop through and measure the corresponding tour-length}\nobreak\ {\footnotesize {91d}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@#ks = range(1,20,2)   @\\
+\mbox{}\verb@ks = [2,4]@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb91a}{91a}.
+
+\item{}
+\end{list}
+\end{minipage}\vspace{4ex}
+\end{flushleft}
+%{/python-mode}%
+
+\vspace{-0.8cm} \newchunk This is the main loop for genereating data. For different numbers of drones, we get the corresponding tour-lengths. These will be plotted in a succeeding chunk. 
+%{python-mode}%
+\begin{flushleft} \small
+\begin{minipage}{\linewidth}\label{scrap144}\raggedright\small
+\NWtarget{nuweb92a}{} $\langle\,${\itshape Run the selected algorithms for the various $k$s and generate plots of the tours}\nobreak\ {\footnotesize {92a}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@tour_lengths = []@\\
+\mbox{}\verb@for k in ks:@\\
+\mbox{}\verb@    tour = run.getTour(ohmf.algo_greedy_earliest_capture, phi, number_of_flies=k)@\\
+\mbox{}\verb@    print tour@\\
+\mbox{}\verb@    #tour_lengths.append(pass)@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb91a}{91a}.
+\item \NWtxtIdentsUsed\nobreak\  \verb@getTour@\nobreak\ \NWlink{nuweb74c}{74c}.
+\item{}
+\end{list}
+\end{minipage}\vspace{4ex}
+\end{flushleft}
+%{/python-mode}%
+
+
+\vspace{-0.8cm} \newchunk
+%{python-mode}%
+\begin{flushleft} \small
+\begin{minipage}{\linewidth}\label{scrap145}\raggedright\small
+\NWtarget{nuweb92b}{} $\langle\,${\itshape Plot lengths of tours against the number of drones}\nobreak\ {\footnotesize {92b}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@fig, ax = plt.subplots()@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb91a}{91a}.
+
+\item{}
+\end{list}
+\end{minipage}\vspace{4ex}
+\end{flushleft}
+%{/python-mode}%
+\newpage
 \section{Chapter Index of Fragments}
 
 {\small\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
@@ -6673,7 +6871,7 @@ comment the \verb|plt.show()| line, at the end of the block.
 \item $\langle\,$Clear canvas and states of all objects\nobreak\ {\footnotesize \NWlink{nuweb73a}{73a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb71a}{71a}.}
 \item $\langle\,$Construct and store every frame of the animation in the \verb|ims| array\nobreak\ {\footnotesize \NWlink{nuweb86b}{86b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb84a}{84a}.}
 \item $\langle\,$Continue moving towards the site\nobreak\ {\footnotesize \NWlink{nuweb80a}{80a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb79c}{79c}.}
-\item $\langle\,$Define discretization function for a leg of the horse or fly tour\nobreak\ {\footnotesize \NWlink{nuweb89a}{89a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb86b}{86b}.}
+\item $\langle\,$Define discretization function for a leg of the horse or fly tour\nobreak\ {\footnotesize \NWlink{nuweb88}{88}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb86b}{86b}.}
 \item $\langle\,$Define key-press handler\nobreak\ {\footnotesize \NWlink{nuweb71a}{71a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb69}{69}.}
 \item $\langle\,$Definition of method \verb|rendezvous_time_and_point_if_selected_by_horse|\nobreak\ {\footnotesize \NWlink{nuweb78b}{78b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb76b}{76b}.}
 \item $\langle\,$Definition of method \verb|update_fly_trajectory|\nobreak\ {\footnotesize \NWlink{nuweb79c}{79c}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb76b}{76b}.}
@@ -6682,6 +6880,7 @@ comment the \verb|plt.show()| line, at the end of the block.
 \item $\langle\,$Find the $k$-nearest sites to \verb|inithorseposn| for $k=$\verb|number_of_flies| and claim them\nobreak\ {\footnotesize \NWlink{nuweb77a}{77a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb76a}{76a}.}
 \item $\langle\,$Find the index of the fly \bm{F} which can meet the horse at the earliest, the rendezvous point $R$, and time till rendezvous\nobreak\ {\footnotesize \NWlink{nuweb78a}{78a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb76a}{76a}.}
 \item $\langle\,$Generate a bunch of uniform or non-uniform random points on the canvas\nobreak\ {\footnotesize \NWlink{nuweb72b}{72b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb71a}{71a}.}
+\item $\langle\,$Generate a point set of size $N$\nobreak\ {\footnotesize \NWlink{nuweb91c}{91c}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb91a}{91a}.}
 \item $\langle\,$Helper functions for \verb|algo_greedy_earliest_capture|\nobreak\ {\footnotesize \NWlink{nuweb79a}{79a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb76a}{76a}.}
 \item $\langle\,$Initialize one \verb|FlyState| object per fly for all flies\nobreak\ {\footnotesize \NWlink{nuweb77b}{77b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb76a}{76a}.}
 \item $\langle\,$Local data-structures\nobreak\ {\footnotesize \NWlink{nuweb74a}{74a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb69}{69}.}
@@ -6689,12 +6888,16 @@ comment the \verb|plt.show()| line, at the end of the block.
 \item $\langle\,$Move towards the provided rendezvous point\nobreak\ {\footnotesize \NWlink{nuweb79d}{79d}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb79c}{79c}.}
 \item $\langle\,$Move towards the site mark site as serviced and then head towards rendezvous point\nobreak\ {\footnotesize \NWlink{nuweb80b}{80b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb79c}{79c}.}
 \item $\langle\,$Parse trajectory information and convert trajectory representation to leg list form\nobreak\ {\footnotesize \NWlink{nuweb86a}{86a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb84a}{84a}.}
+\item $\langle\,$Plot lengths of tours against the number of drones\nobreak\ {\footnotesize \NWlink{nuweb92b}{92b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb91a}{91a}.}
 \item $\langle\,$Plotting routines\nobreak\ {\footnotesize \NWlink{nuweb83}{83}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb69}{69}.}
 \item $\langle\,$Relevant imports\nobreak\ {\footnotesize \NWlink{nuweb70a}{70a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb69}{69}.}
 \item $\langle\,$Return multiple flies tour\nobreak\ {\footnotesize \NWlink{nuweb82c}{82c}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb76a}{76a}.}
+\item $\langle\,$Run the selected algorithms for the various $k$s and generate plots of the tours\nobreak\ {\footnotesize \NWlink{nuweb92a}{92a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb91a}{91a}.}
 \item $\langle\,$Select algorithm to execute\nobreak\ {\footnotesize \NWlink{nuweb72a}{72a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb71b}{71b}.}
 \item $\langle\,$Set algo-state and input-output files config\nobreak\ {\footnotesize \NWlink{nuweb81b}{81b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb76a}{76a}.}
 \item $\langle\,$Set speed and number of flies\nobreak\ {\footnotesize \NWlink{nuweb71c}{71c}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb71b}{71b}.}
+\item $\langle\,$Set up a run data-struture for one horse multiple flies\nobreak\ {\footnotesize \NWlink{nuweb91b}{91b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb91a}{91a}.}
+\item $\langle\,$Set up an list of $k$s which we will loop through and measure the corresponding tour-length\nobreak\ {\footnotesize \NWlink{nuweb91d}{91d}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb91a}{91a}.}
 \item $\langle\,$Set up configurations and parameters for all necessary graphics\nobreak\ {\footnotesize \NWlink{nuweb84b}{84b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb84a}{84a}.}
 \item $\langle\,$Set up interactive canvas\nobreak\ {\footnotesize \NWlink{nuweb73b}{73b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb69}{69}.}
 \item $\langle\,$Set up logging information relevant to this module\nobreak\ {\footnotesize \NWlink{nuweb70b}{70b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb69}{69}.}
@@ -6702,14 +6905,14 @@ comment the \verb|plt.show()| line, at the end of the block.
 \item $\langle\,$Update fly trajectory in each \verb|FlyState| object till \bm{F} meets the horse at $R$\nobreak\ {\footnotesize \NWlink{nuweb79b}{79b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb76a}{76a}.}
 \item $\langle\,$Update \verb|current_horse_posn| and horse trajectory\nobreak\ {\footnotesize \NWlink{nuweb80c}{80c}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb76a}{76a}.}
 \item $\langle\,$Write algorithms current state to file, if \verb|write_algo_states_to_disk_p == True|\nobreak\ {\footnotesize \NWlink{nuweb81c}{81c}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb76a}{76a}.}
-\item $\langle\,$Write animation of tour to disk and display in live window\nobreak\ {\footnotesize \NWlink{nuweb89b}{89b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb84a}{84a}.}
+\item $\langle\,$Write animation of tour to disk and display in live window\nobreak\ {\footnotesize \NWlink{nuweb89}{89}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb84a}{84a}.}
 \item $\langle\,$Write input and output to file if \verb|write_io_p == True|\nobreak\ {\footnotesize \NWlink{nuweb82a}{82a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb76a}{76a}.}
 \end{list}}
 \section{Chapter Index of Identifiers}
 
 {\small\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \verb@clearAllStates@: \NWlink{nuweb72b}{72b}\NWlink{nuweb73a}{, 73a}, \underline{\NWlink{nuweb74b}{74b}}.
-\item \verb@getTour@: \NWlink{nuweb72a}{72a}, \underline{\NWlink{nuweb74c}{74c}}.
+\item \verb@getTour@: \NWlink{nuweb72a}{72a}, \underline{\NWlink{nuweb74c}{74c}}\NWlink{nuweb92a}{, 92a}.
 \item \verb@meeting_time_horse_fly_opp_dir@: \NWlink{nuweb78b}{78b}, \underline{\NWlink{nuweb79a}{79a}}.
 \item \verb@rendezvous_time_and_point_if_selected_by_horse@: \NWlink{nuweb78a}{78a}, \underline{\NWlink{nuweb78b}{78b}}.
 \item \verb@wrapperkeyPressHandler@: \underline{\NWlink{nuweb71a}{71a}}\NWlink{nuweb73b}{, 73b}.
@@ -6724,6 +6927,7 @@ comment the \verb|plt.show()| line, at the end of the block.
 
 {\small\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \verb@"../main.py"@ {\footnotesize {\NWtxtDefBy} \NWlink{nuweb12}{12}.}
+\item \verb@"../src/expts/expt_decrease_in_tour_length_with_larger_number_of_drones.py"@ {\footnotesize {\NWtxtDefBy} \NWlink{nuweb91a}{91a}.}
 \item \verb@"../src/lib/problem_classic_horsefly.py"@ {\footnotesize {\NWtxtDefBy} \NWlink{nuweb20a}{20a}.}
 \item \verb@"../src/lib/problem_one_horse_multiple_flies.py"@ {\footnotesize {\NWtxtDefBy} \NWlink{nuweb69}{69}.}
 \item \verb@"../src/lib/utils_algo.py"@ {\footnotesize {\NWtxtDefBy} \NWlink{nuweb17a}{17a}\NWlink{nuweb17b}{b}\NWlink{nuweb18a}{, 18a}\NWlink{nuweb18b}{b}\NWlink{nuweb18c}{c}\NWlink{nuweb18d}{d}\NWlink{nuweb18e}{e}\NWlink{nuweb18f}{f}\NWlink{nuweb19c}{, 19c}.

@@ -470,7 +470,7 @@ number_of_flies = len(fly_trajectories)
 colors          = utils_graphics.get_colors(number_of_flies, lightness=0.5)
 
 ax.set_title("Number of sites: " + str(len(sites)), fontsize=25)
-ax.set_xlabel(r"$\varphi=$ " + str(phi) + "\nNumber of flies: " + str(number_of_flies), fontsize=20)
+ax.set_xlabel(r"$\varphi=$ " + str(phi) + "\nNumber of drones: " + str(number_of_flies), fontsize=20)
 @| @}
 %{/python-mode}%
 
@@ -706,12 +706,10 @@ plt.show() # For displaying the animation in a live window.
 @| @}
 %{/python-mode}%
 
+\newpage
+@i problem-one-horse-multiple-flies/experiment-fall-of-tour-length-with-increasing-drones.web
 
-
-
-\needspace{17cm}
-\section{Local Utility Functions}
-\blindtext
+\newpage
 \section{Chapter Index of Fragments}
 @m
 \section{Chapter Index of Identifiers}
