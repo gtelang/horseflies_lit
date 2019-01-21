@@ -48,7 +48,8 @@ lists when trying to specify the number of drones used as a list as a list
 comprehension. 
 %{python-mode}%
 @o ../src/expts/expt_decrease_in_tour_length_with_larger_number_of_drones.py -cp 
-@{import sys, os
+@{
+import sys, os
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import rc
@@ -59,74 +60,53 @@ import problem_one_horse_multiple_flies as ohmf
 import utils_graphics
 import utils_algo
 import scipy
+import matplotlib as mpl
 
 def expt(number_of_sites, scheme, inithorseposn, phi):
-    @<Set up a run data-struture for one horse multiple flies@>
-    @<Generate a point set of size $N$@>
-    @<Set up an list of $k$s which we will loop through and measure the corresponding tour-length@>
-    @<Run the selected algorithms for the various $k$s and generate plots of the tours @>
-    @<Plot lengths of tours against the number of drones@>
+  plt.rc('text', usetex=True)
+  plt.rc('font', family='serif')
+  fig, ax = plt.subplots()
+  ax.set_title("Tour Length v/s Number of Drones for Earliest Capture Heuristic, $N$="+str(number_of_sites) + " ("+scheme+")", fontsize=28)
+  ax.set_xlabel("Number of Drones", fontsize=25)
+  ax.set_ylabel("Tour Length", fontsize=25)
+  plt.grid(True, linestyle='--')
+  
+  textstr = r"$\varphi$=" + str(phi)
+  ax.text(0.85, 0.95, textstr, transform=ax.transAxes, fontsize=40,
+        verticalalignment='top')
+  plt.tick_params(labelsize=20)
+
+  for i in range(5):
+      # Generate a point set of size $N$
+      if scheme == 'nonuniform': 
+         sites = utils_algo.bunch_of_non_uniform_random_points(number_of_sites)
+      elif scheme == 'uniform' : 
+         sites = scipy.rand(number_of_sites,2).tolist()
+      else:
+          print "scheme not recognized"
+          sys.exit()
+
+      ks           = range(2,40,4)
+      tour_lengths = []
+      for k in ks:
+          tour = ohmf.algo_greedy_earliest_capture(sites=sites, 
+                                                   inithorseposn=inithorseposn, 
+                                                   phi=phi, 
+                                                   number_of_flies=k,
+                                                   write_algo_states_to_disk_p = False,\
+                                                   write_io_p                  = False,\
+                                                   animate_tour_p              = False)
+          horse_traj_pts = map(lambda x: x[0], tour['horse_trajectory'])
+          tour_lengths.append(utils_algo.length_polygonal_chain(horse_traj_pts))
+
+      ax.plot(ks, tour_lengths, "o-", linewidth=2.5)
+
+  plt.show()
+
 
 if __name__ == "__main__":
-    expt(number_of_sites=10, scheme='uniform', inithorseposn=(0.2,0.5), phi=3)
+    expt(number_of_sites=100, scheme='uniform', inithorseposn=(0.5,0.5), phi=3.0)
 @|  @}
 %{/python-mode}%
 
 
-
-
-\vspace{-0.8cm} \newchunk This just sets up an empty data-structure whose members will be populated
-in the succeeding chunks. The \verb|MultipleFliesInput| data-structure stores the list of sites and 
-the initial horse position. 
-
-%{python-mode}%
-@d Set up a run data-struture for one horse multiple flies 
-@{run = ohmf.MultipleFliesInput()
-@| @}
-%{/python-mode}%
-
-
-\vspace{-0.8cm} \newchunk It makes sense to run an experiment against both uniform and non-uniform sets of sites. 
-%{python-mode}%
-@d Generate a point set of size $N$ 
-@{if scheme == 'nonuniform': 
-    run.sites = utils_algo.bunch_of_non_uniform_random_points(number_of_sites)
-elif scheme == 'uniform' : 
-    run.sites = scipy.rand(number_of_sites,2).tolist()
-else:
-    print "scheme not recognized"
-    sys.exit()
-
-run.inithorseposn = inithorseposn
-print run.sites
-@| @}
-%{/python-mode}%
-
-\vspace{-0.8cm} \newchunk It will be sufficient to test the decrease in the tour-length for values of 
-ks upto a small number say 20. Maybe for going to bigger and bigger data-sets it will make sense
-to increase the number of $k$s. 
-%{python-mode}%
-@d Set up an list of $k$s which we will loop through and measure the corresponding tour-length 
-@{#ks = range(1,20,2)   
-ks = [2,4]
-@| @}
-%{/python-mode}%
-
-\vspace{-0.8cm} \newchunk This is the main loop for genereating data. For different numbers of drones, we get the corresponding tour-lengths. These will be plotted in a succeeding chunk. 
-%{python-mode}%
-@d Run the selected algorithms for the various $k$s and generate plots of the tours 
-@{tour_lengths = []
-for k in ks:
-    tour = run.getTour(ohmf.algo_greedy_earliest_capture, phi, number_of_flies=k)
-    print tour
-    #tour_lengths.append(pass)
-@| @}
-%{/python-mode}%
-
-
-\vspace{-0.8cm} \newchunk
-%{python-mode}%
-@d Plot lengths of tours against the number of drones 
-@{fig, ax = plt.subplots()
-@| @}
-%{/python-mode}%

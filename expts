@@ -1,0 +1,10 @@
+- Greedy incremental, post optimizer LP/SLSQP.
+     I am not aplying this inside the body of the function. 
+     Igt should be applied just after the *.........while loop......*
+- Collinear horseflies tour length / That obtained after post optimizer
+- Greedy incremental with post=optimizer/TSP with post-optimizer
+- Greedy incremental vs/ wweight of phi mst, is it good? 
+  An example where the algorithm greedy gives better example than phi-=mst
+
+
+All these, do not add to interactive right now except for first. 

@@ -1591,7 +1591,7 @@ def animateSchedule(schedule_file_name):
                    else:                                  # site has not been serviced
                        sitecolor = 'blue'
 
-                   circle = Circle((site[0], site[1]), 0.02, \
+                   circle = Circle((site[0], site[1]), 0.015, \
                                    facecolor = sitecolor   , \
                                    edgecolor = 'black'     , \
                                    linewidth=1.4)

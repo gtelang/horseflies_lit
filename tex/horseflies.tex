@@ -4714,7 +4714,7 @@ job of the \verb|if subleg_idx==9| block in the code-fragment below. The magic-n
 \mbox{}\verb@    else:                                  # site has not been serviced@\\
 \mbox{}\verb@        sitecolor = 'blue'@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@    circle = Circle((site[0], site[1]), 0.02, \@\\
+\mbox{}\verb@    circle = Circle((site[0], site[1]), 0.015, \@\\
 \mbox{}\verb@                    facecolor = sitecolor   , \@\\
 \mbox{}\verb@                    edgecolor = 'black'     , \@\\
 \mbox{}\verb@                    linewidth=1.4)@\\
@@ -5425,7 +5425,7 @@ The list of possible algorithms are typically prefixed with \verb|algo_|.
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \NWtxtMacroDefBy\ \NWlink{nuweb74b}{74b}\NWlink{nuweb74c}{c}.
 \item \NWtxtMacroRefIn\ \NWlink{nuweb74a}{74a}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@getTour@\nobreak\ \NWlink{nuweb72a}{72a}\NWlink{nuweb92a}{, 92a}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@getTour@\nobreak\ \NWlink{nuweb72a}{72a}.
 \item{}
 \end{list}
 \vspace{4ex}
@@ -6338,8 +6338,11 @@ when viewed against a white canvas.
 \mbox{}\verb@number_of_flies = len(fly_trajectories)@\\
 \mbox{}\verb@colors          = utils_graphics.get_colors(number_of_flies, lightness=0.5)@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@ax.set_title("Number of sites: " + str(len(sites)), fontsize=25)@\\
-\mbox{}\verb@ax.set_xlabel(r"$\varphi=$ " + str(phi) + "\nNumber of flies: " + str(number_of_flies), fontsize=20)@\\
+\mbox{}\verb@horse_trajectory_pts = map(lambda x: x[0], horse_trajectory)@\\
+\mbox{}\verb@tour_length = utils_algo.length_polygonal_chain(horse_trajectory_pts)@\\
+\mbox{}\verb@    @\\
+\mbox{}\verb@ax.set_title("Number of sites: " + str(len(sites)) + "\nTour Length: " + str(round(tour_length,4)), fontsize=15)@\\
+\mbox{}\verb@ax.set_xlabel(r"$\varphi=$ " + str(phi) + "\nNumber of drones: " + str(number_of_flies), fontsize=15)@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
@@ -6485,14 +6488,6 @@ it meets up with at the head of the corresponding segment vector.
 \mbox{}\verb@              else: @\\
 \mbox{}\verb@                    current_fly_posns.append(None)@\\
 \mbox{}\verb@        objs = []@\\
-\mbox{}\verb@        # Plot sites as black circles@\\
-\mbox{}\verb@        for site in sites:@\\
-\mbox{}\verb@             circle = Circle((site[0], site[1]), 0.01, \@\\
-\mbox{}\verb@                              facecolor = 'k'   , \@\\
-\mbox{}\verb@                              edgecolor = 'black'     , \@\\
-\mbox{}\verb@                              linewidth=1.0)@\\
-\mbox{}\verb@             sitepatch = ax.add_patch(circle)@\\
-\mbox{}\verb@             objs.append(sitepatch)@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@        # Plot trajectory of flies @\\
 \mbox{}\verb@        assert(len(fly_points_so_far) == number_of_flies)@\\
@@ -6512,6 +6507,26 @@ it meets up with at the head of the corresponding segment vector.
 \mbox{}\verb@             objs.append(flypatch)@\\
 \mbox{}\verb@             objs.append(flyline)@\\
 \mbox{}\verb@@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@        # Plot trajectory of horse@\\
+\mbox{}\verb@        xhs = [pt[0] for pt in horse_points_so_far] + [current_horse_posn[0]]@\\
+\mbox{}\verb@        yhs = [pt[1] for pt in horse_points_so_far] + [current_horse_posn[1]]@\\
+\mbox{}\verb@        horseline, = ax.plot(xhs,yhs,'-',linewidth=5.0, markersize=6, alpha=1.00, color='#D13131')@\\
+\mbox{}\verb@        horseloc   = Circle((current_horse_posn[0], current_horse_posn[1]), 0.02, facecolor = '#D13131', alpha=1.00)@\\
+\mbox{}\verb@        horsepatch = ax.add_patch(horseloc)@\\
+\mbox{}\verb@        objs.append(horseline)@\\
+\mbox{}\verb@        objs.append(horsepatch)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@        # Plot sites as black circles@\\
+\mbox{}\verb@        for site in sites:@\\
+\mbox{}\verb@             circle = Circle((site[0], site[1]), 0.01, \@\\
+\mbox{}\verb@                              facecolor = 'k'   , \@\\
+\mbox{}\verb@                              edgecolor = 'black'     , \@\\
+\mbox{}\verb@                              linewidth=1.0)@\\
+\mbox{}\verb@             sitepatch = ax.add_patch(circle)@\\
+\mbox{}\verb@             objs.append(sitepatch)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@@\\
 \mbox{}\verb@        # Plot currently covered sites as colored circles@\\
 \mbox{}\verb@        for sitelist, i in zip(fly_sites_so_far, range(number_of_flies)):@\\
 \mbox{}\verb@           for site in sitelist:@\\
@@ -6522,17 +6537,8 @@ it meets up with at the head of the corresponding segment vector.
 \mbox{}\verb@                 sitepatch = ax.add_patch(circle)@\\
 \mbox{}\verb@                 objs.append(sitepatch)@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@        # Plot trajectory of horse@\\
-\mbox{}\verb@        xhs = [pt[0] for pt in horse_points_so_far] + [current_horse_posn[0]]@\\
-\mbox{}\verb@        yhs = [pt[1] for pt in horse_points_so_far] + [current_horse_posn[1]]@\\
-\mbox{}\verb@        horseline, = ax.plot(xhs,yhs,'-',linewidth=5.0, markersize=6, alpha=1.00, color='#D13131')@\\
-\mbox{}\verb@        horseloc   = Circle((current_horse_posn[0], current_horse_posn[1]), 0.01, facecolor = '#D13131', alpha=1.00)@\\
-\mbox{}\verb@        horsepatch = ax.add_patch(horseloc)@\\
-\mbox{}\verb@        objs.append(horsepatch)@\\
-\mbox{}\verb@        objs.append(horseline)@\\
-\mbox{}\verb@@\\
 \mbox{}\verb@        debug(Fore.CYAN + "Appending to ims "+ Style.RESET_ALL)@\\
-\mbox{}\verb@        ims.append(objs) # [::-1] means reverse the list@\\
+\mbox{}\verb@        ims.append(objs[::-1]) @\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
@@ -6626,9 +6632,9 @@ comment the \verb|plt.show()| line, at the end of the block.
 \mbox{}\verb@debug(Fore.BLACK + Back.WHITE + "\nFinished constructing ani object"+ Style.RESET_ALL)@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@print "Mike testing, mike testing"@\\
-\mbox{}\verb@#debug(Fore.MAGENTA + "\nStarted writing animation to disk"+ Style.RESET_ALL)@\\
-\mbox{}\verb@#ani.save(animation_file_name_prefix+'.avi', dpi=250)@\\
-\mbox{}\verb@#debug(Fore.MAGENTA + "\nFinished writing animation to disk"+ Style.RESET_ALL)@\\
+\mbox{}\verb@debug(Fore.MAGENTA + "\nStarted writing animation to disk"+ Style.RESET_ALL)@\\
+\mbox{}\verb@ani.save(animation_file_name_prefix+'.avi', dpi=250)@\\
+\mbox{}\verb@debug(Fore.MAGENTA + "\nFinished writing animation to disk"+ Style.RESET_ALL)@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@plt.show() # For displaying the animation in a live window. @\\
 \mbox{}\verb@@{\NWsep}
@@ -6696,9 +6702,10 @@ comprehension.
 %{python-mode}%
 \begin{flushleft} \small
 \begin{minipage}{\linewidth}\label{scrap140}\raggedright\small
-\NWtarget{nuweb91a}{} \verb@"../src/expts/expt_decrease_in_tour_length_with_larger_number_of_drones.py"@\nobreak\ {\footnotesize {91a}}$\equiv$
+\NWtarget{nuweb91}{} \verb@"../src/expts/expt_decrease_in_tour_length_with_larger_number_of_drones.py"@\nobreak\ {\footnotesize {91}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
+\mbox{}\verb@@\\
 \mbox{}\verb@import sys, os@\\
 \mbox{}\verb@import numpy as np@\\
 \mbox{}\verb@import matplotlib.pyplot as plt@\\
@@ -6710,16 +6717,52 @@ comprehension.
 \mbox{}\verb@import utils_graphics@\\
 \mbox{}\verb@import utils_algo@\\
 \mbox{}\verb@import scipy@\\
+\mbox{}\verb@import matplotlib as mpl@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@def expt(number_of_sites, scheme, inithorseposn, phi):@\\
-\mbox{}\verb@    @\hbox{$\langle\,${\itshape Set up a run data-struture for one horse multiple flies}\nobreak\ {\footnotesize \NWlink{nuweb91b}{91b}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@    @\hbox{$\langle\,${\itshape Generate a point set of size $N$}\nobreak\ {\footnotesize \NWlink{nuweb91c}{91c}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@    @\hbox{$\langle\,${\itshape Set up an list of $k$s which we will loop through and measure the corresponding tour-length}\nobreak\ {\footnotesize \NWlink{nuweb91d}{91d}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@    @\hbox{$\langle\,${\itshape Run the selected algorithms for the various $k$s and generate plots of the tours}\nobreak\ {\footnotesize \NWlink{nuweb92a}{92a}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@    @\hbox{$\langle\,${\itshape Plot lengths of tours against the number of drones}\nobreak\ {\footnotesize \NWlink{nuweb92b}{92b}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@  plt.rc('text', usetex=True)@\\
+\mbox{}\verb@  plt.rc('font', family='serif')@\\
+\mbox{}\verb@  fig, ax = plt.subplots()@\\
+\mbox{}\verb@  ax.set_title("Tour Length v/s Number of Drones for Earliest Capture Heuristic, $N$="+str(number_of_sites) + " ("+scheme+")", fontsize=28)@\\
+\mbox{}\verb@  ax.set_xlabel("Number of Drones", fontsize=25)@\\
+\mbox{}\verb@  ax.set_ylabel("Tour Length", fontsize=25)@\\
+\mbox{}\verb@  plt.grid(True, linestyle='--')@\\
+\mbox{}\verb@  @\\
+\mbox{}\verb@  textstr = r"$\varphi$=" + str(phi)@\\
+\mbox{}\verb@  ax.text(0.85, 0.95, textstr, transform=ax.transAxes, fontsize=40,@\\
+\mbox{}\verb@        verticalalignment='top')@\\
+\mbox{}\verb@  plt.tick_params(labelsize=20)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@  for i in range(5):@\\
+\mbox{}\verb@      # Generate a point set of size $N$@\\
+\mbox{}\verb@      if scheme == 'nonuniform': @\\
+\mbox{}\verb@         sites = utils_algo.bunch_of_non_uniform_random_points(number_of_sites)@\\
+\mbox{}\verb@      elif scheme == 'uniform' : @\\
+\mbox{}\verb@         sites = scipy.rand(number_of_sites,2).tolist()@\\
+\mbox{}\verb@      else:@\\
+\mbox{}\verb@          print "scheme not recognized"@\\
+\mbox{}\verb@          sys.exit()@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@      ks           = range(2,40,4)@\\
+\mbox{}\verb@      tour_lengths = []@\\
+\mbox{}\verb@      for k in ks:@\\
+\mbox{}\verb@          tour = ohmf.algo_greedy_earliest_capture(sites=sites, @\\
+\mbox{}\verb@                                                   inithorseposn=inithorseposn, @\\
+\mbox{}\verb@                                                   phi=phi, @\\
+\mbox{}\verb@                                                   number_of_flies=k,@\\
+\mbox{}\verb@                                                   write_algo_states_to_disk_p = False,\@\\
+\mbox{}\verb@                                                   write_io_p                  = False,\@\\
+\mbox{}\verb@                                                   animate_tour_p              = False)@\\
+\mbox{}\verb@          horse_traj_pts = map(lambda x: x[0], tour['horse_trajectory'])@\\
+\mbox{}\verb@          tour_lengths.append(utils_algo.length_polygonal_chain(horse_traj_pts))@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@      ax.plot(ks, tour_lengths, "o-", linewidth=2.5)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@  plt.show()@\\
+\mbox{}\verb@@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@if __name__ == "__main__":@\\
-\mbox{}\verb@    expt(number_of_sites=10, scheme='uniform', inithorseposn=(0.2,0.5), phi=3)@\\
+\mbox{}\verb@    expt(number_of_sites=100, scheme='uniform', inithorseposn=(0.5,0.5), phi=3.0)@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
@@ -6734,132 +6777,6 @@ comprehension.
 
 
 
-
-\vspace{-0.8cm} \newchunk This just sets up an empty data-structure whose members will be populated
-in the succeeding chunks. The \verb|MultipleFliesInput| data-structure stores the list of sites and 
-the initial horse position. 
-
-%{python-mode}%
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap141}\raggedright\small
-\NWtarget{nuweb91b}{} $\langle\,${\itshape Set up a run data-struture for one horse multiple flies}\nobreak\ {\footnotesize {91b}}$\,\rangle\equiv$
-\vspace{-1ex}
-\begin{list}{}{} \item
-\mbox{}\verb@run = ohmf.MultipleFliesInput()@\\
-\mbox{}\verb@@{\NWsep}
-\end{list}
-\vspace{-1.5ex}
-\footnotesize
-\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb91a}{91a}.
-
-\item{}
-\end{list}
-\end{minipage}\vspace{4ex}
-\end{flushleft}
-%{/python-mode}%
-
-
-\vspace{-0.8cm} \newchunk It makes sense to run an experiment against both uniform and non-uniform sets of sites. 
-%{python-mode}%
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap142}\raggedright\small
-\NWtarget{nuweb91c}{} $\langle\,${\itshape Generate a point set of size $N$}\nobreak\ {\footnotesize {91c}}$\,\rangle\equiv$
-\vspace{-1ex}
-\begin{list}{}{} \item
-\mbox{}\verb@if scheme == 'nonuniform': @\\
-\mbox{}\verb@    run.sites = utils_algo.bunch_of_non_uniform_random_points(number_of_sites)@\\
-\mbox{}\verb@elif scheme == 'uniform' : @\\
-\mbox{}\verb@    run.sites = scipy.rand(number_of_sites,2).tolist()@\\
-\mbox{}\verb@else:@\\
-\mbox{}\verb@    print "scheme not recognized"@\\
-\mbox{}\verb@    sys.exit()@\\
-\mbox{}\verb@@\\
-\mbox{}\verb@run.inithorseposn = inithorseposn@\\
-\mbox{}\verb@print run.sites@\\
-\mbox{}\verb@@{\NWsep}
-\end{list}
-\vspace{-1.5ex}
-\footnotesize
-\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb91a}{91a}.
-
-\item{}
-\end{list}
-\end{minipage}\vspace{4ex}
-\end{flushleft}
-%{/python-mode}%
-
-\vspace{-0.8cm} \newchunk It will be sufficient to test the decrease in the tour-length for values of 
-ks upto a small number say 20. Maybe for going to bigger and bigger data-sets it will make sense
-to increase the number of $k$s. 
-%{python-mode}%
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap143}\raggedright\small
-\NWtarget{nuweb91d}{} $\langle\,${\itshape Set up an list of $k$s which we will loop through and measure the corresponding tour-length}\nobreak\ {\footnotesize {91d}}$\,\rangle\equiv$
-\vspace{-1ex}
-\begin{list}{}{} \item
-\mbox{}\verb@#ks = range(1,20,2)   @\\
-\mbox{}\verb@ks = [2,4]@\\
-\mbox{}\verb@@{\NWsep}
-\end{list}
-\vspace{-1.5ex}
-\footnotesize
-\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb91a}{91a}.
-
-\item{}
-\end{list}
-\end{minipage}\vspace{4ex}
-\end{flushleft}
-%{/python-mode}%
-
-\vspace{-0.8cm} \newchunk This is the main loop for genereating data. For different numbers of drones, we get the corresponding tour-lengths. These will be plotted in a succeeding chunk. 
-%{python-mode}%
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap144}\raggedright\small
-\NWtarget{nuweb92a}{} $\langle\,${\itshape Run the selected algorithms for the various $k$s and generate plots of the tours}\nobreak\ {\footnotesize {92a}}$\,\rangle\equiv$
-\vspace{-1ex}
-\begin{list}{}{} \item
-\mbox{}\verb@tour_lengths = []@\\
-\mbox{}\verb@for k in ks:@\\
-\mbox{}\verb@    tour = run.getTour(ohmf.algo_greedy_earliest_capture, phi, number_of_flies=k)@\\
-\mbox{}\verb@    print tour@\\
-\mbox{}\verb@    #tour_lengths.append(pass)@\\
-\mbox{}\verb@@{\NWsep}
-\end{list}
-\vspace{-1.5ex}
-\footnotesize
-\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb91a}{91a}.
-\item \NWtxtIdentsUsed\nobreak\  \verb@getTour@\nobreak\ \NWlink{nuweb74c}{74c}.
-\item{}
-\end{list}
-\end{minipage}\vspace{4ex}
-\end{flushleft}
-%{/python-mode}%
-
-
-\vspace{-0.8cm} \newchunk
-%{python-mode}%
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap145}\raggedright\small
-\NWtarget{nuweb92b}{} $\langle\,${\itshape Plot lengths of tours against the number of drones}\nobreak\ {\footnotesize {92b}}$\,\rangle\equiv$
-\vspace{-1ex}
-\begin{list}{}{} \item
-\mbox{}\verb@fig, ax = plt.subplots()@\\
-\mbox{}\verb@@{\NWsep}
-\end{list}
-\vspace{-1.5ex}
-\footnotesize
-\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb91a}{91a}.
-
-\item{}
-\end{list}
-\end{minipage}\vspace{4ex}
-\end{flushleft}
-%{/python-mode}%
 \newpage
 \section{Chapter Index of Fragments}
 
@@ -6880,7 +6797,6 @@ to increase the number of $k$s.
 \item $\langle\,$Find the $k$-nearest sites to \verb|inithorseposn| for $k=$\verb|number_of_flies| and claim them\nobreak\ {\footnotesize \NWlink{nuweb77a}{77a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb76a}{76a}.}
 \item $\langle\,$Find the index of the fly \bm{F} which can meet the horse at the earliest, the rendezvous point $R$, and time till rendezvous\nobreak\ {\footnotesize \NWlink{nuweb78a}{78a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb76a}{76a}.}
 \item $\langle\,$Generate a bunch of uniform or non-uniform random points on the canvas\nobreak\ {\footnotesize \NWlink{nuweb72b}{72b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb71a}{71a}.}
-\item $\langle\,$Generate a point set of size $N$\nobreak\ {\footnotesize \NWlink{nuweb91c}{91c}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb91a}{91a}.}
 \item $\langle\,$Helper functions for \verb|algo_greedy_earliest_capture|\nobreak\ {\footnotesize \NWlink{nuweb79a}{79a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb76a}{76a}.}
 \item $\langle\,$Initialize one \verb|FlyState| object per fly for all flies\nobreak\ {\footnotesize \NWlink{nuweb77b}{77b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb76a}{76a}.}
 \item $\langle\,$Local data-structures\nobreak\ {\footnotesize \NWlink{nuweb74a}{74a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb69}{69}.}
@@ -6888,16 +6804,12 @@ to increase the number of $k$s.
 \item $\langle\,$Move towards the provided rendezvous point\nobreak\ {\footnotesize \NWlink{nuweb79d}{79d}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb79c}{79c}.}
 \item $\langle\,$Move towards the site mark site as serviced and then head towards rendezvous point\nobreak\ {\footnotesize \NWlink{nuweb80b}{80b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb79c}{79c}.}
 \item $\langle\,$Parse trajectory information and convert trajectory representation to leg list form\nobreak\ {\footnotesize \NWlink{nuweb86a}{86a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb84a}{84a}.}
-\item $\langle\,$Plot lengths of tours against the number of drones\nobreak\ {\footnotesize \NWlink{nuweb92b}{92b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb91a}{91a}.}
 \item $\langle\,$Plotting routines\nobreak\ {\footnotesize \NWlink{nuweb83}{83}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb69}{69}.}
 \item $\langle\,$Relevant imports\nobreak\ {\footnotesize \NWlink{nuweb70a}{70a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb69}{69}.}
 \item $\langle\,$Return multiple flies tour\nobreak\ {\footnotesize \NWlink{nuweb82c}{82c}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb76a}{76a}.}
-\item $\langle\,$Run the selected algorithms for the various $k$s and generate plots of the tours\nobreak\ {\footnotesize \NWlink{nuweb92a}{92a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb91a}{91a}.}
 \item $\langle\,$Select algorithm to execute\nobreak\ {\footnotesize \NWlink{nuweb72a}{72a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb71b}{71b}.}
 \item $\langle\,$Set algo-state and input-output files config\nobreak\ {\footnotesize \NWlink{nuweb81b}{81b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb76a}{76a}.}
 \item $\langle\,$Set speed and number of flies\nobreak\ {\footnotesize \NWlink{nuweb71c}{71c}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb71b}{71b}.}
-\item $\langle\,$Set up a run data-struture for one horse multiple flies\nobreak\ {\footnotesize \NWlink{nuweb91b}{91b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb91a}{91a}.}
-\item $\langle\,$Set up an list of $k$s which we will loop through and measure the corresponding tour-length\nobreak\ {\footnotesize \NWlink{nuweb91d}{91d}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb91a}{91a}.}
 \item $\langle\,$Set up configurations and parameters for all necessary graphics\nobreak\ {\footnotesize \NWlink{nuweb84b}{84b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb84a}{84a}.}
 \item $\langle\,$Set up interactive canvas\nobreak\ {\footnotesize \NWlink{nuweb73b}{73b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb69}{69}.}
 \item $\langle\,$Set up logging information relevant to this module\nobreak\ {\footnotesize \NWlink{nuweb70b}{70b}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb69}{69}.}
@@ -6912,7 +6824,7 @@ to increase the number of $k$s.
 
 {\small\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \verb@clearAllStates@: \NWlink{nuweb72b}{72b}\NWlink{nuweb73a}{, 73a}, \underline{\NWlink{nuweb74b}{74b}}.
-\item \verb@getTour@: \NWlink{nuweb72a}{72a}, \underline{\NWlink{nuweb74c}{74c}}\NWlink{nuweb92a}{, 92a}.
+\item \verb@getTour@: \NWlink{nuweb72a}{72a}, \underline{\NWlink{nuweb74c}{74c}}.
 \item \verb@meeting_time_horse_fly_opp_dir@: \NWlink{nuweb78b}{78b}, \underline{\NWlink{nuweb79a}{79a}}.
 \item \verb@rendezvous_time_and_point_if_selected_by_horse@: \NWlink{nuweb78a}{78a}, \underline{\NWlink{nuweb78b}{78b}}.
 \item \verb@wrapperkeyPressHandler@: \underline{\NWlink{nuweb71a}{71a}}\NWlink{nuweb73b}{, 73b}.
@@ -6927,7 +6839,7 @@ to increase the number of $k$s.
 
 {\small\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \verb@"../main.py"@ {\footnotesize {\NWtxtDefBy} \NWlink{nuweb12}{12}.}
-\item \verb@"../src/expts/expt_decrease_in_tour_length_with_larger_number_of_drones.py"@ {\footnotesize {\NWtxtDefBy} \NWlink{nuweb91a}{91a}.}
+\item \verb@"../src/expts/expt_decrease_in_tour_length_with_larger_number_of_drones.py"@ {\footnotesize {\NWtxtDefBy} \NWlink{nuweb91}{91}.}
 \item \verb@"../src/lib/problem_classic_horsefly.py"@ {\footnotesize {\NWtxtDefBy} \NWlink{nuweb20a}{20a}.}
 \item \verb@"../src/lib/problem_one_horse_multiple_flies.py"@ {\footnotesize {\NWtxtDefBy} \NWlink{nuweb69}{69}.}
 \item \verb@"../src/lib/utils_algo.py"@ {\footnotesize {\NWtxtDefBy} \NWlink{nuweb17a}{17a}\NWlink{nuweb17b}{b}\NWlink{nuweb18a}{, 18a}\NWlink{nuweb18b}{b}\NWlink{nuweb18c}{c}\NWlink{nuweb18d}{d}\NWlink{nuweb18e}{e}\NWlink{nuweb18f}{f}\NWlink{nuweb19c}{, 19c}.

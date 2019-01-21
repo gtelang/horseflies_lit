@@ -1,3 +1,4 @@
+
 import sys, os
 import numpy as np
 import matplotlib.pyplot as plt
@@ -35,7 +36,7 @@ def expt(number_of_sites, scheme, inithorseposn, phi):
           print "scheme not recognized"
           sys.exit()
 
-      ks           = range(2,60,4)
+      ks           = range(2,40,4)
       tour_lengths = []
       for k in ks:
           tour = ohmf.algo_greedy_earliest_capture(sites=sites, 
@@ -54,4 +55,4 @@ def expt(number_of_sites, scheme, inithorseposn, phi):
 
 
 if __name__ == "__main__":
-    expt(number_of_sites=600, scheme='uniform', inithorseposn=(0.5,0.5), phi=3.0)
+    expt(number_of_sites=100, scheme='uniform', inithorseposn=(0.5,0.5), phi=3.0)

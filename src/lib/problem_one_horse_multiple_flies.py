@@ -485,8 +485,11 @@ def animate_tour (sites, inithorseposn, phi, horse_trajectory, fly_trajectories,
     number_of_flies = len(fly_trajectories)
     colors          = utils_graphics.get_colors(number_of_flies, lightness=0.5)
 
-    ax.set_title("Number of sites: " + str(len(sites)), fontsize=25)
-    ax.set_xlabel(r"$\varphi=$ " + str(phi) + "\nNumber of drones: " + str(number_of_flies), fontsize=20)
+    horse_trajectory_pts = map(lambda x: x[0], horse_trajectory)
+    tour_length = utils_algo.length_polygonal_chain(horse_trajectory_pts)
+        
+    ax.set_title("Number of sites: " + str(len(sites)) + "\nTour Length: " + str(round(tour_length,4)), fontsize=15)
+    ax.set_xlabel(r"$\varphi=$ " + str(phi) + "\nNumber of drones: " + str(number_of_flies), fontsize=15)
     
     # Parse trajectory information and convert trajectory representation to leg list form
      
@@ -603,14 +606,6 @@ def animate_tour (sites, inithorseposn, phi, horse_trajectory, fly_trajectories,
                   else: 
                         current_fly_posns.append(None)
             objs = []
-            # Plot sites as black circles
-            for site in sites:
-                 circle = Circle((site[0], site[1]), 0.01, \
-                                  facecolor = 'k'   , \
-                                  edgecolor = 'black'     , \
-                                  linewidth=1.0)
-                 sitepatch = ax.add_patch(circle)
-                 objs.append(sitepatch)
 
             # Plot trajectory of flies 
             assert(len(fly_points_so_far) == number_of_flies)
@@ -630,6 +625,26 @@ def animate_tour (sites, inithorseposn, phi, horse_trajectory, fly_trajectories,
                  objs.append(flypatch)
                  objs.append(flyline)
 
+
+            # Plot trajectory of horse
+            xhs = [pt[0] for pt in horse_points_so_far] + [current_horse_posn[0]]
+            yhs = [pt[1] for pt in horse_points_so_far] + [current_horse_posn[1]]
+            horseline, = ax.plot(xhs,yhs,'-',linewidth=5.0, markersize=6, alpha=1.00, color='#D13131')
+            horseloc   = Circle((current_horse_posn[0], current_horse_posn[1]), 0.02, facecolor = '#D13131', alpha=1.00)
+            horsepatch = ax.add_patch(horseloc)
+            objs.append(horseline)
+            objs.append(horsepatch)
+
+            # Plot sites as black circles
+            for site in sites:
+                 circle = Circle((site[0], site[1]), 0.01, \
+                                  facecolor = 'k'   , \
+                                  edgecolor = 'black'     , \
+                                  linewidth=1.0)
+                 sitepatch = ax.add_patch(circle)
+                 objs.append(sitepatch)
+
+
             # Plot currently covered sites as colored circles
             for sitelist, i in zip(fly_sites_so_far, range(number_of_flies)):
                for site in sitelist:
@@ -640,17 +655,8 @@ def animate_tour (sites, inithorseposn, phi, horse_trajectory, fly_trajectories,
                      sitepatch = ax.add_patch(circle)
                      objs.append(sitepatch)
 
-            # Plot trajectory of horse
-            xhs = [pt[0] for pt in horse_points_so_far] + [current_horse_posn[0]]
-            yhs = [pt[1] for pt in horse_points_so_far] + [current_horse_posn[1]]
-            horseline, = ax.plot(xhs,yhs,'-',linewidth=5.0, markersize=6, alpha=1.00, color='#D13131')
-            horseloc   = Circle((current_horse_posn[0], current_horse_posn[1]), 0.01, facecolor = '#D13131', alpha=1.00)
-            horsepatch = ax.add_patch(horseloc)
-            objs.append(horsepatch)
-            objs.append(horseline)
-
             debug(Fore.CYAN + "Appending to ims "+ Style.RESET_ALL)
-            ims.append(objs) # [::-1] means reverse the list
+            ims.append(objs[::-1]) 
     
     # Write animation of tour to disk and display in live window
        
@@ -662,7 +668,7 @@ def animate_tour (sites, inithorseposn, phi, horse_trajectory, fly_trajectories,
 
     print "Mike testing, mike testing"
     debug(Fore.MAGENTA + "\nStarted writing animation to disk"+ Style.RESET_ALL)
-    ani.save(animation_file_name_prefix+'.avi', dpi=150)
+    ani.save(animation_file_name_prefix+'.avi', dpi=250)
     debug(Fore.MAGENTA + "\nFinished writing animation to disk"+ Style.RESET_ALL)
 
     plt.show() # For displaying the animation in a live window. 
