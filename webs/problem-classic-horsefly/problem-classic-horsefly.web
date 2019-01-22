@@ -168,7 +168,9 @@ input_str = raw_input(Fore.YELLOW                                            +\
         "  (kl)   k2-center (using approximate L1 ordering)\n"               +\
         "  (g)    Greedy\n"                                                  +\
         "  (gl)   Greedy (using approximate L1 ordering])\n"                 +\
-        "  (ginc) Greedy Incremental\n"                                      +\
+        "  (gincex) Greedy Incremental(exact post optimization with slsqp)\n"                                      +\
+        "  (gincoll) Greedy Incremental(no post optimization, just colinear)\n"                                      +\
+        "  (gincl1) Greedy Incremental(using approximate L1 ordering)\n"                                      +\
         "  (phi-mst) Compute the phi-prim-mst "                              +\
         Style.RESET_ALL)
 
@@ -216,10 +218,21 @@ elif input_str == 'gl':
                           phi,
                           post_optimizer= algo_approximate_L1_given_specific_ordering)
                           
-elif input_str == 'ginc':
+elif input_str == 'gincex':
       horseflytour = \
              run.getTour( algo_greedy_incremental_insertion,
                           phi, post_optimizer= algo_exact_given_specific_ordering)
+
+elif input_str == 'gincoll':
+      horseflytour = \
+             run.getTour( algo_greedy_incremental_insertion,
+                          phi, post_optimizer=None)
+
+elif input_str == 'gincl1':
+      horseflytour = \
+             run.getTour( algo_greedy_incremental_insertion,
+                          phi, post_optimizer=algo_approximate_L1_given_specific_ordering)
+
 
 elif input_str == 'phi-mst':
       phi_mst = \
@@ -231,7 +244,7 @@ else:
 #print horseflytour['tour_points']
 
 if input_str not in ['phi-mst']:
-     plotTour(ax,horseflytour, run.inithorseposn, phi, input_str)
+     plotTour(horseflytour, run.inithorseposn, phi, input_str)
 elif input_str == 'phi-mst':
      draw_phi_mst(ax, phi_mst, run.inithorseposn, phi)
      
@@ -508,8 +521,31 @@ are collected at the end of this chapter.
 
 %{python-mode}%
 @D Plotting routines for classic horsefly 
-@{def plotTour(ax,horseflytour, horseflyinit, phi, algo_str, tour_color='#d13131'):
+@{def plotTour(horseflytour, horseflyinit, phi, algo_str, tour_color='#d13131'):
    
+    plt.rc('text', usetex=True)
+    plt.rc('font', family='serif')
+
+    fig, ax = plt.subplots()
+    ax.set_xlim([0,1])
+    ax.set_ylim([0,1])  
+    ax.set_aspect('equal')
+
+    ax.set_xticks(np.arange(0, 1, 0.1))
+    ax.set_yticks(np.arange(0, 1, 0.1))
+
+    # Turn on the minor TICKS, which are required for the minor GRID
+    ax.minorticks_on()
+
+    # customize the major grid
+    ax.grid(which='major', linestyle='--', linewidth='0.3', color='red')
+
+    # Customize the minor grid
+    ax.grid(which='minor', linestyle=':', linewidth='0.3', color='black')
+
+    ax.get_xaxis().set_ticklabels([])
+    ax.get_yaxis().set_ticklabels([])
+
     @<Get x and y coordinates of the endpoints of segments on the horse-tour@>
     @<Get x and y coordinates of the sites@>
     @<Construct the fly-tour from the information about horse tour and sites@>
@@ -598,17 +634,17 @@ for x,y,i in zip(xsites, ysites, range(len(xsites))):
 ax.plot(xfs,yfs,'g-')
 ax.plot(xhs, yhs, color=tour_color, marker='s', linewidth=3.0) 
 
-ax.add_patch( mpl.patches.Circle( horseflyinit, radius = 1/140.0,
+ax.add_patch( mpl.patches.Circle( horseflyinit, radius = 1/60.0,
                                   facecolor= '#D13131', edgecolor='black'   )  )
 fontsize = 20
 
 
-plt.rc('text', usetex=True)
-plt.rc('font', family='serif')
 ax.set_title( r'Algorithm Used: ' + algo_str +  '\nTour Length: ' \
                + str(tour_length)[:7], fontdict={'fontsize':fontsize})
 ax.set_xlabel(r'Number of sites: ' + str(len(xsites)) + '\nDrone Speed: ' + str(phi) ,
                   fontdict={'fontsize':fontsize})
+fig.canvas.draw()
+plt.show()
 @| @}
 %{/python-mode}%
 
@@ -745,9 +781,6 @@ inithorseposn = schedule['inithorseposn']
 horse_tour  = map(np.asarray, schedule['horse_tour']   )
 sites       = map(np.asarray, schedule['visited_sites'])
            
-# set important meta-data for plot
-ax.set_title("Number of sites: " + str(len(sites)), fontsize=25)
-ax.set_xlabel(r"$\varphi$ = " + str(phi), fontsize=20)
 
 xhs = [ horse_tour[i][0] for i in range(len(horse_tour))]    
 yhs = [ horse_tour[i][1] for i in range(len(horse_tour))]    
@@ -761,6 +794,11 @@ horse_legs = zip(horse_tour, horse_tour[1:])
 fly_legs   = zip(fly_tour, fly_tour[1:], fly_tour[2:]) [0::2]
 
 assert(len(horse_legs) == len(fly_legs))
+
+# set important meta-data for plot
+ax.set_title("Number of sites: " + str(len(sites)) + "\nTour Length: " +\
+             str(round(utils_algo.length_polygonal_chain(zip(xhs, yhs)),4)), fontsize=20)
+ax.set_xlabel(r"$\varphi$ = " + str(phi), fontsize=20)
 @| @}
 %{/python-mode}%
 
@@ -832,7 +870,7 @@ if subleg_idx == 9:
     fys.append(sites[leg_idx][1])
     number_of_sites_serviced += 1
 
-horseline, = ax.plot(hxs1,hys1,'ro-', linewidth=5.0, markersize=6, alpha=1.00)
+horseline, = ax.plot(hxs1,hys1,'o-', linewidth=5.0, markersize=6, alpha=1.00, color='#d13131')
 flyline,   = ax.plot(fxs1,fys1,'go-', linewidth=1.0, markersize=3)
 
 objs = [flyline,horseline] 
@@ -852,6 +890,14 @@ for site, j in zip(sites, range(len(sites))):
                     linewidth=1.4)
     sitepatch = ax.add_patch(circle)
     objs.append(sitepatch)
+
+# Mark initial horse positions with big red circle
+circle = Circle((inithorseposn[0], inithorseposn[1]), 0.020, \
+                facecolor = '#d13131'   , \
+                edgecolor = 'black'     , \
+                linewidth=1.4)
+inithorsepatch = ax.add_patch(circle)
+objs.append(inithorsepatch)
 
 debug(Fore.CYAN + "Appending to ims "+ Style.RESET_ALL)
 ims.append(objs[::-1])
@@ -912,11 +958,12 @@ debug(Fore.BLACK + Back.WHITE + "\nStarted constructing ani object"+ Style.RESET
 ani = animation.ArtistAnimation(fig, ims, interval=50, blit=True, repeat_delay=1000)
 debug(Fore.BLACK + Back.WHITE + "\nFinished constructing ani object"+ Style.RESET_ALL)
 
-plt.show() # For displaying the animation in a live window. 
 
-debug(Fore.MAGENTA + "\nStarted writing animation to disk"+ Style.RESET_ALL)
-ani.save(schedule_file_name+'.avi', dpi=150)
-debug(Fore.MAGENTA + "\nFinished writing animation to disk"+ Style.RESET_ALL)
+#debug(Fore.MAGENTA + "\nStarted writing animation to disk"+ Style.RESET_ALL)
+#ani.save(schedule_file_name+'.avi', dpi=150)
+#debug(Fore.MAGENTA + "\nFinished writing animation to disk"+ Style.RESET_ALL)
+
+#plt.show() # For displaying the animation in a live window. 
 @| @}
 %{/python-mode}%
 

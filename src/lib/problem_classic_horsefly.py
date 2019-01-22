@@ -62,7 +62,9 @@ def run_handler():
                             "  (kl)   k2-center (using approximate L1 ordering)\n"               +\
                             "  (g)    Greedy\n"                                                  +\
                             "  (gl)   Greedy (using approximate L1 ordering])\n"                 +\
-                            "  (ginc) Greedy Incremental\n"                                      +\
+                            "  (gincex) Greedy Incremental(exact post optimization with slsqp)\n"                                      +\
+                            "  (gincoll) Greedy Incremental(no post optimization, just colinear)\n"                                      +\
+                            "  (gincl1) Greedy Incremental(using approximate L1 ordering)\n"                                      +\
                             "  (phi-mst) Compute the phi-prim-mst "                              +\
                             Style.RESET_ALL)
 
@@ -110,10 +112,21 @@ def run_handler():
                                               phi,
                                               post_optimizer= algo_approximate_L1_given_specific_ordering)
                                               
-                    elif input_str == 'ginc':
+                    elif input_str == 'gincex':
                           horseflytour = \
                                  run.getTour( algo_greedy_incremental_insertion,
                                               phi, post_optimizer= algo_exact_given_specific_ordering)
+
+                    elif input_str == 'gincoll':
+                          horseflytour = \
+                                 run.getTour( algo_greedy_incremental_insertion,
+                                              phi, post_optimizer=None)
+
+                    elif input_str == 'gincl1':
+                          horseflytour = \
+                                 run.getTour( algo_greedy_incremental_insertion,
+                                              phi, post_optimizer=algo_approximate_L1_given_specific_ordering)
+
 
                     elif input_str == 'phi-mst':
                           phi_mst = \
@@ -125,7 +138,7 @@ def run_handler():
                     #print horseflytour['tour_points']
 
                     if input_str not in ['phi-mst']:
-                         plotTour(ax,horseflytour, run.inithorseposn, phi, input_str)
+                         plotTour(horseflytour, run.inithorseposn, phi, input_str)
                     elif input_str == 'phi-mst':
                          draw_phi_mst(ax, phi_mst, run.inithorseposn, phi)
                          
@@ -768,9 +781,10 @@ class PolicyBestInsertionNaive:
 
 def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
                                       insertion_policy_name       = "naive",
-                                      write_algo_states_to_disk_p = False   ,
+                                      write_algo_states_to_disk_p = False  ,
                                       animate_schedule_p          = True   , 
-                                      post_optimizer              = None):
+                                      post_optimizer              = None   ,  
+                                      plot_computed_schedule      = False):
       # Set log, algo-state and input-output files config
         
       import sys, logging, datetime, os, errno
@@ -932,6 +946,17 @@ def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
               debug("Dumped algorithm state to " + algo_state_file_name)
          
 
+      # Run post optimizer on obtained tour
+      
+      if not (post_optimizer is None):
+          import utils_algo
+          print insertion_policy.horse_tour
+          answer=post_optimizer(insertion_policy.visited_sites, inithorseposn, phi)
+          insertion_policy.horse_tour = [inithorseposn] + answer['tour_points']
+          print "  "
+          print insertion_policy.horse_tour
+          #sys.exit()
+      
       # Write input and output to file
       # ASSERT: `inithorseposn` is included as first point of the tour
       assert(len(insertion_policy.horse_tour) == len(insertion_policy.visited_sites) + 1) 
@@ -1359,8 +1384,31 @@ def compute_phi_prim_mst(sites, inithorseposn,phi):
      return G
 
 # Plotting routines for classic horsefly
-def plotTour(ax,horseflytour, horseflyinit, phi, algo_str, tour_color='#d13131'):
+def plotTour(horseflytour, horseflyinit, phi, algo_str, tour_color='#d13131'):
    
+    plt.rc('text', usetex=True)
+    plt.rc('font', family='serif')
+
+    fig, ax = plt.subplots()
+    ax.set_xlim([0,1])
+    ax.set_ylim([0,1])  
+    ax.set_aspect('equal')
+
+    ax.set_xticks(np.arange(0, 1, 0.1))
+    ax.set_yticks(np.arange(0, 1, 0.1))
+
+    # Turn on the minor TICKS, which are required for the minor GRID
+    ax.minorticks_on()
+
+    # customize the major grid
+    ax.grid(which='major', linestyle='--', linewidth='0.3', color='red')
+
+    # Customize the minor grid
+    ax.grid(which='minor', linestyle=':', linewidth='0.3', color='black')
+
+    ax.get_xaxis().set_ticklabels([])
+    ax.get_yaxis().set_ticklabels([])
+
     # Get x and y coordinates of the endpoints of segments on the horse-tour
        
     xhs, yhs = [horseflyinit[0]], [horseflyinit[1]]
@@ -1420,17 +1468,17 @@ def plotTour(ax,horseflytour, horseflyinit, phi, algo_str, tour_color='#d13131')
     ax.plot(xfs,yfs,'g-')
     ax.plot(xhs, yhs, color=tour_color, marker='s', linewidth=3.0) 
 
-    ax.add_patch( mpl.patches.Circle( horseflyinit, radius = 1/140.0,
+    ax.add_patch( mpl.patches.Circle( horseflyinit, radius = 1/60.0,
                                       facecolor= '#D13131', edgecolor='black'   )  )
     fontsize = 20
 
 
-    plt.rc('text', usetex=True)
-    plt.rc('font', family='serif')
     ax.set_title( r'Algorithm Used: ' + algo_str +  '\nTour Length: ' \
                    + str(tour_length)[:7], fontdict={'fontsize':fontsize})
     ax.set_xlabel(r'Number of sites: ' + str(len(xsites)) + '\nDrone Speed: ' + str(phi) ,
                       fontdict={'fontsize':fontsize})
+    fig.canvas.draw()
+    plt.show()
     
     
 def draw_phi_mst(ax, phi_mst, inithorseposn, phi):
@@ -1500,9 +1548,6 @@ def animateSchedule(schedule_file_name):
      horse_tour  = map(np.asarray, schedule['horse_tour']   )
      sites       = map(np.asarray, schedule['visited_sites'])
                 
-     # set important meta-data for plot
-     ax.set_title("Number of sites: " + str(len(sites)), fontsize=25)
-     ax.set_xlabel(r"$\varphi$ = " + str(phi), fontsize=20)
 
      xhs = [ horse_tour[i][0] for i in range(len(horse_tour))]    
      yhs = [ horse_tour[i][1] for i in range(len(horse_tour))]    
@@ -1516,6 +1561,11 @@ def animateSchedule(schedule_file_name):
      fly_legs   = zip(fly_tour, fly_tour[1:], fly_tour[2:]) [0::2]
 
      assert(len(horse_legs) == len(fly_legs))
+
+     # set important meta-data for plot
+     ax.set_title("Number of sites: " + str(len(sites)) + "\nTour Length: " +\
+                  str(round(utils_algo.length_polygonal_chain(zip(xhs, yhs)),4)), fontsize=20)
+     ax.set_xlabel(r"$\varphi$ = " + str(phi), fontsize=20)
      
      # Construct and store every frame of the animation in \verb|ims|
      ims = []
@@ -1577,7 +1627,7 @@ def animateSchedule(schedule_file_name):
                    fys.append(sites[leg_idx][1])
                    number_of_sites_serviced += 1
 
-               horseline, = ax.plot(hxs1,hys1,'ro-', linewidth=5.0, markersize=6, alpha=1.00)
+               horseline, = ax.plot(hxs1,hys1,'o-', linewidth=5.0, markersize=6, alpha=1.00, color='#d13131')
                flyline,   = ax.plot(fxs1,fys1,'go-', linewidth=1.0, markersize=3)
 
                objs = [flyline,horseline] 
@@ -1598,6 +1648,14 @@ def animateSchedule(schedule_file_name):
                    sitepatch = ax.add_patch(circle)
                    objs.append(sitepatch)
 
+               # Mark initial horse positions with big red circle
+               circle = Circle((inithorseposn[0], inithorseposn[1]), 0.020, \
+                               facecolor = '#d13131'   , \
+                               edgecolor = 'black'     , \
+                               linewidth=1.4)
+               inithorsepatch = ax.add_patch(circle)
+               objs.append(inithorsepatch)
+
                debug(Fore.CYAN + "Appending to ims "+ Style.RESET_ALL)
                ims.append(objs[::-1])
                
@@ -1609,10 +1667,11 @@ def animateSchedule(schedule_file_name):
      ani = animation.ArtistAnimation(fig, ims, interval=50, blit=True, repeat_delay=1000)
      debug(Fore.BLACK + Back.WHITE + "\nFinished constructing ani object"+ Style.RESET_ALL)
 
-     plt.show() # For displaying the animation in a live window. 
 
-     debug(Fore.MAGENTA + "\nStarted writing animation to disk"+ Style.RESET_ALL)
-     ani.save(schedule_file_name+'.avi', dpi=150)
-     debug(Fore.MAGENTA + "\nFinished writing animation to disk"+ Style.RESET_ALL)
+     #debug(Fore.MAGENTA + "\nStarted writing animation to disk"+ Style.RESET_ALL)
+     #ani.save(schedule_file_name+'.avi', dpi=150)
+     #debug(Fore.MAGENTA + "\nFinished writing animation to disk"+ Style.RESET_ALL)
+
+     #plt.show() # For displaying the animation in a live window. 
      
 

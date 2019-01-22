@@ -57,9 +57,10 @@ benchmark the quality and speed of implementation of future insertion policies.
 @<Define various insertion policy classes@>
 def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
                                       insertion_policy_name       = "naive",
-                                      write_algo_states_to_disk_p = False   ,
+                                      write_algo_states_to_disk_p = False  ,
                                       animate_schedule_p          = True   , 
-                                      post_optimizer              = None):
+                                      post_optimizer              = None   ,  
+                                      plot_computed_schedule      = False):
       @<Set log, algo-state and input-output files config@>
       @<Set insertion policy class for current run@>
 
@@ -67,6 +68,7 @@ def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
          @<Use insertion policy to find the cheapest site to insert into current tour@>
          @<Write algorithms current state to file@>
 
+      @<Run post optimizer on obtained tour@>
       @<Write input and output to file@>
       @<Make an animation of the schedule, if \verb|animate_schedule_p == True| @>
       #sys.exit()
@@ -191,6 +193,21 @@ affect timing/benchmarking results.
 
      algo_state_counter = algo_state_counter + 1
      debug("Dumped algorithm state to " + algo_state_file_name)
+@| @}
+%{/python-mode}%
+
+
+\vspace{-0.8cm} \newchunk
+%{python-mode}%
+@d Run post optimizer on obtained tour @{
+if not (post_optimizer is None):
+    import utils_algo
+    print insertion_policy.horse_tour
+    answer=post_optimizer(insertion_policy.visited_sites, inithorseposn, phi)
+    insertion_policy.horse_tour = [inithorseposn] + answer['tour_points']
+    print "  "
+    print insertion_policy.horse_tour
+    #sys.exit()
 @| @}
 %{/python-mode}%
 
@@ -354,6 +371,7 @@ plt.close()
 debug(Fore.BLUE+"Rendered algorithm state to image file"+Style.RESET_ALL)
 @| @}     
 %{/python-mode}%
+
 
 
 \vspace{-0.8cm}\newchunk The final answer is written to disk in the form of a YAML file. It lists the input sites 
