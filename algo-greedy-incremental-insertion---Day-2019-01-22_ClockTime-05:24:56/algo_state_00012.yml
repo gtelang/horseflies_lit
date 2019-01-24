@@ -1,0 +1,184 @@
+horse_tour:
+- !!python/tuple
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - &id001 !!python/object/apply:numpy.dtype
+      args:
+      - f8
+      - 0
+      - 1
+      state: !!python/tuple
+      - 3
+      - <
+      - null
+      - null
+      - null
+      - -1
+      - -1
+      - 0
+    - !!binary |
+      gj8RCxBh6j8=
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - *id001
+    - !!binary |
+      CS+EHGJj6j8=
+- !!python/tuple
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - *id001
+    - !!binary |
+      jkz1actu6z8=
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - *id001
+    - !!binary |
+      om3fzRFe6T8=
+- !!python/tuple
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - *id001
+    - !!binary |
+      2PXvzgil6j8=
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - *id001
+    - !!binary |
+      EktvzUjd4T8=
+- !!python/tuple
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - *id001
+    - !!binary |
+      5hIfpVcC7T8=
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - *id001
+    - !!binary |
+      ir6ikzRD3z8=
+- !!python/tuple
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - *id001
+    - !!binary |
+      mlpEIPng7D8=
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - *id001
+    - !!binary |
+      yX7xJrlx3j8=
+- !!python/tuple
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - *id001
+    - !!binary |
+      VkBcMWLx6z8=
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - *id001
+    - !!binary |
+      ul88aDaF3j8=
+- !!python/tuple
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - *id001
+    - !!binary |
+      qw5uaS0q6j8=
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - *id001
+    - !!binary |
+      MxP/Y2JA3j8=
+- !!python/tuple
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - *id001
+    - !!binary |
+      ADIefyVq5j8=
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - *id001
+    - !!binary |
+      jEzWKOJP4T8=
+- !!python/tuple
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - *id001
+    - !!binary |
+      OoDTlX4u5z8=
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - *id001
+    - !!binary |
+      +CWeAjSm4z8=
+- !!python/tuple
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - *id001
+    - !!binary |
+      btE8zDId5z8=
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - *id001
+    - !!binary |
+      ast/bysx5T8=
+- !!python/tuple
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - *id001
+    - !!binary |
+      P7Hncdd55j8=
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - *id001
+    - !!binary |
+      GSLhqmGJ5j8=
+- !!python/tuple
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - *id001
+    - !!binary |
+      QMTn8i+X5j8=
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - *id001
+    - !!binary |
+      wtHP7nJn5z8=
+- !!python/tuple
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - *id001
+    - !!binary |
+      lFnXErRz5D8=
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - *id001
+    - !!binary |
+      2Dl2e97y6T8=
+insertion_policy_name: naive
+unvisited_sites:
+- - 0.7141389195120504
+  - 0.2883233409859638
+- - 0.10076612741999436
+  - 0.01731558748946227
+- - 0.2420891108257167
+  - 0.962321295118174
+- - 0.15480180051864756
+  - 0.2967622559467372
+- - 0.1176960618807783
+  - 0.7568132091911347
+- - 0.36031192470767204
+  - 0.462043842389655
+- - 0.04071730195075063
+  - 0.5593601236790818
+- - 0.09318021647457553
+  - 0.8725365621835124
+- - 0.03929079959821602
+  - 0.4890522858420312
+- - 0.34264805845318935
+  - 0.2802728921401689
+- - 0.578128693366218
+  - 0.22108684987077587
+- - 0.2501500710854945
+  - 0.29270845555136527
+- - 0.2482288484993369
+  - 0.42811087088346367
+visited_sites:
+- - 0.8902009890396585
+  - 0.7608344540543679
+- - 0.8080168737405738
+  - 0.3237914089052226
+- - 0.9804260643300028
+  - 0.41869152747277294
+- - 0.8983891520884498
+  - 0.46290534199305045
+- - 0.8439689920352883
+  - 0.47807017856122036
+- - 0.7620814470564313
+  - 0.4684787688375802
+- - 0.5832660585753425
+  - 0.6093230837509365
+- - 0.7483938569843773
+  - 0.6870755486161042
+- - 0.7202029277551284
+  - 0.7104658417042873
+- - 0.6824322185898684
+  - 0.746288251615419
+- - 0.709537721994572
+  - 0.7584858885857504
+- - 0.5722924224605467
+  - 0.8904161604341974

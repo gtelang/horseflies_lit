@@ -781,7 +781,7 @@ class PolicyBestInsertionNaive:
 
 def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
                                       insertion_policy_name       = "naive",
-                                      write_algo_states_to_disk_p = False  ,
+                                      write_algo_states_to_disk_p = True  ,
                                       animate_schedule_p          = True   , 
                                       post_optimizer              = None   ,  
                                       plot_computed_schedule      = False):
