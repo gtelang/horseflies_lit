@@ -1463,7 +1463,7 @@ def plotTour(horseflytour, horseflyinit, phi, algo_str, tour_color='#d13131'):
      
     #kwargs = {'size':'large'}
     for x,y,i in zip(xsites, ysites, range(len(xsites))):
-        ax.text(x, y, str(i+1), bbox=dict(facecolor='#ddcba0', alpha=1.0)) 
+        ax.text(x, y, str(i+1), fontsize=14, bbox=dict(facecolor='#ddcba0', alpha=1.0)) 
 
     ax.plot(xfs,yfs,'g-')
     ax.plot(xhs, yhs, color=tour_color, marker='s', linewidth=3.0) 

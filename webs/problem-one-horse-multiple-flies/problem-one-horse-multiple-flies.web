@@ -640,7 +640,7 @@ for idx in range(len(horse_traj_ll)):
                  objs.append(sitepatch)
 
         debug(Fore.CYAN + "Appending to ims "+ Style.RESET_ALL)
-        ims.append(objs[::-1]) 
+        ims.append(objs) 
 @| @}
 %{/python-mode}%
 
@@ -703,9 +703,9 @@ debug(Fore.BLACK + Back.WHITE + "\nStarted constructing ani object"+ Style.RESET
 ani = animation.ArtistAnimation(fig, ims, interval=50, blit=True, repeat_delay=1000)
 debug(Fore.BLACK + Back.WHITE + "\nFinished constructing ani object"+ Style.RESET_ALL)
 
-debug(Fore.MAGENTA + "\nStarted writing animation to disk"+ Style.RESET_ALL)
-ani.save(animation_file_name_prefix+'.avi', dpi=150)
-debug(Fore.MAGENTA + "\nFinished writing animation to disk"+ Style.RESET_ALL)
+#debug(Fore.MAGENTA + "\nStarted writing animation to disk"+ Style.RESET_ALL)
+#ani.save(animation_file_name_prefix+'.avi', dpi=150)
+#debug(Fore.MAGENTA + "\nFinished writing animation to disk"+ Style.RESET_ALL)
 
 plt.show() # For displaying the animation in a live window. 
 @| @}

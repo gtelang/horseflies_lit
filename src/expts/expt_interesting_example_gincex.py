@@ -1,3 +1,4 @@
+
 import sys, os                                                                                   
 import numpy as np                                                                               
 import matplotlib.pyplot as plt                                                                  
@@ -30,4 +31,3 @@ chf.plotTour(collinear_tour, inithorseposn, phi, 'gincoll')
 tsp_ordering_tour = chf.algo_tsp_ordering(sites, inithorseposn, phi,
                                     post_optimizer=chf.algo_exact_given_specific_ordering)  
 chf.plotTour(tsp_ordering_tour, inithorseposn, phi, 'tsp')
-

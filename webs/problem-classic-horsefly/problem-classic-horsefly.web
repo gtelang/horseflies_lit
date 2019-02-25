@@ -629,7 +629,7 @@ print "----------------------------------\n"
 @d Plot everything @{ 
 #kwargs = {'size':'large'}
 for x,y,i in zip(xsites, ysites, range(len(xsites))):
-    ax.text(x, y, str(i+1), bbox=dict(facecolor='#ddcba0', alpha=1.0)) 
+    ax.text(x, y, str(i+1), fontsize=14, bbox=dict(facecolor='#ddcba0', alpha=1.0)) 
 
 ax.plot(xfs,yfs,'g-')
 ax.plot(xhs, yhs, color=tour_color, marker='s', linewidth=3.0) 
@@ -966,6 +966,13 @@ debug(Fore.BLACK + Back.WHITE + "\nFinished constructing ani object"+ Style.RESE
 #plt.show() # For displaying the animation in a live window. 
 @| @}
 %{/python-mode}%
+
+\newpage
+
+@i problem-classic-horsefly/expt-length-increase-after-collinearizing-horsefly-tour.web
+@i problem-classic-horsefly/expt-interesting-example-for-greedy-incremental-insertion.web
+
+
 
 \section{Chapter Index of Fragments}
 @m

@@ -1,3 +1,4 @@
+    
 import sys, os
 import numpy as np
 import matplotlib.pyplot as plt
@@ -15,12 +16,14 @@ def expt(number_of_sites, scheme, inithorseposn, phis, number_of_runs):
   plt.rc('text', usetex=True)
   plt.rc('font', family='serif')
   fig, ax = plt.subplots()
-  ax.set_title("Collinear Tour Length / Exact Tour Length, $N$="+str(number_of_sites) + " ("+scheme+")" + "\n(Greedy Incremental Ordering)", fontsize=28)
-  ax.set_xlabel("Run Number", fontsize=25)
+  ax.set_title("Tour Length of Collinear Horsefly Tour/Tour Length of Exact Horsefly Tour \n for Greedy Incremental Ordering, $N$="+str(number_of_sites), fontsize=28)
+  ax.set_xlabel("Runs", fontsize=25)
   ax.set_ylabel("Tour Length Ratios", fontsize=25)
-  plt.grid(True, linestyle='--')
+  #plt.grid(True, linestyle='--')
   plt.tick_params(labelsize=20)
   #ax.set_xticklabels(map(str,range(number_of_runs)))
+  #ax.minorticks_on()
+
   ax.set_ylim([0.75,1.75])
   
   for phi in phis:
@@ -60,5 +63,6 @@ def expt(number_of_sites, scheme, inithorseposn, phis, number_of_runs):
 
 
 if __name__ == "__main__":
-    expt(number_of_sites=30, scheme='uniform', inithorseposn=(0.5,0.5), \
-         phis=[3.0, 6.0, 12.0, 24.0], number_of_runs=20)
+    expt(number_of_sites=10, scheme='uniform', inithorseposn=(0.5,0.5), \
+         phis=[3.0, 6.0, 12.0, 24.0], number_of_runs=40)
+

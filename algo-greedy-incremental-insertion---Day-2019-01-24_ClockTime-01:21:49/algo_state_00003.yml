@@ -1,0 +1,69 @@
+horse_tour:
+- !!python/tuple
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - &id001 !!python/object/apply:numpy.dtype
+      args:
+      - f8
+      - 0
+      - 1
+      state: !!python/tuple
+      - 3
+      - <
+      - null
+      - null
+      - null
+      - -1
+      - -1
+      - 0
+    - !!binary |
+      hA8++OCD1z8=
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - *id001
+    - !!binary |
+      pgb2jqmB1T8=
+- !!python/tuple
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - *id001
+    - !!binary |
+      H2Gh++5R4D8=
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - *id001
+    - !!binary |
+      nHObXfl81j8=
+- !!python/tuple
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - *id001
+    - !!binary |
+      S4LHuQJp4T8=
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - *id001
+    - !!binary |
+      npghv0Ir2T8=
+- !!python/tuple
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - *id001
+    - !!binary |
+      JXNpM0zz4T8=
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - *id001
+    - !!binary |
+      tzRTOddu2D8=
+insertion_policy_name: naive
+unvisited_sites:
+- - 0.023719617325735354
+  - 0.24936776161549723
+- - 0.39601518813608294
+  - 0.05960226942183844
+- - 0.07445174993547887
+  - 0.07181961731187991
+- - 0.8954560793437042
+  - 0.8161564515397535
+- - 0.7634937518395907
+  - 0.8809333540515496
+visited_sites:
+- - 0.866445173329354
+  - 0.3897249421316361
+- - 0.6292362607115711
+  - 0.4979844567750027
+- - 0.6031512683133905
+  - 0.3530145686208208
