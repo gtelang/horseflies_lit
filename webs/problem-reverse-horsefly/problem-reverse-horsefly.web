@@ -1,1 +1,15 @@
+@s 
 \chapter{Reverse Horsefly}
+\label{chap:reverse-horsefly}
+
+\section{Module Overview}
+
+\newchunk 
+All algorithms to solve the reverse horsefly problems have been implemented in 
+\verb|problem_reverse_horsefly.py|. The \verb|run_handler| function acts 
+as a kind of main function for this module. It is called from 
+\verb|main.py| to process the command-line arguments and run the 
+experimental or interactive sections of the code. 
+
+
+@S
