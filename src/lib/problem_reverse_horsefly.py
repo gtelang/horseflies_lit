@@ -62,7 +62,8 @@ def run_handler():
 
                     algo_str = raw_input(Fore.YELLOW                                             +\
                             "Enter algorithm to be used to compute the tour:\n Options are:\n"   +\
-                            " (gncr)   Greedy NN Concentric Routing \n"                                        +\
+                            " (gncr)   Greedy NN Concentric Routing \n"                          +\
+                            " (jte)    Greedy NN Joe thought experiments (phi < 1) \n"           +\
                             Style.RESET_ALL)
 
                     algo_str = algo_str.lstrip()
@@ -72,6 +73,8 @@ def run_handler():
 
                     if   algo_str == 'gncr':
                           tour = run.getTour( algo_greedy_nn_concentric_routing, phi)
+                    elif algo_str == 'jte':
+                          tour = run.getTour(algo_greedy_nn_joes_thought_experiments, phi)
                     else:
                           print "Unknown option. No horsefly for you! ;-D "
                           sys.exit()
@@ -160,11 +163,216 @@ class ReverseHorseflyInput:
 
 #---------------------------------
 # Algorithms for reverse horsefly 
-#---------------------------------   
+#---------------------------------
+def algo_greedy_nn_joes_thought_experiments(sites, inithorseposn, phi,    \
+                                      write_algo_states_to_disk_p = True, \
+                                      write_io_p                  = True, \
+                                      animate_tour_p              = False,\
+                                      plot_tour_p                 = True) :
+    
+    assert(phi<1) # If phi > 1 then you might have to do some waiting time. 
+    # Set algo-state and input-output files config
+    import sys, datetime, os, errno
+    from sklearn.neighbors import NearestNeighbors
+
+    algo_name     = 'algo-greedy-nn-joes-thought-experiments'
+    time_stamp    = datetime.datetime.now().strftime('Day-%Y-%m-%d_ClockTime-%H:%M:%S')
+    dir_name      = algo_name + '---' + time_stamp
+    io_file_name  = 'input_and_output.yml'
+
+    try:
+        os.makedirs(dir_name)
+    except OSError as e:
+        if e.errno != errno.EEXIST:
+            raise
+
+    # First we decide the order in which the drones are collected/flies are serviced
+    # i.e. we perform the thought experiments. While deciding the order. 
+    # remember there is no waiting time. 
+    numsites                 = len(sites)
+    current_horse_posn       = np.asarray(inithorseposn) 
+    horse_traj_seq           = [current_horse_posn]
+    drones_collected_seq_p   = [False for i in range(numsites)] 
+    order_collection         = []
+
+    while not(all(drones_collected_seq_p)):
+        uncollected_drones_seq_idx  = [idx for idx in range(len(drones_collected_seq_p)) 
+                                      if drones_collected_seq_p[idx] == False]
+
+        # find the closest uncollected drone from the current horse position
+        # Replace this step with some dynamic nearest neighbor algorithm for 
+        # improving the speed. 
+        imin = 0 
+        dmin = np.inf
+        for idx in uncollected_drones_seq_idx:
+            dmin_test  = np.linalg.norm(sites[idx]-current_horse_posn)
+            if dmin_test < dmin:
+                imin = idx
+                dmin =  dmin_test
+
+        # Make the horse and drone meet on a point along the 
+        # segment joining the horse and drone
+        new_horse_posn     = current_horse_posn + 1.0/(1+phi) * (sites[imin]-current_horse_posn) 
+        current_horse_posn = new_horse_posn
+        horse_traj_seq.append(current_horse_posn)
+        order_collection.append((imin, new_horse_posn)) 
+
+        # Mark the drone as collected and the position of the new horse
+        drones_collected_seq_p[imin] = True
+
+    # Plot the horse-trajectory and the corresponding collection points
+    import matplotlib.animation as animation
+    from   matplotlib.patches import Circle
+    import matplotlib.pyplot as plt 
+
+    # Set up configurations and parameters for all necessary graphics
+       
+    plt.rc('text', usetex=True)
+    plt.rc('font', family='serif')
+    sitesize = 0.015
+    fig, ax = plt.subplots(nrows=1, ncols=2)
+    ax[0].set_xlim([0,1])
+    ax[0].set_ylim([0,1])
+    ax[0].set_aspect('equal')
+    ax[1].set_xlim([0,1])
+    ax[1].set_ylim([0,1])
+    ax[1].set_aspect('equal')
+
+    ax[0].set_xticks(np.arange(0, 1, 0.1))
+    ax[0].set_yticks(np.arange(0, 1, 0.1))
+    ax[1].set_xticks(np.arange(0, 1, 0.1))
+    ax[1].set_yticks(np.arange(0, 1, 0.1))
+
+    # Turn on the minor TICKS, which are required for the minor GRID
+    ax[0].minorticks_on()
+    ax[1].minorticks_on()
+
+    # customize the major grid
+    ax[0].grid(which='major', linestyle='--', linewidth='0.3', color='red')
+    ax[1].grid(which='major', linestyle='--', linewidth='0.3', color='red')
+
+    # Customize the minor grid
+    ax[0].grid(which='minor', linestyle=':', linewidth='0.3', color='black')
+    ax[1].grid(which='minor', linestyle=':', linewidth='0.3', color='black')
+
+    ax[0].get_xaxis().set_ticklabels([])
+    ax[0].get_yaxis().set_ticklabels([])
+    ax[1].get_xaxis().set_ticklabels([])
+    ax[1].get_yaxis().set_ticklabels([])
+
+    # Plot sites as small disks
+    for site in sites:
+         circle = Circle((site[0], site[1]), sitesize, \
+                          facecolor = 'k'   , \
+                          edgecolor = 'black'     , \
+                          linewidth=1.0)
+         sitepatch = ax[0].add_patch(circle)
+
+    circle = Circle((inithorseposn[0], inithorseposn[1]), 0.02, facecolor = '#D13131', edgecolor='black', linewidth=1.0)
+    ax[0].add_patch(circle)
+
+    xhs = [x for (x,y) in horse_traj_seq]
+    yhs = [y for (x,y) in horse_traj_seq]
+    ax[0].plot(xhs,yhs,'-',linewidth=5.0, markersize=6, alpha=1.00, color='#D13131')
+
+    # Fly segments
+    for (idx, endpt) in order_collection:
+        print idx, endpt
+        xfs = [sites[idx][0], endpt[0]]
+        yfs = [sites[idx][1], endpt[1]]
+        ax[0].plot(xfs,yfs,'-',linewidth=2.0, markersize=3, alpha=0.7, color='k')
+
+    tour_length = utils_algo.length_polygonal_chain(zip(xhs, yhs))
+    ax[0].set_title("Number of sites: " + str(len(sites)) + "\n Serial Collection tour length " +\
+                    str(round(tour_length,4)), fontsize=15)
+    ax[0].set_xlabel(r"$\varphi=$ " + str(phi) , fontsize=15)
+
+    def normalize(vec):
+        unit_vec =  1.0/np.linalg.norm(vec) * vec
+        assert( abs(np.linalg.norm(unit_vec)-1.0) < 1e-8 )
+        return unit_vec
+
+    # Return the smaller angle between two vectors
+    def cosine_angle_between_two_vectors(v1, v2):
+        dot_product      = np.dot(v1,v2)
+        norm_v1, norm_v2 = map(np.linalg.norm, [v1, v2])
+        return dot_product/(norm_v1*norm_v2)
+
+
+    # Now that we know the order of collection and the destination of each of the drones,
+    # the drones start moving in tandem along those rays. In the mean time the horse 
+    # collects the drones in order as given. For the algorithm to not crash it is 
+    # important that phi < 1, which is why the assert statement was put at the beginning 
+    # of this code.
+
+    horse_traj                = [np.asarray(inithorseposn)]
+    current_posns_of_drones   = map(np.asarray, [sites[idx] for (idx, _)   in order_collection]) # this keeps changing
+    heading_vectors_of_drones = [normalize(head_pt - sites[idx]) for (idx, head_pt) in order_collection] # this stays constant throughout the loop! 
+
+    for i in range(len(order_collection)):
+
+        # Horse catches up with the drone 
+        # Update the position of the horse *and* that drone.  
+        # Record the time catch_time taken to catch up with that drone
+
+        current_horse_posn = horse_traj[-1]
+        drone_truck_vector = np.asarray(current_horse_posn) - current_posns_of_drones[i]                                    
+        l                  = np.linalg.norm(drone_truck_vector)                                                             
+        cos_theta          = cosine_angle_between_two_vectors(drone_truck_vector, heading_vectors_of_drones[i])            
+        t                  = 1.0/(1.0-phi**2) * l * (-phi*cos_theta + np.sqrt(phi**2 * cos_theta**2 + (1.0-phi**2)))
+        d                  = t * phi                                                                               
+        new_drone_posn     = current_posns_of_drones[i] + d * heading_vectors_of_drones[i]                        
+        new_horse_posn     = new_drone_posn # horse and drone have just met up
+
+        current_posns_of_drones[i] = new_drone_posn
+        horse_traj.append(new_horse_posn)
+
+        # Update the positions of the remaining drones using catch_time recorded above
+        # the current positions of the drones and the heading-vectors
+        for k in range(i+1,len(current_posns_of_drones)):
+                current_posns_of_drones[k] = current_posns_of_drones[k] +\
+                                             d * heading_vectors_of_drones[k]
+        
+    # Initial position of horse
+    circle = Circle((inithorseposn[0], inithorseposn[1]), 0.02, facecolor = '#D13131', edgecolor='black', linewidth=1.0)
+    ax[1].add_patch(circle)
+
+    # Horse tour
+    xhs = [x for (x,y) in horse_traj]
+    yhs = [y for (x,y) in horse_traj]
+    ax[1].plot(xhs,yhs,'-',linewidth=5.0, markersize=6, alpha=1.00, color='#D13131')
+
+    tour_length = utils_algo.length_polygonal_chain(zip(xhs, yhs))
+    ax[1].set_title("Number of sites: " + str(len(sites)) + "\n Thought Experiment heuristic tour length " +\
+                 str(round(tour_length,4)), fontsize=15)
+    ax[1].set_xlabel(r"$\varphi=$ " + str(phi) , fontsize=15)
+
+    # Fly segments
+    for (idx, endpt), i in zip(order_collection, range(len(current_posns_of_drones))):
+        xfs = [sites[idx][0], endpt[0], current_posns_of_drones[i][0]]
+        yfs = [sites[idx][1], endpt[1], current_posns_of_drones[i][1]]
+        ax[1].plot(xfs,yfs,'s-',linewidth=2.0, markersize=5, markerfacecolor='g', alpha=0.7, color='k')
+
+    # Plot sites as small disks
+    for site in sites:
+         circle = Circle((site[0], site[1]), sitesize, \
+                          facecolor = 'k'   , \
+                          edgecolor = 'black'     , \
+                          linewidth=1.0)
+         sitepatch = ax[1].add_patch(circle)
+
+
+
+    plt.show()
+
+    sys.exit()
+
+   
 def algo_greedy_nn_concentric_routing(sites, inithorseposn, phi, \
                                       write_algo_states_to_disk_p = True,\
                                       write_io_p                  = True,\
-                                      animate_tour_p              = True) :
+                                      animate_tour_p              = False,\
+                                      plot_tour_p                 = True) :
     # Set algo-state and input-output files config
     import sys, datetime, os, errno
     from sklearn.neighbors import NearestNeighbors
@@ -238,6 +446,16 @@ def algo_greedy_nn_concentric_routing(sites, inithorseposn, phi, \
     print Fore.YELLOW, "Horse Trajectory is "
     utils_algo.print_list(horse_traj)
     print Style.RESET_ALL
+
+    if plot_tour_p:
+        plot_tour_gncr(sites            = sites, 
+                  inithorseposn    = inithorseposn, 
+                  phi              = phi, 
+                  horse_trajectory = horse_traj, 
+                  fly_trajectories = fly_trajs,
+                  plot_file_name   = dir_name + '/' + 'plot.png')
+
+
 
     # Animate compute tour if \verb|animate_tour_p == True|
     if animate_tour_p:
@@ -313,6 +531,82 @@ def head_towards_center(center_heading,        \
     return new_horse_posn, new_fly_posns, idx_of_fastest_fly_to_center
 
 
+
+
+def plot_tour_gncr (sites, inithorseposn, phi, \
+               horse_trajectory,          \
+               fly_trajectories,          \
+               plot_file_name):
+
+    import numpy as np
+    import matplotlib.animation as animation
+    from   matplotlib.patches import Circle
+    import matplotlib.pyplot as plt 
+
+    # Set up configurations and parameters for all necessary graphics
+       
+    plt.rc('text', usetex=True)
+    plt.rc('font', family='serif')
+
+    fig, ax = plt.subplots()
+    ax.set_xlim([0,1])
+    ax.set_ylim([0,1])
+    ax.set_aspect('equal')
+
+    ax.set_xticks(np.arange(0, 1, 0.1))
+    ax.set_yticks(np.arange(0, 1, 0.1))
+
+    # Turn on the minor TICKS, which are required for the minor GRID
+    ax.minorticks_on()
+
+    # customize the major grid
+    ax.grid(which='major', linestyle='--', linewidth='0.3', color='red')
+
+    # Customize the minor grid
+    ax.grid(which='minor', linestyle=':', linewidth='0.3', color='black')
+
+    ax.get_xaxis().set_ticklabels([])
+    ax.get_yaxis().set_ticklabels([])
+
+    horse_trajectory_pts = map(lambda x: x[0], horse_trajectory)
+    tour_length = utils_algo.length_polygonal_chain(horse_trajectory_pts)
+        
+    ax.set_title("Number of sites: " + str(len(sites)) + "\nReverse Horsefly Tour Length: " +\
+                 str(round(tour_length,4)), fontsize=15)
+    ax.set_xlabel(r"$\varphi=$ " + str(phi) , fontsize=15)
+
+    xhs = [ elt[0][0] for elt in horse_trajectory] 
+    yhs = [ elt[0][1] for elt in horse_trajectory] 
+    ax.plot(xhs,yhs,'-',linewidth=5.0, markersize=6, alpha=1.00, color='#D13131')
+
+    circle = Circle((inithorseposn[0], inithorseposn[1]), 0.02, facecolor = 'r', edgecolor='black', linewidth=1.0)
+    ax.add_patch(circle)
+    
+    # Plot sites as black circles
+    for site in sites:
+         circle = Circle((site[0], site[1]), 0.005, \
+                          facecolor = 'k'   , \
+                          edgecolor = 'black'     , \
+                          linewidth=1.0)
+         sitepatch = ax.add_patch(circle)
+
+    # Plot the routes of flies as black lines
+    for ftraj in fly_trajectories:
+        #xfs = [elt[0][0] for elt in ftraj ]
+        #yfs = [elt[0][1] for elt in ftraj ]
+        
+        xfs = [ftraj[0][0][0], ftraj[-1][0][0]]
+        yfs = [ftraj[0][0][1], ftraj[-1][0][1]]
+        
+        ax.plot(xfs,yfs,'-',linewidth=2.0, markersize=6, alpha=0.5, color='k')
+
+    plt.savefig(plot_file_name, bbox_inches='tight', dpi=250)
+    plt.show()
+
+
+#------------------------------------------------------
+#### Warning here be dragons!
+#------------------------------------------------------
 # Animation routines
 # Make sure that the fly_tours are all light blue
 # but the dots are black as they move. When a site 
@@ -382,6 +676,7 @@ def animate_tour (sites, inithorseposn, phi, \
              fly_traj_ll.append((fly_traj[i][0], fly_traj[i+1][0]))
         fly_trajs_ll.append(fly_traj_ll)
 
+
     def discretize_leg(pts):
         subleg_pts = []
         if pts == None:
@@ -400,17 +695,11 @@ def animate_tour (sites, inithorseposn, phi, \
 
     ims                 = []
     horse_points_so_far = []
-    fly_points_so_far   = [[] for i in range(len(sites))] 
-    for idx in range(len(horse_traj_ll)):
-        horse_points_so_far.append(horse_traj_ll[idx][0])       
+    fly_points_so_far   = []
+    for horse_leg_num in range(len(horse_traj_ll)):
+        horse_points_so_far.append(horse_traj_ll[horse_leg_num][0])
         
-        for k in range(len(sites)):
-              if idx < len(fly_trajs_ll[k]):
-                     fly_points_so_far[k].append(fly_trajs_ll[k][idx][0])
-              else :
-                     fly_points_so_far[k].append(fly_trajectories[k][-1][0])
-
-        horse_leg_pts  = [horse_traj_ll[idx][0], horse_traj_ll[idx][1]]
+        horse_leg_pts  = [horse_traj_ll[horse_leg_num][0], horse_traj_ll[horse_leg_num][1]]
         horse_leg_disc = discretize_leg(horse_leg_pts)   # list of points 
         print horse_leg_disc
 
@@ -438,6 +727,14 @@ def animate_tour (sites, inithorseposn, phi, \
 
             debug(Fore.CYAN + "Appending to ims "+ Style.RESET_ALL)
             ims.append(objs) 
+
+        # .....HERE be dragons.....
+        for flynum in range(len(sites)):
+            if len(fly_trajs_ll[flynum]) > horse_leg_num: # flies are still moving
+                print Fore.GREEN, "Processing happens here!!", Style.RESET_ALL
+            else: # flies have come to a stand-still
+                pass
+
 
     # Write animation of tour to disk and display in live window
     from colorama import Back 

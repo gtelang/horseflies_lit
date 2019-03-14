@@ -663,11 +663,11 @@ def animate_tour (sites, inithorseposn, phi, horse_trajectory, fly_trajectories,
     from colorama import Back 
 
     debug(Fore.BLACK + Back.WHITE + "\nStarted constructing ani object"+ Style.RESET_ALL)
-    ani = animation.ArtistAnimation(fig, ims, interval=20, blit=True)
+    ani = animation.ArtistAnimation(fig, ims, interval=40, blit=True)
     debug(Fore.BLACK + Back.WHITE + "\nFinished constructing ani object"+ Style.RESET_ALL)
 
     #debug(Fore.MAGENTA + "\nStarted writing animation to disk"+ Style.RESET_ALL)
-    #ani.save(animation_file_name_prefix+'.avi', dpi=150)
+    #ani.save(animation_file_name_prefix+'.avi', dpi=100)
     #debug(Fore.MAGENTA + "\nFinished writing animation to disk"+ Style.RESET_ALL)
 
     plt.show() # For displaying the animation in a live window. 
