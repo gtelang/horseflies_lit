@@ -371,8 +371,8 @@ def algo_greedy_nn_joes_thought_experiments(sites, inithorseposn, phi,    \
 def algo_greedy_nn_concentric_routing(sites, inithorseposn, phi, \
                                       write_algo_states_to_disk_p = True,\
                                       write_io_p                  = True,\
-                                      animate_tour_p              = False,\
-                                      plot_tour_p                 = True) :
+                                      animate_tour_p              = True,\
+                                      plot_tour_p                 = False) :
     # Set algo-state and input-output files config
     import sys, datetime, os, errno
     from sklearn.neighbors import NearestNeighbors
@@ -459,12 +459,11 @@ def algo_greedy_nn_concentric_routing(sites, inithorseposn, phi, \
 
     # Animate compute tour if \verb|animate_tour_p == True|
     if animate_tour_p:
-        animate_tour(sites            = sites, 
-                     inithorseposn    = inithorseposn, 
-                     phi              = phi, 
-                     horse_trajectory = horse_traj, 
-                     fly_trajectories = fly_trajs,
-                     animation_file_name_prefix = dir_name + '/' + io_file_name)
+        animate_tour(phi                = phi, 
+                     horse_trajectories = [horse_traj],
+                     fly_trajectories   = fly_trajs,
+                     animation_file_name_prefix = dir_name + '/' + io_file_name,
+                     squiggles_p                = True)
     
 
 
@@ -487,7 +486,7 @@ def algo_greedy_nn_concentric_routing(sites, inithorseposn, phi, \
 # function that essentially only otherwise makes the decisions of what centers
 # to choose to head towards. 
 # Finally the money-shot begins. Implement this function carefully after some 
-# detailed derivation. The important thing here is if horse reaches first, then 
+ # detailed derivation. The important thing here is if horse reaches first, then 
 # it waits and if the fly reaches first then it waits, basically you need to 
 # calculate the time it takes for the horse to reach and the time it takes for 
 # the fly to reach. Any waiting is the absolute value of the difference between 
@@ -592,44 +591,72 @@ def plot_tour_gncr (sites, inithorseposn, phi, \
 
     # Plot the routes of flies as black lines
     for ftraj in fly_trajectories:
-        #xfs = [elt[0][0] for elt in ftraj ]
-        #yfs = [elt[0][1] for elt in ftraj ]
+        xfs = [elt[0][0] for elt in ftraj ]
+        yfs = [elt[0][1] for elt in ftraj ]
         
-        xfs = [ftraj[0][0][0], ftraj[-1][0][0]]
-        yfs = [ftraj[0][0][1], ftraj[-1][0][1]]
+        #xfs = [ftraj[0][0][0], ftraj[-1][0][0]]
+        #yfs = [ftraj[0][0][1], ftraj[-1][0][1]]
         
         ax.plot(xfs,yfs,'-',linewidth=2.0, markersize=6, alpha=0.5, color='k')
 
     plt.savefig(plot_file_name, bbox_inches='tight', dpi=250)
     plt.show()
 
-
-#------------------------------------------------------
-#### Warning here be dragons!
-#------------------------------------------------------
-# Animation routines
-# Make sure that the fly_tours are all light blue
-# but the dots are black as they move. When a site 
-# gets serviced it turns to blue. Unserviced sites
-# remain black till they get serviced. The horse 
-# trajectory as before is always red. When you graduate
-# to two horses, then you can make the things 
-# multicolored.
-
-# For nn routing, where all the flies have the same velocity
-# you can completely ignore waiting times, because no one ever
-# waits in the nn routing ever. 
-def animate_tour (sites, inithorseposn, phi, \
-                  horse_trajectory,          \
-                  fly_trajectories,          \
-                  animation_file_name_prefix):
+#----------------------------------------------------------------------------------------
+def animate_tour (phi, horse_trajectories, fly_trajectories, 
+                  animation_file_name_prefix, squiggles_p=False):
+    """ This function can handle the animation of multiple 
+    horses and arbitrary waiting times at the end point of the 
+    trajectory. I will assume that there is no waiting at any 
+    intermediate point, including the starting point. Also 
+    for multiple horses, the fly and the fly trajectory is labelled with
+    is labelled with the same color depending on the horse it is serviced 
+    at the very end by. There may be intermediate loyalty switching 
+    in some heuristics, but I won't care about that in this particular 
+    heuristic.
+    
+    A fly/horse trajectory should only be a list of points! No waiting 
+    or anything at required! The horse trajectory should have the inithorseposn 
+    as the first point in the sequence. So too with the fly trajectories, the 
+    sites are always the first point on the trajectories
+    The waiting time can be calculated easily given the horse trajectory 
+    and the fly trajectories. No need to calculate it explicitly within a 
+    heuristic which you were attempting. The waiting time can then optionally 
+    be pasted on top of waiting drone on the animation canvas. 
+    
+    At the end of each segment of a horse-trajectory, it just stores the 
+    list of drones collected at the end point. Usually this willbe a list of 
+    size 1, but there may be heuristics where you might want to collect a 
+    bunch of them together. 
+    
+    For an initial implementation, I won't need a drone list. The drone list 
+    is only so that you can flip the color of the drone to indicate that it has 
+    been collected and some counter on top of the canvas gets updated on the number 
+    of drones left as uncollected. This will serve as some kind of ticker.
+    
+    if squiggles_p = True then the original fly trajectories are used. 
+    if False, then you just head for the end point and wait. Remember fly 
+    trajectories are just a list of points. horse trajectory is a list of 
+    points and the number of the drone served at the end point. Waiting time 
+    for either case can be computed based on whether this boolean flag is 
+    on or off. 
+   
+    If the heuristic already does the shortcutting, then the squiggles_p 
+    flag will in general not matter. The default setting is to use the 
+    trajectories of the flies as given. 
+    
+    For a first implementation, I don't need waiting times, and which drone 
+    a horse collects at the end of each leg. I just want to animate the trajectories
+    as moving. I will also asusme that the trucks move at speed 1.0 and all the 
+    drones with speed $\phi$. The heuristics, can be adapted to variable speed, 
+    but for the moment I would just like to keep things simple. 
+    """
     import numpy as np
     import matplotlib.animation as animation
     from   matplotlib.patches import Circle
     import matplotlib.pyplot as plt 
 
     # Set up configurations and parameters for all necessary graphics
-       
     plt.rc('text', usetex=True)
     plt.rc('font', family='serif')
 
@@ -653,97 +680,133 @@ def animate_tour (sites, inithorseposn, phi, \
     ax.get_xaxis().set_ticklabels([])
     ax.get_yaxis().set_ticklabels([])
 
-    # Visually distinct colors for displaying each flys trajectory in a different color 
-    number_of_flies = len(fly_trajectories)
-
-    horse_trajectory_pts = map(lambda x: x[0], horse_trajectory)
-    tour_length = utils_algo.length_polygonal_chain(horse_trajectory_pts)
+    number_of_flies  = len(fly_trajectories)
+    number_of_horses = len(horse_trajectories)
+    colors           = utils_graphics.get_colors(number_of_horses, lightness=0.5)
         
-    ax.set_title("Number of sites: " + str(len(sites)) + "\nReverse Horsefly Tour Length: " +\
-                 str(round(tour_length,4)), fontsize=15)
-    ax.set_xlabel(r"$\varphi=$ " + str(phi) , fontsize=15)
+    ims                = []
+    from colorama import Back 
+    debug(Fore.BLACK + Back.WHITE + "\nStarted constructing ani object"+ Style.RESET_ALL)
+    ani = animation.ArtistAnimation(fig, ims, interval=40, blit=True)
+    debug(Fore.BLACK + Back.WHITE + "\nFinished constructing ani object"+ Style.RESET_ALL)
 
-    # Leg list form for all horse trajectories
-    horse_traj_ll = []
-    for i in range(len(horse_trajectory)-1):
-        horse_traj_ll.append((horse_trajectory[i][0], horse_trajectory[i+1][0]))
+    # Constant for discretizing each segment inside the trajectories of the horses
+    # and flies. 
+    NUM_SUB_LEGS              = 5
+    
+    # Arrays keeping track of the states of the horses
+    horses_reached_endpt_p    = [False for i in range(number_of_horses)]
+    horses_traj_num_legs      = [len(traj)-1 for traj in horse_trajectories] # the -1 is because the initial position of the horse is always included. 
+    horses_current_leg_idx    = [0 for i in range(number_of_horses)]
+    horses_current_subleg_idx = [0 for i in range(number_of_horses)] 
+    horses_current_posn       = [traj[0] for traj in horse_trajectories]
 
-    # Leg list form for all fly trajectories
-    fly_trajs_ll = []
-    for fly_traj in fly_trajectories:
-        fly_traj_ll = []
-        for i in range(len(fly_traj)-1):
-             fly_traj_ll.append((fly_traj[i][0], fly_traj[i+1][0]))
-        fly_trajs_ll.append(fly_traj_ll)
+    # Arrays keeping track of the states of the flies
+    flies_reached_endpt_p    = [False for i in range(number_of_flies)]
+    flies_traj_num_legs      = [len(traj)-1 for traj in fly_trajectories]
+    flies_current_leg_idx    = [0 for i in range(number_of_flies)]
+    flies_current_subleg_idx = [0 for i in range(number_of_flies)] 
+    flies_current_posn       = [traj[0] for traj in fly_trajectories]
 
+    # The drone collection process ends, when all the flies AND horses 
+    # have reached their ends. Some heuristics, might involve the flies 
+    # or the horses waiting at the endpoints of their respective trajectories. 
+    while not(all(horses_reached_endpt_p + flies_reached_endpt_p)): 
 
-    def discretize_leg(pts):
-        subleg_pts = []
-        if pts == None:
-             return None
-        else:
-             k  = 6
-             pts = map(np.asarray, pts)
-             for p,q in zip(pts, pts[1:]):
-                 tmp = []
-                 for t in np.linspace(0,1,k): 
-                       tmp.append((1-t)*p + t*q) 
-                 subleg_pts.extend(tmp[:-1])
+        # Update the states of all the horses
+        for hidx in range(number_of_horses):
+            if horses_reached_endpt_p[hidx] == False:
+                htraj  = horse_trajectories[hidx]
 
-             subleg_pts.append(pts[-1])
-             return subleg_pts
+                if horses_current_subleg_idx[hidx] <= NUM_SUB_LEGS-2:
 
-    ims                 = []
-    horse_points_so_far = []
-    fly_points_so_far   = []
-    for horse_leg_num in range(len(horse_traj_ll)):
-        horse_points_so_far.append(horse_traj_ll[horse_leg_num][0])
-        
-        horse_leg_pts  = [horse_traj_ll[horse_leg_num][0], horse_traj_ll[horse_leg_num][1]]
-        horse_leg_disc = discretize_leg(horse_leg_pts)   # list of points 
-        print horse_leg_disc
+                    horses_current_subleg_idx[hidx] += 1     # subleg idx changes
+                    legidx    = horses_current_leg_idx[hidx] # the legidx remains the same
+                    
+                    sublegidx = horses_current_subleg_idx[hidx] # shorthand for easier reference in the next two lines
+                    xcurr = np.linspace( htraj[legidx][0], htraj[legidx+1][0], NUM_SUB_LEGS+1 )[sublegidx]
+                    ycurr = np.linspace( htraj[legidx][1], htraj[legidx+1][1], NUM_SUB_LEGS+1 )[sublegidx]
+                    horses_current_posn[hidx]  = [xcurr, ycurr] 
 
-        for k in range(len(horse_leg_disc)):
-            current_horse_posn = horse_leg_disc[k]
-            objs = []
+                else:
+                    horses_current_subleg_idx[hidx] = 0 # reset to 0
+                    horses_current_leg_idx[hidx]   += 1 # you have passed onto the next leg
+                    legidx    = horses_current_leg_idx[hidx]
 
-            # Plot trajectory of horse
-            xhs = [pt[0] for pt in horse_points_so_far] + [current_horse_posn[0]]
-            yhs = [pt[1] for pt in horse_points_so_far] + [current_horse_posn[1]]
+                    xcurr, ycurr = htraj[legidx][0], htraj[legidx][1] # current position is the zeroth point on the next leg
+                    horses_current_posn[hidx]  = [xcurr , ycurr] 
+
+                    if horses_current_leg_idx[hidx] == horses_traj_num_legs[hidx]:
+                        horses_reached_endpt_p[hidx] = True
+
+        # Update the states of all the flies
+        for fidx in range(number_of_flies):
+            if flies_reached_endpt_p[fidx] == False:
+                ftraj  = fly_trajectories[fidx]
+
+                if flies_current_subleg_idx[fidx] <= NUM_SUB_LEGS-2:
+                    
+                    flies_current_subleg_idx[fidx] += 1
+                    legidx    = flies_current_leg_idx[fidx]
+
+                    sublegidx = flies_current_subleg_idx[fidx]
+                    xcurr = np.linspace( ftraj[legidx][0], ftraj[legidx+1][0], NUM_SUB_LEGS+1 )[sublegidx]
+                    ycurr = np.linspace( ftraj[legidx][1], ftraj[legidx+1][1], NUM_SUB_LEGS+1 )[sublegidx]
+                    flies_current_posn[fidx]  = [xcurr, ycurr] 
+
+                else:
+                    flies_current_subleg_idx[fidx] = 0 # reset to zero
+                    flies_current_leg_idx[fidx]   += 1 # you have passed onto the next leg
+                    legidx    = flies_current_leg_idx[fidx]
+
+                    xcurr, ycurr = ftraj[legidx][0], ftraj[legidx][1] # current position is the zeroth point on the next leg
+                    flies_current_posn[fidx]  = [xcurr , ycurr] 
+
+                    if flies_current_leg_idx[fidx] == flies_traj_num_legs[fidx]:
+                        flies_reached_endpt_p[fidx] = True
+
+        # Render all the horse trajectories uptil this point in time. 
+        for hidx in range(number_of_horses):
+            traj               = horse_trajectories[hidx]
+            current_horse_posn = horses_current_posn[hidx]
+            
+            if horses_current_leg_idx[hidx] != horses_traj_num_legs[hidx]: # the horse is still moving
+
+                  xhs = [traj[k][0] for k in range(1+horses_current_leg_idx[hidx])] + [current_horse_posn[0]]
+                  yhs = [traj[k][1] for k in range(1+horses_current_leg_idx[hidx])] + [current_horse_posn[1]]
+
+            else: # The horse has stopped moving
+                  xhs = traj
+                  yhs = traj
+
             horseline, = ax.plot(xhs,yhs,'-',linewidth=5.0, markersize=6, alpha=1.00, color='#D13131')
-            horseloc   = Circle((current_horse_posn[0], current_horse_posn[1]), 0.02, facecolor = '#D13131', alpha=1.00)
+            horseloc   = Circle((current_horse_posn[0], current_horse_posn[1]), 0.015, facecolor = '#D13131', alpha=1.00)
             horsepatch = ax.add_patch(horseloc)
             objs.append(horseline)
             objs.append(horsepatch)
 
-            # Plot sites as black circles
-            for site in sites:
-                 circle = Circle((site[0], site[1]), 0.01, \
-                                  facecolor = 'k'   , \
-                                  edgecolor = 'black'     , \
-                                  linewidth=1.0)
-                 sitepatch = ax.add_patch(circle)
-                 objs.append(sitepatch)
 
-            debug(Fore.CYAN + "Appending to ims "+ Style.RESET_ALL)
-            ims.append(objs) 
+        # Render all fly trajectories uptil this point in time
+        for fidx in range(number_of_flies):
+            traj               = fly_trajectories[fidx]
+            current_fly_posn   = flies_current_posn[fidx]
+            
+            if flies_current_leg_idx[fidx] != flies_traj_num_legs[fidx]: # the fly is still moving
 
-        # .....HERE be dragons.....
-        for flynum in range(len(sites)):
-            if len(fly_trajs_ll[flynum]) > horse_leg_num: # flies are still moving
-                print Fore.GREEN, "Processing happens here!!", Style.RESET_ALL
-            else: # flies have come to a stand-still
-                pass
+                  xfs = [traj[k][0] for k in range(1+flies_current_leg_idx[fidx])] + [current_fly_posn[0]]
+                  yfs = [traj[k][1] for k in range(1+flies_current_leg_idx[fidx])] + [current_fly_posn[1]]
+
+            else: # The fly has stopped moving
+                  xfs = traj
+                  yfs = traj
+
+            flyline, = ax.plot(xfs,yfs,'-',linewidth=2.5, markersize=6, alpha=1.00, color='#3FE3AD')
+            flyloc   = Circle((current_fly_posn[0], current_fly_posn[1]), 0.008, facecolor = '#3FE3AD', alpha=1.00)
+            flypatch = ax.add_patch(flyloc)
+            objs.append(flyline)
+            objs.append(flypatch)
 
 
-    # Write animation of tour to disk and display in live window
-    from colorama import Back 
-    debug(Fore.BLACK + Back.WHITE + "\nStarted constructing ani object"+ Style.RESET_ALL)
-    ani = animation.ArtistAnimation(fig, ims, interval=50, blit=True, repeat_delay=1000)
-    debug(Fore.BLACK + Back.WHITE + "\nFinished constructing ani object"+ Style.RESET_ALL)
+        ims.append(objs) 
 
-    #debug(Fore.MAGENTA + "\nStarted writing animation to disk"+ Style.RESET_ALL)
-    #ani.save(animation_file_name_prefix+'.avi', dpi=150)
-    #debug(Fore.MAGENTA + "\nFinished writing animation to disk"+ Style.RESET_ALL)
-
-    plt.show() # For displaying the animation in a live window. 
+    plt.show()
