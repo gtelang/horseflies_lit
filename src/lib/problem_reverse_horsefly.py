@@ -388,16 +388,16 @@ def algo_greedy_nn_concentric_routing(sites, inithorseposn, phi, \
         if e.errno != errno.EEXIST:
             raise
     numsites            = len(sites)
-    horse_traj          = [ np.asarray(inithorseposn) ] 
+    horse_traj          = [ {'coords'            : np.asarray(inithorseposn), 
+                             'fly_idxs_picked_up': []                       , 
+                             'waiting_time'      : 0.0} ] 
     fly_trajs           = [ [np.array(sites[i])] for i in range(numsites)] 
     flies_collected_p   = [False for i in range(numsites)]
 
     # There are exactly $n$ iterations in this loop where exactly 
-    # one package gets exchanged between the horse and one of the 
-    # flies. 
+    # one fly is picked up by the horse in each iteration. 
     while not(all(flies_collected_p)):
-        # CHOOSE CENTER: here we choose as 
-        current_horse_posn   = horse_traj[-1]
+        current_horse_posn   = horse_traj[-1]['coords']
         unserviced_flies_idx = [idx for idx in range(len(flies_collected_p)) 
                                  if flies_collected_p[idx] == False ]
         fly_trajs_unserviced = [fly_trajs[idx] for idx in unserviced_flies_idx]
@@ -418,7 +418,9 @@ def algo_greedy_nn_concentric_routing(sites, inithorseposn, phi, \
         center_heading                 = current_horse_posn + dist_of_horse_to_meeting_point * horse_fly_uvec
        
         # Move the horse and flies
-        fly_subidxs_picked_up, \
+        # In the greedy algorithm exactly one fly is collected
+        # in each iteration
+        [subidx], \
         horse_wait_time   , \
         new_fly_posns =     \
                     head_towards_center(center_heading         = center_heading, 
@@ -426,16 +428,28 @@ def algo_greedy_nn_concentric_routing(sites, inithorseposn, phi, \
                                         current_fly_posns      = [traj[-1] for traj in fly_trajs_unserviced], 
                                         phis                   = [phi for i in range(len(fly_trajs_unserviced))]) 
 
-        horse_traj.append(center_heading) 
 
+        # update the fly trajectories of the unserviced flies
         for idx, posn in zip(unserviced_flies_idx, new_fly_posns):
-            fly_trajs[idx].append(posn)    ##### Not all fly trajectories have to be updated
+            fly_trajs[idx].append(posn)  
+
+        # Append a point to the horse trajectory
+        horse_traj.append({'coords'             : center_heading,
+                          'fly_idxs_picked_up'  : [unserviced_flies_idx[subidx]],
+                          'waiting_time'        : horse_wait_time} ) 
 
         # Flip the boolean flag on the flies which was just collected
-        for idx in fly_subidxs_picked_up:
-            flies_collected_p[unserviced_flies_idx[idx]] = True
- 
+        flies_collected_p[unserviced_flies_idx[subidx]] = True
+
+
+
+    # print computed horse trajectory for debugging
+    print Fore.YELLOW
+    utils_algo.print_list(horse_traj)
+    print Style.RESET_ALL
+    
     # Animate compute tour if \verb|animate_tour_p == True|
+    #horse_traj = [elt['coords'] for elt in horse_traj]
     if animate_tour_p:
         animate_tour(phi                = phi, 
                      horse_trajectories = [horse_traj],
@@ -639,12 +653,8 @@ def animate_tour (phi, horse_trajectories, fly_trajectories,
     ax.get_xaxis().set_ticklabels([])
     ax.get_yaxis().set_ticklabels([])
 
-    ############ Here be dragons....updating the length of the horse trajectory when multiple points involved and waiting of horses possibly?
-    horse_trajectory_pts = map(lambda x: x[0], horse_trajectories[0])
-    tour_length = utils_algo.length_polygonal_chain(horse_trajectory_pts)
-    ax.set_title("Number of drones: " + str(len(fly_trajectories)) + "\nTour Length: " + str(round(tour_length,4)), fontsize=19)
+    ax.set_title("Number of drones: " + str(len(fly_trajectories)), fontsize=19)
     ax.set_xlabel(r"$\varphi=$ " + str(phi), fontsize=19)
-    ###########3
 
     number_of_flies  = len(fly_trajectories)
     number_of_horses = len(horse_trajectories)
@@ -654,14 +664,17 @@ def animate_tour (phi, horse_trajectories, fly_trajectories,
     
     # Constant for discretizing each segment inside the trajectories of the horses
     # and flies. 
-    NUM_SUB_LEGS              = 3 # Number of subsegments within each segment of every trajectory
+    NUM_SUB_LEGS              = 2 # Number of subsegments within each segment of every trajectory
     
     # Arrays keeping track of the states of the horses
     horses_reached_endpt_p    = [False for i in range(number_of_horses)]
     horses_traj_num_legs      = [len(traj)-1 for traj in horse_trajectories] # the -1 is because the initial position of the horse is always included. 
     horses_current_leg_idx    = [0 for i in range(number_of_horses)]
     horses_current_subleg_idx = [0 for i in range(number_of_horses)] 
-    horses_current_posn       = [traj[0] for traj in horse_trajectories]
+    horses_current_posn       = [traj[0]['coords'] for traj in horse_trajectories]
+
+    # List of arrays keeping track of the flies collected by the horses at any given point in time, 
+    fly_idxs_collected_so_far = [[] for i in range(number_of_horses)] 
 
     # Arrays keeping track of the states of the flies
     flies_reached_endpt_p    = [False for i in range(number_of_flies)]
@@ -669,6 +682,8 @@ def animate_tour (phi, horse_trajectories, fly_trajectories,
     flies_current_leg_idx    = [0 for i in range(number_of_flies)]
     flies_current_subleg_idx = [0 for i in range(number_of_flies)] 
     flies_current_posn       = [traj[0] for traj in fly_trajectories]
+
+
 
     # The drone collection process ends, when all the flies AND horses 
     # have reached their ends. Some heuristics, might involve the flies 
@@ -679,7 +694,8 @@ def animate_tour (phi, horse_trajectories, fly_trajectories,
         # Update the states of all the horses
         for hidx in range(number_of_horses):
             if horses_reached_endpt_p[hidx] == False:
-                htraj  = horse_trajectories[hidx]
+                htraj                       = [elt['coords'] for elt in horse_trajectories[hidx]]
+                all_flys_collected_by_horse = [i             for elt in horse_trajectories[hidx] for i in elt['fly_idxs_picked_up']]
 
                 if horses_current_subleg_idx[hidx] <= NUM_SUB_LEGS-2:
 
@@ -691,6 +707,7 @@ def animate_tour (phi, horse_trajectories, fly_trajectories,
                     ycurr = np.linspace( htraj[legidx][1], htraj[legidx+1][1], NUM_SUB_LEGS+1 )[sublegidx]
                     horses_current_posn[hidx]  = [xcurr, ycurr] 
 
+                    
                 else:
                     horses_current_subleg_idx[hidx] = 0 # reset to 0
                     horses_current_leg_idx[hidx]   += 1 # you have passed onto the next leg
@@ -701,6 +718,10 @@ def animate_tour (phi, horse_trajectories, fly_trajectories,
 
                     if horses_current_leg_idx[hidx] == horses_traj_num_legs[hidx]:
                         horses_reached_endpt_p[hidx] = True
+
+                ####################......for marking in yellow during rendering
+                fly_idxs_collected_so_far[hidx].extend(horse_trajectories[hidx][legidx]['fly_idxs_picked_up'])
+
 
         # Update the states of all the flies
         for fidx in range(number_of_flies):
@@ -731,7 +752,7 @@ def animate_tour (phi, horse_trajectories, fly_trajectories,
         objs = []
         # Render all the horse trajectories uptil this point in time. 
         for hidx in range(number_of_horses):
-            traj               = horse_trajectories[hidx]
+            traj               = [elt['coords'] for elt in horse_trajectories[hidx]]
             current_horse_posn = horses_current_posn[hidx]
             
             if horses_current_leg_idx[hidx] != horses_traj_num_legs[hidx]: # the horse is still moving
@@ -773,12 +794,16 @@ def animate_tour (phi, horse_trajectories, fly_trajectories,
             #flyline, = ax.plot(xfs,yfs,'-',linewidth=2.5, markersize=6, alpha=0.2, color=fly_line_col)
             #objs.append(flyline)
 
-            ###### Only use when there is no waiting on the part of both the fly or the horse
-            if flies_reached_endpt_p[fidx] == True:
-                service_status_col = 'y'
-            else:
-                service_status_col = fly_line_col
-            ######## Experimental......
+            # If the current fly is in the list of flies already collected by some horse, 
+            # mark this fly with yellow. (or whatever color)
+            service_status_col = fly_line_col
+            for hidx in range(number_of_horses):
+                #print fly_idxs_collected_so_far[hidx]
+                if fidx in fly_idxs_collected_so_far[hidx]:
+                    service_status_col = 'y'
+                    break
+
+
 
             flyloc   = Circle((current_fly_posn[0], current_fly_posn[1]), 0.007, 
                               facecolor = service_status_col, edgecolor='k', alpha=1.00)
