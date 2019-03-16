@@ -388,154 +388,131 @@ def algo_greedy_nn_concentric_routing(sites, inithorseposn, phi, \
         if e.errno != errno.EEXIST:
             raise
     numsites            = len(sites)
-    horse_traj          = [(np.asarray(inithorseposn), None)] 
-    fly_trajs           = [[(np.array(sites[i]),None)] for i in range(numsites)] 
-    packages_received_p = [False for i in range(numsites)]
+    horse_traj          = [ np.asarray(inithorseposn) ] 
+    fly_trajs           = [ [np.array(sites[i])] for i in range(numsites)] 
+    flies_collected_p   = [False for i in range(numsites)]
 
     # There are exactly $n$ iterations in this loop where exactly 
     # one package gets exchanged between the horse and one of the 
     # flies. 
-    while not(all(packages_received_p)):
+    while not(all(flies_collected_p)):
         # CHOOSE CENTER: here we choose as 
-        current_horse_posn   = horse_traj[-1][0]
-        unserviced_flies_idx = [idx for idx in range(len(packages_received_p)) 
-                                 if packages_received_p[idx] == False ]
+        current_horse_posn   = horse_traj[-1]
+        unserviced_flies_idx = [idx for idx in range(len(flies_collected_p)) 
+                                 if flies_collected_p[idx] == False ]
         fly_trajs_unserviced = [fly_trajs[idx] for idx in unserviced_flies_idx]
 
         imin = 0
         dmin = np.inf
         for idx in unserviced_flies_idx:
-            current_fly_posn = fly_trajs[idx][-1][0]
+            current_fly_posn = fly_trajs[idx][-1]
             dmin_test = np.linalg.norm(current_fly_posn-current_horse_posn)
             if dmin_test < dmin:
                 imin = idx
                 dmin =  dmin_test
 
         # the meeting point of the horse and the fly closest to the horse
-        horse_nearest_fly_distance     = np.linalg.norm(current_horse_posn-fly_trajs[imin][-1][0])
-        horse_fly_uvec                 = 1.0/horse_nearest_fly_distance * (fly_trajs[imin][-1][0]-current_horse_posn) 
+        horse_nearest_fly_distance     = np.linalg.norm(current_horse_posn-fly_trajs[imin][-1])
+        horse_fly_uvec                 = 1.0/horse_nearest_fly_distance * (fly_trajs[imin][-1]-current_horse_posn) 
         dist_of_horse_to_meeting_point = 1.0/(phi+1.0) * horse_nearest_fly_distance
         center_heading                 = current_horse_posn + dist_of_horse_to_meeting_point * horse_fly_uvec
        
         # Move the horse and flies
-        new_horse_posn, \
-        new_fly_posns , \
-        subidx        = \
+        fly_subidxs_picked_up, \
+        horse_wait_time   , \
+        new_fly_posns =     \
                     head_towards_center(center_heading         = center_heading, 
                                         current_horse_posn     = current_horse_posn, 
-                                        current_posns_of_flies = [traj[-1][0] for traj in fly_trajs_unserviced], 
+                                        current_fly_posns      = [traj[-1] for traj in fly_trajs_unserviced], 
                                         phis                   = [phi for i in range(len(fly_trajs_unserviced))]) 
 
-        # TACK ON NEW HORSE POSITION TO HORSE TRAJECTORY
-        horse_traj.append(new_horse_posn) # note that the position also contains the waiting time for 
-        print Fore.YELLOW, new_horse_posn, Style.RESET_ALL
+        horse_traj.append(center_heading) 
 
-        # The horse if any at the new position. In the greedy routing scheme this is always zero because 
-        # you are heading towards the fly it can reach the soonest. Other schemes may choose different centers. 
-        # TACK ON NEW FLY POSITION TO FLY TRAJECTORIES
-        assert(len(unserviced_flies_idx) == len(new_fly_posns))
         for idx, posn in zip(unserviced_flies_idx, new_fly_posns):
             fly_trajs[idx].append(posn)    ##### Not all fly trajectories have to be updated
 
-        # UPDATE packages_received_p,, flip the boolean flag on 
-        # on the fly which just received its package. 
-        packages_received_p[unserviced_flies_idx[subidx]] = True
+        # Flip the boolean flag on the flies which was just collected
+        for idx in fly_subidxs_picked_up:
+            flies_collected_p[unserviced_flies_idx[idx]] = True
  
-    print "Yay! Reverse horsefly routing completed!"
-    utils_algo.print_list(fly_trajs)
-    print Fore.YELLOW, "Horse Trajectory is "
-    utils_algo.print_list(horse_traj)
-
-    for idx in range(len(sites)):
-         print "\n", Fore.GREEN, "Fly Trajectory ", idx, " is "
-         utils_algo.print_list(fly_trajs[idx])
-    print Style.RESET_ALL
-
-    if plot_tour_p:
-        plot_tour_gncr(sites       = sites, 
-                  inithorseposn    = inithorseposn, 
-                  phi              = phi, 
-                  horse_trajectory = horse_traj, 
-                  fly_trajectories = fly_trajs,
-                  plot_file_name   = dir_name + '/' + 'plot.png')
-
-
     # Animate compute tour if \verb|animate_tour_p == True|
-     
     if animate_tour_p:
-        # strip away some of the waiting time gunk you had put in before.
-        # Just pass in the points
-        horse_traj = [elt[0] for elt in horse_traj]
-        fly_trajs  = [[elt[0] for elt in traj] for traj in fly_trajs]
         animate_tour(phi                = phi, 
                      horse_trajectories = [horse_traj],
                      fly_trajectories   = fly_trajs,
-                     animation_file_name_prefix = dir_name + '/' + io_file_name,
-                     shortcut_fly_squiggles_p                = False)
+                     animation_file_name_prefix = dir_name + '/' + io_file_name)
+    
     
 
-
-# This routine is the heart of all the concentric routing
-# heuristics which is why I am trying to make it as general 
-# as possible with varying fly speeds at the sites. The horse
-# is assumed to have speed 1 though. 
-# It returns 
-# 1. The new positions of the horse and flies
-# 2. Waiting times at the resulting points. Usually these waiting 
-#    times are zero, except for those which reach the center
-#    and has to wait either for the horse to get there, or if 
-#    the horse got there then for the first fly to get there. Note that
-#    it is possible for multiple flies to reach the center and 
-#    having to wait. In this case, the horse hands over the packages
-#    to the one with the least index, even if multiple flies have reached
-#    the concentric point. It is this index which is returned by the function
-#    along with the rendezvous points with waiting times. 
-# What this function returns is important to the flow of the actual algorithm
-# function that essentially only otherwise makes the decisions of what centers
-# to choose to head towards. 
-# Finally the money-shot begins. Implement this function carefully after some 
- # detailed derivation. The important thing here is if horse reaches first, then 
-# it waits and if the fly reaches first then it waits, basically you need to 
-# calculate the time it takes for the horse to reach and the time it takes for 
-# the fly to reach. Any waiting is the absolute value of the difference between 
-# those two times. You just need to add it to the appropriate agent, and return 
-# the appropriate index of the fly. 
 def head_towards_center(center_heading,        \
                         current_horse_posn,    \
-                        current_posns_of_flies,\
+                        current_fly_posns,\
                         phis):
+    """ Given a horse (speed 1) and a bunch of flies (speed phis) and a center-heading, 
+    all animals move towards the center-heading. If the horse gets to the center-heading
+    before any flies, it waits till it meets the first fly. 
+    (In this case, the waiting time for the horse is recorded along with the index of the fly)
 
-    assert(len(phis) == len(current_posns_of_flies))
-    fly_times_to_center_with_idx = \
-              zip([np.linalg.norm(current_posns_of_flies[idx]-center_heading)/phis[idx] \
-                          for idx in range(len(current_posns_of_flies))], 
-                  range(len(current_posns_of_flies)))
+    If one or more flies get to the center-heading before the horse, they wait there for the horse
+    to come and pick them up. (The indices of the flies picked up are recorded. The waiting time 
+    for the horse is zero.)
 
-    fly_times_to_center_with_idx_sorted = sorted(fly_times_to_center_with_idx, key = lambda tup: tup[0])
-    fastest_fly_time_to_center          = fly_times_to_center_with_idx_sorted[0][0]
-    idx_of_fastest_fly_to_center        = fly_times_to_center_with_idx_sorted[0][1] # this fly gets the package
-    horse_time_to_center                = np.linalg.norm(current_horse_posn-center_heading)/1.0
+    The answer returned is 
+    1. The indices of the flies picked up 
+    2. The waiting time for the horse at the center
+    3. The new positions of the flies
+    
+    The new position of the horse is just the center heading.(duh!)
+    """
+    numflies = len(current_fly_posns)
+    assert(len(phis) == numflies)
 
-    # We want to find the indices of the flies which reach the center faster
-    # than the horse. if imin = -1 after the loop below, it means the horsr
-    # reaches the fastest
-    imin = -1
-    for idx in range(len(fly_times_to_center_with_idx_sorted)):
-        if fly_times_to_center_with_idx_sorted[idx][0] < horse_time_to_center:
-            imin = idx
-            continue
-        else:
-            break
+    horse_time_to_center          =  np.linalg.norm( current_horse_posn - center_heading )/1.0
+    fly_times_to_center_with_idx  = zip([np.linalg.norm( current_fly_posns[idx] -
+                                                center_heading )/phis[idx] \
+                                             for idx in range(numflies)], 
+                                        range(numflies))
 
-    new_horse_posn = [center_heading, abs(horse_time_to_center-fastest_fly_time_to_center)]
-    new_fly_posns  = []
-    for idx in range(len(current_posns_of_flies)):
-           v      = center_heading - current_posns_of_flies[idx]
-           unit_v = 1.0/np.linalg.norm(v) * v
-           new_fly_posns.append([ current_posns_of_flies[idx] + \
-                                  phis[idx]*fastest_fly_time_to_center * unit_v, 0.0 ])
+    # Find the list of flies who reached the center before the horse
+    fly_idxs_reached_center_before_horse = [ tup[1] for tup in fly_times_to_center_with_idx
+                                             if tup[0] <= horse_time_to_center  ]
 
-    return new_horse_posn, new_fly_posns, idx_of_fastest_fly_to_center
+    if fly_idxs_reached_center_before_horse:
+        # at least one fly reached the center before the horse
+        fly_idxs_picked_up = fly_idxs_reached_center_before_horse
+        dt                 = horse_time_to_center
+        horse_wait_time    = 0.0             
+
+        new_fly_posns      = []
+        for i in range(numflies):
+
+            if i in fly_idxs_reached_center_before_horse:
+                new_fly_posns.append(center_heading)
+            else:
+                v      = center_heading - current_fly_posns[i]
+                unit_v =  1/np.linalg.norm(v) * v
+                new_fly_posns.append(current_fly_posns[i] + dt*phis[i]*unit_v)
+
+    else:                                    
+        # the horse reached before all the flies
+        fly_times_to_center       = [tup[0] for tup in fly_times_to_center_with_idx]
+        idx_fastest_fly_to_center =  min(xrange(len(fly_times_to_center)), key=fly_times_to_center.__getitem__) # https://stackoverflow.com/a/11825864
+        horse_wait_time           =  min(fly_times_to_center) - horse_time_to_center
+        assert(horse_wait_time>=0)
+
+        fly_idxs_picked_up = [idx_fastest_fly_to_center] 
+        dt                 = min(fly_times_to_center)
+
+        new_fly_posns      = []
+        for i in range(numflies):
+                v      = center_heading - current_fly_posns[i]
+                unit_v =  1/np.linalg.norm(v) * v
+                new_fly_posns.append(current_fly_posns[i] + dt*phis[i]*unit_v)
+
+    utils_algo.print_list(fly_idxs_picked_up)
+    print "\n", horse_wait_time
+    utils_algo.print_list(new_fly_posns)
+    return fly_idxs_picked_up, horse_wait_time, new_fly_posns
 
 
 

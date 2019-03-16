@@ -1,2 +1,6 @@
 - Store the index of the drone collected at the end of the each leg of a horse trajectory
 - Make corresponding change in animation function and test
+
+Changes to the animation module. 
+- Spacebar stops the animation midway while playing or some kind of a pause button. 
+- On reaching the end it stops. Press 'r' for replay.  
