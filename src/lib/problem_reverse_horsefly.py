@@ -586,7 +586,8 @@ def plot_tour_gncr (sites, inithorseposn, phi, \
     yhs = [ elt[0][1] for elt in horse_trajectory] 
     ax.plot(xhs,yhs,'-',linewidth=5.0, markersize=6, alpha=1.00, color='#D13131')
 
-    circle = Circle((inithorseposn[0], inithorseposn[1]), 0.02, facecolor = 'r', edgecolor='black', linewidth=1.0)
+    circle = Circle((inithorseposn[0], inithorseposn[1]), 0.02, 
+                    facecolor = 'r', edgecolor='black', linewidth=1.0)
     ax.add_patch(circle)
     
     # Plot sites as black circles
@@ -612,64 +613,30 @@ def plot_tour_gncr (sites, inithorseposn, phi, \
 
 #----------------------------------------------------------------------------------------
 def animate_tour (phi, horse_trajectories, fly_trajectories, 
-                  animation_file_name_prefix, shortcut_fly_squiggles_p=False):
-    """ This function can handle the animation of multiple 
-    horses and arbitrary waiting times at the end point of the 
-    trajectory. I will assume that there is no waiting at any 
-    intermediate point, including the starting point. Also 
-    for multiple horses, the fly and the fly trajectory is labelled with
-    is labelled with the same color depending on the horse it is serviced 
-    at the very end by. There may be intermediate loyalty switching 
-    in some heuristics, but I won't care about that in this particular 
-    heuristic.
+                  animation_file_name_prefix):
+    """ This function can handle the animation of multiple
+    horses and flies even when the the fly trajectories are all squiggly
+    and if the flies have to wait at the end of their trajectories. 
     
-    A fly/horse trajectory should only be a list of points! No waiting 
-    or anything at required! The horse trajectory should have the inithorseposn 
-    as the first point in the sequence. So too with the fly trajectories, the 
-    sites are always the first point on the trajectories
-    The waiting time can be calculated easily given the horse trajectory 
-    and the fly trajectories. No need to calculate it explicitly within a 
-    heuristic which you were attempting. The waiting time can then optionally 
-    be pasted on top of waiting drone on the animation canvas. 
-    
-    At the end of each segment of a horse-trajectory, it just stores the 
-    list of drones collected at the end point. Usually this willbe a list of 
-    size 1, but there may be heuristics where you might want to collect a 
-    bunch of them together. 
-    
-    For an initial implementation, I won't need a drone list. The drone list 
-    is only so that you can flip the color of the drone to indicate that it has 
-    been collected and some counter on top of the canvas gets updated on the number 
-    of drones left as uncollected. This will serve as some kind of ticker.
-    
-    if squiggles_p = True then the original fly trajectories are used. 
-    if False, then you just head for the end point and wait. Remember fly 
-    trajectories are just a list of points. horse trajectory is a list of 
-    points and the number of the drone served at the end point. Waiting time 
-    for either case can be computed based on whether this boolean flag is 
-    on or off. 
-   
-    If the heuristic already does the shortcutting, then the squiggles_p 
-    flag will in general not matter. The default setting is to use the 
-    trajectories of the flies as given. 
-    
-    For a first implementation, I don't need waiting times, and which drone 
-    a horse collects at the end of each leg. I just want to animate the trajectories
-    as moving. I will also asusme that the trucks move at speed 1.0 and all the 
-    drones with speed $\phi$. The heuristics, can be adapted to variable speed, 
-    but for the moment I would just like to keep things simple. 
+    A fly trajectory should only be a list of points! The sites are always the 
+    first points on the trajectories. Any waiting for the flies, is assumed to be 
+    at the end of their trajectories where it waits for the horse to come 
+    and pick them up. 
+
+    Every point on the horse trajectory stores a list of indices of the flies
+    collected at the end point. (The first point just stores the dummy value None). 
+    Usually these index lists will be size 1, but there may be heuristics where you 
+    might want to collect a bunch of them together since they may already be waiting 
+    there at the pick up point. 
+
+    For each drone collected, a yellow circle is placed on top of it, so that 
+    it is marked as collected to be able to see the progress of the visualization 
+    as it goes on. 
     """
     import numpy as np
     import matplotlib.animation as animation
     from   matplotlib.patches import Circle
     import matplotlib.pyplot as plt 
-
-
-    if shortcut_fly_squiggles_p == True:
-        for idx in  range(len(fly_trajectories)):
-            traj                  = fly_trajectories[idx]
-            shortcut_traj         = [traj[0],traj[-1]]
-            fly_trajectories[idx] = shortcut_traj
 
     # Set up configurations and parameters for all necessary graphics
     plt.rc('text', usetex=True)
@@ -695,16 +662,12 @@ def animate_tour (phi, horse_trajectories, fly_trajectories,
     ax.get_xaxis().set_ticklabels([])
     ax.get_yaxis().set_ticklabels([])
 
- 
     ############ Here be dragons....updating the length of the horse trajectory when multiple points involved and waiting of horses possibly?
     horse_trajectory_pts = map(lambda x: x[0], horse_trajectories[0])
     tour_length = utils_algo.length_polygonal_chain(horse_trajectory_pts)
     ax.set_title("Number of drones: " + str(len(fly_trajectories)) + "\nTour Length: " + str(round(tour_length,4)), fontsize=19)
     ax.set_xlabel(r"$\varphi=$ " + str(phi), fontsize=19)
     ###########3
-
-    
-
 
     number_of_flies  = len(fly_trajectories)
     number_of_horses = len(horse_trajectories)
