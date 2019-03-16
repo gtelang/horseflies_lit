@@ -445,10 +445,14 @@ def algo_greedy_nn_concentric_routing(sites, inithorseposn, phi, \
     utils_algo.print_list(fly_trajs)
     print Fore.YELLOW, "Horse Trajectory is "
     utils_algo.print_list(horse_traj)
+
+    for idx in range(len(sites)):
+         print "\n", Fore.GREEN, "Fly Trajectory ", idx, " is "
+         utils_algo.print_list(fly_trajs[idx])
     print Style.RESET_ALL
 
     if plot_tour_p:
-        plot_tour_gncr(sites            = sites, 
+        plot_tour_gncr(sites       = sites, 
                   inithorseposn    = inithorseposn, 
                   phi              = phi, 
                   horse_trajectory = horse_traj, 
@@ -456,14 +460,18 @@ def algo_greedy_nn_concentric_routing(sites, inithorseposn, phi, \
                   plot_file_name   = dir_name + '/' + 'plot.png')
 
 
-
     # Animate compute tour if \verb|animate_tour_p == True|
+     
     if animate_tour_p:
+        # strip away some of the waiting time gunk you had put in before.
+        # Just pass in the points
+        horse_traj = [elt[0] for elt in horse_traj]
+        fly_trajs  = [[elt[0] for elt in traj] for traj in fly_trajs]
         animate_tour(phi                = phi, 
                      horse_trajectories = [horse_traj],
                      fly_trajectories   = fly_trajs,
                      animation_file_name_prefix = dir_name + '/' + io_file_name,
-                     squiggles_p                = True)
+                     shortcut_fly_squiggles_p                = False)
     
 
 
@@ -604,7 +612,7 @@ def plot_tour_gncr (sites, inithorseposn, phi, \
 
 #----------------------------------------------------------------------------------------
 def animate_tour (phi, horse_trajectories, fly_trajectories, 
-                  animation_file_name_prefix, squiggles_p=False):
+                  animation_file_name_prefix, shortcut_fly_squiggles_p=False):
     """ This function can handle the animation of multiple 
     horses and arbitrary waiting times at the end point of the 
     trajectory. I will assume that there is no waiting at any 
@@ -656,6 +664,13 @@ def animate_tour (phi, horse_trajectories, fly_trajectories,
     from   matplotlib.patches import Circle
     import matplotlib.pyplot as plt 
 
+
+    if shortcut_fly_squiggles_p == True:
+        for idx in  range(len(fly_trajectories)):
+            traj                  = fly_trajectories[idx]
+            shortcut_traj         = [traj[0],traj[-1]]
+            fly_trajectories[idx] = shortcut_traj
+
     # Set up configurations and parameters for all necessary graphics
     plt.rc('text', usetex=True)
     plt.rc('font', family='serif')
@@ -680,19 +695,26 @@ def animate_tour (phi, horse_trajectories, fly_trajectories,
     ax.get_xaxis().set_ticklabels([])
     ax.get_yaxis().set_ticklabels([])
 
+ 
+    ############ Here be dragons....updating the length of the horse trajectory when multiple points involved and waiting of horses possibly?
+    horse_trajectory_pts = map(lambda x: x[0], horse_trajectories[0])
+    tour_length = utils_algo.length_polygonal_chain(horse_trajectory_pts)
+    ax.set_title("Number of drones: " + str(len(fly_trajectories)) + "\nTour Length: " + str(round(tour_length,4)), fontsize=19)
+    ax.set_xlabel(r"$\varphi=$ " + str(phi), fontsize=19)
+    ###########3
+
+    
+
+
     number_of_flies  = len(fly_trajectories)
     number_of_horses = len(horse_trajectories)
     colors           = utils_graphics.get_colors(number_of_horses, lightness=0.5)
         
     ims                = []
-    from colorama import Back 
-    debug(Fore.BLACK + Back.WHITE + "\nStarted constructing ani object"+ Style.RESET_ALL)
-    ani = animation.ArtistAnimation(fig, ims, interval=40, blit=True)
-    debug(Fore.BLACK + Back.WHITE + "\nFinished constructing ani object"+ Style.RESET_ALL)
-
+    
     # Constant for discretizing each segment inside the trajectories of the horses
     # and flies. 
-    NUM_SUB_LEGS              = 5
+    NUM_SUB_LEGS              = 3 # Number of subsegments within each segment of every trajectory
     
     # Arrays keeping track of the states of the horses
     horses_reached_endpt_p    = [False for i in range(number_of_horses)]
@@ -711,6 +733,7 @@ def animate_tour (phi, horse_trajectories, fly_trajectories,
     # The drone collection process ends, when all the flies AND horses 
     # have reached their ends. Some heuristics, might involve the flies 
     # or the horses waiting at the endpoints of their respective trajectories. 
+    image_frame_counter = 0
     while not(all(horses_reached_endpt_p + flies_reached_endpt_p)): 
 
         # Update the states of all the horses
@@ -765,6 +788,7 @@ def animate_tour (phi, horse_trajectories, fly_trajectories,
                     if flies_current_leg_idx[fidx] == flies_traj_num_legs[fidx]:
                         flies_reached_endpt_p[fidx] = True
 
+        objs = []
         # Render all the horse trajectories uptil this point in time. 
         for hidx in range(number_of_horses):
             traj               = horse_trajectories[hidx]
@@ -776,11 +800,11 @@ def animate_tour (phi, horse_trajectories, fly_trajectories,
                   yhs = [traj[k][1] for k in range(1+horses_current_leg_idx[hidx])] + [current_horse_posn[1]]
 
             else: # The horse has stopped moving
-                  xhs = traj
-                  yhs = traj
+                  xhs = [x for (x,y) in traj]
+                  yhs = [y for (x,y) in traj]
 
             horseline, = ax.plot(xhs,yhs,'-',linewidth=5.0, markersize=6, alpha=1.00, color='#D13131')
-            horseloc   = Circle((current_horse_posn[0], current_horse_posn[1]), 0.015, facecolor = '#D13131', alpha=1.00)
+            horseloc   = Circle((current_horse_posn[0], current_horse_posn[1]), 0.015, facecolor = '#D13131', edgecolor='k',  alpha=1.00)
             horsepatch = ax.add_patch(horseloc)
             objs.append(horseline)
             objs.append(horsepatch)
@@ -797,16 +821,41 @@ def animate_tour (phi, horse_trajectories, fly_trajectories,
                   yfs = [traj[k][1] for k in range(1+flies_current_leg_idx[fidx])] + [current_fly_posn[1]]
 
             else: # The fly has stopped moving
-                  xfs = traj
-                  yfs = traj
+                  xfs = [x for (x,y) in traj]
+                  yfs = [y for (x,y) in traj]
 
-            flyline, = ax.plot(xfs,yfs,'-',linewidth=2.5, markersize=6, alpha=1.00, color='#3FE3AD')
-            flyloc   = Circle((current_fly_posn[0], current_fly_posn[1]), 0.008, facecolor = '#3FE3AD', alpha=1.00)
+            ##### Only use the currrent position in the fly trajectories               
+            xfs = [current_fly_posn[0]]
+            yfs = [current_fly_posn[1]]
+            ###### Experimental.....
+
+            fly_line_col = 'b'
+            #flyline, = ax.plot(xfs,yfs,'-',linewidth=2.5, markersize=6, alpha=0.2, color=fly_line_col)
+            #objs.append(flyline)
+
+            ###### Only use when there is no waiting on the part of both the fly or the horse
+            if flies_reached_endpt_p[fidx] == True:
+                service_status_col = 'y'
+            else:
+                service_status_col = fly_line_col
+            ######## Experimental......
+
+            flyloc   = Circle((current_fly_posn[0], current_fly_posn[1]), 0.007, 
+                              facecolor = service_status_col, edgecolor='k', alpha=1.00)
             flypatch = ax.add_patch(flyloc)
-            objs.append(flyline)
             objs.append(flypatch)
-
-
+            
+        print "........................"
+        print "Appending to ims ", image_frame_counter
         ims.append(objs) 
+        image_frame_counter += 1
 
+    from colorama import Back 
+    debug(Fore.BLACK + Back.WHITE + "\nStarted constructing ani object"+ Style.RESET_ALL)
+    ani = animation.ArtistAnimation(fig, ims, interval=70, blit=True)
+    debug(Fore.BLACK + Back.WHITE + "\nFinished constructing ani object"+ Style.RESET_ALL)
+
+    #debug(Fore.MAGENTA + "\nStarted writing animation to disk"+ Style.RESET_ALL)
+    #ani.save(animation_file_name_prefix+'.avi', dpi=150)
+    #debug(Fore.MAGENTA + "\nFinished writing animation to disk"+ Style.RESET_ALL)
     plt.show()

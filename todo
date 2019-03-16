@@ -6,3 +6,12 @@ Todo
   a.  one indicating the thought experment tour
   b.  the tour where everyone moves in parallel
   Put them in separate ax frames but in the same plot
+
+Use reverse horsefly collection center, the end point of the 
+greedy concentric routing heuristic!!! And then do Kintic TSP 
+on that. 
+
+use only the penultimate leg? or just the current positions
+of the flies, to be able to scale to larger simulations.
+Right now because i am plotting trajectories at every step
+it takes quadratic time to generate the animation. 
