@@ -44,6 +44,32 @@ def info(msg):
     logger.info('{i} [{m}]'.format(
         i='.'*indentation_level, m=msg))
 
+xlim, ylim = [0,1], [0,1]
+
+def applyAxCorrection(ax):
+      ax.set_xlim([xlim[0], xlim[1]])
+      ax.set_ylim([ylim[0], ylim[1]])
+      ax.set_aspect(1.0)
+
+def clearPatches(ax):
+    # Get indices cooresponding to the polygon patches
+    for index , patch in zip(range(len(ax.patches)), ax.patches):
+        if isinstance(patch, mpl.patches.Polygon) == True:
+            patch.remove()
+    ax.lines[:]=[]
+    applyAxCorrection(ax)
+
+def clearAxPolygonPatches(ax):
+
+    # Get indices cooresponding to the polygon patches
+    for index , patch in zip(range(len(ax.patches)), ax.patches):
+        if isinstance(patch, mpl.patches.Polygon) == True:
+            patch.remove()
+    ax.lines[:]=[]
+    applyAxCorrection(ax)
+
+
+
 
 def run_handler():
     # Define key-press handler
@@ -141,28 +167,71 @@ def run_handler():
     ax.set_xticks([])
     ax.set_yticks([])
           
-    mouseClick   = utils_graphics.wrapperEnterRunPoints (fig,ax, run)
+    mouseClick   = wrapperEnterRunPoints (fig,ax, run)
     fig.canvas.mpl_connect('button_press_event' , mouseClick )
           
     keyPress     = wrapperkeyPressHandler(fig,ax, run)
     fig.canvas.mpl_connect('key_press_event', keyPress   )
     plt.show()
     
+def wrapperEnterRunPoints(fig, ax, run):
+    def _enterPoints(event):
+        if event.name      == 'button_press_event'          and \
+           (event.button   == 1 or event.button == 3)       and \
+            event.dblclick == True and event.xdata  != None and event.ydata  != None:
+
+             if event.button == 1:  
+                 # Insert blue circle representing a site
+                 newPoint = (event.xdata, event.ydata)
+                 run.sites.append( newPoint  )
+                 patchSize  = (xlim[1]-xlim[0])/140.0
+                    
+                 ax.add_patch( mpl.patches.Circle( newPoint, radius = patchSize,
+                                                   facecolor='blue', edgecolor='black'  ))
+                 ax.set_title('Points Inserted: ' + str(len(run.sites)), \
+                              fontdict={'fontsize':40})
+                 
+
+             elif event.button == 3:  
+                 # Insert big red circle representing initial position of horse and fly
+                 newinithorseposn = (event.xdata, event.ydata)
+                 run.inithorseposns.append(newinithorseposn)  
+                 patchSize         = (xlim[1]-xlim[0])/100.0
+
+                 ax.add_patch( mpl.patches.Circle( newinithorseposn,radius = patchSize,
+                                                   facecolor= '#D13131', edgecolor='black' ))
+                 
+                 print Fore.RED, "Initial positions of horses\n", 
+                 utils_algo.print_list(run.inithorseposns)
+                 print Style.RESET_ALL
+
+             # Clear polygon patches and set up last minute \verb|ax| tweaks
+             clearAxPolygonPatches(ax)
+             applyAxCorrection(ax)
+             fig.canvas.draw()
+             
+
+    return _enterPoints
 
 
 # Local data-structures
 class ReverseHorseflyInput:
-      def __init__(self, sites=[], inithorseposn=()):
-           self.sites           = sites
-           self.inithorseposn   = inithorseposn
+      def __init__(self, sites=[], inithorseposns=[]):
+           self.sites            = sites
+           self.inithorseposns   = inithorseposns
 
       # Methods for \verb|ReverseHorseflyInput|
       def clearAllStates (self):
-         self.sites = []
-         self.inithorseposn = ()
+          self.sites = []
+          self.inithorseposns = []
 
       def getTour(self, algo, speedratio):
-            return algo(self.sites, self.inithorseposn, speedratio)
+          if len(self.inithorseposns) == 1 and (id(algo) in map(id, [algo_greedy_concentric_kinetic_tsp, 
+                                                                     algo_greedy_nn_concentric_routing, 
+                                                                     algo_greedy_nn_joes_thought_experiments]) ): # these algorithms can only handle one horse
+                 return algo(self.sites, self.inithorseposns[0], speedratio)
+          else:
+                 return algo(self.sites, self.inithorseposns, speedratio)
 
 #---------------------------------
 # Algorithms for reverse horsefly 
@@ -508,55 +577,6 @@ def algo_greedy_concentric_kinetic_tsp(sites, inithorseposn, phi, \
 
         
 
-
-def intercept_info(current_horse_posn, current_fly_posn, phi, center, center_reached_p):
-    
-    if center_reached_p: 
-        dt                   = np.linalg.norm(current_fly_posn-current_horse_posn)/1.0 # all horses have speed 1.0
-        fly_reaches_center_p = True # vacuously true, since the fly is already at the center
-        interceptpt          = center
-
-    else: # fly has not reached center
- 
-        # vector joining current_fly_posn to center
-        u      = center - current_fly_posn 
-        unit_u = 1.0/np.linalg.norm(u) * u
-        
-        # vector joining current_fly_posn to current_horse_posn
-        v      = current_horse_posn - current_fly_posn
-        unit_v = 1.0/np.linalg.norm(v) * v
-
-        cos_alpha          = np.dot(unit_u, unit_v) # cosine of the angle between u and v
-        l                  = np.linalg.norm(v)      # distance between current_horse_posn and current_fly_posn
-        fly_time_to_center = np.linalg.norm(center-current_fly_posn)/phi
-
-        discriminant = 4.0 * l**2 * (cos_alpha**2 - (1.0 - 1.0/phi**2))  
-
-        if discriminant < 0.0:  
-            fly_reaches_center_p = True
-            dt                   = (center - current_horse_posn)/1.0
-            interceptpt          = center
-
-        else:
-            roots  = np.roots([(1.0-1.0/phi**2), -2.0*l*cos_alpha, l**2])
-            assert(all(map(np.isreal, roots)))
-            #print roots
-            assert(max(roots)>0.0)
-            
-            if min(roots)/phi > fly_time_to_center: # fly reaches the center before the intercept happens. So it just waits there
-                fly_reaches_center_p = True
-                dt                   =  (center - current_horse_posn)/1.0
-                interceptpt          = center
-
-            else :                                 # intercept happens, before the fly reaches the center. 
-                fly_reaches_center_p = False
-                dt                   = max(roots)/phi
-                interceptpt          = current_fly_posn + dt * phi * unit_u
-               
-    return dt, fly_reaches_center_p, interceptpt
-            
-
-
 #------------------------------------------------------------------------------------------------------------------------------   
 def algo_greedy_nn_concentric_routing(sites, inithorseposn, phi, \
                                       shortcut_squiggles_p        = True,\
@@ -685,6 +705,31 @@ def algo_greedy_nn_concentric_routing(sites, inithorseposn, phi, \
     
     return horse_traj, fly_trajs
 
+
+#-----------------------------------------------------------------------------------------------
+def algo_greedy_nn_concentric_routing_multiple_horses(sites, inithorseposns, phi,         \
+                                                      shortcut_squiggles_p        = False,\
+                                                      write_algo_states_to_disk_p = False,\
+                                                      write_io_p                  = False,\
+                                                      animate_tour_p              = True,\
+                                                      plot_tour_p                 = False) :
+    
+
+    numsites      = len(sites)
+    horse_trajs   = [[{'coords'            : posn, 
+                       'fly_idxs_picked_up': []  , 
+                       'waiting_time'      : 0.0} ] for posn in inithorseposns ] 
+
+    fly_trajs     = [ [np.array(sites[i])] for i in range(numsites)] 
+    flies_collected_p   = [False for i in range(numsites)]
+
+    while not(all(flies_collected_p)):
+        pass
+
+
+
+
+#--------------------------------------------------------------------------------------------------
 def head_towards_center(center_heading,        \
                         current_horse_posn,    \
                         current_fly_posns,\
@@ -756,6 +801,56 @@ def head_towards_center(center_heading,        \
     return fly_idxs_picked_up, horse_wait_time, new_fly_posns
 
 
+#----------------------------------------------------------------------------------------------
+
+def intercept_info(current_horse_posn, current_fly_posn, phi, center, center_reached_p):
+    
+    if center_reached_p: 
+        dt                   = np.linalg.norm(current_fly_posn-current_horse_posn)/1.0 # all horses have speed 1.0
+        fly_reaches_center_p = True # vacuously true, since the fly is already at the center
+        interceptpt          = center
+
+    else: # fly has not reached center
+ 
+        # vector joining current_fly_posn to center
+        u      = center - current_fly_posn 
+        unit_u = 1.0/np.linalg.norm(u) * u
+        
+        # vector joining current_fly_posn to current_horse_posn
+        v      = current_horse_posn - current_fly_posn
+        unit_v = 1.0/np.linalg.norm(v) * v
+
+        cos_alpha          = np.dot(unit_u, unit_v) # cosine of the angle between u and v
+        l                  = np.linalg.norm(v)      # distance between current_horse_posn and current_fly_posn
+        fly_time_to_center = np.linalg.norm(center-current_fly_posn)/phi
+
+        discriminant = 4.0 * l**2 * (cos_alpha**2 - (1.0 - 1.0/phi**2))  
+
+        if discriminant < 0.0:  
+            fly_reaches_center_p = True
+            dt                   = (center - current_horse_posn)/1.0
+            interceptpt          = center
+
+        else:
+            roots  = np.roots([(1.0-1.0/phi**2), -2.0*l*cos_alpha, l**2])
+            assert(all(map(np.isreal, roots)))
+            #print roots
+            assert(max(roots)>0.0)
+            
+            if min(roots)/phi > fly_time_to_center: # fly reaches the center before the intercept happens. So it just waits there
+                fly_reaches_center_p = True
+                dt                   =  (center - current_horse_posn)/1.0
+                interceptpt          = center
+
+            else :                                 # intercept happens, before the fly reaches the center. 
+                fly_reaches_center_p = False
+                dt                   = max(roots)/phi
+                interceptpt          = current_fly_posn + dt * phi * unit_u
+               
+    return dt, fly_reaches_center_p, interceptpt
+            
+
+#---------------------------------------------------------------------------------------------
 
 
 def plot_tour_gncr (sites, inithorseposn, phi, \
