@@ -312,7 +312,7 @@ def algo_dumb(sites, horseflyinit, phi):
    
 def algo_greedy(sites, inithorseposn, phi, 
                 write_algo_states_to_disk_p = True   ,
-                animate_schedule_p          = True   , 
+                animate_schedule_p          = False   , 
                 post_optimizer              = None):
 
       # Set log, algo-state and input-output files config for \verb|algo_greedy|
@@ -782,7 +782,7 @@ class PolicyBestInsertionNaive:
 def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
                                       insertion_policy_name       = "naive",
                                       write_algo_states_to_disk_p = True  ,
-                                      animate_schedule_p          = True   , 
+                                      animate_schedule_p          = False   , 
                                       post_optimizer              = None   ,  
                                       plot_computed_schedule      = False):
       # Set log, algo-state and input-output files config
@@ -1673,5 +1673,3 @@ def animateSchedule(schedule_file_name):
      #debug(Fore.MAGENTA + "\nFinished writing animation to disk"+ Style.RESET_ALL)
 
      #plt.show() # For displaying the animation in a live window. 
-     
-
