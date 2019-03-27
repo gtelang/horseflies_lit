@@ -16,15 +16,17 @@ import matplotlib as mpl
 # (gncr) vs greedy_kinetic_tsp (gkin) we do this first 
 # for many randomly generated point clouds of size 100
 num_reps   = 100
-num_pts_per_cloud = 60
+num_pts_per_cloud = 50
 
 mspans_gncr = []
 mspans_gkin = []
+mspans_gdr = []
 
 inithorseposn = np.asarray([0.0, 0.0])
 phi = 0.5
 
 for i in range(num_reps):
+    print "Rep: ", i
     sites = np.random.rand(num_pts_per_cloud,2)
 
     htraj_gncr, fly_trajs_gncr = rhf.algo_greedy_nn_concentric_routing(sites, inithorseposn, phi, \
@@ -36,25 +38,33 @@ for i in range(num_reps):
                                       write_algo_states_to_disk_p = False, write_io_p = False, 
                                       animate_tour_p              = False, plot_tour_p= False) 
    
+    htraj_gdr, fly_trajs_gdr  = rhf.algo_greedy_dead_reckoning(sites, inithorseposn, phi, \
+                                      write_algo_states_to_disk_p = False, write_io_p = False, 
+                                      animate_tour_p              = False, plot_tour_p= False) 
+
     mspan_gncr, _ = rhf.makespan([htraj_gncr])
     mspan_gkin, _ = rhf.makespan([htraj_gkin])
+    mspan_gdr , _ = rhf.makespan([htraj_gdr])
 
     mspans_gncr.append(mspan_gncr)
     mspans_gkin.append(mspan_gkin)
+    mspans_gdr.append(mspan_gdr)
     
 
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
 fig, ax = plt.subplots()
 ax.set_xlabel("Runs", fontsize=25)
-ax.set_ylabel("Makespan of gncr and gkin", fontsize=25)
+ax.set_ylabel("Makespans of Reverse Horsefly heuristics", fontsize=25)
 plt.grid(True, linestyle='--')
 plt.tick_params(labelsize=20)
 
 plt.plot(range(num_reps), mspans_gncr, 'go-', label=r"gncr")
 plt.plot(range(num_reps), mspans_gkin, 'ro-', label=r"gkin")
+plt.plot(range(num_reps), mspans_gdr,  'bo-', label=r"gdr")
 
-ax.set_title("Number of drones per run: " + str(num_pts_per_cloud), fontsize=15)
+ax.set_title("Number of drones per run: " 
+             + str(num_pts_per_cloud)+ "\n" + r"$\varphi$: " + str(phi) , fontsize=25)
 
 ax.legend(prop={'size': 20})
 plt.show()
