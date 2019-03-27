@@ -242,8 +242,8 @@ class ReverseHorseflyInput:
 def algo_greedy_dead_reckoning_multiple_horses(sites, inithorseposns, phi,    \
                                write_algo_states_to_disk_p = False, \
                                write_io_p                  = False, \
-                               animate_tour_p              = False,\
-                               plot_tour_p                 = True) :
+                               animate_tour_p              = True,\
+                               plot_tour_p                 = False) :
 
     # Set algo-state and input-output files config
     import sys, datetime, os, errno
@@ -423,8 +423,8 @@ def algo_greedy_dead_reckoning_multiple_horses(sites, inithorseposns, phi,    \
 def algo_greedy_dead_reckoning(sites, inithorseposn, phi,    \
                                write_algo_states_to_disk_p = False, \
                                write_io_p                  = False, \
-                               animate_tour_p              = False,\
-                               plot_tour_p                 = True) :
+                               animate_tour_p              = True,\
+                               plot_tour_p                 = False) :
     
     # Set algo-state and input-output files config
     import sys, datetime, os, errno
@@ -593,8 +593,8 @@ def algo_greedy_concentric_kinetic_tsp(sites, inithorseposn, phi, \
                                        center_choice               = 'gncr_endpt',
                                        write_algo_states_to_disk_p = True,\
                                        write_io_p                  = True,\
-                                       animate_tour_p              = False,\
-                                       plot_tour_p                 = True) :
+                                       animate_tour_p              = True,\
+                                       plot_tour_p                 = False) :
 
     """Each fly heads towards a given center-point (same center-point for all flies) 
     along the directed segment joining its initial position to the center. 
@@ -789,12 +789,9 @@ def algo_greedy_concentric_kinetic_tsp(sites, inithorseposn, phi, \
 def algo_greedy_nn_concentric_routing(sites, inithorseposn, phi, \
                                       shortcut_squiggles_p        = True,\
                                       write_algo_states_to_disk_p = False,\
-                                      write_io_p                  = True,\
-                                      animate_tour_p              = False,\
+                                      write_io_p                  = False,\
+                                      animate_tour_p              = True,\
                                       plot_tour_p                 = True) :
-    # Set algo-state and input-output files config
-    import sys, datetime, os, errno
-    from sklearn.neighbors import NearestNeighbors
 
     if write_io_p:
         algo_name     = 'algo-greedy_nn_concentric_routing'
@@ -910,7 +907,7 @@ def algo_greedy_nn_concentric_routing(sites, inithorseposn, phi, \
                      phi                = phi, 
                      horse_trajectories = [horse_traj],
                      fly_trajectories   = fly_trajs,
-                     animation_file_name_prefix = dir_name + '/' + io_file_name,
+                     animation_file_name_prefix = None,
                      render_trajectory_trails_p = True,
                      algo_name = 'gncr')
  
@@ -969,6 +966,7 @@ def algo_greedy_nn_concentric_routing(sites, inithorseposn, phi, \
         ax.set_title("Algo: gncr \n Number of sites: " + str(len(sites)) + "\n Makespan " +\
                     str(round(makespan,4)), fontsize=25)
         ax.set_xlabel(r"$\varphi=$ " + str(phi) , fontsize=25)
+
         plt.show()
 
     return horse_traj, fly_trajs
@@ -979,8 +977,8 @@ def algo_greedy_nn_concentric_routing_multiple_horses(sites, inithorseposns, phi
                                                       shortcut_squiggles_p        = False,\
                                                       write_algo_states_to_disk_p = False,\
                                                       write_io_p                  = False,\
-                                                      animate_tour_p              = False,\
-                                                      plot_tour_p                 = True) :
+                                                      animate_tour_p              = True,\
+                                                      plot_tour_p                 = False) :
     """ When more than one horse is given to us. Here we generalize the idea
     of greedy nn concentric routing. Note that each horse has speed 1.0
     """
@@ -1465,7 +1463,7 @@ def animate_tour (sites, phi, horse_trajectories, fly_trajectories,
 
     from colorama import Back 
     debug(Fore.BLACK + Back.WHITE + "\nStarted constructing ani object"+ Style.RESET_ALL)
-    ani = animation.ArtistAnimation(fig, ims, interval=70, blit=True, repeat=False, repeat_delay=1000)
+    ani = animation.ArtistAnimation(fig, ims, interval=70, blit=True, repeat=True, repeat_delay=500)
     debug(Fore.BLACK + Back.WHITE + "\nFinished constructing ani object"+ Style.RESET_ALL)
 
     plt.show()
