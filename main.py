@@ -8,9 +8,10 @@ mpl_logger.setLevel(logging.WARNING)
    
 import sys
 sys.path.append('src/lib')
-import problem_classic_horsefly         as chf
-import problem_one_horse_multiple_flies as ohmf
-import problem_reverse_horsefly         as rhf
+import problem_classic_horsefly              as chf
+import problem_one_horse_multiple_flies      as ohmf
+import problem_reverse_horsefly              as rhf
+import problem_distributed_reverse_horsefly  as drhf
 
 if __name__=="__main__":
      # Select algorithm or experiment 
@@ -26,6 +27,9 @@ if __name__=="__main__":
      
      elif sys.argv[1] == "--problem-reverse-horsefly":
           rhf.run_handler()
+
+     elif sys.argv[1] == "--problem-distributed-reverse-horsefly":
+          drhf.run_handler()
 
      else:
           print "Option not recognized"
