@@ -1,0 +1,167 @@
+horse_tour:
+- !!python/tuple
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - &id001 !!python/object/apply:numpy.dtype
+      args:
+      - f8
+      - 0
+      - 1
+      state: !!python/tuple
+      - 3
+      - <
+      - null
+      - null
+      - null
+      - -1
+      - -1
+      - 0
+    - !!binary |
+      pFIWg4RL1T8=
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - *id001
+    - !!binary |
+      mGeXyZxH4T8=
+- !!python/tuple
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - *id001
+    - !!binary |
+      YUzotl9t0z8=
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - *id001
+    - !!binary |
+      dwGr/gK64T8=
+- !!python/tuple
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - *id001
+    - !!binary |
+      yxHtIfta0j8=
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - *id001
+    - !!binary |
+      nfS76+YB5D8=
+- !!python/tuple
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - *id001
+    - !!binary |
+      YCKdXyy91j8=
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - *id001
+    - !!binary |
+      WBEz6vcu5D8=
+- !!python/tuple
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - *id001
+    - !!binary |
+      C3J2HEOy1j8=
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - *id001
+    - !!binary |
+      8Sj297Ip5D8=
+- !!python/tuple
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - *id001
+    - !!binary |
+      4nizmv+42T8=
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - *id001
+    - !!binary |
+      mlU3LZeY5D8=
+- !!python/tuple
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - *id001
+    - !!binary |
+      ktt6jA102j8=
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - *id001
+    - !!binary |
+      ROZCI/zV4z8=
+- !!python/tuple
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - *id001
+    - !!binary |
+      qzJPRBh83D8=
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - *id001
+    - !!binary |
+      g4QtYnKF5j8=
+- !!python/tuple
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - *id001
+    - !!binary |
+      g5sSb9et3j8=
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - *id001
+    - !!binary |
+      L7xx+J3j5j8=
+- !!python/tuple
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - *id001
+    - !!binary |
+      KOhwhvUS3z8=
+  - !!python/object/apply:numpy.core.multiarray.scalar
+    - *id001
+    - !!binary |
+      /m/ILhTP5j8=
+insertion_policy_name: naive
+unvisited_sites:
+- - 0.07039490396955739
+  - 0.5207316471792688
+- - 0.9912803872966314
+  - 0.5366825446855366
+- - 0.1878738854310229
+  - 0.8250242111501745
+- - 0.39807858652984074
+  - 0.219624480114454
+- - 0.26342591205526544
+  - 0.020690276547536635
+- - 0.8837906304446459
+  - 0.21922975981341175
+- - 0.8655345128914608
+  - 0.4224356278697946
+- - 0.07318157060226904
+  - 0.3762465726181392
+- - 0.20614159599773219
+  - 0.39720758278841684
+- - 0.6392198746471287
+  - 0.08999375646936325
+- - 0.672282235275962
+  - 0.46463599650594345
+- - 0.9883959299896193
+  - 0.10279536672184186
+- - 0.8046519162298175
+  - 0.38044418182123263
+- - 0.9351223638737395
+  - 0.9317627203356891
+- - 0.4005461569216735
+  - 0.0003306786537449202
+- - 0.9738089916255281
+  - 0.621185141956126
+- - 0.01903603072377047
+  - 0.8667239690790305
+- - 0.12775361197960766
+  - 0.9632991211544759
+- - 0.9737294009045063
+  - 0.517409897615513
+- - 0.08863948636282848
+  - 0.5831027857422924
+- - 0.20580878606744157
+  - 0.15414856666891819
+visited_sites:
+- - 0.23059170735809753
+  - 0.5888683858502798
+- - 0.2449340051716622
+  - 0.8034213714296495
+- - 0.5265291871812087
+  - 0.6444866179724946
+- - 0.35296534428825366
+  - 0.6284821524596944
+- - 0.5201317875618369
+  - 0.6774681552362055
+- - 0.44187555548459
+  - 0.5604822828886407
+- - 0.5244262366397324
+  - 0.9135866155270416
+- - 0.5650761965485119
+  - 0.7440237702996729
+- - 0.5009614833276113
+  - 0.7065104071603375

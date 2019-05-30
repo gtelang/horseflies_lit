@@ -413,7 +413,7 @@ def plot_tour(ax, tour):
     yhs = [ horse_trajectory[i][0][1] for i in range(len(horse_trajectory))]    
 
     number_of_flies = len(fly_trajectories)
-    colors          = utils_graphics.get_colors(number_of_flies, lightness=0.4)
+    colors          = utils_graphics.get_colors(number_of_flies, lightness=0.1)
 
     ax.cla()
     utils_graphics.applyAxCorrection(ax)
@@ -483,7 +483,7 @@ def animate_tour (sites, inithorseposn, phi, horse_trajectory, fly_trajectories,
 
     # Visually distinct colors for displaying each flys trajectory in a different color 
     number_of_flies = len(fly_trajectories)
-    colors          = utils_graphics.get_colors(number_of_flies, lightness=0.5)
+    colors          = utils_graphics.get_colors(number_of_flies, lightness=0.4)
 
     horse_trajectory_pts = map(lambda x: x[0], horse_trajectory)
     tour_length = utils_algo.length_polygonal_chain(horse_trajectory_pts)
@@ -667,7 +667,7 @@ def animate_tour (sites, inithorseposn, phi, horse_trajectory, fly_trajectories,
     debug(Fore.BLACK + Back.WHITE + "\nFinished constructing ani object"+ Style.RESET_ALL)
 
     #debug(Fore.MAGENTA + "\nStarted writing animation to disk"+ Style.RESET_ALL)
-    #ani.save(animation_file_name_prefix+'.avi', dpi=100)
+    #ani.save(animation_file_name_prefix+'.avi', dpi=300)
     #debug(Fore.MAGENTA + "\nFinished writing animation to disk"+ Style.RESET_ALL)
 
     plt.show() # For displaying the animation in a live window. 

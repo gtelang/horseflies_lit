@@ -781,7 +781,7 @@ class PolicyBestInsertionNaive:
 
 def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
                                       insertion_policy_name       = "naive",
-                                      write_algo_states_to_disk_p = True  ,
+                                      write_algo_states_to_disk_p = False  ,
                                       animate_schedule_p          = False   , 
                                       post_optimizer              = None   ,  
                                       plot_computed_schedule      = False):
@@ -825,7 +825,7 @@ def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
       while insertion_policy.unvisited_sites_idxs: 
          # Use insertion policy to find the cheapest site to insert into current tour
          insertion_policy.insert_another_unvisited_site()
-         debug(Fore.GREEN + "Inserted another unvisited site" + Style.RESET_ALL)
+         #debug(Fore.GREEN + "Inserted another unvisited site" + Style.RESET_ALL)
          
          # Write algorithms current state to file
          if write_algo_states_to_disk_p:

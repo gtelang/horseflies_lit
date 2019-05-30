@@ -87,6 +87,6 @@ def get_colors(num_colors, lightness=0.2):
     colors=[]
     for i in np.arange(60., 360., 300. / num_colors):
         hue        = i/360.0
-        saturation = 0.95
+        saturation = 0.88
         colors.append(colorsys.hls_to_rgb(hue, lightness, saturation))
     return colors

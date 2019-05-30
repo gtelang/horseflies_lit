@@ -167,8 +167,8 @@ def run_handler():
     run = ReverseHorseflyInput()
     #print run
         
-    ax.set_xlim([utils_graphics.xlim[0], utils_graphics.xlim[1]])
-    ax.set_ylim([utils_graphics.ylim[0], utils_graphics.ylim[1]])
+    ax.set_xlim([xlim[0], xlim[1]])
+    ax.set_ylim([ylim[0], ylim[1]])
     ax.set_aspect(1.0)
     ax.set_xticks([])
     ax.set_yticks([])
@@ -244,46 +244,42 @@ class ReverseHorseflyInput:
 # Algorithms for reverse horsefly 
 #---------------------------------
 def algo_proceed_to_farthest_drone(sites, inithorseposn, phi,    \
+                               shortcut_squiggles_p = True,
                                write_algo_states_to_disk_p = False, \
                                write_io_p                  = False, \
                                animate_tour_p              = False,\
                                plot_tour_p                 = True) :
     def normalize(vec):
-        assert(np.linalg.norm(vec)>1e-8) # you are not being passed the zero vector
         unit_vec =  1.0/np.linalg.norm(vec) * vec
         return unit_vec
 
-    def furthest_uncollected_fly(current_horse_posn, uncollected_flies_idx):
+    def furthest_uncollected_fly(current_horse_posn, uncollected_flies_idx, fly_trajs):
         """ Find the furthest uncollected fly from the current horse position
         Replace this step with some dynamic farthest neighbor algorithm for 
         improving the speed."""
         imax = 0 
         dmax = -np.inf
         for idx in uncollected_flies_idx:
-            dmax_test  = np.linalg.norm(sites[idx]-current_horse_posn)
+            dmax_test  = np.linalg.norm(fly_trajs[idx][-1]-current_horse_posn)
             if dmax_test > dmax:
                 imax = idx
                 dmax = dmax_test
-        return imax, dmax
+        return imax, dmax, fly_trajs[imax][-1]
 
     def lies_inside_segment(segstart, segend, querypt):
+        """ querypt is aassumed to lie along the line joining segstart and segend
+        """
         alpha, beta  = segstart
         gamma, delta = segend
         u, v         = querypt
         
-        theta1 = (u-alpha)/(gamma-alpha)
-        theta2 = (v-beta)/(delta-beta)
-    
-        assert(abs(theta1-theta2)<1e-8, "querypt does not even lie on the line joining segstart and segend")
-        theta = theta1
+        theta = (u-alpha)/(gamma-alpha)
 
         if 0.0 <= theta <= 1.0:
             return True
         else: 
             return False
         
-        
-
     def calculate_interception_point(startpt, endpt, flypt):
         """ Consider the directed segment joining startpt and endpt with a truck beginning at `startpt'. 
         Consider a drone located at `flypt'. This function decides if a drone can intercept
@@ -328,60 +324,100 @@ def algo_proceed_to_farthest_drone(sites, inithorseposn, phi,    \
             if e.errno != errno.EEXIST:
                 raise
     
-    numsites           = len(sites)
-    numflies           = numsites
+    numflies           = len(sites)
     current_horse_posn = np.asarray(inithorseposn) 
 
     horse_traj = [ {'coords'            : np.asarray(inithorseposn), 
                     'fly_idxs_picked_up': []                       , 
                     'waiting_time'      : 0.0} ] 
 
-    flies_collected_p  = [False for i in range(numsites)] 
+    flies_collected_p  = [False for i in range(numflies)] 
     order_collection   = []
-    clock_time         = 0.0
 
-    fly_trajs      = [[np.array(sites[i])] for i in range(numflies)]
-    #---------------------------------------------------------------------------------
-    # Main loop. Several flies will possibly be collected in each iteration unlike the 
-    # Joe's original dead reckoning heuristic. 
-    #---------------------------------------------------------------------------------
+    fly_trajs          = [[np.array(sites[i])] for i in range(numflies)]
+
+    numrounds = 0
     while (not all(flies_collected_p)):
-        current_horse_posn     = horse_traj[-1]['coords']
-        uncollected_flies_idx  = [idx for idx in range(len(flies_collected_p)) if flies_collected_p[idx] == False]
-        imax, dmax             = furthest_uncollected_fly(current_horse_posn, uncollected_flies_idx)
 
-        # Extract position of farthest drone from current position of the truck 
-        farthest_fly_posn    = sites[imax] 
+        current_horse_posn            = horse_traj[-1]['coords']
+        uncollected_flies_idx         = [idx for idx in range(len(flies_collected_p)) if flies_collected_p[idx] == False]
+        imax, dmax, farthest_fly_posn = furthest_uncollected_fly(current_horse_posn, uncollected_flies_idx, fly_trajs)
 
         # Find the interception point with the furthest drone assuming ``head-on'' collision
-        fly_idxs_picked_up = []
+        fly_idxs_picked_up_with_meetpts = []
+        d           = np.linalg.norm(farthest_fly_posn-current_horse_posn)
+        meetpt_imax = current_horse_posn + d/(1.0+phi) * normalize(farthest_fly_posn-current_horse_posn)
+        fly_idxs_picked_up_with_meetpts.append((imax, meetpt_imax))
+
         for idx in uncollected_flies_idx:
             if idx != imax:
-                maybe_meetpt = calculate_interception_point(current_horse_posn, farthest_fly_posn, sites[idx])
+                maybe_meetpt = calculate_interception_point(current_horse_posn, meetpt_imax, fly_trajs[idx][-1])
                 if maybe_meetpt is not None:
-                    fly_idxs_picked_up.append((idx, maybe_meetpt))
-            else: 
-                d      = np.linalg.norm(farthest_fly_posn-current_horse_posn)
-                meetpt = current_horse_posn + d/(1.0+phi) * normalize(farthest_fly_posn-current_horse_posn)
-                fly_idxs_picked_up.append((idx, meetpt))
+                    fly_idxs_picked_up_with_meetpts.append((idx, maybe_meetpt))
          
         # Sort the interception points along the ray and add it to the horse trajectory
-        fly_idxs_picked_up = sorted(fly_idxs_picked_up, \
+        fly_idxs_picked_up_with_meetpts = sorted(fly_idxs_picked_up_with_meetpts, \
                                     key=lambda (idx, meetpt): np.linalg.norm(meetpt-current_horse_posn))
-        #assert(fly_idxs_picked_up[-1][0] == imax)
-        print Fore.GREEN
-        utils_algo.print_list(fly_idxs_picked_up)
-        print " ", Style.RESET_ALL
-        for (idx, meetpt) in fly_idxs_picked_up:
+        
+        #assert(fly_idxs_picked_up_with_meetpts[-1][0] == imax)
+        # Truck trajectory and Drone trajectories as the truck moves towards the farthest drone in this round
+        for (idx, meetpt) in fly_idxs_picked_up_with_meetpts:
             horse_traj.append({'coords'             : meetpt, 
                                'fly_idxs_picked_up' : [idx]        , 
                                'waiting_time'       : 0.0})
-
             fly_trajs[idx].append(meetpt)
-            horse_traj_pts = [pt['coords'] for pt in horse_traj ]
-            clock_time     = utils_algo.length_polygonal_chain(horse_traj_pts) 
-            order_collection.append((idx, meetpt, clock_time)) 
             flies_collected_p[idx] = True
+
+        # Those drones that couldn't intercept the truck along its journey to the farthest drone of this round
+        # head towards the interception point
+        all_fly_idxs_picked_up     = [idx for idx in range(numflies) if flies_collected_p[idx] == True] 
+        all_fly_idxs_not_picked_up = list(set((range(numflies))) - set(all_fly_idxs_picked_up))         
+
+        dt = np.linalg.norm(horse_traj[-1]['coords']-current_horse_posn) # Truck travels at speed 1.0
+        for idx in all_fly_idxs_not_picked_up:
+            current_fly_posn = fly_trajs[idx][-1]
+            new_fly_posn     = current_fly_posn +  phi * dt * normalize(horse_traj[-1]['coords']-current_fly_posn)
+            fly_trajs[idx].append(new_fly_posn)
+        numrounds += 1   
+    
+    if shortcut_squiggles_p:
+       new_fly_trajs = [ ]
+
+       for traj in fly_trajs:
+           startpt    = traj[0]
+           endpt      = traj[-1]
+
+           v       = endpt - startpt
+           unit_v  = 1.0/np.linalg.norm(v) * v
+           newtraj = [startpt]
+           
+           for hidx in range(len(horse_traj)-1):
+               currentpt = newtraj[-1]
+
+               # Remember horse speed is assumed to be 1.0. 
+               # Hence the curious division by 1.0 
+               dt = np.linalg.norm(horse_traj[hidx+1]['coords']-\
+                                   horse_traj[hidx]['coords'])/1.0
+
+               if dt*phi < np.linalg.norm(currentpt-endpt):
+                   newtraj.append( currentpt + dt*phi*unit_v   )
+               else: 
+                   newtraj.append( endpt )  
+                   break # shortcutting is complete! break out of
+                         # the loop and process next trajectory 
+                   
+           new_fly_trajs.append(newtraj)
+
+       fly_trajs = new_fly_trajs
+
+    if animate_tour_p:
+          animate_tour(sites            = sites, 
+                     phi                = phi, 
+                     horse_trajectories = [horse_traj],
+                     fly_trajectories   = fly_trajs,
+                     animation_file_name_prefix = None,
+                     algo_name = 'fh', 
+                     render_trajectory_trails_p = False)
 
 
     if plot_tour_p:
@@ -395,12 +431,12 @@ def algo_proceed_to_farthest_drone(sites, inithorseposn, phi,    \
         plt.rc('font', family='serif')
         sitesize = 0.010
         fig, ax = plt.subplots()
-        ax.set_xlim([0,1])
-        ax.set_ylim([0,1])
+        ax.set_xlim([xlim[0],xlim[1]])
+        ax.set_ylim([ylim[0],ylim[1]])
         ax.set_aspect('equal')
 
-        ax.set_xticks(np.arange(0, 1, 0.1))
-        ax.set_yticks(np.arange(0, 1, 0.1))
+        ax.set_xticks(np.arange(xlim[0], xlim[1], 0.1))
+        ax.set_yticks(np.arange(ylim[0], ylim[1], 0.1))
 
         # Turn on the minor TICKS, which are required for the minor GRID
         ax.minorticks_on()
@@ -416,9 +452,9 @@ def algo_proceed_to_farthest_drone(sites, inithorseposn, phi,    \
 
         # Plot Fly segments
         for ftraj  in fly_trajs:
-            xfs = [ftraj[0][0], ftraj[-1][0]]
-            yfs = [ftraj[0][1], ftraj[-1][1]]
-            ax.plot(xfs,yfs,'-',linewidth=2.0, markersize=3, alpha=0.7, color='g')
+            xfs = [ftraj[idx][0] for idx in range(len(ftraj))]   
+            yfs = [ftraj[idx][1] for idx in range(len(ftraj))]  
+            ax.plot(xfs,yfs,'-',linewidth=2.0, markersize=3, alpha=0.5, color='g')
 
         # Plot sites as small disks (these are obviosuly the initial positions of the flies)
         for site in sites:
@@ -446,7 +482,7 @@ def algo_proceed_to_farthest_drone(sites, inithorseposn, phi,    \
 
 
 
-    return horse_traj, fly_trajs
+    return horse_traj, fly_trajs, numrounds
 
 
 
@@ -633,7 +669,7 @@ def algo_greedy_dead_reckoning_multiple_horses(sites, inithorseposns, phi,    \
 
 def algo_greedy_dead_reckoning(sites, inithorseposn, phi,    \
                                write_algo_states_to_disk_p = False, \
-                               write_io_p                  = False, \
+                               write_io_p                  = True, \
                                animate_tour_p              = True,\
                                plot_tour_p                 = False) :
     
@@ -736,7 +772,7 @@ def algo_greedy_dead_reckoning(sites, inithorseposn, phi,    \
                      phi                = phi, 
                      horse_trajectories = [horse_traj],
                      fly_trajectories   = fly_trajs,
-                     animation_file_name_prefix = None,
+                     animation_file_name_prefix = dir_name+'/',
                      algo_name = 'gdr', 
                      render_trajectory_trails_p = True)
 
@@ -792,7 +828,7 @@ def algo_greedy_dead_reckoning(sites, inithorseposn, phi,    \
 
         # Plot meta-data
         tour_length = utils_algo.length_polygonal_chain(zip(xhs, yhs))
-        ax.set_title("Algo: gdr \n Number of sites: " + str(len(sites)) + "\n Tour length " +\
+        ax.set_title("Algo: gdr \n Number of sites: " + str(len(sites)) + "\n Tour Length: " +\
                     str(round(tour_length,4)), fontsize=25)
         ax.set_xlabel(r"$\varphi=$ " + str(phi) , fontsize=25)
         plt.show()
@@ -805,7 +841,7 @@ def algo_greedy_concentric_kinetic_tsp(sites, inithorseposn, phi, \
                                        write_algo_states_to_disk_p = True,\
                                        write_io_p                  = True,\
                                        animate_tour_p              = True,\
-                                       plot_tour_p                 = False) :
+                                       plot_tour_p                 = True) :
 
     """Each fly heads towards a given center-point (same center-point for all flies) 
     along the directed segment joining its initial position to the center. 
@@ -1620,19 +1656,11 @@ def animate_tour (sites, phi, horse_trajectories, fly_trajectories,
                   xhs = [x for (x,y) in traj]
                   yhs = [y for (x,y) in traj]
 
-            horseline, = ax.plot(xhs,yhs,'-',linewidth=5.0, markersize=6, alpha=1.00, color='#D13131')
+            horseline, = ax.plot(xhs,yhs,'-',linewidth=5.0, markersize=6, alpha=0.80, color='#D13131')
             horseloc   = Circle((current_horse_posn[0], current_horse_posn[1]), 0.015, facecolor = '#D13131', edgecolor='k',  alpha=1.00)
             horsepatch = ax.add_patch(horseloc)
             objs.append(horseline)
             objs.append(horsepatch)
-
-        # Plot sites as small disks (these are obviosuly the initial positions of the flies)
-        #sitesize = 0.005
-        #for site in sites:
-        #    circle    = Circle((site[0], site[1]), sitesize, facecolor='b', edgecolor='black',linewidth=0.5)
-        #    sitepatch = ax.add_patch(circle)
-        #    objs.append(sitepatch)
-
 
         # Render all fly trajectories uptil this point in time
         for fidx in range(number_of_flies):
@@ -1662,7 +1690,7 @@ def animate_tour (sites, phi, horse_trajectories, fly_trajectories,
                     service_status_col = 'y'
                     break
 
-            flyloc   = Circle((current_fly_posn[0], current_fly_posn[1]), 0.009, 
+            flyloc   = Circle((current_fly_posn[0], current_fly_posn[1]), 0.013, 
                               facecolor = service_status_col, edgecolor='k', alpha=1.00)
             flypatch = ax.add_patch(flyloc)
             objs.append(flypatch)
@@ -1673,9 +1701,15 @@ def animate_tour (sites, phi, horse_trajectories, fly_trajectories,
         image_frame_counter += 1
 
     from colorama import Back 
+   
     debug(Fore.BLACK + Back.WHITE + "\nStarted constructing ani object"+ Style.RESET_ALL)
     ani = animation.ArtistAnimation(fig, ims, interval=70, blit=True, repeat=True, repeat_delay=500)
     debug(Fore.BLACK + Back.WHITE + "\nFinished constructing ani object"+ Style.RESET_ALL)
+
+    debug(Fore.MAGENTA + "\nStarted writing animation to disk"+ Style.RESET_ALL)
+    #ani.save(animation_file_name_prefix+'.avi', dpi=100)
+    #ani.save('reverse_horsefly.avi', dpi=300)
+    debug(Fore.MAGENTA + "\nFinished writing animation to disk"+ Style.RESET_ALL)
 
     plt.show()
 
