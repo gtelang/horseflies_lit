@@ -1,0 +1,859 @@
+\newcommand{\NWtarget}[2]{\hypertarget{#1}{#2}}
+\newcommand{\NWlink}[2]{\hyperlink{#1}{#2}}
+\newcommand{\NWtxtMacroDefBy}{Fragment defined by}
+\newcommand{\NWtxtMacroRefIn}{Fragment referenced in}
+\newcommand{\NWtxtMacroNoRef}{Fragment never referenced}
+\newcommand{\NWtxtDefBy}{Defined by}
+\newcommand{\NWtxtRefIn}{Referenced in}
+\newcommand{\NWtxtNoRef}{Not referenced}
+\newcommand{\NWtxtFileDefBy}{File defined by}
+\newcommand{\NWtxtIdentsUsed}{Uses:}
+\newcommand{\NWtxtIdentsNotUsed}{Never used}
+\newcommand{\NWtxtIdentsDefed}{Defines:}
+\newcommand{\NWsep}{${\diamond}$}
+\newcommand{\NWnotglobal}{(not defined globally)}
+\newcommand{\NWuseHyperlinks}{}
+\documentclass[11.5pt]{report}
+\input{standard_settings.tex}
+                                                                                                                      
+%%% Super useful for marking todo notes, ripped from here:                                                            
+%%% https://tex.stackexchange.com/a/178806/17858                                                                      
+\usepackage{xargs}                      % Use more than one optional parameter in a new commands                      
+\usepackage[colorinlistoftodos,prependcaption,textsize=tiny]{todonotes}
+\newcommandx{\UNSURE}[2][1=]{\todo[linecolor=blue,backgroundcolor=blue!25,bordercolor=blue,#1]{#2}}
+\newcommandx{\TODO}[2][1=]{\todo[linecolor=red,backgroundcolor=red!25,bordercolor=red,#1]{#2}}
+                                                                                                                      
+\usepackage{kantlipsum}
+\usepackage{fancyvrb}
+\usepackage{setspace}
+\newenvironment{CVerbatim}
+ {\singlespacing\center\BVerbatim}  
+ {\endBVerbatim\endcenter}
+                                                                                                                      
+\usepackage{tocloft}
+\renewcommand{\cftpartfont}{\LARGE\itshape} % Part title in Huge Italic font                                          
+\usepackage{hyperref}
+\usepackage{etoolbox}
+% Better formatting of backticks in                                                                                   
+% verbatim environment.                                                                                               
+\usepackage{upquote} 
+                                                                                                                      
+% page numbering at top right                                                                                         
+\usepackage{fancyhdr}
+\pagestyle{fancy} 
+\fancyhf{}                                                                                                            
+\fancyhead[R]{\thepage}                                                                                               
+  
+\title{Horsefly Problems on Graphs}
+
+\begin{document}
+\maketitle
+\tableofcontents
+
+\chapter{Introduction}
+
+This set of literate programs implement heuristics to solve Horsefly type problems on graphs. The generic problem for this setting 
+is: given a set of nodes, with some distinguished nodes marked as delivery points and one node marked as the starting point 
+of a truck and drone we want to minimize the makespan of the delivery process in which the drone departs from the truck 
+with a package, flies to a site along a sequence of edges, drops of the package and returns to the truck (which itself might be moving 
+along the graph edges) to pick up the next package for delivery. For the sake of simplicity, we only allow the drone itself to do the delivery 
+and the meeting points between the truck and drone to happen at the nodes of the graph. Some edges in the graph will be traversable by 
+only the truck or only the drone and some edges will be traversable by both. 
+
+The challenge in this problem is to set up a coordinated schedule of the truck and the drone so that the total delivery time is minimized. 
+The truck is assumed to always travel with unit speed and the drone with integer speed $\varphi \in \{2,3,\ldots\}$. 
+
+While almost all the algorithms developed here are intended to be graph agnostic, the input graphs for such problems will typically come 
+about from the discretization of geometric domains where there might be obstacles, some for the drone, some for the truck, some for maybe both. 
+To test the algorithms interactively, I will typically use rectangular obstacles, along with an appropriate background mesh of points.
+
+
+
+Several variants on this basic theme are possible in which a truck might have been equipped with more than one drone or there might be 
+constraints at the sites or pick-up points (such as service or package-handoff times). Lots of special cases abound too: what if the underlying 
+graph is or outerplanar planar, what if the set of truck and/or drone edges form a tree? What if the truck is restricted to travelling only 
+along a path-graph? 
+
+Heuristics for such variants and their experimental-performance analyses 
+will also be discussed later. Such problems are typically extremely hard, so all heuristics are meant to be approximations to the optimal 
+routing scheme for each instance. Algorithms developed will typically use a combination of greedy strategies, dynamic programming, branch-and-bound
+and local search. Several interesting problems also arise in being able to efficiently implement a particular strategy and so answers to these questions
+will often be developed in tandem with the implementation of different strategies for Horsefly problems. 
+
+
+\chapter{User Input}
+
+This chapter implements (boring  but important) UI code for the user to mouse in rectangular obstacles, service points, and initial position of the truck and drone onto 
+the Matplotlib canvas and generate an appropriate geometric graph for the truck and drone to travel along. Typically these geometric graphs 
+will be the visibility graph, delaunay triangulation or some other graph on such points which can be set at run-time through a command-line menu. 
+The resulting algorithms, however, will typically be graph-agnostic unless explicitly indicated in the doc-string of the implemented algorithm. 
+
+One can also enter in the set of truck and drone obstacles along with any discretization parameters via a YAML file. This is particularly useful 
+for storing nice instances and answers discovered wihle experimenting on a canvas. 
+
+Here is a high-level overview of the \verb|horsefly_graphs.py| module. 
+
+%{python-mode}%
+\begin{flushleft} \small\label{scrap1}\raggedright\small
+\NWtarget{nuweb3}{} \verb@"horsefly_graphs.py"@\nobreak\ {\footnotesize {3}}$\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@    @\\
+\mbox{}\verb@import matplotlib.pyplot as plt@\\
+\mbox{}\verb@import matplotlib as mpl@\\
+\mbox{}\verb@from matplotlib import rc@\\
+\mbox{}\verb@import numpy as np@\\
+\mbox{}\verb@import scipy as sp@\\
+\mbox{}\verb@import sys, os, time@\\
+\mbox{}\verb@import itertools@\\
+\mbox{}\verb@from colorama import Fore, Style@\\
+\mbox{}\verb@import logging@\\
+\mbox{}\verb@import utils_graphics, utils_algo@\\
+\mbox{}\verb@import networkx as nx@\\
+\mbox{}\verb@from CGAL.CGAL_Kernel import Point_2, Segment_2, Iso_rectangle_2@\\
+\mbox{}\verb@from CGAL.CGAL_Kernel import do_intersect, intersection@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@@\hbox{$\langle\,${\itshape Local data-structures}\nobreak\ {\footnotesize \NWlink{nuweb4}{4}, \ldots\ }$\,\rangle$}\verb@@\\
+\mbox{}\verb@@\hbox{$\langle\,${\itshape Some basic canvas functions}\nobreak\ {\footnotesize \NWlink{nuweb6a}{6a}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@@\hbox{$\langle\,${\itshape Implementation of the key-press handler}\nobreak\ {\footnotesize \NWlink{nuweb7a}{7a}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@@\hbox{$\langle\,${\itshape Implementation of \verb|wrapperEnterPoints|}\nobreak\ {\footnotesize \NWlink{nuweb7b}{7b}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@@\hbox{$\langle\,${\itshape Implementation of \verb|wrapperHoverObstacle|}\nobreak\ {\footnotesize \NWlink{nuweb8}{8}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@@\hbox{$\langle\,${\itshape Implementation of \verb|wrapperPlaceObstacle|}\nobreak\ {\footnotesize \NWlink{nuweb9}{9}}$\,\rangle$}\verb@   @\\
+\mbox{}\verb@@\hbox{$\langle\,${\itshape Implementation of \verb|wrapperResizeHoveringObstacle|}\nobreak\ {\footnotesize \NWlink{nuweb10}{10}}$\,\rangle$}\verb@   @\\
+\mbox{}\verb@@\\
+\mbox{}\verb@if __name__ == "__main__":@\\
+\mbox{}\verb@    @\hbox{$\langle\,${\itshape Body of main function}\nobreak\ {\footnotesize \NWlink{nuweb6b}{6b}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+
+\item{}
+\end{list}
+\vspace{4ex}
+\end{flushleft}
+%{/python-mode}%
+
+
+\section{Local Data Structures}
+
+The data-structure used by the canvas for manipulating the input is \verb|HorseflyInputGraph|. It performs simple house-keeping duties such as keeping track of the 
+sites, the initial position of the truck, various obstacles etc. The main method for this class is \verb|getTour| which generates the actual graph according to 
+the graph-policy specified and runs the appropriate algorithm on the generated graph. The flag \verb|obstacle\_input\_mode\_p| is toggled to \verb|True| or 
+\verb|False| according as obstacles are being entered onto the canvas. The input is entered in two modes (the default site insertion mode and the optional 
+obstacle insertion mode, which is toggled by pressing the ``o'' or ``O'' key. )
+
+The definition of the method \verb|makeHorseflyInputGraph| will be given later. This will help exposition since details of the function depend on the 
+\verb|Obstacle| class which will be introduced in the next code-chunk.  
+
+
+%{python-mode}%
+\begin{flushleft} \small\label{scrap2}\raggedright\small
+\NWtarget{nuweb4}{} $\langle\,${\itshape Local data-structures}\nobreak\ {\footnotesize {4}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@@\\
+\mbox{}\verb@ @\\
+\mbox{}\verb@class HorseflyInputGraph:@\\
+\mbox{}\verb@      def __init__(self, sites=[], inithorseposn=[]):@\\
+\mbox{}\verb@           self.sites                = sites@\\
+\mbox{}\verb@           self.inithorseposn        = inithorseposn@\\
+\mbox{}\verb@           self.obstacle_list        = []@\\
+\mbox{}\verb@           self.horsefly_input_graph = nx.Graph()@\\
+\mbox{}\verb@    @\\
+\mbox{}\verb@           # Tracking variables used only during interactive input. @\\
+\mbox{}\verb@           # To be frank these tracking variables should be placed in a separate class@\\
+\mbox{}\verb@           # they seem out of place here. Else have a dedicated class stored as a @\\
+\mbox{}\verb@           # variable/dictionary containinig all these icky state variables used @\\
+\mbox{}\verb@           # during input manipulation. @\\
+\mbox{}\verb@           self.default_obstacle_width   = 0.1 @\\
+\mbox{}\verb@           self.default_obstacle_height  = 0.1 @\\
+\mbox{}\verb@@\\
+\mbox{}\verb@           self.hovering_obstacle_width  = 0.1 # This will be modified during the move@\\
+\mbox{}\verb@           self.hovering_obstacle_height = 0.1 # This will be modified during the move@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@           self.horse_obstacle_input_mode_p = False@\\
+\mbox{}\verb@           self.fly_obstacle_input_mode_p = False@\\
+\mbox{}\verb@           self.common_obstacle_input_mode_p = False@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@      def clearAllStates (self):@\\
+\mbox{}\verb@          self.sites           = []@\\
+\mbox{}\verb@          self.inithorseposn   = None@\\
+\mbox{}\verb@          self.obstacle_list = [] @\\
+\mbox{}\verb@   @\\
+\mbox{}\verb@          self.horse_obstacle_input_mode_p  = False@\\
+\mbox{}\verb@          self.fly_obstacle_input_mode_p    = False@\\
+\mbox{}\verb@          self.common_obstacle_input_mode_p = False@\\
+\mbox{}\verb@    @\\
+\mbox{}\verb@          self.horsefly_input_graph = nx.Graph()@\\
+\mbox{}\verb@      @\\
+\mbox{}\verb@      @\hbox{$\langle\,${\itshape Definition of method \verb|makeHorseflyInputGraph|}\nobreak\ {\footnotesize \NWlink{nuweb12}{12}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@      @\hbox{$\langle\,${\itshape Definition of method \verb|renderHorseflyInputGraph|}\nobreak\ {\footnotesize \NWlink{nuweb13}{13}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@      def clearGraph(self,fig,ax):@\\
+\mbox{}\verb@          self.horsefly_input_graph = nx.Graph() # Input Graph is set to the empty null graph@\\
+\mbox{}\verb@          # TODO, clear the canvas completely and then redraw the current sites and obstacles stored@\\
+\mbox{}\verb@          # so that the drawn graph is cleared from the canvas, and the input is restored to its @\\
+\mbox{}\verb@          # original prsitine state, so that other algorithms can be tried out. @\\
+\mbox{}\verb@          pass@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@      def getTour(self, algo, phi):@\\
+\mbox{}\verb@             return algo(self.horsefly_input_graph, phi)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroDefBy\ \NWlink{nuweb4}{4}\NWlink{nuweb5}{, 5}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb3}{3}.
+
+\item{}
+\end{list}
+\vspace{4ex}
+\end{flushleft}
+%{/python-mode}%
+
+The UI code allows only rectangular obstacles to be inserted for convenience of implementation. As has already been mentioned, once the underlying domain of obsctales and surrounding
+space is discretized the algorithms are graph agnostic. Code for inserting obstacles of more complicated shapes will be added later. 
+
+%{python-mode}%
+\begin{flushleft} \small\label{scrap3}\raggedright\small
+\NWtarget{nuweb5}{} $\langle\,${\itshape Local data-structures}\nobreak\ {\footnotesize {5}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@@\\
+\mbox{}\verb@class Obstacle:@\\
+\mbox{}\verb@    def __init__(self, llcorner, width, height, figure=None, @\\
+\mbox{}\verb@                 axes_object=None, obstype=None, diskcolor = 'crimson'):@\\
+\mbox{}\verb@        self.llcorner = llcorner@\\
+\mbox{}\verb@        self.width    = width@\\
+\mbox{}\verb@        self.height   = height@\\
+\mbox{}\verb@        self.fig      = figure@\\
+\mbox{}\verb@        self.ax       = axes_object@\\
+\mbox{}\verb@        self.obstype  = obstype@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@        # Only inserted disks will end up having this attribute@\\
+\mbox{}\verb@        if self.fig != None:@\\
+\mbox{}\verb@             self.canvas_patch =  mpl.patches.Rectangle( self.llcorner, self.width, @\\
+\mbox{}\verb@                                                         self.height  , facecolor = diskcolor, @\\
+\mbox{}\verb@                                                         alpha = 0.7 )@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    def mplPatch(self, diskcolor= 'crimson' ):@\\
+\mbox{}\verb@        return  self.canvas_patch@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    def getVertices(self):@\\
+\mbox{}\verb@         [x,y] = self.llcorner@\\
+\mbox{}\verb@         p_ll = [x            , y       ]@\\
+\mbox{}\verb@         p_lr = [x+self.width , y       ]@\\
+\mbox{}\verb@         p_ur = [x+self.width , y+self.height]@\\
+\mbox{}\verb@         p_ul = [x            , y+self.height]@\\
+\mbox{}\verb@         return [p_ll,p_lr,p_ur,p_ul]@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    def intersectionWithSegment(self,p,q):@\\
+\mbox{}\verb@    @\\
+\mbox{}\verb@        [llv, _, urv, _] = self.getVertices()@\\
+\mbox{}\verb@        llv = Point_2(llv[0],llv[1])@\\
+\mbox{}\verb@        urv = Point_2(urv[0],urv[1])@\\
+\mbox{}\verb@        rect = Iso_rectangle_2(llv,urv)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@        p = Point_2(p[0],p[1])@\\
+\mbox{}\verb@        q = Point_2(q[0],q[1])@\\
+\mbox{}\verb@        seg = Segment_2(p,q)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@        interscn_object = intersection(rect,seg)@\\
+\mbox{}\verb@        interscn_p     = do_intersect(rect,seg)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@        return (interscn_p, interscn_object)@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroDefBy\ \NWlink{nuweb4}{4}\NWlink{nuweb5}{, 5}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb3}{3}.
+
+\item{}
+\end{list}
+\vspace{4ex}
+\end{flushleft}
+%{/python-mode}%
+
+\section{Some basic canvas functions}
+
+A few basic functions are needed to manipulate the matplotlib canvas, such as clearing the canvas of patches, setting aspect ratio etc. We implement them here. 
+
+%{python-mode}%
+\begin{flushleft} \small
+\begin{minipage}{\linewidth}\label{scrap4}\raggedright\small
+\NWtarget{nuweb6a}{} $\langle\,${\itshape Some basic canvas functions}\nobreak\ {\footnotesize {6a}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@@\\
+\mbox{}\verb@def applyAxCorrection(ax):@\\
+\mbox{}\verb@      ax.set_xlim([utils_graphics.xlim[0], utils_graphics.xlim[1]])@\\
+\mbox{}\verb@      ax.set_ylim([utils_graphics.ylim[0], utils_graphics.ylim[1]])@\\
+\mbox{}\verb@      ax.set_aspect(1.0)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@def clearPatches(ax):@\\
+\mbox{}\verb@    # Get indices cooresponding to the polygon patches@\\
+\mbox{}\verb@    for index , patch in zip(range(len(ax.patches)), ax.patches):@\\
+\mbox{}\verb@        if isinstance(patch, mpl.patches.Polygon) == True:@\\
+\mbox{}\verb@            patch.remove()@\\
+\mbox{}\verb@    ax.lines[:]=[]@\\
+\mbox{}\verb@    applyAxCorrection(ax)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@def clearAxPolygonPatches(ax):@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    # Get indices cooresponding to the polygon patches@\\
+\mbox{}\verb@    for index , patch in zip(range(len(ax.patches)), ax.patches):@\\
+\mbox{}\verb@        if isinstance(patch, mpl.patches.Polygon) == True:@\\
+\mbox{}\verb@            patch.remove()@\\
+\mbox{}\verb@    ax.lines[:]=[]@\\
+\mbox{}\verb@    applyAxCorrection(ax)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb3}{3}.
+
+\item{}
+\end{list}
+\end{minipage}\vspace{4ex}
+\end{flushleft}
+%{/python-mode}%
+
+
+The \verb|main| function just sets up the basic canvas and the container to hold the user-input data. Once the canvas is started, it ``listens in'' on the mouse-press and key-press events 
+to enter various elements such as the initial position of the truck and drone, the sites of delivery, the input obstacles. 
+
+%{python-mode}%
+\begin{flushleft} \small\label{scrap5}\raggedright\small
+\NWtarget{nuweb6b}{} $\langle\,${\itshape Body of main function}\nobreak\ {\footnotesize {6b}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@@\\
+\mbox{}\verb@fig, ax =  plt.subplots()@\\
+\mbox{}\verb@run = HorseflyInputGraph()@\\
+\mbox{}\verb@        @\\
+\mbox{}\verb@ax.set_xlim([utils_graphics.xlim[0], utils_graphics.xlim[1]])@\\
+\mbox{}\verb@ax.set_ylim([utils_graphics.ylim[0], utils_graphics.ylim[1]])@\\
+\mbox{}\verb@ax.set_aspect(1.0)@\\
+\mbox{}\verb@ax.set_xticks([])@\\
+\mbox{}\verb@ax.set_yticks([])@\\
+\mbox{}\verb@          @\\
+\mbox{}\verb@mouseClick = wrapperEnterPoints (fig,ax, run)@\\
+\mbox{}\verb@fig.canvas.mpl_connect('button_press_event' , mouseClick )@\\
+\mbox{}\verb@         @\\
+\mbox{}\verb@keyPress   = wrapperkeyPressHandler(fig,ax, run)@\\
+\mbox{}\verb@fig.canvas.mpl_connect('key_press_event', keyPress )@\\
+\mbox{}\verb@    @\\
+\mbox{}\verb@hoverObstacle  = wrapperHoverObstacle(fig,ax, run)@\\
+\mbox{}\verb@fig.canvas.mpl_connect('motion_notify_event', hoverObstacle )@\\
+\mbox{}\verb@    @\\
+\mbox{}\verb@placeObstacle  = wrapperPlaceObstacle(fig,ax, run)@\\
+\mbox{}\verb@fig.canvas.mpl_connect('button_press_event' , placeObstacle )@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@resizeHoveringObstacle  = wrapperResizeHoveringObstacle(fig,ax, run)@\\
+\mbox{}\verb@fig.canvas.mpl_connect('key_press_event', resizeHoveringObstacle)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@plt.show()@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb3}{3}.
+
+\item{}
+\end{list}
+\vspace{4ex}
+\end{flushleft}
+%{/python-mode}%
+
+This function handles the manages events corresponding to key-presses on the computer key-board. For instance, 
+pressing \verb|Ctrl+| $\rightarrow$ increases (resp. decreases) the X-dimension of the rectangle. Similarly for 
+the Y-dimension and the keys \verb|Ctrl+| $\uparrow$ and \verb|Ctrl+| $\downarrow$. Behavior of other-keys is 
+self-explantory as documented in the code-chunks below.  
+
+%{python-mode}%
+\begin{flushleft} \small\label{scrap6}\raggedright\small
+\NWtarget{nuweb7a}{} $\langle\,${\itshape Implementation of the key-press handler}\nobreak\ {\footnotesize {7a}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@@\\
+\mbox{}\verb@def wrapperkeyPressHandler(fig,ax, run): @\\
+\mbox{}\verb@      def _keyPressHandler(event):@\\
+\mbox{}\verb@                      @\\
+\mbox{}\verb@             if event.key in ['c', 'C']: @\\
+\mbox{}\verb@                   # Clear canvas and states of all objects@\\
+\mbox{}\verb@                    run.clearAllStates()@\\
+\mbox{}\verb@                    ax.cla()@\\
+\mbox{}\verb@                                  @\\
+\mbox{}\verb@                    utils_graphics.applyAxCorrection(ax)@\\
+\mbox{}\verb@                    ax.set_xticks([])@\\
+\mbox{}\verb@                    ax.set_yticks([])@\\
+\mbox{}\verb@                                     @\\
+\mbox{}\verb@                    fig.texts = []@\\
+\mbox{}\verb@                    fig.canvas.draw()@\\
+\mbox{}\verb@             @\\
+\mbox{}\verb@             elif event.key in ['h' , 'H']: # `h` for horse@\\
+\mbox{}\verb@                  run.horse_obstacle_input_mode_p    = not (run.horse_obstacle_input_mode_p)@\\
+\mbox{}\verb@                  run.fly_obstacle_input_mode_p      = False@\\
+\mbox{}\verb@                  run.common_obstacle_input_mode_p   = False@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    @\\
+\mbox{}\verb@             elif event.key in ['f' , 'F']: # `f` for fly@\\
+\mbox{}\verb@                  run.horse_obstacle_input_mode_p   = False@\\
+\mbox{}\verb@                  run.fly_obstacle_input_mode_p     = not (run.fly_obstacle_input_mode_p)@\\
+\mbox{}\verb@                  run.common_obstacle_input_mode_p  = False@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@             elif event.key in ['g' , 'G']: # 'g' lies between the f and h keys on the keybard signifying intersection@\\
+\mbox{}\verb@                  run.horse_obstacle_input_mode_p   = False@\\
+\mbox{}\verb@                  run.fly_obstacle_input_mode_p     = False@\\
+\mbox{}\verb@                  run.common_obstacle_input_mode_p  = not (run.common_obstacle_input_mode_p)@\\
+\mbox{}\verb@    @\\
+\mbox{}\verb@             elif event.key in ['d','D']: # `d` for discretize domain, using the obstacles we sprinkle @\\
+\mbox{}\verb@                                          # some points and discretize everything@\\
+\mbox{}\verb@                  background_grid_pts = [[np.random.rand(), np.random.rand()] for i in range(60)]@\\
+\mbox{}\verb@                  run.makeHorseflyInputGraph(fig, ax, background_grid_pts)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@      return _keyPressHandler@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb3}{3}.
+
+\item{}
+\end{list}
+\vspace{4ex}
+\end{flushleft}
+%{/python-mode}%
+
+This function just implements the behavior of the canvas under mouse-clicks. The left mouse button double-clicked inserts a site onto 
+the canvas while the right mouse button inserts the intial position of the truck and drone. These two types of points have been given 
+different colors. Later on the points used in the background grid to discretize the domain will again be shown in a different colour. 
+
+%{python-mode}%
+\begin{flushleft} \small\label{scrap7}\raggedright\small
+\NWtarget{nuweb7b}{} $\langle\,${\itshape Implementation of \verb|wrapperEnterPoints|}\nobreak\ {\footnotesize {7b}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@   @\\
+\mbox{}\verb@def wrapperEnterPoints(fig,ax,run):@\\
+\mbox{}\verb@    def _enterPoints(event):@\\
+\mbox{}\verb@        if event.name      == 'button_press_event'          and \@\\
+\mbox{}\verb@           run.horse_obstacle_input_mode_p  == False        and \@\\
+\mbox{}\verb@           run.fly_obstacle_input_mode_p    == False        and \@\\
+\mbox{}\verb@           run.common_obstacle_input_mode_p == False        and \@\\
+\mbox{}\verb@           (event.button   == 1 or event.button == 3)       and \@\\
+\mbox{}\verb@            event.dblclick == True and event.xdata  != None and event.ydata  != None:@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@             if event.button == 1:  @\\
+\mbox{}\verb@                 # Insert blue circle representing a site@\\
+\mbox{}\verb@                 newPoint = (event.xdata, event.ydata)@\\
+\mbox{}\verb@                 run.sites.append( newPoint  )@\\
+\mbox{}\verb@                 patchSize  = (utils_graphics.xlim[1]-utils_graphics.xlim[0])/140.0@\\
+\mbox{}\verb@                    @\\
+\mbox{}\verb@                 ax.add_patch( mpl.patches.Circle( newPoint, radius = patchSize,@\\
+\mbox{}\verb@                                                   facecolor='blue', edgecolor='black'  ))@\\
+\mbox{}\verb@                 ax.set_title('Number of sites : ' + str(len(run.sites)), \@\\
+\mbox{}\verb@                              fontdict={'fontsize':40})@\\
+\mbox{}\verb@                 @\\
+\mbox{}\verb@@\\
+\mbox{}\verb@             elif event.button == 3:  @\\
+\mbox{}\verb@                 # Insert big red circle representing initial position of horse and fly@\\
+\mbox{}\verb@                 newinithorseposn  = (event.xdata, event.ydata)@\\
+\mbox{}\verb@                 run.inithorseposn = newinithorseposn  @\\
+\mbox{}\verb@                 patchSize         = (utils_graphics.xlim[1]-utils_graphics.xlim[0])/100.0@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@                 ax.add_patch( mpl.patches.Circle( newinithorseposn,radius = patchSize,@\\
+\mbox{}\verb@                                                   facecolor= '#D13131', edgecolor='black' ))@\\
+\mbox{}\verb@                 @\\
+\mbox{}\verb@                 print Fore.RED, "Initial positions of truck\n", @\\
+\mbox{}\verb@                 print run.inithorseposn@\\
+\mbox{}\verb@                 print Style.RESET_ALL@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@             # Clear polygon patches and set up last minute \verb|ax| tweaks@\\
+\mbox{}\verb@             clearAxPolygonPatches(ax)@\\
+\mbox{}\verb@             applyAxCorrection(ax)@\\
+\mbox{}\verb@             fig.canvas.draw()@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    return _enterPoints@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb3}{3}.
+
+\item{}
+\end{list}
+\vspace{4ex}
+\end{flushleft}
+%{/python-mode}%
+
+This function allows allows me to move a potential obstacle over the canvas before double-clicking it into place. It is called a hovering obstacle because
+the position of the rectangular obstacle follows the position of the mouse cursor as it moves over the matplotlib canvas. There are three obstacle modes
+one for truck-only obstacles (indicated by crimson) one for drone-only obstacles (indicated by blue) and one for obstacles common to both the truck and 
+drone (indicated by green). To exit any of these obstacle placement modes to insert more sites, just press the corresponding obstacle mode keys again ('h', 'f' and 'g')
+to toggle them. 
+
+%{python-mode}%
+\begin{flushleft} \small\label{scrap8}\raggedright\small
+\NWtarget{nuweb8}{} $\langle\,${\itshape Implementation of \verb|wrapperHoverObstacle|}\nobreak\ {\footnotesize {8}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@   @\\
+\mbox{}\verb@def wrapperHoverObstacle(fig,ax, run):@\\
+\mbox{}\verb@        """ Wrapper for the call-back function _hoverObstacle@\\
+\mbox{}\verb@        """@\\
+\mbox{}\verb@        def _hoverObstacle(event, previous_patch = []):@\\
+\mbox{}\verb@          """ Bind the motion of the mouse with the movement of a disk to be placed.@\\
+\mbox{}\verb@          """@\\
+\mbox{}\verb@          if previous_patch != []:@\\
+\mbox{}\verb@              previous_patch.pop().remove() # This physically removes the patch from the screen and from memory@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@          if event.xdata != None and event.ydata!=None and (run.horse_obstacle_input_mode_p  or @\\
+\mbox{}\verb@                                                            run.fly_obstacle_input_mode_p    or @\\
+\mbox{}\verb@                                                            run.common_obstacle_input_mode_p):@\\
+\mbox{}\verb@              if run.horse_obstacle_input_mode_p: @\\
+\mbox{}\verb@                    fcol = 'crimson'@\\
+\mbox{}\verb@    @\\
+\mbox{}\verb@              elif run.fly_obstacle_input_mode_p:@\\
+\mbox{}\verb@                     fcol = 'blue'@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@              elif run.common_obstacle_input_mode_p:@\\
+\mbox{}\verb@                     fcol = 'green'@\\
+\mbox{}\verb@    @\\
+\mbox{}\verb@              current_patch = mpl.patches.Rectangle((event.xdata,event.ydata),             \@\\
+\mbox{}\verb@                                                 width     = run.hovering_obstacle_width,  \@\\
+\mbox{}\verb@                                                 height    = run.hovering_obstacle_height,  \@\\
+\mbox{}\verb@                                                 facecolor = fcol,   \@\\
+\mbox{}\verb@                                                 alpha     = 0.5)@\\
+\mbox{}\verb@              previous_patch.append(current_patch)@\\
+\mbox{}\verb@              ax.add_patch(current_patch)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@              fig.canvas.draw()@\\
+\mbox{}\verb@        return _hoverObstacle@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb3}{3}.
+
+\item{}
+\end{list}
+\vspace{4ex}
+\end{flushleft}
+%{/python-mode}%
+
+When you decide to place an obstacle at a particular place on the canvas, just double-click it into place. 
+
+%{python-mode}%
+\begin{flushleft} \small\label{scrap9}\raggedright\small
+\NWtarget{nuweb9}{} $\langle\,${\itshape Implementation of \verb|wrapperPlaceObstacle|}\nobreak\ {\footnotesize {9}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@   @\\
+\mbox{}\verb@def wrapperPlaceObstacle(fig,ax,run):@\\
+\mbox{}\verb@        def _placeObstacle(event):@\\
+\mbox{}\verb@            """ Double-clicking Button 1 inserts the hovering disk@\\
+\mbox{}\verb@                into the current arrangement and onto the canvas@\\
+\mbox{}\verb@            """@\\
+\mbox{}\verb@            if event.name     == 'button_press_event' and \@\\
+\mbox{}\verb@               event.button   == 1                    and \@\\
+\mbox{}\verb@               event.dblclick == True                 and \@\\
+\mbox{}\verb@               event.xdata    != None                 and \@\\
+\mbox{}\verb@               event.ydata    != None                 and \@\\
+\mbox{}\verb@               (run.horse_obstacle_input_mode_p or run.fly_obstacle_input_mode_p or run.common_obstacle_input_mode_p) :@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@                if run.horse_obstacle_input_mode_p: @\\
+\mbox{}\verb@                    fcol = 'crimson'@\\
+\mbox{}\verb@                    obstype = 'horseobs'@\\
+\mbox{}\verb@    @\\
+\mbox{}\verb@                elif run.fly_obstacle_input_mode_p:@\\
+\mbox{}\verb@                     fcol = 'blue'@\\
+\mbox{}\verb@                     obstype = 'flyobs'@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@                elif run.common_obstacle_input_mode_p:@\\
+\mbox{}\verb@                     fcol = 'green'@\\
+\mbox{}\verb@                     obstype = 'commonobs' @\\
+\mbox{}\verb@ @\\
+\mbox{}\verb@                # Update the current disk list@\\
+\mbox{}\verb@                run.obstacle_list.append( Obstacle( llcorner = [event.xdata,event.ydata], \@\\
+\mbox{}\verb@                                             width = run.hovering_obstacle_width, \@\\
+\mbox{}\verb@                                             height = run.hovering_obstacle_height, \@\\
+\mbox{}\verb@                                             figure      = fig, \@\\
+\mbox{}\verb@                                             axes_object = ax,@\\
+\mbox{}\verb@                                             obstype     = obstype  ,@\\
+\mbox{}\verb@                                             diskcolor   = fcol)  )@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@                # Add representation of the disk appended to the canvas and show the updated count@\\
+\mbox{}\verb@                ax.add_patch( run.obstacle_list[-1].mplPatch(fcol))@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@                # Render the canvas@\\
+\mbox{}\verb@                fig.canvas.draw()@\\
+\mbox{}\verb@        return _placeObstacle@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb3}{3}.
+
+\item{}
+\end{list}
+\vspace{4ex}
+\end{flushleft}
+%{/python-mode}%
+
+Obstacle sizes can be increased by using the \verb|Shift| key and decreased using the \verb|Ctrl| key. 
+
+%{python-mode}%
+\begin{flushleft} \small\label{scrap10}\raggedright\small
+\NWtarget{nuweb10}{} $\langle\,${\itshape Implementation of \verb|wrapperResizeHoveringObstacle|}\nobreak\ {\footnotesize {10}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@   @\\
+\mbox{}\verb@def wrapperResizeHoveringObstacle(fig,ax,run):@\\
+\mbox{}\verb@        """ Wrapper for the call-back function _resizeHoveringObstacle@\\
+\mbox{}\verb@        """@\\
+\mbox{}\verb@        def _resizeHoveringObstacle(event):@\\
+\mbox{}\verb@            """ Each key-press increments or decrements by a fixed amount@\\
+\mbox{}\verb@            the radius of the hovering disk. Change the frozenset global config@\\
+\mbox{}\verb@            GC dictionary for changing the increment and decrement deltas corresponding@\\
+\mbox{}\verb@            to each key-press@\\
+\mbox{}\verb@            """@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@            # This used to be in the arguments to _resizeHoveringObstacle@\\
+\mbox{}\verb@            previous_patch=[]@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@            # Increase hovering disk radius@\\
+\mbox{}\verb@            if  event.key  == "shift":@\\
+\mbox{}\verb@                run.hovering_obstacle_height += 0.05@\\
+\mbox{}\verb@                run.hovering_obstacle_width += 0.05@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@                current_patch = mpl.patches.Rectangle((event.xdata,event.ydata),         \@\\
+\mbox{}\verb@                                                   width     = run.hovering_obstacle_width,  \@\\
+\mbox{}\verb@                                                   height    = run.hovering_obstacle_height, \@\\
+\mbox{}\verb@                                                   facecolor = 'black', \@\\
+\mbox{}\verb@                                                   alpha=0.2)@\\
+\mbox{}\verb@                previous_patch.append(current_patch)@\\
+\mbox{}\verb@                ax.add_patch(current_patch)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@                fig.canvas.draw()@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@            elif event.key == "control" and \@\\
+\mbox{}\verb@                run.hovering_obstacle_width >= 2.0 * 0.05:@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@                run.hovering_obstacle_width  -= 0.05@\\
+\mbox{}\verb@                run.hovering_obstacle_height -= 0.05@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@                current_patch = mpl.patches.Rectangle((event.xdata,event.ydata),           \@\\
+\mbox{}\verb@                                                   width     = run.hovering_obstacle_width,  \@\\
+\mbox{}\verb@                                                   height    = run.hovering_obstacle_height, \@\\
+\mbox{}\verb@                                                   facecolor = 'black', \@\\
+\mbox{}\verb@                                                   alpha=0.2)@\\
+\mbox{}\verb@                previous_patch.append(current_patch)@\\
+\mbox{}\verb@                ax.add_patch(current_patch)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@                fig.canvas.draw()@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@            while len(previous_patch) != 0:@\\
+\mbox{}\verb@                previous_patch.pop().remove()@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@        return _resizeHoveringObstacle@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb3}{3}.
+
+\item{}
+\end{list}
+\vspace{4ex}
+\end{flushleft}
+%{/python-mode}%
+
+\section{Discretization of the Geometric Domain}
+
+Having placed all the obstacles in memory, we now discretize the underlying geometric domain. I will be 
+using CGAL for performing Segment-Segment intersection tests while building visibiity graphs on any 
+underlying grid. For the moment, during an initial implementation, I will assume that none of the sites are 
+covered by any of the obstacles and no two obstacles intersect. The background grid points however, 
+may lie inside the obstacles. 
+
+%{python-mode}%
+\begin{flushleft} \small
+\begin{minipage}{\linewidth}\label{scrap11}\raggedright\small
+\NWtarget{nuweb12}{} $\langle\,${\itshape Definition of method \verb|makeHorseflyInputGraph|}\nobreak\ {\footnotesize {12}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@   @\\
+\mbox{}\verb@def makeHorseflyInputGraph(self, fig, ax, background_grid_pts, @\\
+\mbox{}\verb@                           horse_graph_policy='visibility', @\\
+\mbox{}\verb@                           fly_graph_policy  ='visibility'):@\\
+\mbox{}\verb@    """ @\\
+\mbox{}\verb@      background_grid_pts is a list of the points used in the background_grid@\\
+\mbox{}\verb@        (typically uniform grid points, or points distributed in the surrounding square@\\
+\mbox{}\verb@        according to some probability distribution. )@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@      There can be several types of policies for each of the horse and fly-graphs. @\\
+\mbox{}\verb@      The most basic one and the default, used is just the visibility graph on the set @\\
+\mbox{}\verb@      of points. A segment is in the visibility graph if it does not intersect any @\\
+\mbox{}\verb@      obstacle.@\\
+\mbox{}\verb@    """@\\
+\mbox{}\verb@    # Make a list of nbunch of nodes to be inserted into \verb|horsfly_input_graph|@\\
+\mbox{}\verb@    node_list = []@\\
+\mbox{}\verb@    num_non_obstacle_vertices = len(background_grid_pts)+len(run.sites) + 1 # the +1 is the initial position of horse and fly@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    # Insert background_grid_pts@\\
+\mbox{}\verb@    for pt in background_grid_pts:@\\
+\mbox{}\verb@        node_list.append( {'coordinates': pt, 'point_type' : 'background'} )@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    # Insert site points@\\
+\mbox{}\verb@    for site in run.sites:@\\
+\mbox{}\verb@        node_list.append({'coordinates':site, 'point_type': 'site'})@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    # Insert inithorseposn if it has been provided@\\
+\mbox{}\verb@    if run.inithorseposn:@\\
+\mbox{}\verb@         node_list.append({'coordinates':run.inithorseposn, 'point_type':'inithorseposn'})@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    # Insert obstacle vertices@\\
+\mbox{}\verb@    for obs in run.obstacle_list:@\\
+\mbox{}\verb@         for vertex in obs.getVertices():@\\
+\mbox{}\verb@             node_list.append({'coordinates':vertex, 'point_type':'obstacle_vertex'})@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    # Give indexes to each node@\\
+\mbox{}\verb@    for node, idx in zip(node_list, range(len(node_list))):@\\
+\mbox{}\verb@         node['idx'] = idx@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    utils_algo.print_list(node_list)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    # Make a list of ebunch of nodes to be inserted into \verb|horsfly_input_graph|@\\
+\mbox{}\verb@    from itertools import combinations@\\
+\mbox{}\verb@    potential_edge_list = list(combinations(node_list[:num_non_obstacle_vertices], 2))@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    for pt_edge in potential_edge_list:@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@         [p,q] = pt_edge@\\
+\mbox{}\verb@         pcd = p['coordinates']@\\
+\mbox{}\verb@         qcd = q['coordinates']@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@         if np.linalg.norm(np.asarray(pcd)-np.asarray(qcd)) < 0.4:@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@             # IMPORTANT!! : A segment might intersect many obstacles. @\\
+\mbox{}\verb@             # 0. If a segment does not intersect any obstacles then the segment is included @\\
+\mbox{}\verb@             #    as an edge in the segment.  @\\
+\mbox{}\verb@             # 1. If a segment intersects one or more obstacles precisely of type 'horseobs' @\\
+\mbox{}\verb@             #    then the edge is included and only a drone can travel along that edge@\\
+\mbox{}\verb@             # 2. If a segment intersects one or more obstacles precisely of type 'flyobs' @\\
+\mbox{}\verb@             #    then the edge is included and only a truck can travel along that edge@\\
+\mbox{}\verb@             # 3. If a segment intersects one or more obstacles precisely of type 'commonobs' @\\
+\mbox{}\verb@             #    then the segment is *NOT* included as an edge in the graph@\\
+\mbox{}\verb@             # 4. If a segment intersects one or more obstacles of more than one type, then @\\
+\mbox{}\verb@             #    the segment is *NOT* included as an edge in the graph@\\
+\mbox{}\verb@             # Besides this only those segments whose length is less than a certain given@\\
+\mbox{}\verb@             # tolerance is included in the graph. This will allow me to make the graph@\\
+\mbox{}\verb@             # denser and the domain more well-sampled. And more importantly the drawn @\\
+\mbox{}\verb@             # graph will be easily visualizable too. @\\
+\mbox{}\verb@             obstacle_interscn_info = []@\\
+\mbox{}\verb@             for obs in run.obstacle_list:@\\
+\mbox{}\verb@                   (interscn_p, _) = obs.intersectionWithSegment(pcd,qcd)@\\
+\mbox{}\verb@                   if interscn_p:@\\
+\mbox{}\verb@                       obstacle_interscn_info.append(obs.obstype)    @\\
+\mbox{}\verb@ @\\
+\mbox{}\verb@             # Make a count of the type of each obstacle intersected by segment@\\
+\mbox{}\verb@             obs_interscn_count = {'horseobs': 0, 'flyobs':0, 'commonobs':0}@\\
+\mbox{}\verb@             for obstype in obstacle_interscn_info:@\\
+\mbox{}\verb@                if   obstype == 'horseobs':@\\
+\mbox{}\verb@                         obs_interscn_count['horseobs']  += 1@\\
+\mbox{}\verb@                 @\\
+\mbox{}\verb@                elif obstype == 'flyobs':@\\
+\mbox{}\verb@                         obs_interscn_count['flyobs']    += 1@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@                elif obstype == 'commonobs':@\\
+\mbox{}\verb@                         obs_interscn_count['commonobs'] += 1@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    @\\
+\mbox{}\verb@             if   obs_interscn_count['horseobs']   == 0  and \@\\
+\mbox{}\verb@                obs_interscn_count['flyobs']     == 0  and \@\\
+\mbox{}\verb@                obs_interscn_count['commonobs']  == 0:@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@                run.horsefly_input_graph.add_edge(p['idx'], q['idx'], edgetype='commonedge' )@\\
+\mbox{}\verb@                ax.plot( [pcd[0],qcd[0]], [pcd[1],qcd[1]], 'y-',  alpha=0.2 ) @\\
+\mbox{}\verb@@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@             elif obs_interscn_count['horseobs']  >= 1  and \@\\
+\mbox{}\verb@                obs_interscn_count['flyobs']      == 0  and \@\\
+\mbox{}\verb@                obs_interscn_count['commonobs']   == 0:@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@                run.horsefly_input_graph.add_edge(p['idx'], q['idx'], edgetype='flyedge' )@\\
+\mbox{}\verb@                ax.plot( [pcd[0],qcd[0]], [pcd[1],qcd[1]], 'b-',  alpha=0.2 ) @\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    @\\
+\mbox{}\verb@             elif obs_interscn_count['horseobs']    == 0  and \@\\
+\mbox{}\verb@                 obs_interscn_count['flyobs']      >= 1  and \@\\
+\mbox{}\verb@                 obs_interscn_count['commonobs']   == 0:@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@                 run.horsefly_input_graph.add_edge(p['idx'], q['idx'], edgetype='horseedge' )@\\
+\mbox{}\verb@                 ax.plot( [pcd[0],qcd[0]], [pcd[1],qcd[1]], 'r-', alpha = 0.2 ) @\\
+\mbox{}\verb@@\\
+\mbox{}\verb@             else:@\\
+\mbox{}\verb@                 continue @\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb4}{4}.
+
+\item{}
+\end{list}
+\end{minipage}\vspace{4ex}
+\end{flushleft}
+%{/python-mode}%
+
+
+\section{Rendering the Discretized Graph}
+
+%{python-mode}%
+\begin{flushleft} \small
+\begin{minipage}{\linewidth}\label{scrap12}\raggedright\small
+\NWtarget{nuweb13}{} $\langle\,${\itshape Definition of method \verb|renderHorseflyInputGraph|}\nobreak\ {\footnotesize {13}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@   @\\
+\mbox{}\verb@def renderHorseflyInputGraph(self,fig,ax):@\\
+\mbox{}\verb@    pass@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb4}{4}.
+
+\item{}
+\end{list}
+\end{minipage}\vspace{4ex}
+\end{flushleft}
+%{/python-mode}%
+
+
+
+\end{document}
