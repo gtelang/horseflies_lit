@@ -52,120 +52,169 @@ class HorseflyInputGraph:
       
       # Definition of method \verb|makeHorseflyInputGraph|
          
-      def makeHorseflyInputGraph(self, fig, ax, background_grid_pts, 
-                                 horse_graph_policy='visibility', 
-                                 fly_graph_policy  ='visibility'):
-          """ 
-            background_grid_pts is a list of the points used in the background_grid
-              (typically uniform grid points, or points distributed in the surrounding square
-              according to some probability distribution. )
-
-            There can be several types of policies for each of the horse and fly-graphs. 
-            The most basic one and the default, used is just the visibility graph on the set 
-            of points. A segment is in the visibility graph if it does not intersect any 
-            obstacle.
-          """
-          # Make a list of nbunch of nodes to be inserted into \verb|horsfly_input_graph|
+      def makeHorseflyInputGraph(self, fig, ax, background_grid_pts, k=5):
+          # Create an initial list of nodes to be inserted into \verb|self.horsefly_input_graph|
+             
           node_list = []
-          num_non_obstacle_vertices = len(background_grid_pts)+len(run.sites) + 1 # the +1 is the initial position of horse and fly
 
           # Insert background_grid_pts
           for pt in background_grid_pts:
-              node_list.append( {'coordinates': pt, 'point_type' : 'background'} )
-
+                  node_list.append( {'coordinates': pt, 
+                                     'point_type' : 'background'} )
           # Insert site points
           for site in run.sites:
-              node_list.append({'coordinates':site, 'point_type': 'site'})
+                  node_list.append({'coordinates':site, 
+                                    'point_type': 'site'})
 
           # Insert inithorseposn if it has been provided
           if run.inithorseposn:
-               node_list.append({'coordinates':run.inithorseposn, 'point_type':'inithorseposn'})
+                   node_list.append({'coordinates':run.inithorseposn, 
+                                     'point_type':'inithorseposn'})
+          
+          # Extract data from the Delaunay Triangulation of the points corresponding to the nodes
+          
+          from scipy.spatial import Delaunay
+          tri = Delaunay([node['coordinates'] for node in node_list])
+          numtris = len(tri.simplices)
 
-          # Insert obstacle vertices
-          for obs in run.obstacle_list:
-               for vertex in obs.getVertices():
-                   node_list.append({'coordinates':vertex, 'point_type':'obstacle_vertex'})
+          print tri.simplices
 
-          # Give indexes to each node
-          for node, idx in zip(node_list, range(len(node_list))):
-               node['idx'] = idx
+          del_tri_edge_list = []
+          for simplex, fidx in zip(tri.simplices,range(numtris)):
+                  [i,j,k] = simplex
+                  
+                  del_tri_edge_list.append([[min(i,j), max(i,j)], fidx])
+                  del_tri_edge_list.append([[min(j,k), max(j,k)], fidx])
+                  del_tri_edge_list.append([[min(k,i), max(k,i)], fidx])
 
-          utils_algo.print_list(node_list)
+          del_tri_edge_list.sort()
+          from itertools import groupby
+          del_tri_edge_list = [elt[0] for elt in groupby(del_tri_edge_list)]
+           
+          utils_algo.print_list(del_tri_edge_list)
+             
+          
+          # Add points along each edge of a simplex in the triangulation
+             
+          def add_points_interior_to_segment(p,q,k):
+              p, q = map(np.asarray, [p,q])
+              return []
+              #return [p + float(i)/3.0 * (q-p) for i in [1,2]] 
+           
+          old_len_of_node_list = len(node_list)
+          edges_processed      = {}
+          face_info            = { fidx: [] for fidx in range(numtris)  }
 
-          # Make a list of ebunch of nodes to be inserted into \verb|horsfly_input_graph|
-          from itertools import combinations
-          potential_edge_list = list(combinations(node_list[:num_non_obstacle_vertices], 2))
+          for [[i,j], fidx] in del_tri_edge_list:
 
+                if (i,j) not in edges_processed.keys():
+                        new_segment_pts = add_points_interior_to_segment(node_list[i]['coordinates'], 
+                                                                 node_list[j]['coordinates'], k)
+                        for pt in new_segment_pts:
+                            node_list.append({'coordinates': pt, 'point_type' : 'background'})
+              
+                        num_new_nodes = len(new_segment_pts)
 
-          for pt_edge in potential_edge_list:
+                        print Fore.RED, "New nodes added: ", range(old_len_of_node_list, old_len_of_node_list + num_new_nodes), Style.RESET_ALL
 
-               [p,q] = pt_edge
-               pcd = p['coordinates']
-               qcd = q['coordinates']
-
-
-               if np.linalg.norm(np.asarray(pcd)-np.asarray(qcd)) < 0.4:
-
-                   # IMPORTANT!! : A segment might intersect many obstacles. 
-                   # 0. If a segment does not intersect any obstacles then the segment is included 
-                   #    as an edge in the segment.  
-                   # 1. If a segment intersects one or more obstacles precisely of type 'horseobs' 
-                   #    then the edge is included and only a drone can travel along that edge
-                   # 2. If a segment intersects one or more obstacles precisely of type 'flyobs' 
-                   #    then the edge is included and only a truck can travel along that edge
-                   # 3. If a segment intersects one or more obstacles precisely of type 'commonobs' 
-                   #    then the segment is *NOT* included as an edge in the graph
-                   # 4. If a segment intersects one or more obstacles of more than one type, then 
-                   #    the segment is *NOT* included as an edge in the graph
-                   # Besides this only those segments whose length is less than a certain given
-                   # tolerance is included in the graph. This will allow me to make the graph
-                   # denser and the domain more well-sampled. And more importantly the drawn 
-                   # graph will be easily visualizable too. 
-                   obstacle_interscn_info = []
-                   for obs in run.obstacle_list:
-                         (interscn_p, _) = obs.intersectionWithSegment(pcd,qcd)
-                         if interscn_p:
-                             obstacle_interscn_info.append(obs.obstype)    
-       
-                   # Make a count of the type of each obstacle intersected by segment
-                   obs_interscn_count = {'horseobs': 0, 'flyobs':0, 'commonobs':0}
-                   for obstype in obstacle_interscn_info:
-                      if   obstype == 'horseobs':
-                               obs_interscn_count['horseobs']  += 1
+                        edges_processed[(i,j)] = range(old_len_of_node_list, 
+                                                       old_len_of_node_list+num_new_nodes)
+                        face_info[fidx].append( ((i,j), edges_processed[(i,j)]) )  
+                        old_len_of_node_list = len(node_list)
+                else: 
+                        face_info[fidx].append( ((i,j), edges_processed[(i,j)]) )  
                        
-                      elif obstype == 'flyobs':
-                               obs_interscn_count['flyobs']    += 1
+          
+          # Iterate through every simplex and draw the complete graph on the points on the edges of simplex
+             
+              
+          possible_edge_list_idxs = []
+          for fidx, finfo in face_info.items(): 
 
-                      elif obstype == 'commonobs':
-                               obs_interscn_count['commonobs'] += 1
+              # Create graph edges along each simplex edge
+              # and add to possible_edge_list_idxs
+              for ((i,j), new_pts_idxs) in finfo:
+                   tmp = [i] + new_pts_idxs + [j]
+                   possible_edge_list_idxs.extend(zip(tmp,tmp[1:]))
 
+              # Create graph edges interior to each face between 
+              # every pair of edges and add to possible_edge_list_idxs
+              [ (_, idxs1 ), (_, idxs2), (_, idxs3) ]= finfo
+              
+              print Fore.YELLOW, finfo, Style.RESET_ALL
+
+              possible_edge_list_idxs.extend([ (i,j) for i in idxs1 for j in idxs2 ])
+              possible_edge_list_idxs.extend([ (i,j) for i in idxs2 for j in idxs3 ])
+              possible_edge_list_idxs.extend([ (i,j) for i in idxs3 for j in idxs1 ])
+
+
+          # Extract the actual nodes from node_list correponding to the 
+          # the indexes in possible_edge_list_idxs
+          possible_edge_list = map(lambda xs : [node_list[xs[0]], node_list[xs[1]]], 
+                                   possible_edge_list_idxs)
+          
+          # Make a list of possible edges that will be tested for intersection against the obstacles
+             
+
+          for node,i in zip(node_list, range(len(node_list))):
+              node['idx'] = i
+
+          for pt_edge in possible_edge_list:
+
+                       [p,q] = pt_edge
+                       pcd = p['coordinates']
+                       qcd = q['coordinates']
+
+                       obstacle_interscn_info = []
+                       for obs in run.obstacle_list:
+                             (interscn_p, _) = obs.intersectionWithSegment(pcd,qcd)
+                             if interscn_p:
+                                 obstacle_interscn_info.append(obs.obstype)    
+           
+                       # Make a count of the type of each obstacle intersected by segment
+                       obs_interscn_count = {'horseobs': 0, 'flyobs':0, 'commonobs':0}
+                       for obstype in obstacle_interscn_info:
+                          if   obstype == 'horseobs':
+                                   obs_interscn_count['horseobs']  += 1
+                           
+                          elif obstype == 'flyobs':
+                                   obs_interscn_count['flyobs']    += 1
+
+                          elif obstype == 'commonobs':
+                                   obs_interscn_count['commonobs'] += 1
+
+
+              
+                       if   obs_interscn_count['horseobs']   == 0  and \
+                          obs_interscn_count['flyobs']     == 0  and \
+                          obs_interscn_count['commonobs']  == 0:
+
+                          run.horsefly_input_graph.add_edge(p['idx'], q['idx'], edgetype='commonedge' )
+                          ax.plot( [pcd[0],qcd[0]], [pcd[1],qcd[1]], 'y-',  alpha=0.2 ) 
+
+
+                       elif obs_interscn_count['horseobs']  >= 1  and \
+                          obs_interscn_count['flyobs']      == 0  and \
+                          obs_interscn_count['commonobs']   == 0:
+
+                          run.horsefly_input_graph.add_edge(p['idx'], q['idx'], edgetype='flyedge' )
+                          ax.plot( [pcd[0],qcd[0]], [pcd[1],qcd[1]], 'b-',  alpha=0.2 ) 
+
+              
+                       elif obs_interscn_count['horseobs']    == 0  and \
+                           obs_interscn_count['flyobs']      >= 1  and \
+                           obs_interscn_count['commonobs']   == 0:
+
+                           run.horsefly_input_graph.add_edge(p['idx'], q['idx'], edgetype='horseedge' )
+                           ax.plot( [pcd[0],qcd[0]], [pcd[1],qcd[1]], 'r-', alpha = 0.2 ) 
+
+                       else:
+                           continue 
 
           
-                   if   obs_interscn_count['horseobs']   == 0  and \
-                      obs_interscn_count['flyobs']     == 0  and \
-                      obs_interscn_count['commonobs']  == 0:
-
-                      run.horsefly_input_graph.add_edge(p['idx'], q['idx'], edgetype='commonedge' )
-                      ax.plot( [pcd[0],qcd[0]], [pcd[1],qcd[1]], 'y-',  alpha=0.2 ) 
-
-
-                   elif obs_interscn_count['horseobs']  >= 1  and \
-                      obs_interscn_count['flyobs']      == 0  and \
-                      obs_interscn_count['commonobs']   == 0:
-
-                      run.horsefly_input_graph.add_edge(p['idx'], q['idx'], edgetype='flyedge' )
-                      ax.plot( [pcd[0],qcd[0]], [pcd[1],qcd[1]], 'b-',  alpha=0.2 ) 
-
+          # Construct the graph consisting of the edges that were filtered through
+             
           
-                   elif obs_interscn_count['horseobs']    == 0  and \
-                       obs_interscn_count['flyobs']      >= 1  and \
-                       obs_interscn_count['commonobs']   == 0:
-
-                       run.horsefly_input_graph.add_edge(p['idx'], q['idx'], edgetype='horseedge' )
-                       ax.plot( [pcd[0],qcd[0]], [pcd[1],qcd[1]], 'r-', alpha = 0.2 ) 
-
-                   else:
-                       continue 
       
       # Definition of method \verb|renderHorseflyInputGraph|
          
@@ -289,8 +338,8 @@ def wrapperkeyPressHandler(fig,ax, run):
     
              elif event.key in ['d','D']: # `d` for discretize domain, using the obstacles we sprinkle 
                                           # some points and discretize everything
-                  background_grid_pts = [[np.random.rand(), np.random.rand()] for i in range(60)]
-                  run.makeHorseflyInputGraph(fig, ax, background_grid_pts)
+                  background_grid_pts = [[np.random.rand(), np.random.rand()] for i in range(200)]
+                  run.makeHorseflyInputGraph(fig, ax, background_grid_pts, k=5)
 
       return _keyPressHandler
 
@@ -421,8 +470,8 @@ def wrapperResizeHoveringObstacle(fig,ax,run):
         def _resizeHoveringObstacle(event):
             """ Each key-press increments or decrements by a fixed amount
             the radius of the hovering disk. Change the frozenset global config
-            GC dictionary for changing the increment and decrement deltas corresponding
-            to each key-press
+            GC dictionary for changing the increment and decrement deltas 
+            corresponding to each key-press
             """
 
             # This used to be in the arguments to _resizeHoveringObstacle
@@ -431,7 +480,7 @@ def wrapperResizeHoveringObstacle(fig,ax,run):
             # Increase hovering disk radius
             if  event.key  == "shift":
                 run.hovering_obstacle_height += 0.05
-                run.hovering_obstacle_width += 0.05
+                run.hovering_obstacle_width  += 0.05
 
                 current_patch = mpl.patches.Rectangle((event.xdata,event.ydata),         \
                                                    width     = run.hovering_obstacle_width,  \

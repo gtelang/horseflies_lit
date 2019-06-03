@@ -189,8 +189,8 @@ The definition of the method \verb|makeHorseflyInputGraph| will be given later. 
 \mbox{}\verb@    @\\
 \mbox{}\verb@          self.horsefly_input_graph = nx.Graph()@\\
 \mbox{}\verb@      @\\
-\mbox{}\verb@      @\hbox{$\langle\,${\itshape Definition of method \verb|makeHorseflyInputGraph|}\nobreak\ {\footnotesize \NWlink{nuweb12}{12}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@      @\hbox{$\langle\,${\itshape Definition of method \verb|renderHorseflyInputGraph|}\nobreak\ {\footnotesize \NWlink{nuweb13}{13}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@      @\hbox{$\langle\,${\itshape Definition of method \verb|makeHorseflyInputGraph|}\nobreak\ {\footnotesize \NWlink{nuweb11a}{11a}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@      @\hbox{$\langle\,${\itshape Definition of method \verb|renderHorseflyInputGraph|}\nobreak\ {\footnotesize \NWlink{nuweb15b}{15b}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@      def clearGraph(self,fig,ax):@\\
 \mbox{}\verb@          self.horsefly_input_graph = nx.Graph() # Input Graph is set to the empty null graph@\\
@@ -421,8 +421,8 @@ self-explantory as documented in the code-chunks below.
 \mbox{}\verb@    @\\
 \mbox{}\verb@             elif event.key in ['d','D']: # `d` for discretize domain, using the obstacles we sprinkle @\\
 \mbox{}\verb@                                          # some points and discretize everything@\\
-\mbox{}\verb@                  background_grid_pts = [[np.random.rand(), np.random.rand()] for i in range(60)]@\\
-\mbox{}\verb@                  run.makeHorseflyInputGraph(fig, ax, background_grid_pts)@\\
+\mbox{}\verb@                  background_grid_pts = [[np.random.rand(), np.random.rand()] for i in range(200)]@\\
+\mbox{}\verb@                  run.makeHorseflyInputGraph(fig, ax, background_grid_pts, k=5)@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@      return _keyPressHandler@\\
 \mbox{}\verb@@{\NWsep}
@@ -501,11 +501,11 @@ different colors. Later on the points used in the background grid to discretize 
 \end{flushleft}
 %{/python-mode}%
 
-This function allows allows me to move a potential obstacle over the canvas before double-clicking it into place. It is called a hovering obstacle because
+This function allows allows me to move a possible obstacle over the canvas before double-clicking it into place. It is called a hovering obstacle because
 the position of the rectangular obstacle follows the position of the mouse cursor as it moves over the matplotlib canvas. There are three obstacle modes
 one for truck-only obstacles (indicated by crimson) one for drone-only obstacles (indicated by blue) and one for obstacles common to both the truck and 
-drone (indicated by green). To exit any of these obstacle placement modes to insert more sites, just press the corresponding obstacle mode keys again ('h', 'f' and 'g')
-to toggle them. 
+drone (indicated by green). To exit any of these obstacle placement modes to insert more sites, just press the corresponding obstacle mode keys again 
+('h', 'f' and 'g') to toggle them. 
 
 %{python-mode}%
 \begin{flushleft} \small\label{scrap8}\raggedright\small
@@ -631,8 +631,8 @@ Obstacle sizes can be increased by using the \verb|Shift| key and decreased usin
 \mbox{}\verb@        def _resizeHoveringObstacle(event):@\\
 \mbox{}\verb@            """ Each key-press increments or decrements by a fixed amount@\\
 \mbox{}\verb@            the radius of the hovering disk. Change the frozenset global config@\\
-\mbox{}\verb@            GC dictionary for changing the increment and decrement deltas corresponding@\\
-\mbox{}\verb@            to each key-press@\\
+\mbox{}\verb@            GC dictionary for changing the increment and decrement deltas @\\
+\mbox{}\verb@            corresponding to each key-press@\\
 \mbox{}\verb@            """@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@            # This used to be in the arguments to _resizeHoveringObstacle@\\
@@ -641,7 +641,7 @@ Obstacle sizes can be increased by using the \verb|Shift| key and decreased usin
 \mbox{}\verb@            # Increase hovering disk radius@\\
 \mbox{}\verb@            if  event.key  == "shift":@\\
 \mbox{}\verb@                run.hovering_obstacle_height += 0.05@\\
-\mbox{}\verb@                run.hovering_obstacle_width += 0.05@\\
+\mbox{}\verb@                run.hovering_obstacle_width  += 0.05@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@                current_patch = mpl.patches.Rectangle((event.xdata,event.ydata),         \@\\
 \mbox{}\verb@                                                   width     = run.hovering_obstacle_width,  \@\\
@@ -689,88 +689,240 @@ Obstacle sizes can be increased by using the \verb|Shift| key and decreased usin
 
 \section{Discretization of the Geometric Domain}
 
-Having placed all the obstacles in memory, we now discretize the underlying geometric domain. I will be 
-using CGAL for performing Segment-Segment intersection tests while building visibiity graphs on any 
-underlying grid. For the moment, during an initial implementation, I will assume that none of the sites are 
-covered by any of the obstacles and no two obstacles intersect. The background grid points however, 
-may lie inside the obstacles. 
+Having placed all the obstacles in memory, we now discretize the underlying geometric domain. 
+I will be using CGAL for performing Segment-Segment intersection tests while building the graphs. 
+
+\verb|background_grid_pts| is a list of the points used in the background grid
+(typically uniform grid points, or points distributed in the surrounding square
+according to some probability distribution.). The input graph is created by first 
+making a Delaunay Triangulation on the set of sites and \verb|background_grid_pts|. 
+Then within each triangle create $k$ points on each edge where and the complete graph 
+between all points on that triangle. 
 
 %{python-mode}%
 \begin{flushleft} \small
 \begin{minipage}{\linewidth}\label{scrap11}\raggedright\small
-\NWtarget{nuweb12}{} $\langle\,${\itshape Definition of method \verb|makeHorseflyInputGraph|}\nobreak\ {\footnotesize {12}}$\,\rangle\equiv$
+\NWtarget{nuweb11a}{} $\langle\,${\itshape Definition of method \verb|makeHorseflyInputGraph|}\nobreak\ {\footnotesize {11a}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@   @\\
-\mbox{}\verb@def makeHorseflyInputGraph(self, fig, ax, background_grid_pts, @\\
-\mbox{}\verb@                           horse_graph_policy='visibility', @\\
-\mbox{}\verb@                           fly_graph_policy  ='visibility'):@\\
-\mbox{}\verb@    """ @\\
-\mbox{}\verb@      background_grid_pts is a list of the points used in the background_grid@\\
-\mbox{}\verb@        (typically uniform grid points, or points distributed in the surrounding square@\\
-\mbox{}\verb@        according to some probability distribution. )@\\
+\mbox{}\verb@def makeHorseflyInputGraph(self, fig, ax, background_grid_pts, k=5):@\\
+\mbox{}\verb@    @\hbox{$\langle\,${\itshape Create an initial list of nodes to be inserted into \verb|self.horsefly_input_graph|}\nobreak\ {\footnotesize \NWlink{nuweb11b}{11b}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@    @\hbox{$\langle\,${\itshape Extract data from the Delaunay Triangulation of the points corresponding to the nodes}\nobreak\ {\footnotesize \NWlink{nuweb12a}{12a}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@    @\hbox{$\langle\,${\itshape Add points along each edge of a simplex in the triangulation}\nobreak\ {\footnotesize \NWlink{nuweb12b}{12b}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@    @\hbox{$\langle\,${\itshape Iterate through every simplex and draw the complete graph on the points on the edges of simplex}\nobreak\ {\footnotesize \NWlink{nuweb13}{13}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@    @\hbox{$\langle\,${\itshape Make a list of possible edges that will be tested for intersection against the obstacles}\nobreak\ {\footnotesize \NWlink{nuweb14}{14}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@    @\hbox{$\langle\,${\itshape Construct the graph consisting of the edges that were filtered through}\nobreak\ {\footnotesize \NWlink{nuweb15a}{15a}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb4}{4}.
+
+\item{}
+\end{list}
+\end{minipage}\vspace{4ex}
+\end{flushleft}
+%{/python-mode}%
+
+This chunk does as it says in the label. Along with recording a point, we also note its 
+type whether it is a background node, a site or the initial position of the truck and drone. 
+Each of these points will have different roles to play in the algorithms for horsefly on graphs. 
+
+%{python-mode}%
+\begin{flushleft} \small
+\begin{minipage}{\linewidth}\label{scrap12}\raggedright\small
+\NWtarget{nuweb11b}{} $\langle\,${\itshape Create an initial list of nodes to be inserted into \verb|self.horsefly_input_graph|}\nobreak\ {\footnotesize {11b}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@   @\\
+\mbox{}\verb@node_list = []@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@      There can be several types of policies for each of the horse and fly-graphs. @\\
-\mbox{}\verb@      The most basic one and the default, used is just the visibility graph on the set @\\
-\mbox{}\verb@      of points. A segment is in the visibility graph if it does not intersect any @\\
-\mbox{}\verb@      obstacle.@\\
-\mbox{}\verb@    """@\\
-\mbox{}\verb@    # Make a list of nbunch of nodes to be inserted into \verb|horsfly_input_graph|@\\
-\mbox{}\verb@    node_list = []@\\
-\mbox{}\verb@    num_non_obstacle_vertices = len(background_grid_pts)+len(run.sites) + 1 # the +1 is the initial position of horse and fly@\\
+\mbox{}\verb@# Insert background_grid_pts@\\
+\mbox{}\verb@for pt in background_grid_pts:@\\
+\mbox{}\verb@        node_list.append( {'coordinates': pt, @\\
+\mbox{}\verb@                           'point_type' : 'background'} )@\\
+\mbox{}\verb@# Insert site points@\\
+\mbox{}\verb@for site in run.sites:@\\
+\mbox{}\verb@        node_list.append({'coordinates':site, @\\
+\mbox{}\verb@                          'point_type': 'site'})@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@    # Insert background_grid_pts@\\
-\mbox{}\verb@    for pt in background_grid_pts:@\\
-\mbox{}\verb@        node_list.append( {'coordinates': pt, 'point_type' : 'background'} )@\\
+\mbox{}\verb@# Insert inithorseposn if it has been provided@\\
+\mbox{}\verb@if run.inithorseposn:@\\
+\mbox{}\verb@         node_list.append({'coordinates':run.inithorseposn, @\\
+\mbox{}\verb@                           'point_type':'inithorseposn'})@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb11a}{11a}.
+
+\item{}
+\end{list}
+\end{minipage}\vspace{4ex}
+\end{flushleft}
+%{/python-mode}%
+
+For some weird reason, the implementation of Delauny Triangulation in scipy does not 
+provide me with an explicit list of edges in the computed answer. These have to be 
+extracted by iterating through each simplex, and then discarding duplicate edges 
+(because two simplices might share the same edge)
+
+%{python-mode}%
+\begin{flushleft} \small
+\begin{minipage}{\linewidth}\label{scrap13}\raggedright\small
+\NWtarget{nuweb12a}{} $\langle\,${\itshape Extract data from the Delaunay Triangulation of the points corresponding to the nodes}\nobreak\ {\footnotesize {12a}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
 \mbox{}\verb@@\\
-\mbox{}\verb@    # Insert site points@\\
-\mbox{}\verb@    for site in run.sites:@\\
-\mbox{}\verb@        node_list.append({'coordinates':site, 'point_type': 'site'})@\\
+\mbox{}\verb@from scipy.spatial import Delaunay@\\
+\mbox{}\verb@tri = Delaunay([node['coordinates'] for node in node_list])@\\
+\mbox{}\verb@numtris = len(tri.simplices)@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@    # Insert inithorseposn if it has been provided@\\
-\mbox{}\verb@    if run.inithorseposn:@\\
-\mbox{}\verb@         node_list.append({'coordinates':run.inithorseposn, 'point_type':'inithorseposn'})@\\
+\mbox{}\verb@print tri.simplices@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@    # Insert obstacle vertices@\\
-\mbox{}\verb@    for obs in run.obstacle_list:@\\
-\mbox{}\verb@         for vertex in obs.getVertices():@\\
-\mbox{}\verb@             node_list.append({'coordinates':vertex, 'point_type':'obstacle_vertex'})@\\
+\mbox{}\verb@del_tri_edge_list = []@\\
+\mbox{}\verb@for simplex, fidx in zip(tri.simplices,range(numtris)):@\\
+\mbox{}\verb@        [i,j,k] = simplex@\\
+\mbox{}\verb@        @\\
+\mbox{}\verb@        del_tri_edge_list.append([[min(i,j), max(i,j)], fidx])@\\
+\mbox{}\verb@        del_tri_edge_list.append([[min(j,k), max(j,k)], fidx])@\\
+\mbox{}\verb@        del_tri_edge_list.append([[min(k,i), max(k,i)], fidx])@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@    # Give indexes to each node@\\
-\mbox{}\verb@    for node, idx in zip(node_list, range(len(node_list))):@\\
-\mbox{}\verb@         node['idx'] = idx@\\
+\mbox{}\verb@del_tri_edge_list.sort()@\\
+\mbox{}\verb@from itertools import groupby@\\
+\mbox{}\verb@del_tri_edge_list = [elt[0] for elt in groupby(del_tri_edge_list)]@\\
+\mbox{}\verb@ @\\
+\mbox{}\verb@utils_algo.print_list(del_tri_edge_list)@\\
+\mbox{}\verb@   @\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb11a}{11a}.
+
+\item{}
+\end{list}
+\end{minipage}\vspace{4ex}
+\end{flushleft}
+%{/python-mode}%
+
+%{python-mode}%
+\begin{flushleft} \small
+\begin{minipage}{\linewidth}\label{scrap14}\raggedright\small
+\NWtarget{nuweb12b}{} $\langle\,${\itshape Add points along each edge of a simplex in the triangulation}\nobreak\ {\footnotesize {12b}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@   @\\
+\mbox{}\verb@def add_points_interior_to_segment(p,q,k):@\\
+\mbox{}\verb@    p, q = map(np.asarray, [p,q])@\\
+\mbox{}\verb@    return []@\\
+\mbox{}\verb@    #return [p + float(i)/3.0 * (q-p) for i in [1,2]] @\\
+\mbox{}\verb@ @\\
+\mbox{}\verb@old_len_of_node_list = len(node_list)@\\
+\mbox{}\verb@edges_processed      = {}@\\
+\mbox{}\verb@face_info            = { fidx: [] for fidx in range(numtris)  }@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@    utils_algo.print_list(node_list)@\\
+\mbox{}\verb@for [[i,j], fidx] in del_tri_edge_list:@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@    # Make a list of ebunch of nodes to be inserted into \verb|horsfly_input_graph|@\\
-\mbox{}\verb@    from itertools import combinations@\\
-\mbox{}\verb@    potential_edge_list = list(combinations(node_list[:num_non_obstacle_vertices], 2))@\\
+\mbox{}\verb@      if (i,j) not in edges_processed.keys():@\\
+\mbox{}\verb@              new_segment_pts = add_points_interior_to_segment(node_list[i]['coordinates'], @\\
+\mbox{}\verb@                                                       node_list[j]['coordinates'], k)@\\
+\mbox{}\verb@              for pt in new_segment_pts:@\\
+\mbox{}\verb@                  node_list.append({'coordinates': pt, 'point_type' : 'background'})@\\
+\mbox{}\verb@    @\\
+\mbox{}\verb@              num_new_nodes = len(new_segment_pts)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@              print Fore.RED, "New nodes added: ", range(old_len_of_node_list, old_len_of_node_list + num_new_nodes), Style.RESET_ALL@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@              edges_processed[(i,j)] = range(old_len_of_node_list, @\\
+\mbox{}\verb@                                             old_len_of_node_list+num_new_nodes)@\\
+\mbox{}\verb@              face_info[fidx].append( ((i,j), edges_processed[(i,j)]) )  @\\
+\mbox{}\verb@              old_len_of_node_list = len(node_list)@\\
+\mbox{}\verb@      else: @\\
+\mbox{}\verb@              face_info[fidx].append( ((i,j), edges_processed[(i,j)]) )  @\\
+\mbox{}\verb@             @\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb11a}{11a}.
+
+\item{}
+\end{list}
+\end{minipage}\vspace{4ex}
+\end{flushleft}
+%{/python-mode}%
+
+
+%{python-mode}%
+\begin{flushleft} \small
+\begin{minipage}{\linewidth}\label{scrap15}\raggedright\small
+\NWtarget{nuweb13}{} $\langle\,${\itshape Iterate through every simplex and draw the complete graph on the points on the edges of simplex}\nobreak\ {\footnotesize {13}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@   @\\
+\mbox{}\verb@    @\\
+\mbox{}\verb@possible_edge_list_idxs = []@\\
+\mbox{}\verb@for fidx, finfo in face_info.items(): @\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    # Create graph edges along each simplex edge@\\
+\mbox{}\verb@    # and add to possible_edge_list_idxs@\\
+\mbox{}\verb@    for ((i,j), new_pts_idxs) in finfo:@\\
+\mbox{}\verb@         tmp = [i] + new_pts_idxs + [j]@\\
+\mbox{}\verb@         possible_edge_list_idxs.extend(zip(tmp,tmp[1:]))@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    # Create graph edges interior to each face between @\\
+\mbox{}\verb@    # every pair of edges and add to possible_edge_list_idxs@\\
+\mbox{}\verb@    [ (_, idxs1 ), (_, idxs2), (_, idxs3) ]= finfo@\\
+\mbox{}\verb@    @\\
+\mbox{}\verb@    print Fore.YELLOW, finfo, Style.RESET_ALL@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    possible_edge_list_idxs.extend([ (i,j) for i in idxs1 for j in idxs2 ])@\\
+\mbox{}\verb@    possible_edge_list_idxs.extend([ (i,j) for i in idxs2 for j in idxs3 ])@\\
+\mbox{}\verb@    possible_edge_list_idxs.extend([ (i,j) for i in idxs3 for j in idxs1 ])@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@    for pt_edge in potential_edge_list:@\\
+\mbox{}\verb@# Extract the actual nodes from node_list correponding to the @\\
+\mbox{}\verb@# the indexes in possible_edge_list_idxs@\\
+\mbox{}\verb@possible_edge_list = map(lambda xs : [node_list[xs[0]], node_list[xs[1]]], @\\
+\mbox{}\verb@                         possible_edge_list_idxs)@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb11a}{11a}.
+
+\item{}
+\end{list}
+\end{minipage}\vspace{4ex}
+\end{flushleft}
+%{/python-mode}%
+
+
+
+%{python-mode}%
+\begin{flushleft} \small
+\begin{minipage}{\linewidth}\label{scrap16}\raggedright\small
+\NWtarget{nuweb14}{} $\langle\,${\itshape Make a list of possible edges that will be tested for intersection against the obstacles}\nobreak\ {\footnotesize {14}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@   @\\
 \mbox{}\verb@@\\
-\mbox{}\verb@         [p,q] = pt_edge@\\
-\mbox{}\verb@         pcd = p['coordinates']@\\
-\mbox{}\verb@         qcd = q['coordinates']@\\
+\mbox{}\verb@for node,i in zip(node_list, range(len(node_list))):@\\
+\mbox{}\verb@    node['idx'] = i@\\
 \mbox{}\verb@@\\
+\mbox{}\verb@for pt_edge in possible_edge_list:@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@         if np.linalg.norm(np.asarray(pcd)-np.asarray(qcd)) < 0.4:@\\
+\mbox{}\verb@             [p,q] = pt_edge@\\
+\mbox{}\verb@             pcd = p['coordinates']@\\
+\mbox{}\verb@             qcd = q['coordinates']@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@             # IMPORTANT!! : A segment might intersect many obstacles. @\\
-\mbox{}\verb@             # 0. If a segment does not intersect any obstacles then the segment is included @\\
-\mbox{}\verb@             #    as an edge in the segment.  @\\
-\mbox{}\verb@             # 1. If a segment intersects one or more obstacles precisely of type 'horseobs' @\\
-\mbox{}\verb@             #    then the edge is included and only a drone can travel along that edge@\\
-\mbox{}\verb@             # 2. If a segment intersects one or more obstacles precisely of type 'flyobs' @\\
-\mbox{}\verb@             #    then the edge is included and only a truck can travel along that edge@\\
-\mbox{}\verb@             # 3. If a segment intersects one or more obstacles precisely of type 'commonobs' @\\
-\mbox{}\verb@             #    then the segment is *NOT* included as an edge in the graph@\\
-\mbox{}\verb@             # 4. If a segment intersects one or more obstacles of more than one type, then @\\
-\mbox{}\verb@             #    the segment is *NOT* included as an edge in the graph@\\
-\mbox{}\verb@             # Besides this only those segments whose length is less than a certain given@\\
-\mbox{}\verb@             # tolerance is included in the graph. This will allow me to make the graph@\\
-\mbox{}\verb@             # denser and the domain more well-sampled. And more importantly the drawn @\\
-\mbox{}\verb@             # graph will be easily visualizable too. @\\
 \mbox{}\verb@             obstacle_interscn_info = []@\\
 \mbox{}\verb@             for obs in run.obstacle_list:@\\
 \mbox{}\verb@                   (interscn_p, _) = obs.intersectionWithSegment(pcd,qcd)@\\
@@ -816,12 +968,33 @@ may lie inside the obstacles.
 \mbox{}\verb@@\\
 \mbox{}\verb@             else:@\\
 \mbox{}\verb@                 continue @\\
+\mbox{}\verb@@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb4}{4}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb11a}{11a}.
+
+\item{}
+\end{list}
+\end{minipage}\vspace{4ex}
+\end{flushleft}
+%{/python-mode}%
+
+%{python-mode}%
+\begin{flushleft} \small
+\begin{minipage}{\linewidth}\label{scrap17}\raggedright\small
+\NWtarget{nuweb15a}{} $\langle\,${\itshape Construct the graph consisting of the edges that were filtered through}\nobreak\ {\footnotesize {15a}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@   @\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb11a}{11a}.
 
 \item{}
 \end{list}
@@ -834,8 +1007,8 @@ may lie inside the obstacles.
 
 %{python-mode}%
 \begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap12}\raggedright\small
-\NWtarget{nuweb13}{} $\langle\,${\itshape Definition of method \verb|renderHorseflyInputGraph|}\nobreak\ {\footnotesize {13}}$\,\rangle\equiv$
+\begin{minipage}{\linewidth}\label{scrap18}\raggedright\small
+\NWtarget{nuweb15b}{} $\langle\,${\itshape Definition of method \verb|renderHorseflyInputGraph|}\nobreak\ {\footnotesize {15b}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@   @\\
