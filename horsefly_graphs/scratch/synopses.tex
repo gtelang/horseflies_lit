@@ -1,0 +1,867 @@
+\input{standard_header.tex}
+\usepackage{mdframed}
+\usepackage{xcolor}
+\usepackage{soul}
+\newcommand{\red}[1]{{\color{red} #1}}
+\newcommand{\blue}[1]{{\color{blue} #1}}
+\definecolor{OliveGreen}{rgb}{0,0.6,0}
+\newcommand{\green}[1]{{\color{OliveGreen} #1}}
+% The sorting=none option comes from wanting to list deliveries in order of appearance
+% in the main paper. https://tex.stackexchange.com/a/337117
+\usepackage[backend=bibtex, style=numeric, sorting=none]{biblatex} 
+\setlength\bibitemsep{\baselineskip}
+\addbibresource{/home/gaurish/Dropbox/MyWiki/research_projects/Study/Synopses/References.bib}
+%--------------------------------------------------------------------------------
+\title{Brief Notes on Research Papers and Proof Techniques}
+\author{Gaurish Telang}
+\date{}
+%-------------------------------------------------------------------------------
+\begin{document}
+\setcounter{tocdepth}{0}
+%\maketitle
+%\newpage
+
+\begin{titlepage}
+   \vspace*{\stretch{1.0}}
+   \begin{center}
+     \textbf{ {\Huge Brief Notes on Research Papers and Proof Techniques} }\\
+     \vspace{5mm}
+      \large\textsl{Gaurish Telang}
+   \end{center}
+   \vspace*{\stretch{40.0}}
+\end{titlepage}
+
+\tableofcontents
+\part{Research Papers}
+\part{Topics in Combinatorial Optimization}
+\part{Topics in Graph Theory}
+
+\part{Topics in Computational Topology}
+\newpage
+\chapter{Basic Concepts}
+\newchunk Point-set topology was invented to put analytical concepts on a stronger foundation. The motivation for that branch
+has little to do with the rubber-sheet nature of the subject.
+\newchunk Combinatorial Topology basically is counting at its heart. The Euler theorem is the most famous example of this
+phenomenon. 
+\newchunk Rubber-sheeting is precisely codified as continuous transformations in mathemtics. Topology began with the idea of
+continuity. Here we study properties which are invariant under continuous transformations. Area, Perimeter are non-examples.
+Examples include, the number of holes, number of boundary curves, etc. An even better meta-example is the principle of conservation
+of energy. 
+
+\newchunk The most fundamental concept in combinatorial topology is that of a \textbf{cell} which is any figure topologically equivalent
+to a disk. Just pull the cheeks of the cell anywhich way, and you get a cell. 
+
+\newchunk The first principle of combinatorial topology is to study complicated figures that can be built in some way
+from simple figures. This means the soul of the subject is algorithmic? How to build a complicated figure/ or decompose
+a figure into simple Lego-block like pieces. Even better think matrix factorizations or number theory factorization. 
+
+\newchunk We restrict ourselves to figures that can be constructed from cells by gluing and pasting them along their edges. 
+All but the most pathological surfaces are complexes. Typically computer scientists will restrict themselves to building
+figures/surfaces which are complexes. A good way to visualizing the cutting and pasting is with the stitches along the baseball
+all those stitches help in visualization. 
+
+\newchunk Because the soul of topology is counting, you have to come up with new things of what to count.Anything that affords counting,
+go for it. The most basic things are vertices, edges and faces. More precisely a cell is called a polygon when there are distinguishing
+vertices along the boundary called the vertices, and there are only a finite number of them. Sections of the boundary in between
+vertices are called edges. 
+
+\newchunk A polyhedron is a complex that is topologically equivalent to a sphere. 
+
+\newchunk Continuous transformations, are intuitively introduced as those which do not involve ripping or tearing. Put more
+positively, it means transformations must preserve nearness of points. that is if a point is near a certain set, then the
+transformed point must be near the transformed set. As a personal note, note that the definition never says the transformtion
+should preserve the farness of points. This is a subtle point to be remembered. Preservation of nearness is all that
+a continuous transformations ask for. And this preservation also leads to another invariant map on its own. i.e nearness
+is the most fundamental invariant.
+
+\newchunk \Large Nearness \normalsize : Let $P$ be a point in the plane. A neighborhood of $P$ is any circular disk (without the boundary-circle) that
+contains $P$. Let $A$ be a subset of the plane. The point $P$ is called \textbf{near} the set $A$ if every neighborhood of $P$
+contains a point of $A$. If $P$ is near $A$, we write $P\leftarrow A$. (point is on the left). this follows the definition of F.Riesz
+a great analyst.
+
+\newchunk \Large Continuity \normalsize : A continuous transformation from one subset $D$ of the plane to another $R$ is a function $f$ with
+domain $D$ and range $R$ such that for any point $P \in D$ and set $A \subseteq D$ if $P$ is near $A$ then $f(P)$ is near
+the set $f(A)$. In symbols, if $P \leftarrow A$ then $f(P) \leftarrow f(A)$.  
+
+\newchunk Folding is a continuous transformation! Folding always involves rotating so that folding line co-incides with the $X$ or $Y$
+axes, and then applying the absolute value function, and then rotating back so the folding line is back to its original position.
+I like the terminology of folding over reflection. 
+
+\newchunk Many maps are constructed Teichmuller like by a sequence of composition of maps. Think back to functional programming, in general
+and parsing in particular, where you construct large maps by sticking together several little ones. 
+
+\newchunk The following is an important construction component that can come in useful during map constructions or even when using
+Diagrams say. This is called the infinite stretch and I already have another example of the infinite stretch constructed from the
+$\tan(x)$ function. This allows you to map the open unit-disk to the entire plane $\RR$.
+The function is $f(x,y) = \tan (\frac{\pi}{2}\sqrt{x^2+y^2}) (x,y)$. Other functions are similar, in that they involve a radial scaling
+outwards. $g(x,y) = \frac{1}{1-\sqrt{x^2+y^2}} (x,y)$ is another fine one!
+
+\newchunk With the notion of continuous transformation pinned down, we come to another fundamental concept that of a topological
+transformation which allows us to define the subject more precisely. A top ological transformation is a continuous transformation
+that has a continuous inverse transformation. In other words, a topological transformation is a continuous transofmration that can be
+\textbf{continuously reversed or undone}. \footnote{Note the highlights!} Thus you are allowed to execute a \texttt{Ctrl+Z} instruction
+when the inverse can  be done continuously. 
+
+\newchunk Topology is the study of those properties of figures that endure when the figures are subjected to topological transformations. 
+It is the study of invertible continuous transformations. A cell is thus any figure topologically equivalent to the closed disk
+$D=\{P | ||P|| \leq 1\}$
+
+
+\newchunk Here is a topic for a nice artificial intelligence question. The computer is given two shapes, and we need to give
+an explicit continuous transformation mapping one to the other. And by explicity, I mean by some kind of formula. Assume that all
+edges of the two figures are perfectly straight. 
+
+\newchunk It happens that the proofs of many important theorems in combinatorial topology fall naturally into two parts:
+a combinatorial part in which some counting argument is featured, and a point-set part in which limits and continuity is
+used. For the point-set part we require some means of producing points near given sets when necessary. The concept of
+compactness suits this purpose exactly because it is designed to ensure that a set has lots of near points. 
+
+\newchunk The way connectedness is introduced in the chapter is intriguing. It perfectly encapulates what it means
+for a shape like a disk or annulus to be ``of one piece''. 
+
+\newchunk Even though there are lots and lots of exotic topologies, never forget that it is the topology of the plane
+that has charted a way for the direction of the subject. That is the king topology of all, the exotic topologies just
+fall out, by default but these exotic topologies are only incidental to the subject -- not essential!
+
+
+
+\newpage
+
+\chapter{Vector Fields}
+\newchunk Where have you encountered vector fields before? Force-fields,
+velocity fields, gradients of scalar fields such as pressure and height.
+The latter alone are an endless source of vector fields because there are
+many natural scalar functions which you can associated with each point in
+the plane, (think dials! temperature is another great example). The vector
+fields methods here seem to have a Eulerian flavor though rather than a
+Lagrangian flavor. 
+
+\newchunk Mathematical biology is rife with differential equations, think
+stochastic or classical and many such things. Vector fields are central to
+the study of \textbf{systems} of differential equations. 
+
+\newchunk The study of vector fields coincides with the study continuous
+transformations. For each continuous transformation $f: D \rarr \RR$
+we can define a correponding vector field. We let $V(P)$ be the vector
+from the point $P$ to the point $f(P)$. 
+
+\newchunk Conversely a given vector field defines a continu
+
+
+\newchunk There is another interesting topological property of a domain
+i.e. it having the fixed point property. This is a kind of universal
+definition so pay heed. A set $D$ has the fixed point-property if
+\textbf{every} continuous transformation, no matter how violent, of
+$D$ \textbf{into}\footnote{Mark this tiger, mark this!} $D$ has a
+fixed point. This fixed point property is topological! i.e. if
+$g : D \rightarrow R$ is a topological transformation(homeomorphism)
+and $D$ has the fixed point property then so does $R$. 
+
+
+\begin{ftheo}
+  \textbf{Brouwer's fixed point theorem}: Cells have the fixed point
+  property, i.e. every continuous transformation from a cell to itself
+  always has atleast one fixed point. 
+\end{ftheo}
+
+
+
+\newchunk An annulus does not have the fixed point-property. i.e. you
+can rotate an annulus onto itself, with no point-being fixed. 
+
+
+\newchunk The Sperner's lemma is an important combinatorial property
+pertaining to complexes which should motivate ideas in other fields.
+It also is an excellent illustration of charging arguments and counting
+a certain fixed quantity one way and then another way. 
+
+The one-dimensional version in particular is simplest to understand
+and also the one which contains the heart of the 2 dimensional
+Sperner's lemma. 
+
+\begin{ftheo}
+  \textbf{Sperner's Lemma:} At least one triangle in a Sperner labeling
+  receives all three labels: $A$,$B$, and $C$. 
+\end{ftheo}
+
+Note that nowhere was straightness used in the lemma, although it is
+often illustrated like that. 
+
+This lemma is not true on an triangular annulus with a triangular hole. 
+
+\begin{ftheo}
+  \textbf{Linear Transformations and Triangles} Given two triangles and
+  a correpondence of the vertices from one triangle to another, there exists
+  a unique affine map $y \larr Ax+b$ which maps one triangle to another according
+  to the given vertex correpondence. Without the vertex correspondence there
+  are 6 such transformations between the triangles in all.
+
+  In other words, just like 5 points are sufficient to determine a conic
+  curve uniquely, the action on three points is necessary and sufficient
+  to determine an affine map.
+
+  On a computer, the map can be computed in one of two ways, either by
+  solving the 12x12 linear system for determining the coefficients in the
+  matrix and shift vector, or by going through an intermediary of the
+  fundamental triangle.
+
+  Mapping the fundamental triangle to any arbitrary triangle is very easy. 
+
+  Similar comments apply to higher dimensions, where you can always find
+  an unique affine transformation to map one tetrahedron to another tetrahedron
+  for a given vertex correspondence. 
+\end{ftheo}
+
+
+\newchunk As a general policy for constructing maps explicitly, when in doubt do
+some rayshooting, and line-sweeping. Then use the fact that two intevals can be
+mapped with ean easily determinable linear transformation. The final map is a
+composition of these maps. And then you will get the formula, and a completely
+well determined linear transformation and computer program. This sweeping technique is
+excellent in combination with the fact that two triangles/tetrahedra can be mapped
+to each other with an affine transformation. 
+
+
+\newchunk Why are vector fields central to the solution of differential equations?
+Because of the integral curves, they offer a map of the solution space. And the main
+insight is that the critical points, the saddle points, are important structurally. 
+
+
+\newchunk Orientation is also a nice thing to count. There are two orientations
+always in the plane. There was another nice thing to count in Vector fields,
+involving counting how many times a vector sweeps through a full orientation.
+This was another counting that was done. 
+
+\newchunk The Index theorem relates the counting of something in a higher dimension
+to something in a lower dimension. The connection between something that happens in
+boundary to something happening in the interior is interesting. Orientation is a specific
+example of binary type. Always be on the hunts for binary or ternary types. 
+
+
+\part{Topics in Approximation Algorithms}
+
+\part{Topics in Discrete and Combinatorial
+  Geometry}
+\part{Topics in Computational Complexity}
+\part{Notes on NP-Hardness Proofs}
+
+\newpage
+\chapter{Some Preliminary Philosophical Notes}
+
+\newchunk 
+First of all remember that the theory of NP-completeness was devised for yes-no questions. Note that 
+yes-no functions look deceptively ``simple''. They are extremely powerful since many questions can be 
+re-cast as yes-no questions. With that in mind burn the above picture of decision questions in mind. 
+
+\newchunk  So all this begs the question: \emph{what kinds of decision questions do you encounter in computer science}?
+Can you classify them? Here is an incomplete stab at this. Note that some of the decision questions
+below can be polynomial time solvable. They also need not necessarily be in NP. Remember the technical 
+definition of NP roughly says that if you answer yes to a question there has to be some sort of 
+object which verifies the yesness in polynomial time. {\color{red} All the questions below, could be Common-Lisp 
+predicates with their names ending in \texttt{-p}}. Useful mnemonic to remember! It is also possible that some questions
+in each of the classes could be in NP and others in co-NP or whatever. It will all depend ont he specific 
+questions at hand.
+
+
+\begin{itemize}
+\item For this class of algebraic equations does a \green{particular type of solution} exist? (3-SAT)
+\item For a given input does a \green{certain structure} within it exist? (Ham-cycle)
+\item For a given cost function and a number \(\mu\) is \green{$OPT \leq \mu$?} (TSP)
+\item Does the given input object belong to such-and-such class? \green{recognition questions} (Is Planar?)
+\item Are these two objects equal (or approximately equal) with respect to this \green{similarity measure}?
+  (Trajectory similarity, graph isomorphism)
+\item Does a pulleyganization exist for a given set of disks? (Did you see that non-optimization
+  based geomtric questions can also be np-hard)
+  \footnote{another possible meta-theorem? For many conjectured structural results which have
+    not been true, it might be that they are untrue and that detecting if they have that particular
+    structure is np-hard. This is clearly a FOCS'y paper :-D Even without
+    them being famous conjectures, showing that "obvious" structural results can fail and
+    that deciding is np-complete}
+\item Is the Delaunay triangulation of a bunch of points hamiltonian?
+\item The task of finding a proof for a given mathematical assertion is a search problem,
+and is therefore in NP (afterall, when a formal proof of a mathematical statement) is written
+out in excruciating detai, it can be checked mechanically, line by line by 
+an efficient algorithm. So if P=NP there would be an efficent method to prove 
+any theorem, thus eliminating the need for mathematicians.
+\end{itemize}
+
+\newchunk 
+
+Note that you made the unconscious assumption for quite a while that geomtric optimizations
+questions were the only way in which NP-completeness questions in the field. That's not true!
+\footnote{possible meta-theorem? Could it be that any geometrical questions which ask whether a
+  certain structure exists and which did \textbf{not} arise from a optimization question, that
+  the Ham-Cycle would be involved in the hardness proof?}
+
+\begin{center}
+\includegraphics[width=15cm]{synopsesdocs/space_np.eps}
+\end{center}
+
+\begin{center}
+\includegraphics[width=5cm]{synopsesdocs/np-monster.eps}
+\end{center}
+
+
+From now on whenever you hear of a hard-problem, make up a hideous monster like the one above.
+You should picture monster from now on.Indeed once you discover that your problem is a monster,
+solving it becomes more and more interested in terms of approximations fixed parameter tractable
+algorithms and what not.
+
+Next remember if you are going to make a Chuck Norris of a paper
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=10cm]{synopsesdocs/chuck_norris.eps}
+\end{figure}
+
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=10cm]{synopsesdocs/nphardness_cartoon.eps}
+\end{figure}
+
+The above picture is the one thing you should take away from this document, if not anything else.
+
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=10cm]{synopsesdocs/circuit.eps}
+\end{figure}
+
+
+\section{Checklist for NP-completeness proofs}
+\label{sec:org7fb4ef8}
+
+These are the steps you need to go through when performing induction proofs. 
+
+\begin{mdframed}
+\begin{enumerate}
+\item Verify that the problem you are studying is in NP.
+\item Write (with pen and paper) a decision version of the question you are studying
+\item Write (with pen and paper) a decision version of the question you know to be NP-complete and are reducing from.
+\item Take particular note of the numerical parameters involved in the decision question, and think about any possible relation between them
+The numerical parameter will have equality or inequality associated with them \(=b, \leq b, \geq b\). Take note specifically of these.
+\item Make little configurations using elements of your problem. There might be wires hanging out trailing elsewhere. 
+The configuration to which you will need to apply the non-existent polynomial time algorithm to your problem will 
+have nice structure in the form of squares/triangles/circuits hooked up together. The final configuration will look 
+\textbf{\emph{beautiful and nice.}}
+\item Show that the transformation of an arbitrary instance of the NP-complete problem you are starting from to your problem 
+can be accomplished in polynomial time.
+\item Show that 
+\begin{enumerate}
+\item If the transformed instance has a solution, then the original instance of the NP-complete problem has a solution
+\item If the original instance of the NP-complete problem has a solution, then the transformed instance has a solution.
+\end{enumerate}
+\end{enumerate}
+\end{mdframed}
+
+Go through all these 7 steps. Okay, don't forget!
+
+\begin{itemize}
+\item For the given question you should exploit peculiar (but valid) configurations of your problem and then 
+somehow give a scheme to map each instance of the NP-complete problem of your choice to such peculiar configurations.
+\textbf{Different configurations of parts of the input to your problem will interact peculiarly}. That's what you should
+exploit to the fullest!
+
+\item In particular, the weaving of different configurations of your input can be sold as modern art. That is true art
+which exploits a rigid logical structure and is art at its most abstract! Become a painter and sell your paintings
+to the museum for a million dollars. Logic becomes beautiful! If not nothing, you can use Hardness proofs to earn
+a lot of money in the commercial world.
+
+\item Thus me thinks that for starters you should start with \textbf{your} problem (\emph{not an existing NP-complete problem!}), divide 
+and group valid inputs to your problem in various ways and then make those aspects of your input interact with one another. 
+As you keep experimenting with peculiar configurations, keep thinking of what NP-complete problems will map to that particular 
+configurations.
+
+In fact you might want to do peculiar things like instead of taking an input \(n\), take an input of size \(kn\) for a suitable 
+\(k\) and for each of the \(k\) groups assume you can solve your problem perfectly and then make the various solutions interact
+in ways specific to an NP-complete problems such as for 3-SAT or some NP-complete graph theory question or planar sat or 
+whatever.
+
+\item The more the \textbf{short} NP-completeness proofs you read, the better you will get.  Note the shortness aspect of this. 
+Like 20-20 cricket they will help you go through a rapid cycle or iteration of vaious ideas. Besides for a specific problem, 
+you can always start mimicking an existing proof to show np-completeness until you have to come up with an innovation.
+This is an old tried and tested idea that will never fail. Mimic until you are forced to innovate.
+
+\item If you can't prove NP-completeness immediately, you will probably have to design a sequence of problems 
+to make the np-completeness proof humanly possible. Thus I am guessing at first you might want to put 
+even more structure on an existing NP-complete problem (which might end up being polynomial as we keep giving it more structure)
+and then get the necessary gadgets and then improve from there.
+
+Thus it helps in to know all the special subcases of those NP-complete problems which continue to remain NP-complete. 
+Thus remember, in general  you don't just have an arsenal of 4-5 prolbems but many many problems which consist of 
+variants on these, which keep giving more and more and more structure. That should make your NP-completeness proof much easier. 
+It is better to think of your core arsenal as belonging to 4-5 classes of problems. Once you suspect that the answer might lie 
+within a class, just search for particular sub0cases which are np-complete.
+\end{itemize}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=10cm]{synopsesdocs/classes_problems.eps}
+\end{figure}
+
+It is possible that you might have to devise a specific specialization of one of the existing classes of problems first
+(which can be not that difficult) and then use \textbf{that} problem as your source problem for shewing NP-completeness.
+
+\begin{itemize}
+\item Funky pairing: That's all I am going to say.
+
+\item The relationship between a NP-complete problem and an special case that is also NP-complete kind of reminds me of the 
+relationship between Rolle's theorem and Lagrange's theorem. Here Rolle's roll is played by 3-SAT. (yes! this is nphardness now)
+and that of Lagrange's by Planar 3-sat. (Note that np-completeness of planar 3-sat gives you np-completeness of 3-SAT for free)
+
+\item SAT games of showing special cases of SAT that are np-complete are an extremely powerful game, because it deals with booleans
+and interesting structures. You should become an expert on SAT from now on.
+
+\item Planar 3-SAT should give you an idea. \textbf{Try to create a SAT game by marrying one aspect of your problem with the SATness}. Then 
+you can include it into your paper and then say, oh well I did create a meta-proof that will be useful for a whole class of 
+generations from now on. SAT is the most appealed to bunch for np-completeness ever! Didn't Erik Demaine create this class 
+of games?
+
+\item It might also be fun to deliberately keep devising specialized instances of a SAT problem (irrespective of whether \textbf{ultimately} that SAT-like 
+problem will turn out to be polynomiall solvable.) It is a fun exercise in hardness and will lead you partially onto the correct solution.
+But the outcome will be if that new \textbf{derived} instance itself is np-complete. That can be then shown by appealing to SAT and so on.
+\end{itemize}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=12cm]{synopsesdocs/newstrat.eps}
+\end{figure}
+
+\section{Todo list for np-completeness}
+\label{sec:orgadab17e}
+
+\begin{itemize}
+\item Gary and Johnson: The main central tree
+\item Planar 3-SAT reductions
+\item Some of Erik Demaine's papers on games-hardness (Mario, \ldots{}).
+\end{itemize}
+
+Make these the chords of learning. You will not get the big picture immediately. But 
+hammer the proofs into your head so you know each and every aspect of the proofs. They
+will give you a reference to start working with. This should be sufficient to get you started
+for now. Remember NP-completeness proofs are a bit like learning indefinite integration.
+You need to be comortable with all the various tricks.
+\section{The Importance of Cuts}
+\label{sec:orgde61d5a}
+A cut is a set of edges whose removal leaves a graph disconnected. It is often 
+of interest to find a set of small cuts. 
+
+\section{A Catalog of NP-complete Problems}
+\label{sec:org59af7fa}
+
+\textbf{Defn:} A search problem is NP-complete is \textbf{all} other search problems reduce to it. 
+
+This is a strong requirement indeed: for a problem to be NP-complete it must be useful 
+in solving every search problem in the world. It is remarkable that such problems exist. 
+But infact they do!
+
+A key thing I always forget is that these problems are formulated as decision problems
+and thus there are budget and goals embedded in their statements. Thus when you are transforming 
+one instance of a problem into another, you need to connect their budgets and goals in someway. 
+Some of the problems have these budgets or goals, others dont. 
+
+\begin{description}
+\item[{Balanced Cut Problem}] Given a graph with \(n\) vertices, and a budget \(b\), partition the 
+vertices into two sets \(S\) and \(T\) such that \(|S|, |T| \geq n/3\) and such that there are 
+at most \(b\) edges between \(S\) and \(T\).
+
+\item[{Integer Linear Programming}] Given a set of linear ineqalities \(Ax \leq b\) where \(A\) is 
+an \(m\times n\) matric and \(b\) is an \(m\) vector find  a non-negative integer vector \(x\) 
+such that \(Ax \leq b\) or report that none exists.
+
+\item[{Clique}] Given a graph and a goal \(g\), find a set of \(g\) vertices 
+such that all possible edges between them are present.
+
+\item[{Set Cover}] Given a set \(E\) and several subsets of it, \(S_1, S_2, \ldots, S_m\) along with a 
+budget \(b\). We are asked to select \(b\) of these subsets so that their
+union is \(E\).
+
+\item[{Subset Sum}] Given a parameter \(W\) and a set \(S\) of integers, is there a subset of \(S\) 
+whose weights add \emph{exactly} to \(W\)? (this is a special case of the knapsack problem and is 
+invaluable in many hardness proofs alongside 3-SAT)
+
+\item[{Vertex Cover}] Given an undirected graph \(G=(V,E)\) and an integer \(k\), is there a subset 
+of vertices \(S \subseteq V\) such that \(|S| \leq k\) and if \((v,w) \in E\) 
+then either \(v \in S\) or \(w \in S\) or both.
+\end{description}
+Remember this! The complement of a vertex cover of a graph is an independent set. 
+\begin{description}
+\item[{Independent Set}] We are given a graph and an integer \(g\), and the aim is to find \(g\) vertices
+that are independent, that is, no two of which have an edge between them.
+
+\item[{Longest Path Problem}] Given a graph \(G\), with non-negative edge weights and two distinguished vertices
+\(s\) and \(t\) along with a goal \(g\), find a simple (i.e. no vertex repeated) path from \(s\) to \(t\)
+with total weight at-least \(g\). (This is also known as the taxi-cab ripoff problem.)
+\item[{3-dimensional matching (3DM)}] Given a set \(T \subseteq X\times Y\times Z\) and an integer \(k\), decide
+whether there exists a 3-dimensional matching \(M \subseteq T\) with \(|M|\geq k\). 
+The problem is NP-complete een in the special case that \(k=|X|=|Y|=|Z|\)! This special case 
+version is parameterless which might be an advantage in many situations. In the notes, of 
+Vazirani and Papadimitriou, this is the version which is stated as 3dM. The former more general
+case was copied from Wikipedia. Both are useful to know.
+
+\item[{Numerical 3-dimensional matching (Numerical 3DM)}] Given by three multisets of integers 
+\(X,Y,Z\), each containing \(k\)
+elements, and a bound \(b\). The goal is to select a subset 
+\(M\) of \(X \times Y \times Z\)  such that every integer in \(X,Y,Z\)
+occurs exactly once and that for every triple \((x,y,z)\) in the subset 
+\(x+y+z=b\) holds. 
+
+(Notice that in the numerical 3dm problem, we don't have a collection of hyper-edges, ``topology'' or anything, 
+ and further the sets \(X,Y,Z\) involved are all multi-sets of integers.) The basic set-up is similar but otherwise 
+ the problem is different in spirit all together. The 3DM problem is combinatorial, whereas Numerical 3DM is 
+ \ldots well \ldots arithmetic in nature.
+
+\item[{3-Partition}] The problem is to decide whether a given multiset of integers 
+can be partitioned into triples that all have the same sum. More precisely given a multiset of \(n=3m\)
+positive integres, can \(S\) be partitioned into \(m\) triplets \(S_1,S_2, \ldots, S_m\) such that the sum of the 
+numbers in each subset is equal. 
+(\emph{Be careful! You are partitioning into triplets and not three sets of the same size})
+\end{description}
+
+Personally, I don't like the the term gadget. I would prefer the term ``configuration'', which is more 
+descriptive and evocative of what happens during hardness proofs. Various configurations are wired together. 
+For any new problem, it helps to think of little configurations immediately. I have seen Supantha doing this 
+sometimes. Jump to a configuration directly when trying to prove hardness. 
+
+Anyway, whenever you have a new swanky problem, which you have to prove hard, remember that the hardness 
+will have to be shown by tiling together somewhat identical looking configurations in a neat way. There 
+is always symmetry in these things. In fact, you might even construct them via Diagrams, they can indeed 
+be constructed neatly. 
+
+Further, use circuits and circles during proofs. These cycles and circuits can take many conceptual forms. 
+Along with circuits, 3ness and 2ness helps a lot. You will see 3ness and 2ness occur many times in hard problems
+especially thos we are reducing from. The 2ness and 3ness can be exploited in clever ways. 
+
+It is also possible that a variable and clause gadget will be sophisticated enough that you will need 
+sophisticated theorems to construct them, and clever reasoning. 
+
+You sometimes make an unconscious mistake of thinking that an arbitrary SAT instance must always have a unique 
+solution. This need not be true, although it might happen in some specific instances. In this context always 
+remember \(Ax=0\) that is when \(A\) is rectangular the kernel need not be the zero-dimensional vector space. 
+
+\begin{description}
+\item[{3-SAT}] Satisfiability question but with at most 3 literals per clause. There is a restriction of 3-SAT 
+	 which also happens to be NP-complete! This is under the restriction that no \emph{variable} appears 
+	 in more than 3 clauses. 
+Generally speaking, SAT problems have lots and lots of structures. Special kinds of clauses can result in a lot 
+of beautiful structure within it.
+\end{description}
+
+
+\begin{description}
+\item[{1-in-3 SAT}] : A collection of clauses \(C_1, \ldots, C_m\), \(m > 1\); each \(C_i\)
+is a disjunction of exactly three literals. Is there a truth assignment
+so that \emph{exactly one} literal is true in each \(C_i\)?
+\end{description}
+
+
+
+\begin{description}
+\item[{Zero One Integer Programming (ZOE)}] The goal is to find a vector \(x\) of 0's and 1's satisfying \(Ax=\mathbf{1}\)
+where \(A\) is a \(m \times n\) matrix with 0-1 entries and \(\mathbf{1}\) is the \(m\) - vector of all 1's. 
+ZOE is an important special case of ILP.
+
+\item[{Traveling Salesman Problem (TSP)}] Remember the classic TSP there is no graph, no euclidean plane, no nothing. 
+Just a distance matrix between the nodes.
+\end{description}
+
+\section{Hardness proofs}
+\label{sec:orgd0dfccc}
+\begin{description}
+\item[{3-SAT \(\leq_p\) Independent Set}] return to this proof always when in doubt. This is the first 
+non-trivial hardness proof which I have grasped completely. Also it explains a lot of details.
+
+\item[{3-SAT \(\leq_p\) 3DM}] Loveliest proof ever which brings out the need for clause gadgets and 
+variable gadgets.
+\end{description}
+
+
+
+
+\begin{appendices}
+\chapter{Philosophy}
+
+ \lettrine{T}{he} goal is to demonstrate the intricate details of proofs for reuse in future papers
+ following the ideas of literate programming and test-driven development. Every idea
+ no matter how small or trivial is given in the form of a small chunk followed by a detailed
+ explanation possibly with some examples. The key-switch in thinking about proofs is that they
+ should be viewed as algorithms, even if inefficient and existential. We also uses the
+ pseudo-code syntax as described by \texttt{algorithm2e}.
+
+ \newchunk This will help in nice exposition of ideas and make ideas super crunchy. This will be useful
+ in recycling ideas used from the past. You can remember this by continuously flipping through
+ document. Further, you these code-blocks are all collected at the end in the form of an index.
+
+  Within a chapter, corollaries, lemmas, algorithms and theorems, are named in serial order
+ one after another. The numbering restarts at a new chapter. Remember a chapter is like a module
+ self-contained which leads towards something else. Remember CLAT, CLAT! system of writing a book
+ or an article or an idea. Every CLAT, should have a small explnataroy note before digging down
+ into the meat and potatoes, possibly with some explnatory examples or figures. 
+
+ \newchunk The same style is used in writing out the Horsefly, Maximally Dispersed Guards, Lookahead
+ Only the reference.bib/citation styles will change. That's why I have created a standard\_header.tex
+ file which will help in writing out proofs, which contains all the dirty gunky code needed to
+ format the \LaTeX file to your specifications.
+ {\footnotesize \color{red} See the \verb|compile| script I've written in in this folder }
+ Later transfer this to other projects. 
+ 
+ \newchunk Most sections are unlabelled, but when you want to start a new idea development, just
+ name the section inline and continue with writing it. In the table of contents, only include
+ those contents which are named. Each algorithm if expressed in stepwise form should be done
+ in alphabetical steps. That way, you know that the number of steps is limited to less than 26,
+ break up if it overshoots that. 
+
+ Sections are generated with a \texttt{newchunk} command. Before stating a theorem, give a
+ quick overview of what the theorem is about. Use asymptote code in LaTeX with the links to scripts
+ to embed everything in it. The hope by doing all this is to isloate all small critical morsels of ideas.
+ The idea is to treat a proof as a literate program. Steps in a proof should be labelled alphabetically. 
+
+ Proofs are programs. Write proofs with forward references in \LaTeX via \verb|\ref{}|, and a short explanation
+ of what you want to achieve, and then in a later section below, give all the details. Inside your notes, there
+ are no appendices as such as, the function when forwarded referenced are explained as soon as possible.
+ Don't forget this. 
+
+ \newchunk All references, and I mean \textbf{(all fucking references!)} are put into References.bib in this folder
+  across all problems. 
+ 
+\newchunk Use \texttt{flem, fcor, ftheo} for coloring the boxes, and the Algorithm2e environment
+for writing pseudo-code. Pseudo-code is either written in Knuthian form in an alphabetized
+list with a \texttt{crunchy} command explaining in short what the step is doing, or in
+algorithm2e form. These will typically be mutually exclusive. Some algorithms are better
+described one way, and some others in another form. 
+
+\newchunk
+
+\begin{description}
+\item[Fundae] One web-file to dump eveyrthing math philosphy fundae/random notes software
+\item[Project]  One web-file/notebook for each research project. (Unique color for each project)
+\item[Synopses] One web-file/(several notebooks same appearance)
+  \begin{itemize}
+  \item All notebooks corresponding to a project have the same color
+  \item All notebooks must have page numbers
+  \item All notebooks must have little stickers referring to the notebook number under use. 
+  \end{itemize}
+\end{description}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=15cm]{synopsesdocs/workflow.pdf}
+\end{figure}
+
+Photographs will have three-phase names. \verb|<project-name,synopses>-booknumber-pagenumber.jpg|>
+
+Further, you should feel like writing in those books. Those spiral
+bound books are ugly as hell, and you can't cover them to get rid of the 
+grime and all. 
+All notebooks (except for those which you already have) must be large, 
+blank, 100 pages and have page numbers. The page numbers are important 
+if there is a sophisticated construction, or diagram that you want to 
+quickly reference, without going through all the take photo bull-shit. 
+It can get extremely irritating, if possible name each photo with the 
+name of the book and page-number. But in general, try to make as many 
+images as possible in Inkscape, because they will be used one-day in 
+papers anyway and when you need extreme precision.
+	      
+For each notebook and paper you download, get the bibtex reference label 
+and place a little label, a short sticker if you will so everything can be 
+serialized. Place the bibtex reference in the main `Reference.bib` file. 
+Everytime, you get a paper, stick a label onto it. You probably should get 
+all your paper print-outs bound into books, or at-least collected and put 
+into a big-binder, which has its own table of contents listing all the 
+papers added, just add the name. 
+
+The notebooks themselves will be stacked alphabetically, possibly
+rubber-bound and shelved for future reference when the stack grows really long. 
+
+The \verb|\sticker{}| command draws a light pink box around piece of text. In
+Emacs presssing \verb|Alt+F1| generates a sticker tag with a random alphanumeric
+string inside it. The sticker function itself is defined in \verb|standard_header.tex|
+
+\red{Blah blah blah}
+\green{Blah blah blah}
+\blue{Blah blah blah}
+\hl{Blah blah blah}
+
+
+\begin{center}
+{\large The quick brown \sticker{sx3goz} jumped over the lazy dog. }
+\end{center}
+
+The sticker will typically be applied just in front of a newchunk. The sticker names
+can then be pdfgrepped! \verb|-n| option to pdfgrep gives page-numbers and not
+line-numbers unlike regular grep. 
+
+Finally this is how you proceed: weave the web in your notebooks and then finally
+tangle the web into the pdf document. The pdf document can then be treated as
+executable code for your brain. The noteboooks are your rough-work and ideas
+developed during deep-work, the computer files are used to commit. 
+
+
+\begin{ftheo}
+   \blindtext[1]
+\end{ftheo}
+ \begin{proof}
+\begin{alphalist}
+  \item \blindtext[1]
+  \item \blindtext[1]
+\end{alphalist}
+\end{proof}
+
+\newchunk
+\begin{flem}
+   \blindtext[1]
+\end{flem}
+ \begin{proof}
+\begin{alphalist}
+  \item \blindtext[1]
+  \item \blindtext[1]
+\end{alphalist}
+\end{proof}
+
+\newchunk
+\begin{fcor}
+   \blindtext[1]
+\end{fcor}
+ \begin{proof}
+\begin{alphalist}
+  \item \crunchy{Get The Variable Here} \blindtext[1]
+  \item \crunchy{Find Toast} \blindtext[1]
+  \item \crunchy{Make An Omelette} \blindtext[1]
+\end{alphalist}
+\end{proof}
+
+\newchunk
+\begin{fprop}
+   \blindtext[1]
+\end{fprop}
+ \begin{proof}
+\begin{alphalist}
+  \item \crunchy{Get The Variable Here} \blindtext[1]
+  \item \crunchy{Find Toast} \blindtext[1]
+  \item \crunchy{Make An Omelette} \blindtext[1]
+\end{alphalist}
+\end{proof}
+
+\newchunk Method 1 of expressing algorithms. (Preferred, when possible)
+
+Method 2 is good when you want to be expressly very precise in what you
+are doing. some complicated argument is going on, such as when expressing
+some liner algebra algorithms like GMRES. 
+
+\begin{algorithm}[h]
+\caption{How to write algorithms}
+\KwIn{A bunch of points}
+\KwOut{The Convex Hulls}
+% Algorithm body here!
+\begin{alphalist}
+\item \crunchy{Get The Variable Here} You can use it for short words without
+  penalty, but for longer text this issues arise. Note that verbatim mode is
+  fragile and \verb doesn't work inside macro arguments.
+\item \crunchy{Find Toast} the other spaces in the same line in order to
+  compensate for a longer verb box, but this has its limits. If you have longer
+\item \crunchy{Make An Omelette}  The fact that it is printed in tt font is
+  just a side-effect! If you use spaces inside verbatim text you are
+  requesting a verbatim, unstretchable and unbreakable space. 
+  \item \crunchy{Eat it} blah blah ablah
+
+\end{alphalist}
+\end{algorithm}
+
+\newchunk \blindtext
+
+\begin{algorithm}[h]
+\SetAlgoLined
+\KwData{this text}
+\KwResult{how to write algorithm with \LaTeX2e }
+initialization\;
+\tcp{A comment!}
+\While{not at end of this document}{
+  read current\;
+  \eIf{understand}{
+    go to next section\;
+    current section becomes this one\;
+  }{
+    go back to the beginning of current section\;
+   blah blah blah  \Comment*[c]{Some comment} 
+   blah blah blah  \Comment{Some other comment}
+  }
+}
+\caption{How to write algorithms}
+\end{algorithm}
+
+The Yasnippet crunchy was installed in \newline
+\verb|/home/gaurish108/.emacs.d/elpa/yasnippet-classic-snippets-1.0.2/snippets/latex-mode|
+
+Note that \verb|\item| almost appears before \verb|\crunchy|. 
+
+\begin{verbatim}
+# contributor: Gaurish Telang
+# name: \crunchy{...}
+# key: cr
+# --
+\item \crunchy{$1}%   
+\end{verbatim}
+
+% \begin{figure}
+%   \centering
+%   \begin{asy}
+%     size(350);
+
+%     real a=3;
+%     real b=4;
+%     real c=hypot(a,b);
+
+%     transform ta=shift(c,c)*rotate(-aCos(a/c))*scale(a/c)*shift(-c);
+%     transform tb=shift(0,c)*rotate(aCos(b/c))*scale(b/c);
+
+%     picture Pythagorean(int n) {
+%       picture pic;
+%       fill(pic,scale(c)*unitsquare,1/(n+1)*green+n/(n+1)*brown);
+%       if(n == 0) return pic;
+%       picture branch=Pythagorean(--n);
+%       add(pic,ta*branch);
+%       add(pic,tb*branch);
+%       return pic;
+%     }
+
+%     add(Pythagorean(12));
+    
+%   \end{asy}
+% \end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% A histogram.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+\blindtext
+\begin{figure}
+  \centering
+  \begin{asy}
+    import graph;
+    import stats;
+
+    size(250,250,IgnoreAspect);
+
+    int n=100;
+    real[] a=new real[n];
+    for(int i=0; i < n; ++i) a[i]=Gaussrand();
+
+    draw(graph(Gaussian,min(a),max(a)),blue);
+
+    // Optionally calculate "optimal" number of bins a la Shimazaki and Shinomoto.
+    int N=bins(a);
+
+    histogram(a,min(a),max(a),N,normalize=true,low=0,blue,black,bars=false);
+
+    xaxis("$x$",BottomTop,LeftTicks);
+    yaxis("$dP/dx$",LeftRight,RightTicks(trailingzero));
+  \end{asy}
+  \caption{My great histogram}
+\end{figure}
+
+\blindtext
+\end{appendices}
+
+\nocite{*}
+\printbibliography
+\end{document}

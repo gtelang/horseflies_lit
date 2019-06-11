@@ -11,7 +11,6 @@ import utils_graphics
 import utils_algo
 import scipy
 import matplotlib as mpl
-from matplotlib.ticker import FormatStrFormatter
 
 def expt(number_of_sites, scheme, inithorseposn, phis, number_of_runs):
   plt.rc('text', usetex=True)
@@ -20,11 +19,6 @@ def expt(number_of_sites, scheme, inithorseposn, phis, number_of_runs):
   ax.set_title("Tour Length of Collinear Horsefly Tour/Tour Length of Exact Horsefly Tour \n for Greedy Incremental Ordering, $N$="+str(number_of_sites), fontsize=28)
   ax.set_xlabel("Runs", fontsize=25)
   ax.set_ylabel("Tour Length Ratios", fontsize=25)
-
-  ax.set_xticks(range(0,number_of_runs+1), minor=False)
-  ax.xaxis.set_major_formatter(FormatStrFormatter('%.0f'))
-  plt.grid(b=True)
-
   #plt.grid(True, linestyle='--')
   plt.tick_params(labelsize=20)
   #ax.set_xticklabels(map(str,range(number_of_runs)))
@@ -62,13 +56,13 @@ def expt(number_of_sites, scheme, inithorseposn, phis, number_of_runs):
          print "Collinear Tour Length            : ", collinear_tour['tour_length_with_waiting_time_included']
          print "Collinear Tour Length After SLSQP: ", collinear_tour_after_slsqp['tour_length_with_waiting_time_included']
 
-     plt.plot(range(number_of_runs), ratios, "o-",  markersize=7, linewidth=4, label=r"$\varphi$="+str(phi))
+     plt.plot(range(number_of_runs), ratios, "o-", label=r"$\varphi$="+str(phi))
      
   ax.legend(prop={'size': 20})
   plt.show()
 
 
 if __name__ == "__main__":
-    expt(number_of_sites=30, scheme='uniform', inithorseposn=(0.5,0.5), \
-         phis=[3.0, 6.0, 12.0, 24.0], number_of_runs=20)
+    expt(number_of_sites=10, scheme='uniform', inithorseposn=(0.5,0.5), \
+         phis=[3.0, 6.0, 12.0, 24.0], number_of_runs=40)
 

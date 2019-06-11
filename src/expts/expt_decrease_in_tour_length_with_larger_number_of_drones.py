@@ -22,7 +22,7 @@ def expt(number_of_sites, scheme, inithorseposn, phi):
   plt.grid(True, linestyle='--')
   
   textstr = r"$\varphi$=" + str(phi)
-  ax.text(0.75, 0.95, textstr, transform=ax.transAxes, fontsize=40,
+  ax.text(0.85, 0.95, textstr, transform=ax.transAxes, fontsize=40,
         verticalalignment='top')
   plt.tick_params(labelsize=20)
 
@@ -49,9 +49,8 @@ def expt(number_of_sites, scheme, inithorseposn, phi):
           horse_traj_pts = map(lambda x: x[0], tour['horse_trajectory'])
           tour_lengths.append(utils_algo.length_polygonal_chain(horse_traj_pts))
 
-      ax.plot(ks, tour_lengths, "o-", linewidth=4, markersize=7, label="Cloud "+str(i))
-  
-  ax.legend(prop={'size': 20})
+      ax.plot(ks, tour_lengths, "o-", linewidth=2.5)
+
   plt.show()
 
 

@@ -98,8 +98,8 @@ class HorseflyInputGraph:
              
           def add_points_interior_to_segment(p,q,k):
               p, q = map(np.asarray, [p,q])
-              return []
-              #return [p + float(i)/3.0 * (q-p) for i in [1,2]] 
+              #return []
+              return [p + float(i)/3.0 * (q-p) for i in [1,2]] 
            
           old_len_of_node_list = len(node_list)
           edges_processed      = {}
@@ -338,7 +338,7 @@ def wrapperkeyPressHandler(fig,ax, run):
     
              elif event.key in ['d','D']: # `d` for discretize domain, using the obstacles we sprinkle 
                                           # some points and discretize everything
-                  background_grid_pts = [[np.random.rand(), np.random.rand()] for i in range(200)]
+                  background_grid_pts = [[np.random.rand(), np.random.rand()] for i in range(0)]
                   run.makeHorseflyInputGraph(fig, ax, background_grid_pts, k=5)
 
       return _keyPressHandler

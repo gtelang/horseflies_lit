@@ -1,0 +1,19 @@
+- Make a separate module, following the literate style
+- Enter in obstacles by using squares (size adjustable using mouse-wheel) 
+  One set of obstacles for drones and another for the trucks. 
+- Enter in delivery points. 
+- Enter in horse beginning position
+- Draw the visibility graph on the given set of truck obstacles 
+  and anothter on the drone obstacles. For the truck use all vertices
+  truck and drone obstacles, and any background grid you will be inserting 
+  but for drawing edges consider only segment-segment intersections 
+  only with the truck obstacles for constructing the graph. and vice versa for the drones. 
+- There is only one graph which the input to the algorithm sees, where one of the attributes 
+  associated with each edge is a kind of bit-vector saying what this edge allows within a network
+- Each node in the graph also mentions whether it is a delivery point or just an obstacle edge
+  and which obstacle edge exactly. 
+- You will be considering the discrete case, where handoff happens only at the points of the 
+  visibility graph of whatever points you are considering.
+- The edges of the underlying graph must be super-light in the background. 
+  The nodes handoff points themselves can have different sizes and shapes 
+  and colors depending on who is waiting for who. 
