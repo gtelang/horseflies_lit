@@ -63,30 +63,6 @@ def center_of_mass(pts):
 
 
 
-def get_max_disp_vc_nodes(graph):
-
-  # as a distance matrix, just use the pure euclidean distances. 
-  # they may be easier to analyze
-
-  from satispy import Variable, Cnf
-  from satispy.solver import Minisat
-  
-  v1 = Variable('v1')
-  v2 = Variable('v2')
-  v3 = Variable('v3')
-  
-  exp    = v1 & v2 | v3
-  solver = Minisat()
-  solution = solver.solve(exp)
-  
-  if solution.success:
-    print "Found a solution:" ; 
-    print v1, solution[v1] 
-    print v2, solution[v2] 
-    print v3, solution[v3]
-  else:
-    print "The expression cannot be satisfied"
-
  
 
 # Local data-structures
@@ -98,14 +74,135 @@ class HorseflyInputGraph:
           self.sites           = []
           
       def maxDispDelTri(self,fig,ax):
+          
+          def get_max_disp_vc_nodes(graph, points):
+                """ Get the maximally dispersed vertex cover for the supplied graph of the delaunay triangulation
+                on the graph. Returns a list of indices. Distances are measured in Euclidean Length between points
+                """
+                
+                def exists_disp_vertex_cover_more_than_bin_guess(graph, points,d):
+                     """ Check if there exists a vertex cover in the graph whose
+                     dipsersion is at least d. We solve this using 2-SAT as 
+                     described in the paper by Arkin and Hassin Theorem 4.1, Page 10, 
+                     \"Minimum Diameter Covering Problems\" that can be downloaded
+                     from http://www.ams.sunysb.edu/~estie/papers/diam.ps.gz
+                     """
+                     from satispy import Variable, Cnf
+                     from satispy.solver import Minisat
 
-          os.system("rm delaunay_tris/*")  
+                     numpts = len(points)
+                     exp    = Cnf()
+
+                     #------------------------------------------------
+                     # Set up variables x_i for each node of the graph
+                     #------------------------------------------------
+                     xs = []
+                     for idx in range(numpts):
+                          xs.append(Variable( 'x_'+str(idx) ))
+                     print "     Created Variables...."
+                     #-------------------------------
+                     # Set up clauses for each graph
+                     #-------------------------------
+                     for (i,j) in  list(graph.edges):
+                             c = Cnf()
+                             c = xs[i] | xs[j]
+                             exp &= c
+
+                     print "     Created Edge Clauses..."
+                     #--------------------------------------------------------------------
+                     # For any pair of vertices k and l whose distance from one another 
+                     # is smaller than d we know we can choose at most one of the vertices
+                     #--------------------------------------------------------------------
+                     for i in range(numpts):
+                         for j in range(i+1, numpts):
+                             if np.linalg.norm(points[i]-points[j]) < d:
+                                    c = Cnf()
+                                    c = -xs[i] | -xs[j]
+                                    exp &= c
+                     print "     Created All Pair Clauses....."
+                     #--------------------------------
+                     # Solve the system with Minisat
+                     #--------------------------------
+                     solver = Minisat()
+                     solution = solver.solve(exp)
+
+                     if solution.success:
+
+                            print      Fore.CYAN, "    2-SAT Solution found!", Style.RESET_ALL
+                            return (True, [idx for idx in range(numpts) if solution[xs[idx]] == True])
+                     else: 
+                            print  Fore.RED, "    2-SAT Solution cannot be found", Style.RESET_ALL
+                            return (False, [])
+
+
+
+
+                tol               = 1e-6      # configurable
+                bin_low, bin_high = 0.0 , 2.0 # initial interval limits for binary search
+                old_disp_idxs     = range(len(points)) 
+
+                while abs(bin_high - bin_low) > tol:
+                    #-----------------------------
+                    # Common sense sanity checks
+                    #-----------------------------
+                    assert bin_high >= bin_low 
+
+                    bin_guess = (bin_high + bin_low)/2.0
+                    
+                    print "\n" + Fore.GREEN, "Binary search Interval Limits are ", "[", bin_low, " , ", bin_high, "]"
+                    print Fore.GREEN, "Guessed dispersion value currently is ", bin_guess, Style.RESET_ALL
+                    print Fore.GREEN, "Checking for vertex cover with ", bin_guess, " dispersion....."
+                    #--------------------------------------------------
+                    # Check if there exists a dispersed vertex cover 
+                    # that is <= or > bin_guess and adjust interval limits 
+                    # of binary search accordingly.
+                    #--------------------------------------------------
+                    [exist_flag_p, disp_idxs] = exists_disp_vertex_cover_more_than_bin_guess(graph,points,bin_guess)
+
+                    if exist_flag_p:
+                          bin_low = bin_guess
+                          old_disp_idxs = disp_idxs
+                    else:
+                          bin_high = bin_guess 
+
+                #---------------------------------------------------------          
+                # Return the indices of the points corresponding to the 
+                # dispersed cover along with the dispersion value.
+                #---------------------------------------------------------
+                return (old_disp_idxs, bin_guess)
+
+
+          os.system("rm max_disp_delaunay_tris/*")  
           points          = np.asarray(self.sites)
           original_points = points
           original_numpts = len(points)
+
+
           filenum = 0
+          plt.cla()
+          plt.grid(linestyle='--')
+          ax.set_aspect(aspect=1.0)
+          ax.set_xlim([0.0,1.0])
+          ax.set_ylim([0.0,1.0])
+
+          ax.set_title("Number of red points: " + str(len(points)))
+          ax.plot(points[:,0], points[:,1], 'o', markerfacecolor='r', markersize=10)
+          plt.savefig('max_disp_delaunay_tris/myplot_' + str(filenum).zfill(4) + '.png', bbox_inches='tight', dpi=200)
           
+
           while len(points) >= 5 :
+              print Fore.YELLOW
+              print "==============================================================================="
+              print "ITERATION ", filenum
+              print "===============================================================================", Style.RESET_ALL
+              #---------------------------------------------
+              # Increment file counter for next iteration
+              #---------------------------------------------
+              filenum += 1
+
+              #-----------------------------------------------------------------------
+              # Clear plot and set up basic things needed for plotting into a new file
+              #-----------------------------------------------------------------------
               plt.cla()
               plt.grid(linestyle='--')
               ax.set_aspect(aspect=1.0)
@@ -113,14 +210,11 @@ class HorseflyInputGraph:
               ax.set_ylim([0.0,1.0])
               ax.scatter(original_points[:,0], original_points[:,1],alpha=0.2)
 
-              print Fore.GREEN, "-----------------------------------------", Style.RESET_ALL
-              print Fore.GREEN, "Number of points is now: ", len(points), Style.RESET_ALL
-
+              #---------------------------------------
               # Construct the delaunay triangulation
-              tri = Delaunay(points)
-              numpts = len(points)
+              #---------------------------------------
+              tri     = Delaunay(points)
               numtris = len(tri.simplices)
-
               #ax.triplot(points[:,0], points[:,1], tri.simplices.copy())
 
               del_tri_edge_list = []
@@ -134,26 +228,30 @@ class HorseflyInputGraph:
               del_tri_edge_list.sort()
               from itertools import groupby
               del_tri_edge_list = [elt[0] for elt in groupby(del_tri_edge_list)]
-              #utils_algo.print_list(del_tri_edge_list)
 
+              #-----------------------------------------------------------
               # Create a networx graph corresponding to the triangulation
+              #-----------------------------------------------------------
               delgraph = nx.Graph()
-              delgraph.add_edges_from([(i,j, {'weight':np.linalg.norm(points[i]-points[j])} ) for [[i,j],_] in del_tri_edge_list])
+              delgraph.add_edges_from([(i,j) for [[i,j],_] in del_tri_edge_list])
 
+              #----------------------------------------------------------
               # get indices of the dispersed nodes in the graph
-              max_disp_vc_nodes = range(numpts-1)# get_max_disp_vc_nodes(delgraph) # solve 2-SAT
-              points            = np.asarray([points[idx] for idx in max_disp_vc_nodes])
-              print points
+              #----------------------------------------------------------
+              max_disp_vc_nodes, dispersion = get_max_disp_vc_nodes(delgraph, points) 
+              points                        = np.asarray([points[idx] for idx in max_disp_vc_nodes])
 
-              ax.plot(points[:,0], points[:,1], 'o', markerfacecolor='r')
+              tri     = Delaunay(points)
+              numtris = len(tri.simplices)
+              
+              #ax.triplot(points[:,0], points[:,1], tri.simplices.copy())
 
-
-
-              # Render the dispersed nodes in a different color
-              plt.savefig('delaunay_tris/myplot_' + str(filenum).zfill(4) + '.png',
-                          bbox_inches='tight', dpi=200)
- 
-              filenum += 1
+              #------------------------------------------------------------------
+              # Render the dispersed nodes in a different color and save to disk
+              #------------------------------------------------------------------
+              ax.plot(points[:,0], points[:,1], 'o', markerfacecolor='r', markersize=10)
+              ax.set_title("Number of red points: " + str(len(points)))
+              plt.savefig('max_disp_delaunay_tris/myplot_' + str(filenum).zfill(4) + '.png', bbox_inches='tight', dpi=200)
 
 
       def runRecDel(self,fig, ax):
@@ -292,6 +390,40 @@ def wrapperkeyPressHandler(fig,ax, run):
 
              elif event.key in ['m', 'M']:
                  run.maxDispDelTri(fig,ax)
+
+
+             elif event.key in ['n', 'N', 'u', 'U']: 
+                    # Generate a bunch of uniform or non-uniform random points on the canvas
+                    numpts = int(raw_input("\n" + Fore.YELLOW+\
+                                           "How many points should I generate?: "+\
+                                           Style.RESET_ALL)) 
+                    run.clearAllStates()
+                    ax.cla()
+                                   
+                    utils_graphics.applyAxCorrection(ax)
+                    ax.set_xticks([])
+                    ax.set_yticks([])
+                                    
+                    fig.texts = []
+                                     
+                    import scipy
+                    if event.key in ['n', 'N']: 
+                            run.sites = utils_algo.bunch_of_non_uniform_random_points(numpts)
+                    else : 
+                            run.sites = scipy.rand(numpts,2).tolist()
+
+                    patchSize  = (utils_graphics.xlim[1]-utils_graphics.xlim[0])/140.0
+
+                    for site in run.sites:      
+                        ax.add_patch(mpl.patches.Circle(site, radius = patchSize, \
+                                     facecolor='blue',edgecolor='black' ))
+
+                    ax.set_title('Points : ' + str(len(run.sites)), fontdict={'fontsize':40})
+                    fig.canvas.draw()
+
+
+
+
 
       return _keyPressHandler
 

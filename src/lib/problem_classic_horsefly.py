@@ -311,8 +311,8 @@ def algo_dumb(sites, horseflyinit, phi):
     return best_tour
    
 def algo_greedy(sites, inithorseposn, phi, 
-                write_algo_states_to_disk_p = True   ,
-                animate_schedule_p          = True   , 
+                write_algo_states_to_disk_p = False   ,
+                animate_schedule_p          = False   , 
                 post_optimizer              = None):
 
       # Set log, algo-state and input-output files config for \verb|algo_greedy|
@@ -327,11 +327,11 @@ def algo_greedy(sites, inithorseposn, phi,
 
       # Create directory for writing data-files and logs to for 
       # current run of this algorithm
-      try:
-          os.makedirs(dir_name)
-      except OSError as e:
-          if e.errno != errno.EEXIST:
-              raise
+      #try:
+      #    os.makedirs(dir_name)
+      #except OSError as e:
+      #    if e.errno != errno.EEXIST:
+      #        raise
 
       logging.basicConfig( filename = log_file_name,
                            level    = logging.DEBUG,
@@ -380,12 +380,12 @@ def algo_greedy(sites, inithorseposn, phi,
               'phi'            : phi                     , 
               'inithorseposn'  : inithorseposn}
 
-      import yaml
-      with open(dir_name + '/' + io_file_name, 'w') as outfile:
-           yaml.dump( data, \
-                      outfile, \
-                      default_flow_style=False)
-      debug("Dumped input and output to " + io_file_name)
+      #import yaml
+      #with open(dir_name + '/' + io_file_name, 'w') as outfile:
+      #     yaml.dump( data, \
+      #                outfile, \
+      #                default_flow_style=False)
+      #debug("Dumped input and output to " + io_file_name)
       
       # Make an animation of the schedule computed by \verb|algo_greedy|, if \verb|animate_schedule_p == True|
       
@@ -781,8 +781,8 @@ class PolicyBestInsertionNaive:
 
 def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
                                       insertion_policy_name       = "naive",
-                                      write_algo_states_to_disk_p = True  ,
-                                      animate_schedule_p          = True   , 
+                                      write_algo_states_to_disk_p = False  ,
+                                      animate_schedule_p          = False   , 
                                       post_optimizer              = None   ,  
                                       plot_computed_schedule      = False):
       # Set log, algo-state and input-output files config
@@ -797,11 +797,11 @@ def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
 
       # Create directory for writing data-files and logs to for 
       # current run of this algorithm
-      try:
-          os.makedirs(dir_name)
-      except OSError as e:
-          if e.errno != errno.EEXIST:
-              raise
+      #try:
+      #    os.makedirs(dir_name)
+      #except OSError as e:
+      #    if e.errno != errno.EEXIST:
+      #        raise
 
       logging.basicConfig( filename = log_file_name,
                            level    = logging.DEBUG,
@@ -970,12 +970,12 @@ def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
               'phi'            : insertion_policy.phi           , 
               'inithorseposn'  : insertion_policy.inithorseposn}
 
-      import yaml
-      with open(dir_name + '/' + io_file_name, 'w') as outfile:
-           yaml.dump( data, \
-                      outfile, \
-                      default_flow_style=False)
-      debug("Dumped input and output to " + io_file_name)
+      #import yaml
+      #with open(dir_name + '/' + io_file_name, 'w') as outfile:
+      #     yaml.dump( data, \
+      #                outfile, \
+      #                default_flow_style=False)
+      #debug("Dumped input and output to " + io_file_name)
       
       # Make an animation of the schedule, if \verb|animate_schedule_p == True|
          

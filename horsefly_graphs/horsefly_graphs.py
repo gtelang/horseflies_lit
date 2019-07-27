@@ -52,7 +52,7 @@ class HorseflyInputGraph:
       
       # Definition of method \verb|makeHorseflyInputGraph|
          
-      def makeHorseflyInputGraph(self, fig, ax, background_grid_pts, k=5):
+      def makeHorseflyInputGraph(self, fig, ax, background_grid_pts):
           # Create an initial list of nodes to be inserted into \verb|self.horsefly_input_graph|
              
           node_list = []
@@ -77,7 +77,7 @@ class HorseflyInputGraph:
           tri = Delaunay([node['coordinates'] for node in node_list])
           numtris = len(tri.simplices)
 
-          print tri.simplices
+          #print tri.simplices
 
           del_tri_edge_list = []
           for simplex, fidx in zip(tri.simplices,range(numtris)):
@@ -91,7 +91,7 @@ class HorseflyInputGraph:
           from itertools import groupby
           del_tri_edge_list = [elt[0] for elt in groupby(del_tri_edge_list)]
            
-          utils_algo.print_list(del_tri_edge_list)
+          #utils_algo.print_list(del_tri_edge_list)
              
           
           # Add points along each edge of a simplex in the triangulation
@@ -115,7 +115,7 @@ class HorseflyInputGraph:
               
                         num_new_nodes = len(new_segment_pts)
 
-                        print Fore.RED, "New nodes added: ", range(old_len_of_node_list, old_len_of_node_list + num_new_nodes), Style.RESET_ALL
+                        #print Fore.RED, "New nodes added: ", range(old_len_of_node_list, old_len_of_node_list + num_new_nodes), Style.RESET_ALL
 
                         edges_processed[(i,j)] = range(old_len_of_node_list, 
                                                        old_len_of_node_list+num_new_nodes)
@@ -141,7 +141,7 @@ class HorseflyInputGraph:
               # every pair of edges and add to possible_edge_list_idxs
               [ (_, idxs1 ), (_, idxs2), (_, idxs3) ]= finfo
               
-              print Fore.YELLOW, finfo, Style.RESET_ALL
+              #print Fore.YELLOW, finfo, Style.RESET_ALL
 
               possible_edge_list_idxs.extend([ (i,j) for i in idxs1 for j in idxs2 ])
               possible_edge_list_idxs.extend([ (i,j) for i in idxs2 for j in idxs3 ])
@@ -164,7 +164,7 @@ class HorseflyInputGraph:
                        [p,q] = pt_edge
                        pcd = p['coordinates']
                        qcd = q['coordinates']
-
+                       
                        obstacle_interscn_info = []
                        for obs in run.obstacle_list:
                              (interscn_p, _) = obs.intersectionWithSegment(pcd,qcd)
@@ -184,12 +184,22 @@ class HorseflyInputGraph:
                                    obs_interscn_count['commonobs'] += 1
 
 
-              
+                       pcd = np.asarray(pcd) 
+                       qcd = np.asarray(qcd)
+                       
                        if   obs_interscn_count['horseobs']   == 0  and \
                           obs_interscn_count['flyobs']     == 0  and \
                           obs_interscn_count['commonobs']  == 0:
 
-                          run.horsefly_input_graph.add_edge(p['idx'], q['idx'], edgetype='commonedge' )
+                          run.horsefly_input_graph.add_edge(p['idx'], q['idx'], edgetype='commonedge', weight=np.linalg.norm(qcd-pcd))
+                          # modify the node attributes at both ends
+                          run.horsefly_input_graph.nodes[p['idx']]['point_type'] = p['point_type']
+                          run.horsefly_input_graph.nodes[p['idx']]['coordinates'] = p['coordinates']
+                          
+                          run.horsefly_input_graph.nodes[q['idx']]['point_type'] = q['point_type']
+                          run.horsefly_input_graph.nodes[q['idx']]['coordinates'] = q['coordinates']
+
+
                           ax.plot( [pcd[0],qcd[0]], [pcd[1],qcd[1]], 'y-',  alpha=0.2 ) 
 
 
@@ -197,7 +207,15 @@ class HorseflyInputGraph:
                           obs_interscn_count['flyobs']      == 0  and \
                           obs_interscn_count['commonobs']   == 0:
 
-                          run.horsefly_input_graph.add_edge(p['idx'], q['idx'], edgetype='flyedge' )
+                          run.horsefly_input_graph.add_edge(p['idx'], q['idx'], edgetype='flyedge', weight=np.linalg.norm(qcd-pcd))
+                          # modify the node attributes at both ends
+                          run.horsefly_input_graph.nodes[p['idx']]['point_type'] = p['point_type']
+                          run.horsefly_input_graph.nodes[p['idx']]['coordinates'] = p['coordinates']
+                          
+                          run.horsefly_input_graph.nodes[q['idx']]['point_type'] = q['point_type']
+                          run.horsefly_input_graph.nodes[q['idx']]['coordinates'] = q['coordinates']
+
+
                           ax.plot( [pcd[0],qcd[0]], [pcd[1],qcd[1]], 'b-',  alpha=0.2 ) 
 
               
@@ -205,15 +223,17 @@ class HorseflyInputGraph:
                            obs_interscn_count['flyobs']      >= 1  and \
                            obs_interscn_count['commonobs']   == 0:
 
-                           run.horsefly_input_graph.add_edge(p['idx'], q['idx'], edgetype='horseedge' )
+                           run.horsefly_input_graph.add_edge(p['idx'], q['idx'], edgetype='horseedge', weight=np.linalg.norm(qcd-pcd) )
+
+                           # modify the node attributes at both ends
+                           run.horsefly_input_graph.nodes[p['idx']]['point_type'] = p['point_type']
+                           run.horsefly_input_graph.nodes[p['idx']]['coordinates'] = p['coordinates']
+                          
+                           run.horsefly_input_graph.nodes[q['idx']]['point_type'] = q['point_type']
+                           run.horsefly_input_graph.nodes[q['idx']]['coordinates'] = q['coordinates']
+
+
                            ax.plot( [pcd[0],qcd[0]], [pcd[1],qcd[1]], 'r-', alpha = 0.2 ) 
-
-                       else:
-                           continue 
-
-          
-          # Construct the graph consisting of the edges that were filtered through
-             
           
       
       # Definition of method \verb|renderHorseflyInputGraph|
@@ -229,8 +249,219 @@ class HorseflyInputGraph:
           # original prsitine state, so that other algorithms can be tried out. 
           pass
 
-      def getTour(self, algo, phi):
-             return algo(self.horsefly_input_graph, phi)
+      def getTour(self, fig, ax):
+            import copy
+
+            str_phi = raw_input("What speed ratio do you want?: ")
+            phi = float(str_phi)
+            #--------------------------------------------------
+            # Get graph which horse is allowed to travel along
+            #-------------------------------------------------
+            G_horse = copy.deepcopy(self.horsefly_input_graph)
+            # Get list of flyedges
+            flyedges = []
+            for (u,v,etype) in G_horse.edges.data('edgetype'):
+                  if etype == 'flyedge':
+                        flyedges.append( (u,v) )
+            # Remove flyedges from the graph
+            for (u,v) in flyedges:
+                  G_horse.remove_edge(u,v)
+
+            # Remove isolated nodes
+            G_horse.remove_nodes_from(list(nx.isolates(G_horse))) 
+   
+            #------------------------------------------------
+            # Get graph which fly is allowed to travel along
+            #------------------------------------------------
+            G_fly   = copy.deepcopy(self.horsefly_input_graph) 
+            # Get list of horseedges
+            horseedges = []
+            for (u,v,etype) in G_fly.edges.data('edgetype'):
+                  if etype == 'horseedge':
+                        horseedges.append( (u,v) )
+            # Remove horseedges from the graph
+            for (u,v) in horseedges:
+                  G_fly.remove_edge(u,v)
+            
+            # Remove isolated nodes
+            G_fly.remove_nodes_from(list(nx.isolates(G_fly))) 
+
+            #---------------------------------------------------------------
+            # Get indexes of nods common to both the horse and fly
+            # This is the list of potential rendezvous points for both the 
+            # horse and fly
+            #---------------------------------------------------------------
+            horse_nodes_idxs = G_horse.nodes
+            fly_nodes_idxs   = G_fly.nodes
+            common_node_idxs = list(set(horse_nodes_idxs) & set(fly_nodes_idxs))
+
+ 
+            # Now finally for the coup-de-grace. Let us first sort the sites greedily
+            # according to greedy TSP ordering. For this we need the indices
+            # of all the sites. 
+            site_idxs        = [ node[0] for node in self.horsefly_input_graph.nodes(data=True) 
+                                  if node[1]['point_type'] == 'site']
+            
+            site_coordinates = [np.asarray(self.horsefly_input_graph.nodes[node[0]]['coordinates']) 
+                                for node in self.horsefly_input_graph.nodes(data=True) 
+                                    if node[1]['point_type'] == 'site']
+
+            numsites = len(site_idxs)
+
+            for node in self.horsefly_input_graph.nodes(data=True):
+                  if node[1]['point_type'] == 'inithorseposn':
+                        inithorseposn_idx = node[0]
+                        inithorseposn     = np.asarray(self.horsefly_input_graph.nodes[node[0]]['coordinates'])
+
+            #utils_algo.print_list(self.horsefly_input_graph.nodes(data=True))
+            #utils_algo.print_list(G_horse.nodes(data=True))
+            #print Fore.GREEN, site_idxs
+            #print Fore.RED, inithorseposn_idx, Style.RESET_ALL
+            
+            path_idxs   = [inithorseposn_idx]
+            path_coords = [inithorseposn]
+
+            while len(path_idxs) < numsites+1: # the +1 is for inithorseposn
+                  current_posn_idx = path_idxs[-1]
+                  current_posn     = path_coords[-1]
+
+                  distance_info = [(site_idx, site_coords, np.linalg.norm(site_coords-current_posn)) 
+                                   for site_idx, site_coords in zip(site_idxs, site_coordinates)]
+                  distance_info = sorted(distance_info, key=lambda tup : tup[2])
+
+                  for idx, coords, _ in distance_info:
+                        if idx in path_idxs: # this means the site has already occured in the order, so skip!
+                              continue
+                        else:
+                              path_idxs.append(idx)
+                              path_coords.append(coords)
+                              break
+            #print "-----------------------------------------------"
+            #utils_algo.print_list(zip(path_idxs,path_coords))
+            site_idxs = path_idxs[1:] # first element is lopped off because it is the inithorseposn
+            site_coordinates = path_coords[1:] 
+
+            #----------------------------------------------------------------------
+            # Now that we have the order of deliveries, it is time to start routing 
+            # the truck and drone!!! 
+            #----------------------------------------------------------------------
+            
+            # Note that 
+            # (1) A horse-path consists paths between successive rendezvous points. It is a list of lists
+            # (2) A fly path is a list of tuples of size two, where each tuple consits of two lists, the 
+            #     first one from rendezvous point to site, and second one from site back to some other rendezvous point
+            # Thus both the horse-path and drone-path have the same length. 
+            # This will be particularly helpful during plotting 
+            horse_path_idxs, fly_path_idxs = [], []
+            # Run all pair shortest paths on both graphs to begin queries
+            print Fore.CYAN, "Beginning all pairs shortest path computation......."
+            all_pairs_G_horse_paths      = dict(nx.all_pairs_shortest_path(G_horse))
+            all_pairs_G_horse_sp_lengths = dict(nx.all_pairs_shortest_path_length(G_horse))
+            
+            all_pairs_G_fly_paths        = dict(nx.all_pairs_shortest_path(G_fly))
+            all_pairs_G_fly_sp_lengths   = dict(nx.all_pairs_shortest_path_length(G_fly))
+            print Fore.CYAN, "Finished  all pairs shortest path computation!", Style.RESET_ALL
+
+            assert(len(site_idxs)==len(site_coordinates))
+
+            # Calculating shortest path computations
+            current_rendezvous_idx = inithorseposn_idx
+            all_rendezvous_idxs    = [current_rendezvous_idx]
+            for site_idx, site_coords in zip(site_idxs, site_coordinates):
+
+                  # find best rendezvous point by iterating over all the 
+                  # common nodes. 
+                  cn_imin = 0
+                  cn_tmin = np.inf
+                  for cn_idx in common_node_idxs:
+                       # Get distance of horse from current rendezvous node 
+                       # to the common node
+                       htime = all_pairs_G_horse_sp_lengths[current_rendezvous_idx][cn_idx]
+
+                       ftime_to_site = all_pairs_G_fly_sp_lengths[current_rendezvous_idx][site_idx]/phi
+                       ftime_from_site = all_pairs_G_fly_sp_lengths[site_idx][cn_idx]/phi
+                       
+                       meeting_time_cn_idx = max(ftime_to_site+ftime_from_site, htime)
+
+                       if meeting_time_cn_idx < cn_tmin:
+                             cn_imin = cn_idx
+                             cn_tmin = meeting_time_cn_idx
+                       
+                  
+                  # Now that the best rendezvous node has been detected
+                  # use the appropriate paths for the horse and the fly
+                  # to the rendezvous node and update the paths 
+                  horse_path_idxs.append( all_pairs_G_horse_paths[current_rendezvous_idx][cn_imin] )
+                  
+                  fly_path_idxs.append( ( all_pairs_G_fly_paths[current_rendezvous_idx][site_idx] ,\
+                                          all_pairs_G_fly_paths[site_idx][cn_imin])        )
+
+
+                  # update the value of the current_rendezvous id for 
+                  # the next iteration
+                  current_rendezvous_idx = cn_imin
+                  all_rendezvous_idxs.append(current_rendezvous_idx)
+
+                  
+            assert(len(horse_path_idxs)==len(fly_path_idxs))
+
+
+            rendezvous_points_coordinates = [G_horse.node[k]['coordinates'] for k in all_rendezvous_idxs]
+            rxs = [x for (x,y) in rendezvous_points_coordinates]
+            rys = [y for (x,y) in rendezvous_points_coordinates]
+            ax.plot(rxs,rys,'ro', markersize=12.0)
+
+            #-------------------------------------------------------------------
+            # Time for plotting! Plot the both the horse and fly paths ontop 
+            # of the graph using the. Just render the fly path first and then 
+            # the horse path. The horse path must be thicker and red, the 
+            # fly path thinner and green. 
+            #-------------------------------------------------------------------
+
+            # Render fly path first. Just flatten the fly_path into a large list 
+            # of nodes. And then render the edges in the graph using the coordinate
+            # key-value pair stored at the dictionary. 
+
+            # Init horseposn marker
+            ax.add_artist(plt.Circle(inithorseposn, 0.03, color='k'))
+
+            fly_path_idxs_flat   = [ idx for (p1,p2) in fly_path_idxs for idx in (p1+p2)]
+            for idx1, idx2 in zip(fly_path_idxs_flat, fly_path_idxs_flat[1:]):
+
+                  # find the coordinates of the points corresponding to the nodes 
+                  # in the graph G_fly. 
+                  p = G_fly.nodes[idx1]['coordinates']
+                  q = G_fly.nodes[idx2]['coordinates']
+
+                  # Render the edge
+                  ax.plot([p[0],q[0]],[p[1],q[1]], linewidth=2.0, 
+                                                   markersize=8, 
+                                                   linestyle='dashed', 
+                                                   color='blue')
+
+            # Now render the horse path similar to the above
+            horse_path_idxs_flat = [idx for p in horse_path_idxs for idx in p]
+            for idx1, idx2 in zip(horse_path_idxs_flat, horse_path_idxs_flat[1:]):
+
+                  # find the coordinates of the points corresponding to the nodes 
+                  # in the graph G_horse. 
+                  p = G_horse.nodes[idx1]['coordinates']
+                  q = G_horse.nodes[idx2]['coordinates']
+
+                  # Render the edge
+                  ax.plot([p[0],q[0]],[p[1],q[1]], linewidth=4.0, 
+                                                   markersize=10, 
+                                                   linestyle='solid', 
+                                                   color='red')
+
+            # Label the sites with the numbers 
+            for k, (x,y) in zip(range(1,len(site_coordinates)+1),site_coordinates):
+                  plt.annotate(str(k),(x,y),bbox={"boxstyle" : "circle", "color":"grey"})
+
+            #plt.rc('text', usetex=True)
+            #plt.rc('font', family='serif')
+            #ax.set_title(r"Number of sites: "+str(len(sites_idx)) + "\n\varphi="+str(phi))
+            plt.show()
 
 
 
@@ -338,8 +569,17 @@ def wrapperkeyPressHandler(fig,ax, run):
     
              elif event.key in ['d','D']: # `d` for discretize domain, using the obstacles we sprinkle 
                                           # some points and discretize everything
-                  background_grid_pts = [[np.random.rand(), np.random.rand()] for i in range(0)]
-                  run.makeHorseflyInputGraph(fig, ax, background_grid_pts, k=5)
+                  #background_grid_pts = [[np.random.rand(), np.random.rand()] for i in range(100)]
+                  unit_interval_division = np.linspace(0.0,1.0,num=3) 
+                  background_grid_pts = [ [x,y] for x in unit_interval_division for y in unit_interval_division  ]
+                  run.makeHorseflyInputGraph(fig, ax, background_grid_pts)
+                  #print list(run.horsefly_input_graph.nodes(data=True))
+                  #utils_algo.print_list(list(run.horsefly_input_graph.edges(data=True)))
+
+
+             elif event.key in ['a','A']: # run the greedy algorithm  to get a tour
+                   run.getTour(fig,ax)
+
 
       return _keyPressHandler
 
