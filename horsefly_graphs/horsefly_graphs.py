@@ -353,14 +353,19 @@ class HorseflyInputGraph:
             # Thus both the horse-path and drone-path have the same length. 
             # This will be particularly helpful during plotting 
             horse_path_idxs, fly_path_idxs = [], []
+
             # Run all pair shortest paths on both graphs to begin queries
             print Fore.CYAN, "Beginning all pairs shortest path computation......."
-            all_pairs_G_horse_paths      = dict(nx.all_pairs_shortest_path(G_horse))
-            all_pairs_G_horse_sp_lengths = dict(nx.all_pairs_shortest_path_length(G_horse))
+            all_pairs_G_horse_paths      = dict(nx.shortest_path(G_horse, weight='weight'))
+            all_pairs_G_horse_sp_lengths = dict(nx.shortest_path_length(G_horse, weight='weight'))
             
-            all_pairs_G_fly_paths        = dict(nx.all_pairs_shortest_path(G_fly))
-            all_pairs_G_fly_sp_lengths   = dict(nx.all_pairs_shortest_path_length(G_fly))
+            all_pairs_G_fly_paths        = dict(nx.shortest_path(G_fly,weight='weight'))
+            all_pairs_G_fly_sp_lengths   = dict(nx.shortest_path_length(G_fly, weight='weight'))
+            
             print Fore.CYAN, "Finished  all pairs shortest path computation!", Style.RESET_ALL
+
+            #print Fore.RED , all_pairs_G_horse_sp_lengths, Style.RESET_ALL
+            #print Fore.CYAN, all_pairs_G_fly_sp_lengths, Style.RESET_ALL
 
             assert(len(site_idxs)==len(site_coordinates))
 
@@ -456,11 +461,12 @@ class HorseflyInputGraph:
 
             # Label the sites with the numbers 
             for k, (x,y) in zip(range(1,len(site_coordinates)+1),site_coordinates):
-                  plt.annotate(str(k),(x,y),bbox={"boxstyle" : "circle", "color":"grey"})
+                  plt.annotate(str(k),(x,y),bbox={"boxstyle" : "circle", "color":"grey"},  fontsize=18)
 
-            #plt.rc('text', usetex=True)
-            #plt.rc('font', family='serif')
-            #ax.set_title(r"Number of sites: "+str(len(sites_idx)) + "\n\varphi="+str(phi))
+            plt.rc('text', usetex=True)
+            plt.rc('font', family='serif')
+            ax.set_title("Number of sites: "+str(len(site_idxs)) + "\nDrone Speed="+str(phi),
+                         fontname='Times New Roman' ,fontsize= 20, ha='center')
             plt.show()
 
 
@@ -570,7 +576,7 @@ def wrapperkeyPressHandler(fig,ax, run):
              elif event.key in ['d','D']: # `d` for discretize domain, using the obstacles we sprinkle 
                                           # some points and discretize everything
                   #background_grid_pts = [[np.random.rand(), np.random.rand()] for i in range(100)]
-                  unit_interval_division = np.linspace(0.0,1.0,num=3) 
+                  unit_interval_division = np.linspace(0.0,1.0,num=6) 
                   background_grid_pts = [ [x,y] for x in unit_interval_division for y in unit_interval_division  ]
                   run.makeHorseflyInputGraph(fig, ax, background_grid_pts)
                   #print list(run.horsefly_input_graph.nodes(data=True))
