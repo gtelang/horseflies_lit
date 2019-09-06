@@ -1401,10 +1401,10 @@ def plotTour(horseflytour, horseflyinit, phi, algo_str, tour_color='#d13131'):
     ax.minorticks_on()
 
     # customize the major grid
-    ax.grid(which='major', linestyle='--', linewidth='0.3', color='red')
+    ax.grid(which='major', linestyle='--', linewidth=0.3, color='red')
 
     # Customize the minor grid
-    ax.grid(which='minor', linestyle=':', linewidth='0.3', color='black')
+    ax.grid(which='minor', linestyle=':', linewidth=0.3, color='black')
 
     ax.get_xaxis().set_ticklabels([])
     ax.get_yaxis().set_ticklabels([])
@@ -1465,8 +1465,8 @@ def plotTour(horseflytour, horseflyinit, phi, algo_str, tour_color='#d13131'):
     for x,y,i in zip(xsites, ysites, range(len(xsites))):
         ax.text(x, y, str(i+1), fontsize=14, bbox=dict(facecolor='#ddcba0', alpha=1.0)) 
 
-    ax.plot(xfs,yfs,'g-')
-    ax.plot(xhs, yhs, color=tour_color, marker='s', linewidth=3.0) 
+    ax.plot(np.asarray(xfs),np.asarray(yfs),'g-')
+    ax.plot(np.asarray(xhs),np.asarray(yhs), color=tour_color, marker='s', linewidth=3.0) 
 
     ax.add_patch( mpl.patches.Circle( horseflyinit, radius = 1/60.0,
                                       facecolor= '#D13131', edgecolor='black'   )  )

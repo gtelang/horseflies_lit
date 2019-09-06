@@ -258,11 +258,13 @@ class HorseflyInputGraph:
             # Get graph which horse is allowed to travel along
             #-------------------------------------------------
             G_horse = copy.deepcopy(self.horsefly_input_graph)
+            
             # Get list of flyedges
             flyedges = []
             for (u,v,etype) in G_horse.edges.data('edgetype'):
                   if etype == 'flyedge':
                         flyedges.append( (u,v) )
+
             # Remove flyedges from the graph
             for (u,v) in flyedges:
                   G_horse.remove_edge(u,v)
@@ -274,11 +276,13 @@ class HorseflyInputGraph:
             # Get graph which fly is allowed to travel along
             #------------------------------------------------
             G_fly   = copy.deepcopy(self.horsefly_input_graph) 
+
             # Get list of horseedges
             horseedges = []
             for (u,v,etype) in G_fly.edges.data('edgetype'):
                   if etype == 'horseedge':
                         horseedges.append( (u,v) )
+
             # Remove horseedges from the graph
             for (u,v) in horseedges:
                   G_fly.remove_edge(u,v)
@@ -287,7 +291,7 @@ class HorseflyInputGraph:
             G_fly.remove_nodes_from(list(nx.isolates(G_fly))) 
 
             #---------------------------------------------------------------
-            # Get indexes of nods common to both the horse and fly
+            # Get indexes of nodes common to both the horse and fly
             # This is the list of potential rendezvous points for both the 
             # horse and fly
             #---------------------------------------------------------------
@@ -295,10 +299,9 @@ class HorseflyInputGraph:
             fly_nodes_idxs   = G_fly.nodes
             common_node_idxs = list(set(horse_nodes_idxs) & set(fly_nodes_idxs))
 
- 
-            # Now finally for the coup-de-grace. Let us first sort the sites greedily
-            # according to greedy TSP ordering. For this we need the indices
-            # of all the sites. 
+            #---------------
+            # Get site info
+            #---------------
             site_idxs        = [ node[0] for node in self.horsefly_input_graph.nodes(data=True) 
                                   if node[1]['point_type'] == 'site']
             
@@ -306,112 +309,108 @@ class HorseflyInputGraph:
                                 for node in self.horsefly_input_graph.nodes(data=True) 
                                     if node[1]['point_type'] == 'site']
 
-            numsites = len(site_idxs)
+            numsites         = len(site_idxs)
 
             for node in self.horsefly_input_graph.nodes(data=True):
                   if node[1]['point_type'] == 'inithorseposn':
                         inithorseposn_idx = node[0]
                         inithorseposn     = np.asarray(self.horsefly_input_graph.nodes[node[0]]['coordinates'])
+                        break
 
-            #utils_algo.print_list(self.horsefly_input_graph.nodes(data=True))
-            #utils_algo.print_list(G_horse.nodes(data=True))
-            #print Fore.GREEN, site_idxs
-            #print Fore.RED, inithorseposn_idx, Style.RESET_ALL
-            
-            path_idxs   = [inithorseposn_idx]
-            path_coords = [inithorseposn]
-
-            while len(path_idxs) < numsites+1: # the +1 is for inithorseposn
-                  current_posn_idx = path_idxs[-1]
-                  current_posn     = path_coords[-1]
-
-                  distance_info = [(site_idx, site_coords, np.linalg.norm(site_coords-current_posn)) 
-                                   for site_idx, site_coords in zip(site_idxs, site_coordinates)]
-                  distance_info = sorted(distance_info, key=lambda tup : tup[2])
-
-                  for idx, coords, _ in distance_info:
-                        if idx in path_idxs: # this means the site has already occured in the order, so skip!
-                              continue
-                        else:
-                              path_idxs.append(idx)
-                              path_coords.append(coords)
-                              break
-            #print "-----------------------------------------------"
-            #utils_algo.print_list(zip(path_idxs,path_coords))
-            site_idxs = path_idxs[1:] # first element is lopped off because it is the inithorseposn
-            site_coordinates = path_coords[1:] 
-
-            #----------------------------------------------------------------------
-            # Now that we have the order of deliveries, it is time to start routing 
-            # the truck and drone!!! 
-            #----------------------------------------------------------------------
-            
-            # Note that 
-            # (1) A horse-path consists paths between successive rendezvous points. It is a list of lists
-            # (2) A fly path is a list of tuples of size two, where each tuple consits of two lists, the 
-            #     first one from rendezvous point to site, and second one from site back to some other rendezvous point
-            # Thus both the horse-path and drone-path have the same length. 
-            # This will be particularly helpful during plotting 
-            horse_path_idxs, fly_path_idxs = [], []
-
+            #--------------------------------------------------------------
             # Run all pair shortest paths on both graphs to begin queries
-            print Fore.CYAN, "Beginning all pairs shortest path computation......."
+            #--------------------------------------------------------------
+            print Fore.CYAN, "Beginning all pairs shortest path computation.................."
             all_pairs_G_horse_paths      = dict(nx.shortest_path(G_horse, weight='weight'))
             all_pairs_G_horse_sp_lengths = dict(nx.shortest_path_length(G_horse, weight='weight'))
             
             all_pairs_G_fly_paths        = dict(nx.shortest_path(G_fly,weight='weight'))
             all_pairs_G_fly_sp_lengths   = dict(nx.shortest_path_length(G_fly, weight='weight'))
-            
             print Fore.CYAN, "Finished  all pairs shortest path computation!", Style.RESET_ALL
 
-            #print Fore.RED , all_pairs_G_horse_sp_lengths, Style.RESET_ALL
-            #print Fore.CYAN, all_pairs_G_fly_sp_lengths, Style.RESET_ALL
+            #-------------------------------------------------------------------------------------------------------------
+            # Note that 
+            # (1) A horse-path consists paths between successive rendezvous points. It is a list of lists
+            # (2) A fly path is a list of tuples of size two, where each tuple consits of two lists, the 
+            #     first one from rendezvous point to site, and second one from site back to some other rendezvous point
+            # Thus both the horse-path and drone-path have the same length. Helpful during ploting
+            #-------------------------------------------------------------------------------------------------------------
+            horse_path_idxs, fly_path_idxs = [], []
 
-            assert(len(site_idxs)==len(site_coordinates))
-
-            # Calculating shortest path computations
             current_rendezvous_idx = inithorseposn_idx
             all_rendezvous_idxs    = [current_rendezvous_idx]
-            for site_idx, site_coords in zip(site_idxs, site_coordinates):
+            
+            unvisited_sites_idx   = copy.deepcopy(site_idxs)
+            visited_sites_idx     = []
+            visited_sites_coods   = [] 
 
-                  # find best rendezvous point by iterating over all the 
-                  # common nodes. 
-                  cn_imin = 0
-                  cn_tmin = np.inf
-                  for cn_idx in common_node_idxs:
-                       # Get distance of horse from current rendezvous node 
-                       # to the common node
-                       htime = all_pairs_G_horse_sp_lengths[current_rendezvous_idx][cn_idx]
+            while unvisited_sites_idx:
 
-                       ftime_to_site = all_pairs_G_fly_sp_lengths[current_rendezvous_idx][site_idx]/phi
-                       ftime_from_site = all_pairs_G_fly_sp_lengths[site_idx][cn_idx]/phi
+               # Index of next site to rendezvous with   
+               sidx_min = 0
+               scood_min = None
+
+               # Corresponding rendezvous point for that site
+               gcn_imin = 0
+               gcn_tmin = np.inf
+
+               for site_idx, site_coords in zip(site_idxs, site_coordinates):
+
+                  if site_idx in visited_sites_idx:  
+                        continue
+                  else:
+                        #--------------------------------------------------------------------
+                        # Find best rendezvous point by iterating over all the common nodes
+                        #--------------------------------------------------------------------
+                        cn_imin = 0
+                        cn_tmin = np.inf
+                        
+                        for cn_idx in common_node_idxs:
+
+                              #-----------------------------------------------------------------------
+                              # Get distance of horse from current rendezvous node to the common node
+                              #-----------------------------------------------------------------------
+                              htime = all_pairs_G_horse_sp_lengths[current_rendezvous_idx][cn_idx]
+
+                              ftime_to_site   = all_pairs_G_fly_sp_lengths[current_rendezvous_idx][site_idx]/phi
+                              ftime_from_site = all_pairs_G_fly_sp_lengths[site_idx][cn_idx]/phi
                        
-                       meeting_time_cn_idx = max(ftime_to_site+ftime_from_site, htime)
+                              meeting_time_cn_idx = max(ftime_to_site+ftime_from_site, htime)
 
-                       if meeting_time_cn_idx < cn_tmin:
-                             cn_imin = cn_idx
-                             cn_tmin = meeting_time_cn_idx
-                       
+                              if meeting_time_cn_idx < cn_tmin:
+                                    cn_imin = cn_idx
+                                    cn_tmin = meeting_time_cn_idx
+
+                        if cn_tmin < gcn_tmin:
+                              gcn_tmin = cn_tmin
+                              gcn_imin = cn_imin
+                              sidx_min = site_idx
+                              scood_min = site_coords
+                              
+               #-------------------------------------------------------
+               # Now that the best rendezvous node has been detected
+               # use the appropriate paths for the horse and the fly
+               # to the rendezvous node and update the paths 
+               #-------------------------------------------------------
+               horse_path_idxs.append( all_pairs_G_horse_paths[current_rendezvous_idx][gcn_imin] )
                   
-                  # Now that the best rendezvous node has been detected
-                  # use the appropriate paths for the horse and the fly
-                  # to the rendezvous node and update the paths 
-                  horse_path_idxs.append( all_pairs_G_horse_paths[current_rendezvous_idx][cn_imin] )
-                  
-                  fly_path_idxs.append( ( all_pairs_G_fly_paths[current_rendezvous_idx][site_idx] ,\
-                                          all_pairs_G_fly_paths[site_idx][cn_imin])        )
+               fly_path_idxs.append( ( all_pairs_G_fly_paths[current_rendezvous_idx][sidx_min] ,\
+                                      all_pairs_G_fly_paths[sidx_min][gcn_imin])        )
+
+               #----------------------------------------------------------------------
+               # Update the value of the current_rendezvous id for the next iteration
+               #----------------------------------------------------------------------
+               current_rendezvous_idx = gcn_imin
+               all_rendezvous_idxs.append(current_rendezvous_idx)
+
+               assert(sidx_min in unvisited_sites_idx)
+               unvisited_sites_idx.remove(sidx_min)
+               visited_sites_idx.append(sidx_min)
+               visited_sites_coods.append(scood_min)
 
 
-                  # update the value of the current_rendezvous id for 
-                  # the next iteration
-                  current_rendezvous_idx = cn_imin
-                  all_rendezvous_idxs.append(current_rendezvous_idx)
-
-                  
-            assert(len(horse_path_idxs)==len(fly_path_idxs))
-
-
-            rendezvous_points_coordinates = [G_horse.node[k]['coordinates'] for k in all_rendezvous_idxs]
+            rendezvous_points_coordinates = [G_horse.node[k]['coordinates'] 
+                                             for k in all_rendezvous_idxs]
             rxs = [x for (x,y) in rendezvous_points_coordinates]
             rys = [y for (x,y) in rendezvous_points_coordinates]
             ax.plot(rxs,rys,'ro', markersize=12.0)
@@ -459,13 +458,15 @@ class HorseflyInputGraph:
                                                    linestyle='solid', 
                                                    color='red')
 
+            assert(sorted(visited_sites_idx)==sorted(site_idxs))
+
             # Label the sites with the numbers 
-            for k, (x,y) in zip(range(1,len(site_coordinates)+1),site_coordinates):
+            for k, (x,y) in zip(range(1,len(visited_sites_coods)+1), visited_sites_coods):
                   plt.annotate(str(k),(x,y),bbox={"boxstyle" : "circle", "color":"grey"},  fontsize=18)
 
             plt.rc('text', usetex=True)
             plt.rc('font', family='serif')
-            ax.set_title("Number of sites: "+str(len(site_idxs)) + "\nDrone Speed="+str(phi),
+            ax.set_title("Number of sites: "+str(numsites) + "\nDrone Speed="+str(phi),
                          fontname='Times New Roman' ,fontsize= 20, ha='center')
             plt.show()
 
@@ -579,6 +580,7 @@ def wrapperkeyPressHandler(fig,ax, run):
                   unit_interval_division = np.linspace(0.0,1.0,num=6) 
                   background_grid_pts = [ [x,y] for x in unit_interval_division for y in unit_interval_division  ]
                   run.makeHorseflyInputGraph(fig, ax, background_grid_pts)
+                  plt.show()
                   #print list(run.horsefly_input_graph.nodes(data=True))
                   #utils_algo.print_list(list(run.horsefly_input_graph.edges(data=True)))
 
