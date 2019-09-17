@@ -93,12 +93,12 @@ def run_handler():
                                               post_optimizer=algo_approximate_L1_given_specific_ordering)
                     elif input_str == 't':
                           horseflytour = \
-                                 run.getTour( algo_tsp_ordering,
+                                 run.getTour( algo_tsp_ordering_new,
                                               phi,
                                               post_optimizer=algo_exact_given_specific_ordering)
                     elif input_str == 'tl':
                           horseflytour = \
-                                 run.getTour( algo_tsp_ordering,
+                                 run.getTour( algo_tsp_ordering_new,
                                               phi,
                                               post_optimizer= algo_approximate_L1_given_specific_ordering)
                     elif input_str == 'g':
@@ -1282,12 +1282,15 @@ def algo_weighted_sites_given_specific_ordering (sites, weights, horseflyinit, p
      return {'tour_points'  : tour_points,
              'site_ordering': sites}
 
-def algo_tsp_ordering(sites, inithorseposn, phi, post_optimizer):
+def algo_tsp_ordering_old(sites, inithorseposn, phi, post_optimizer):
+    """ This uses the slow and inefficient exact TSP solver in Python
+    The new version of this function uses the superfast concorde 
+    TSP solver which can solve large instances quickly. 
+    """
     import tsp
     horseinit_and_sites = [inithorseposn] + sites
 
     _, tsp_idxs = tsp.tsp(horseinit_and_sites)
-
           
     # Get the position of the horse in tsp_idxss
     h = tsp_idxs.index(0) # 0 because the horse was placed first in the above vector
@@ -1316,6 +1319,69 @@ def algo_tsp_ordering(sites, inithorseposn, phi, post_optimizer):
     else:
         print Fore.RED, "Selecting tour1 ", Style.RESET_ALL
         return tour1
+
+
+
+def algo_tsp_ordering_new(sites, inithorseposn, phi, post_optimizer):
+    from concorde.tsp import TSPSolver
+    import math
+
+    horseinit_and_sites = [inithorseposn] + sites
+
+    # Concorde only accepts integer value coordinates. 
+    # Hence I scale by a large factor (arbitrarily chosen as 1000), 
+    # and then take a floor
+    xs = [ int(math.floor(1000*x)) for (x,_) in horseinit_and_sites ]
+    ys = [ int(math.floor(1000*y)) for (_,y) in horseinit_and_sites ]
+
+    print Fore.RED
+    utils_algo.print_list(zip(xs,ys))
+    print Style.RESET_ALL
+
+    solver = TSPSolver.from_data(xs,ys,norm='EUC_2D')
+    solution = solver.solve()
+    
+    assert solution.found_tour, "Did not find soluttion tour"
+    tsp_idxs = solution.tour
+    print "TSP ordering of sites is ", tsp_idxs
+    print "Length of the tsp tour is ", solution.optimal_value
+    
+    #------------------------------------------------------------------------------
+    tsp_idxs = list(tsp_idxs) # Get the position of the horse in tsp_idxss
+    h = tsp_idxs.index(0) # 0 because the horse was placed first in the above vector
+
+    if h != len(tsp_idxs)-1:
+        idx_vec = tsp_idxs[h+1:] + tsp_idxs[:h]
+    else:
+        idx_vec = tsp_idxs[:h]
+
+    # idx-1 because all the indexes of the sites were pushed forward
+    # by 1 when we tacked on inithorseposn at the very beginning
+    # of horseinit_and_sites, hence we auto-correct for that
+    sites_tsp = [sites[idx-1] for idx in idx_vec]
+    
+    tour0    = post_optimizer (sites_tsp                , inithorseposn, phi) 
+    tour1    = post_optimizer (list(reversed(sites_tsp)), inithorseposn, phi) 
+    
+    tour0_length = utils_algo.length_polygonal_chain([inithorseposn] + tour0['site_ordering'])
+    tour1_length = utils_algo.length_polygonal_chain([inithorseposn] + tour1['site_ordering'])
+
+    print Fore.RED, " TSP paths in either direction are ", tour0_length, " ", tour1_length, Style.RESET_ALL
+    
+    if tour0_length < tour1_length:
+        print Fore.RED, "Selecting tour0 ", Style.RESET_ALL
+        return tour0
+    else:
+        print Fore.RED, "Selecting tour1 ", Style.RESET_ALL
+        return tour1
+
+
+
+          
+
+
+
+
 
 # Lower bounds for classic horsefly
 def compute_phi_prim_mst(sites, inithorseposn,phi):
