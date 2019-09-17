@@ -1,0 +1,108 @@
+Implement exact order for Reverse Horsefly
+Implement exact order for Single Drone Classic Horsefly
+Implement exact order for Single Truck Multiple Drones
+
+Experiments
+-----------
+
+- Compare deformation factor for the collinear horsefly idea
+  the goal is to decide a bunch of heuristics that will give the 
+  least deformation factor. because this is useful for m-guillotine
+  and greedy heuristics in deciding the performance.
+
+- Compare the performance of getting makespans for heurisitcs
+  for various algorithms. 	
+  - Greedy nearest neighbor
+  - Greedy insertion
+  - TSP concorde get heuristic. 
+  - Max Dispersion Heuristic part about 
+    extracting an order has to be implemented. 	
+  - The Recursive Fermat Weber Splitting Heuristic
+
+  Get this for clustered and non-clustered data. 
+
+- How does the length of the tour decrease with increasing speed 
+  ratio? 	
+
+- For package handoff measure the deformation factor
+  before and after optimization. This is useful for 
+  explaining the usefulness of straight line package
+  handoff. 	
+
+
+- Explain the notion of arrangement TSP to solve the segment 
+  center problem. 	
+
+
+Video-clips
+-----------
+- Single Truck Multiple Drones: earliest capture heuristic
+- More graph theory obstacles for horse and flies, just produce
+  pictures, maybe with a small explanation about 	
+
+    The recursive Fermat Weber heuristic uses possible? 
+    This applies to multiple drones too. If you can show
+    that the max-dispersion heuristic and recursive fermat
+    weber heuristic are better than greedy, then you will have 
+    a novel method right there. (For phi=1, does this give a tree
+    with weight lower than the MST? My suspician is that it is polytime, 
+    because if $\varphi>0$ and the half-plane propery can you run 
+    experiments on this, the nice thing about the heuristic is that 
+    it will generalize to multiple flies too. Can this be applied to reverse
+    horsefly also? 
+
+
+
+
+
+
+
+
+-------------------------
+- Greedy incremental, post optimizer LP/SLSQP.
+     I am not aplying this inside the body of the function.
+     Igt should be applied just after the *.........while loop......*
+- Collinear horseflies tour length / That obtained after post optimizer
+- Greedy incremental with post=optimizer/TSP with post-optimizer
+- Greedy incremental vs/ wweight of phi mst, is it good?
+  An example where the algorithm greedy gives better example than phi-=mst
+- How much greedy incremental improve upon greedy, both with post-optimizer?
+
+All these, do not add to interactive right now except for first.
+~                                                                                                                                             
+~           
+What I need to do right now. 
+===========================
+
+- Make sure algorithms are not generating stupid folder output. 
+- Makespans of algorithms TSP, Greedy, Greedy Insertion. 
+- Makespans of the reverse horsefly algorithms. 
+- Package Handoff Makespan deformation, why the straight-line package handoff matters. 
+- Give a diagram demonstrating Package Handoff. 
+- Send the video demonstrating how the order of delivery changes as 
+  the speed ratio increases. 
+- Segment Horsefly : important observation for phi <= 1. You can 
+  solve this exactly 
+
+
+
+-------------------------------------------------------------------
+
+Todo
+====
+
+1. Have a plot function for each of the algorithms individually. 
+2. For Joe's thought experiment, you should have two plots
+  a.  one indicating the thought experment tour
+  b.  the tour where everyone moves in parallel
+  Put them in separate ax frames but in the same plot
+
+Use reverse horsefly collection center, the end point of the 
+greedy concentric routing heuristic!!! And then do Kintic TSP 
+on that. 
+
+use only the penultimate leg? or just the current positions
+of the flies, to be able to scale to larger simulations.
+Right now because i am plotting trajectories at every step
+it takes quadratic time to generate the animation. 
+

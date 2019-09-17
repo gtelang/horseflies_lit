@@ -666,9 +666,9 @@ def animate_tour (sites, inithorseposn, phi, horse_trajectory, fly_trajectories,
     ani = animation.ArtistAnimation(fig, ims, interval=50, blit=True, repeat_delay=1000)
     debug(Fore.BLACK + Back.WHITE + "\nFinished constructing ani object"+ Style.RESET_ALL)
 
-    #debug(Fore.MAGENTA + "\nStarted writing animation to disk"+ Style.RESET_ALL)
-    #ani.save(animation_file_name_prefix+'.avi', dpi=150)
-    #debug(Fore.MAGENTA + "\nFinished writing animation to disk"+ Style.RESET_ALL)
+    debug(Fore.MAGENTA + "\nStarted writing animation to disk"+ Style.RESET_ALL)
+    ani.save(animation_file_name_prefix+'.avi', dpi=150)
+    debug(Fore.MAGENTA + "\nFinished writing animation to disk"+ Style.RESET_ALL)
 
     plt.show() # For displaying the animation in a live window. 
     

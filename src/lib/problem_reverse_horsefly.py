@@ -671,7 +671,8 @@ def algo_greedy_dead_reckoning(sites, inithorseposn, phi,    \
                                write_algo_states_to_disk_p = False, \
                                write_io_p                  = True, \
                                animate_tour_p              = True,\
-                               plot_tour_p                 = False) :
+                               plot_tour_p                 = False,
+                               post_optimizer_p            = False) :
     
     # Set algo-state and input-output files config
     import sys, datetime, os, errno
@@ -743,6 +744,7 @@ def algo_greedy_dead_reckoning(sites, inithorseposn, phi,    \
 
         order_collection.append((imin, new_horse_posn, clock_time)) 
 
+
     # For the purposes of the animation we need to record where *each* fly 
     # is when some fly is collected. This step needs to be done outside 
     # the main loop above because before that loop I don't know where 
@@ -772,7 +774,7 @@ def algo_greedy_dead_reckoning(sites, inithorseposn, phi,    \
                      phi                = phi, 
                      horse_trajectories = [horse_traj],
                      fly_trajectories   = fly_trajs,
-                     animation_file_name_prefix = dir_name+'/',
+                     animation_file_name_prefix = 'gdr_'+str(phi),
                      algo_name = 'gdr', 
                      render_trajectory_trails_p = True)
 
@@ -1034,11 +1036,12 @@ def algo_greedy_concentric_kinetic_tsp(sites, inithorseposn, phi, \
 
 #------------------------------------------------------------------------------------------------------------------------------   
 def algo_greedy_nn_concentric_routing(sites, inithorseposn, phi, \
-                                      shortcut_squiggles_p        = False,\
+                                      shortcut_squiggles_p        = True,\
                                       write_algo_states_to_disk_p = False,\
                                       write_io_p                  = False,\
-                                      animate_tour_p              = True,\
-                                      plot_tour_p                 = True) :
+                                      animate_tour_p              = False,\
+                                      plot_tour_p                 = True,\
+                                      post_optimizer_exact_p      = False) :
 
     if write_io_p:
         algo_name     = 'algo-greedy_nn_concentric_routing'
@@ -1059,6 +1062,8 @@ def algo_greedy_nn_concentric_routing(sites, inithorseposn, phi, \
     fly_trajs           = [ [np.array(sites[i])] for i in range(numsites)] 
     flies_collected_p   = [False for i in range(numsites)]
 
+    order_flies_idx    = []
+
     # There are exactly $n$ iterations in this loop where exactly 
     # one fly is picked up by the horse in each iteration. 
     while not(all(flies_collected_p)):
@@ -1075,6 +1080,8 @@ def algo_greedy_nn_concentric_routing(sites, inithorseposn, phi, \
             if dmin_test < dmin:
                 imin = idx
                 dmin =  dmin_test
+
+        order_flies_idx.append(imin)
 
         # the meeting point of the horse and the fly closest to the horse
         horse_nearest_fly_distance     = np.linalg.norm(current_horse_posn-fly_trajs[imin][-1])
@@ -1148,13 +1155,28 @@ def algo_greedy_nn_concentric_routing(sites, inithorseposn, phi, \
 
        fly_trajs = new_fly_trajs
 
+
+    # The Convex Optimization procedure to extract an exact tour 
+    # for the given ordering. For now, at least the animation is
+    # giving me buggy results. To be done for later. 
+    if post_optimizer_exact_p :
+        horse_traj, fly_trajs = post_optimizer_exact(sites, inithorseposn, phi, order_flies_idx)
+
+
+
+    #utils_algo.print_list(horse_traj)    
+
+    #print "   "
+    #utils_algo.print_list(fly_trajs)
+
+
     # Animate compute tour if \verb|animate_tour_p == True|
     if animate_tour_p:
         animate_tour(sites = sites, 
                      phi                = phi, 
                      horse_trajectories = [horse_traj],
                      fly_trajectories   = fly_trajs,
-                     animation_file_name_prefix = None,
+                     animation_file_name_prefix = 'gncr_'+str(phi),
                      render_trajectory_trails_p = True,
                      algo_name = 'gncr')
  
@@ -1703,12 +1725,11 @@ def animate_tour (sites, phi, horse_trajectories, fly_trajectories,
     from colorama import Back 
    
     debug(Fore.BLACK + Back.WHITE + "\nStarted constructing ani object"+ Style.RESET_ALL)
-    ani = animation.ArtistAnimation(fig, ims, interval=70, blit=True, repeat=True, repeat_delay=500)
+    ani = animation.ArtistAnimation(fig, ims, interval=100, blit=True, repeat=True, repeat_delay=500)
     debug(Fore.BLACK + Back.WHITE + "\nFinished constructing ani object"+ Style.RESET_ALL)
 
     debug(Fore.MAGENTA + "\nStarted writing animation to disk"+ Style.RESET_ALL)
-    #ani.save(animation_file_name_prefix+'.avi', dpi=100)
-    #ani.save('reverse_horsefly.avi', dpi=300)
+    #ani.save(animation_file_name_prefix+'.avi', dpi=300)
     debug(Fore.MAGENTA + "\nFinished writing animation to disk"+ Style.RESET_ALL)
 
     plt.show()
@@ -1742,3 +1763,50 @@ def makespan(horse_trajectories):
     makespan  = max(times_to_completion)
     index_max = max(xrange(len(times_to_completion)), key=times_to_completion.__getitem__)
     return makespan, index_max
+
+
+
+def post_optimizer_exact(sites, inithorseposn, phi, order_flies_idx):
+    import cvxpy as cp
+
+    inithorseposn = np.asarray(inithorseposn)
+    r             = len(sites) 
+
+    sites_reordered = []
+    for idx in order_flies_idx:
+        sites_reordered.append( sites[idx] ,  )
+
+    # Variables for rendezvous points of truck with drones
+    X, t = [], []
+    for i in range(r):
+       X.append(cp.Variable(2)) # vector variable
+       t.append(cp.Variable( )) # scalar variable
+
+    constraints_I = [] 
+    for i in range(r):
+        constraints_I.append( 0.0 <= t[i] )
+        constraints_I.append( t[i] >= cp.norm( np.asarray(sites[i] - X[i]) / phi ))
+
+    constraints_L = []
+    for i in range(r-1):
+         constraints_L.append( t[i] + cp.norm(X[i+1] - X[i])/1.0 <= t[i+1] )
+
+    objective = cp.Minimize(  t[r-1]  )
+
+    prob = cp.Problem(objective, constraints_I + constraints_L)
+
+    print Fore.CYAN
+    prob.solve(solver=cp.SCS,verbose=True)
+    print Style.RESET_ALL
+    
+    #horse_traj = [inithorseposn] + [ np.asarray(X[i].value) for i in range(r) ]
+
+ 
+    horse_traj = [ {'fly_idxs_picked_up': []  , 'coords': inithorseposn, 'waiting_time':0.0} ]\
+               + [ {'fly_idxs_picked_up': [i],
+                    'coords'            : np.asarray(X[i].value), 
+                    'waiting_time'      : 0.0} for i in range(r) ]
+    
+    fly_trajs = [   ] ##### Waring this shoould not be empty!
+
+    return horse_traj, fly_trajs

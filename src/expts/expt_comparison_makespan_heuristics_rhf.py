@@ -15,8 +15,8 @@ import matplotlib as mpl
 # compare makespans for greedy_nn_concentric_routing 
 # (gncr) vs greedy_kinetic_tsp (gkin) we do this first 
 # for many randomly generated point clouds of size 100
-num_reps          = 100
-num_pts_per_cloud = 100
+num_reps          = 10
+num_pts_per_cloud = 30
 
 mspans_gncr = []
 mspans_gkin = []
@@ -75,5 +75,6 @@ plt.plot(range(num_reps), mspans_fh,  'ko-', label=r"fh")
 ax.set_title("Number of drones per run: " 
              + str(num_pts_per_cloud)+ "\n" + r"$\varphi$: " + str(phi) , fontsize=25)
 
-ax.legend(prop={'size': 20})
+
+ax.legend(loc='upper right', fancybox=True, shadow=True, prop={'size': 15})
 plt.show()

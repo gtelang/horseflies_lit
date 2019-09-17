@@ -10,6 +10,7 @@ import sys
 sys.path.append('src/lib')
 import problem_classic_horsefly as chf
 import problem_one_horse_multiple_flies as ohmf
+import problem_reverse_horsefly as rhf
 
 
 if __name__=="__main__":
@@ -23,6 +24,9 @@ if __name__=="__main__":
 
      elif sys.argv[1] == "--problem-one-horse-multiple-flies":
           ohmf.run_handler()
+          
+     elif sys.argv[1] == "--problem-reverse-horsefly":
+          rhf.run_handler()
 
      else:
           print "Option not recognized"

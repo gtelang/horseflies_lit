@@ -1005,7 +1005,6 @@ def algo_greedy_incremental_insertion(sites, inithorseposn, phi,
                                                           horse_waiting_times, \
                                                           inithorseposn)}
       
-   
 def algo_kmeans(sites, inithorseposn, phi, k, post_optimizer):
      """
      type Point   (Double, Double)
@@ -1673,5 +1672,3 @@ def animateSchedule(schedule_file_name):
      #debug(Fore.MAGENTA + "\nFinished writing animation to disk"+ Style.RESET_ALL)
 
      #plt.show() # For displaying the animation in a live window. 
-     
-
