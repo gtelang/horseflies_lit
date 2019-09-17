@@ -393,7 +393,7 @@ def algo_greedy(sites, inithorseposn, phi,
            animateSchedule(dir_name + '/' + io_file_name)
       
       return answer
-def algo_exact_given_specific_ordering (sites, horseflyinit, phi):
+def algo_exact_given_specific_ordering_old (sites, horseflyinit, phi):
 
     # Useful functions for \verb|algo_exact_given_specific_ordering|
     
@@ -480,6 +480,92 @@ def algo_exact_given_specific_ordering (sites, horseflyinit, phi):
                                                     horse_waiting_times, 
                                                     horseflyinit)}
  
+
+
+
+def algo_exact_given_specific_ordering(sites, horseflyinit, phi):
+    """ This new routine uses the CVXPY modelling language to solve the 
+    resulting convex program with efficient convex programming solvers. 
+    The SLSQP generic non-linear routine is too slow for a large number 
+    of sites. 
+    """
+    import cvxpy as cp
+    
+    print Fore.CYAN
+    print sites
+    print Style.RESET_ALL
+
+
+    numsites = len(sites)
+    sites    = [np.asarray(site) for site in sites]
+    horseflyinit = np.asarray(horseflyinit)
+
+    # Variables for rendezvous points of robot with package
+    X = [cp.Variable(2)]
+    t = [cp.Variable()] # associated with the initial site 
+
+    for i in range(numsites):
+       X.append(cp.Variable(2)) # vector variable
+       t.append(cp.Variable( )) # scalar variable
+
+    print Fore.GREEN, "Len X: ", len(X), Style.RESET_ALL
+    print Fore.GREEN, "Len t: ", len(t), Style.RESET_ALL
+    print Fore.GREEN, "Len sites: ", len(sites), Style.RESET_ALL
+    print "Set Variables"
+
+    # Constraints 
+    constraints_start = [ X[0] == horseflyinit, t[0] == 0.0 ]
+    #---------------------------------------------------------
+    constraints_pos = [ ] 
+    for i in range(numsites):
+        constraints_pos.append( 0.0 <= t[i] )
+    print Fore.RED, "Set pos constraints!!", Style.RESET_ALL
+    #---------------------------------------------------------
+    constraints_truck = []
+    for i in range(numsites):
+        constraints_truck.append( t[i] + cp.norm(X[i+1]-X[i]) <= t[i+1]  )
+    print Fore.GREEN, "Set tr constraints!!", Style.RESET_ALL
+    #---------------------------------------------------------
+    constraints_drone = []
+    for i in range(numsites):
+        f = cp.norm(sites[i]-X[i]  )
+        b = cp.norm(sites[i]-X[i+1])
+        constraints_drone.append( t[i]+(f+b)/phi <= t[i+1] ) 
+    print Fore.GREEN, "Set dr constraints", Style.RESET_ALL
+    #---------------------------------------------------------
+
+    objective = cp.Minimize(  t[numsites]  )
+    prob      = cp.Problem(objective, constraints_start +\
+                                      constraints_pos   +\
+                                      constraints_drone +\
+                                      constraints_truck)
+    prob.solve(solver=cp.SCS,verbose=True) 
+    #----------------------------------------------------------
+
+    truck_trail           = [ np.asarray(X[i].value) for i in range(numsites+1) ]
+    horse_waiting_times   = np.asarray([0.0 for i in range(numsites+1)]) ### TODO!!! Calculate this!!! exactly. 
+
+    return {'tour_points'                : truck_trail[1:],      # the first site, is the inithorseposn and it is dropped
+            'horse_waiting_times'        : horse_waiting_times,  # the slack in the constraints at the rendezvous points of the truck and drone
+            'site_ordering'              : sites,
+            'tour_length_with_waiting_time_included': \
+                                       tour_length_with_waiting_time_included(\
+                                                    truck_trail, \
+                                                    horse_waiting_times, 
+                                                    horseflyinit)}
+ 
+
+   
+
+
+
+
+
+
+
+
+
+
 def  algo_approximate_L1_given_specific_ordering(sites, horseflyinit, phi):
     import mosek
     numsites = len(sites)
@@ -1526,11 +1612,12 @@ def plotTour(horseflytour, horseflyinit, phi, algo_str, tour_color='#d13131'):
     
     # Plot everything
      
+    # if you want to show the order. 
     #kwargs = {'size':'large'}
-    for x,y,i in zip(xsites, ysites, range(len(xsites))):
-        ax.text(x, y, str(i+1), fontsize=14, bbox=dict(facecolor='#ddcba0', alpha=1.0)) 
+    #for x,y,i in zip(xsites, ysites, range(len(xsites))):
+    #    ax.text(x, y, str(i+1), fontsize=14, bbox=dict(facecolor='#ddcba0', alpha=1.0)) 
 
-    ax.plot(np.asarray(xfs),np.asarray(yfs),'g-')
+    ax.plot(np.asarray(xfs),np.asarray(yfs),'o-', color='#529A61', markerfacecolor='k')
     ax.plot(np.asarray(xhs),np.asarray(yhs), color=tour_color, marker='s', linewidth=3.0) 
 
     ax.add_patch( mpl.patches.Circle( horseflyinit, radius = 1/60.0,
