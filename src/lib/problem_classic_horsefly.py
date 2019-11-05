@@ -289,7 +289,6 @@ def tour_length_with_waiting_time_included(tour_points, horse_waiting_times, hor
       return sum
 
 # Algorithms for classic horsefly
-   
 def algo_dumb(sites, horseflyinit, phi):
       
     tour_length_fn = tour_length(horseflyinit)
@@ -299,7 +298,7 @@ def algo_dumb(sites, horseflyinit, phi):
     for sites_perm in list(itertools.permutations(sites)):
 
         print "Testing a new permutation ", i, " of the sites"; i = i + 1
-        tour_for_current_perm = algo_exact_given_specific_ordering (sites_perm, horseflyinit, phi) 
+        tour_for_current_perm = algo_exact_given_specific_ordering_old(sites_perm, horseflyinit, phi) 
 
         if tour_length_fn(utils_algo.flatten_list_of_lists(tour_for_current_perm ['tour_points']) ) \
          < tour_length_fn(utils_algo.flatten_list_of_lists(            best_tour ['tour_points']) ):
@@ -310,6 +309,10 @@ def algo_dumb(sites, horseflyinit, phi):
     #print Fore.RED + "\nHorse Waiting times are ", best_tour['horse_waiting_times'] , Style.RESET_ALL
     return best_tour
    
+
+
+
+
 def algo_greedy(sites, inithorseposn, phi, 
                 write_algo_states_to_disk_p = False   ,
                 animate_schedule_p          = False   , 
@@ -539,7 +542,7 @@ def algo_exact_given_specific_ordering(sites, horseflyinit, phi):
                                       constraints_pos   +\
                                       constraints_drone +\
                                       constraints_truck)
-    prob.solve(solver=cp.SCS,verbose=True) 
+    prob.solve(solver=cp.CVXOPT,verbose=True) 
     #----------------------------------------------------------
 
     truck_trail           = [ np.asarray(X[i].value) for i in range(numsites+1) ]
