@@ -1,4 +1,3 @@
-    
 # Relevant imports
 from colorama import Fore, Style
 from matplotlib import rc
@@ -64,6 +63,7 @@ def run_handler():
                     algo_str = raw_input(Fore.YELLOW                                             +\
                             "Enter algorithm to be used to compute the tour:\n Options are:\n"   +\
                             " (ec)   Earliest Capture \n"                                        +\
+                            " (sp)   Split Partition  \n"                                        +\
                             Style.RESET_ALL)
 
                     algo_str = algo_str.lstrip()
@@ -72,8 +72,11 @@ def run_handler():
                     utils_graphics.clearAxPolygonPatches(ax)
 
                     if   algo_str == 'ec':
-                          tour = run.getTour( algo_greedy_earliest_capture, phi, \
-                                              number_of_flies = nof)
+                          tour = run.getTour(algo_greedy_earliest_capture, phi, \
+                                             number_of_flies = nof)
+                    elif algo_str == 'sp':
+                          tour = run.getTour(algo_split_partition, phi, \
+                                             number_of_flies = nof)   
                     else:
                           print "Unknown option. No horsefly for you! ;-D "
                           sys.exit()
@@ -265,8 +268,226 @@ class FlyState:
        uhorseheading = horseheading/np.linalg.norm(horseheading)
        return rt, horseposn + uhorseheading * rt
 
+
+#--------------------------------------------------------------------------------
+#  ___      _ _ _     ___          _   _ _   _          
+# / __|_ __| (_) |_  | _ \__ _ _ _| |_(_) |_(_)___ _ _  
+# \__ \ '_ \ | |  _| |  _/ _` | '_|  _| |  _| / _ \ ' \ 
+# |___/ .__/_|_|\__| |_| \__,_|_|  \__|_|\__|_\___/_||_|
+#     |_|  
+#--------------------------------------------------------------------------------
+def algo_split_partition(sites, inithorseposn, phi, number_of_flies,\
+                         write_algo_states_to_disk_p = False,       \
+                         write_io_p                  = False,       \
+                         animate_tour_p              = False) :
+
+    def get_line_between_two_points(pt0, pt1):
+        """ Line is represented as y = m*x+c """
+        coefficients = np.polyfit( [pt0[0], pt1[0]] ,  [pt0[1], pt1[1]] , 1)
+        m, c         =  coefficients
+        return m, c
+    
+    def same_side_on_line_as_point(line, refpt, querypt):
+        """If a point is in one of the open half-planes and the other is 
+           on the line, they are counted to be on the same side of the line """
+        m, c = line
+        [x0,y0], [x1,y1] = refpt, querypt
+
+        if (y0-m*x0-c)*(y1-m*x1-c) >= 0:
+            return True
+        else: # the points lie in the opposite open 
+              # half-planes determined by the line
+            return False
+
+    def split_points_with_line( leafpts, spinept, line ):
+        """ For a given bunch of points (the leafpts) and a reference point
+            split the leafpoints into two sets. The first set returned consists 
+            of points lies on the same side as that of the spinept. """
+        
+        spinept    = np.asarray(spinept)
+        leafpts    = map(np.asarray, leafpts)
+        ptsA, ptsB = [ ] , [ ] 
+        for pt in leafpts:
+            if same_side_on_line_as_point(line, spinept, pt):
+                ptsA.append(pt)
+            else:
+                ptsB.append(pt)
+        return ptsA, ptsB
+
+    def get_center(points, branchpt, branchpt_weight):
+        """ Get center of mass or fermat-weber center """
+
+        assert(branchpt_weight > 0.0)
+        points             = map(np.asarray, points)
+        branchpt           = np.asarray(branchpt)
+        numcopies_branchpt = int(branchpt_weight)
+        newpoints          = points + [branchpt for _ in range(numcopies_branchpt)]  
+        xc, yc             = 0.0, 0.0
+
+        for i  in range(len(newpoints)):
+            xc += newpoints[i][0]
+            yc += newpoints[i][1]
+
+        xc = xc/len(newpoints)
+        yc = yc/len(newpoints)
+        return np.asarray([xc,yc])
+ 
+    def draw_graph(G,itercounter):
+        """ Draw the state of the split partition graph """
+        fig, ax =  plt.subplots()
+        ax.set_xlim([utils_graphics.xlim[0], utils_graphics.xlim[1]])
+        ax.set_ylim([utils_graphics.ylim[0], utils_graphics.ylim[1]])
+        ax.set_aspect(1.0); ax.set_xticks([]); ax.set_yticks([])
+        ax.set_title('Progress of the split partition algorithm: Step ' + str(itercounter))
+        outdir   = 'scratch2'
+        filename = outdir+'/plot_'+ str(itercounter).zfill(5) +'.png'
+        #----------------    
+        # Draw edges
+        #----------------    
+        edges_G = G.edges()
+        segs    = []
+        for u,v in edges_G:
+            px,py = G.nodes[u]['position']
+            qx,qy = G.nodes[v]['position']
+
+            if G.nodes[u]['type'] == 'leaf' or G.nodes[v]['type'] == 'leaf':
+                plt.plot([px,qx],[py,qy],"b-", zorder=1)
+            else :
+                plt.plot([px,qx],[py,qy],"r-", zorder=1)
+            #----------------    
+            # Render node u
+            #----------------    
+            if G.nodes[u]['type'] == 'spine':
+                ax.add_patch(mpl.patches.Circle((px,py), radius=1.0/100, 
+                                          facecolor='red', edgecolor='black',zorder=2))
+            else :
+                ax.add_patch(mpl.patches.Circle((px,py), radius=1.0/120, 
+                                          facecolor='blue', edgecolor='black',zorder=2))
+            #----------------    
+            # Render node v
+            #----------------    
+            if G.nodes[v]['type'] == 'spine':
+                ax.add_patch(mpl.patches.Circle((qx,qy), radius=1.0/100, 
+                                          facecolor='red', edgecolor='black',zorder=2))
+            else :
+                ax.add_patch(mpl.patches.Circle((qx,qy), radius=1.0/120, 
+                                          facecolor='blue', edgecolor='black',zorder=2))
+
+        plt.savefig(filename,dpi=200,bbox_inches='tight')
+        plt.show()
+
+
+    # Set algo-state and input-output files config
+    import sys, datetime, os, errno
+    import networkx as nx
+    import itertools
+    algo_name    = 'algo-split-partition'
+    time_stamp   = datetime.datetime.now().strftime('Day-%Y-%m-%d_ClockTime-%H:%M:%S')
+    iter_counter = 1 
+
+    if write_algo_states_to_disk_p or write_io_p:
+        dir_name     = algo_name + '---' + time_stamp
+        io_file_name = 'input_and_output.yml'
+        try:
+            os.makedirs(dir_name)
+        except OSError as e:
+            if e.errno != errno.EEXIST:
+                raise
+
+    # Using more flies than the number of sites, does not result 
+    # in any speedup. So cut down the number of flies to just the
+    # number of sites
+    numsites = len(sites)
+    if number_of_flies > numsites: 
+          number_of_flies = numsites
+
+    inithorseposn = np.asarray(inithorseposn)
+    sites         = map(np.asarray, sites)
+    G             = nx.Graph()
+    node_attrs    = {}
+
+    for site, idx in zip(sites, range(numsites)):
+        node_attrs[idx] = {'type': 'leaf', 'position': site}  
+        G.add_edge(numsites, idx, weight = np.linalg.norm(site-inithorseposn))
+
+    node_attrs[numsites] = {'type':'spine', 'position': inithorseposn}    
+    nx.set_node_attributes(G, node_attrs)
+    high_degree_nodes = [n for n,v in G.nodes(data=True) 
+                         if v['type'] == 'spine' and G.degree(n) > number_of_flies ]
+
+    # Exactly one high-degree node is processed in each round of the while loop
+    # More high-degree nodes maybe added during the while loop.
+    while high_degree_nodes :
+
+        print Fore.GREEN, "Split Partition Tree" , Style.RESET_ALL
+        utils_algo.print_list(G.nodes(data=True))
+        utils_algo.print_list(G.edges(data=True))
+        print Fore.RED, " High Degree Nodes:  ", high_degree_nodes, Style.RESET_ALL
+        print "ITERATION NUMBER: ", iter_counter, "\n------------------------------------\n"
+        draw_graph(G, iter_counter)
+
+        #================================ ALGORITHM CODE==================================
+        spinept       = G.nodes[high_degree_nodes[0]]['position']
+        leafpts       = G[high_degree_nodes[0]]
+        leafpts_coods = []
+        for nidx in leafpts:
+            leafpts_coods.append(G.nodes[nidx]['position'])
+    
+        for ptpair in itertools.combinations(leafpts_coods, 2):
+            (p,q)        = ptpair
+            [m,c]        = get_line_between_two_points(p,q)
+            [ptsA, ptsB] = split_points_with_line( leafpts_coods, spinept, line=(m,c) )
+
+
+        # modify graph G here    
+        
+
+        #================================ ALGORITHM CODE==================================
+        if write_algo_states_to_disk_p:
+            print "Iterarion Number: ", iter_counter
+            iter_state_file_name = 'iter_state_' + str(iter_counter).zfill(5) + '.yml'
+            data = None
+            utils_algo.write_to_yaml_file(data, dir_name=dir_name, file_name=algo_iter_state_file_name)
+        iter_counter += 1
+        time.sleep(40)
+
+    # Write input and output to file if \verb|write_io_p == True|
+    if write_io_p:
+         data = { 'sites'            : sites,        \
+                  'inithorseposn'    : inithorseposn,\
+                  'phi'              : phi,          \
+                  'horse_trajectory' : horse_traj,   \
+                  'fly_trajectories' : [flystates[i].get_trajectory() 
+                                       for i in range(number_of_flies)] }
+         utils_algo.write_to_yaml_file(data, dir_name = dir_name, file_name = io_file_name)
+    # Animate compute tour if \verb|animate_tour_p == True|
+    if animate_tour_p:
+        animate_tour(sites            = sites, 
+                     inithorseposn    = inithorseposn, 
+                     phi              = phi, 
+                     horse_trajectory = horse_traj, 
+                     fly_trajectories = [flystates[i].get_trajectory() for i in range(number_of_flies)],
+                     animation_file_name_prefix = dir_name + '/' + io_file_name)
+    # Return multiple flies tour
+    return {'sites' : sites, \
+            'inithorseposn' : inithorseposn,\
+            'phi':phi,\
+            'horse_trajectory': horse_traj, \
+            'fly_trajectories': [flystates[i].get_trajectory() for i in range(number_of_flies)]}
     
 
+
+
+
+
+
+
+
+
+
+  
+
+#--------------------------------------------------------------------------------
 def algo_greedy_earliest_capture(sites, inithorseposn, phi, number_of_flies,\
                                  write_algo_states_to_disk_p = True,\
                                  write_io_p                  = True,\
@@ -666,9 +887,9 @@ def animate_tour (sites, inithorseposn, phi, horse_trajectory, fly_trajectories,
     ani = animation.ArtistAnimation(fig, ims, interval=50, blit=True, repeat_delay=1000)
     debug(Fore.BLACK + Back.WHITE + "\nFinished constructing ani object"+ Style.RESET_ALL)
 
-    debug(Fore.MAGENTA + "\nStarted writing animation to disk"+ Style.RESET_ALL)
-    ani.save(animation_file_name_prefix+'.avi', dpi=150)
-    debug(Fore.MAGENTA + "\nFinished writing animation to disk"+ Style.RESET_ALL)
+    #debug(Fore.MAGENTA + "\nStarted writing animation to disk"+ Style.RESET_ALL)
+    #ani.save(animation_file_name_prefix+'.avi', dpi=150)
+    #debug(Fore.MAGENTA + "\nFinished writing animation to disk"+ Style.RESET_ALL)
 
     plt.show() # For displaying the animation in a live window. 
     
