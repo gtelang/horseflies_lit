@@ -277,7 +277,7 @@ class FlyState:
 #     |_|  
 #--------------------------------------------------------------------------------
 def algo_split_partition(sites, inithorseposn, phi, number_of_flies,\
-                         write_algo_states_to_disk_p = False,       \
+                         write_algo_states_to_disk_p = True,       \
                          write_io_p                  = False,       \
                          animate_tour_p              = False) :
 
@@ -331,23 +331,22 @@ def algo_split_partition(sites, inithorseposn, phi, number_of_flies,\
         return np.asarray([xc,yc])
  
     def leaf_degree(G, nidx):
-        nbrs       = G[nidx]
-        leafdegree = 0
+        nbrs    = G[nidx]
+        leafdeg = 0
         for i in nbrs:
             if G.nodes[i]['type']  == 'leaf':
-               leafdegree += 1
-        return leaf_degree
+               leafdeg += 1
+        return leafdeg
 
-
-
-    def draw_graph(G,itercounter):
+    def draw_graph(G,itercounter, outdir):
         """ Draw the state of the split partition graph """
         fig, ax =  plt.subplots()
         ax.set_xlim([utils_graphics.xlim[0], utils_graphics.xlim[1]])
         ax.set_ylim([utils_graphics.ylim[0], utils_graphics.ylim[1]])
         ax.set_aspect(1.0); ax.set_xticks([]); ax.set_yticks([])
-        ax.set_title('Progress of the split partition algorithm: Step ' + str(itercounter))
-        outdir   = 'scratch2'
+        ax.set_title('Progress of the split partition algorithm: Step '    + str(itercounter) +\
+                     '\n  Speed: '+ str(phi) + ' Number of Drones ' + str(number_of_flies ), 
+                     fontname='Times New Roman')
         filename = outdir+'/plot_'+ str(itercounter).zfill(5) +'.png'
         #----------------    
         # Draw edges
@@ -367,21 +366,21 @@ def algo_split_partition(sites, inithorseposn, phi, number_of_flies,\
             #----------------    
             if G.nodes[u]['type'] == 'spine':
                 ax.add_patch(mpl.patches.Circle((px,py), radius=1.0/100, facecolor='red', edgecolor='black',zorder=2))
-                ax.text(px, py, str(u), horizontalalignment='center', verticalalignment='center', bbox=dict(facecolor='#ffe564', edgecolor = '#ffe564', alpha=1.0), zorder=3) 
+                ax.text(px, py, str(u), horizontalalignment='center', verticalalignment='center', bbox=dict(facecolor='#ff5733', edgecolor = '#ff5733', alpha=1.0), zorder=3) 
             else :
                 ax.add_patch(mpl.patches.Circle((px,py), radius=1.0/120, facecolor='blue', edgecolor='black',zorder=2))
-                ax.text(px, py, str(u), horizontalalignment='center', verticalalignment='center' , bbox=dict(facecolor='#ffe564',  edgecolor = '#ffe564', alpha=1.0), zorder=3) 
+                ax.text(px, py, str(u), horizontalalignment='center', verticalalignment='center' , bbox=dict(facecolor='#3355ff',  edgecolor = '#3355ff', alpha=1.0), zorder=3) 
             #----------------    
             # Render node v
             #----------------    
             if G.nodes[v]['type'] == 'spine':
                 ax.add_patch(mpl.patches.Circle((qx,qy), radius=1.0/100, facecolor='red', edgecolor='black',zorder=2))
-                ax.text(qx, qy, str(v), horizontalalignment='center', verticalalignment='center', bbox=dict(facecolor='#ffe564',  edgecolor = '#ffe564',alpha=1.0), zorder=3)
+                ax.text(qx, qy, str(v), horizontalalignment='center', verticalalignment='center', bbox=dict(facecolor='#ff5733',  edgecolor = '#ff5733',alpha=1.0), zorder=3)
             else :
                 ax.add_patch(mpl.patches.Circle((qx,qy), radius=1.0/120, facecolor='blue', edgecolor='black',zorder=2))
-                ax.text(qx, qy, str(v), horizontalalignment='center', verticalalignment='center' , bbox=dict(facecolor='#ffe564', edgecolor = '#ffe564', alpha=1.0), zorder=3) 
+                ax.text(qx, qy, str(v), horizontalalignment='center', verticalalignment='center' , bbox=dict(facecolor='#3355ff', edgecolor = '#3355ff', alpha=1.0), zorder=3) 
 
-        plt.savefig(filename,dpi=200,bbox_inches='tight')
+        plt.savefig(filename,dpi=400,bbox_inches='tight')
         plt.close('all')
 
     # Set algo-state and input-output files config
@@ -420,38 +419,46 @@ def algo_split_partition(sites, inithorseposn, phi, number_of_flies,\
     node_attrs[numsites] = {'type':'spine', 'position': inithorseposn}    
     nx.set_node_attributes(G, node_attrs)
     high_degree_nodes = [n for n,v in G.nodes(data=True) 
-                         if v['type'] == 'spine' and G.degree(n) > number_of_flies ]
+                         if v['type'] == 'spine' and leaf_degree(G,n) > number_of_flies ]
+
+    assert len(high_degree_nodes) == 1, "At this point there should be exactly one high degree node, the initial position of the truck"
 
     # Exactly one high-degree node is processed in each round of the while loop
     # More high-degree nodes maybe added during the while loop.
     while high_degree_nodes :
 
-        print "\n------------------------------------\n",  "ITERATION NUMBER: ", iter_counter, "\n------------------------------------\n"
+        print "\n------------------------------------\n",  \
+              "ITERATION NUMBER: ", iter_counter, \
+              "\n------------------------------------\n"
         print Fore.GREEN, "Split Partition Tree" , Style.RESET_ALL
         utils_algo.print_list(G.nodes(data=True))
         utils_algo.print_list(G.edges(data=True))
-        print Fore.RED, " High Degree Nodes:  ", high_degree_nodes, Style.RESET_ALL
-        draw_graph(G, iter_counter)
+        print Fore.RED, " High Degree Nodes              :  ", high_degree_nodes, Style.RESET_ALL
+        print Fore.RED, " High Degree Nodes  leaf degrees:  ", [leaf_degree(G,n) for n in high_degree_nodes], Style.RESET_ALL
 
-        spinept_idx  = high_degree_nodes[-1]
+        if write_algo_states_to_disk_p:
+            draw_graph(G, iter_counter, dir_name )
+
+        spinept_idx  = high_degree_nodes[-1] 
         spinept      = G.nodes[spinept_idx]['position']
-        leafpts      = G[spinept_idx]  ; print leafpts ; time.sleep(30)
+        leafpts      = G[spinept_idx]  
         leafpts_info = []
         ctr          = 0
         for nidx in leafpts:
-            leafpts_info.append( (ctr, nidx, G.nodes[nidx]['position']) )
-            ctr += 1
+            if G.nodes[nidx]['type'] == 'leaf':
+                leafpts_info.append( (ctr, nidx, G.nodes[nidx]['position']) )
+                ctr += 1
 
         leafpts_coods      = [p for _, _, p in leafpts_info ]
         idxA_opt, idxB_opt = [], [] 
         wt_opt             = np.inf
 
         for ptpair in itertools.combinations(leafpts_info, 2):
-            (pridx, pgidx, p) = ptpair[0]
-            (pridx, qgidx, q) = ptpair[1]
-            [m,c]             = get_line_between_two_points(p,q)
-            [idxA, idxB]      = split_points_with_line( leafpts_info, spinept, line=(m,c) )
-            center            = get_center([leafpts_coods[r] for (r,_) in idxB] , spinept, phi)
+            (_, _, p) = ptpair[0]
+            (_, _, q) = ptpair[1]
+            [m,c]         = get_line_between_two_points(p,q)
+            [idxA, idxB]  = split_points_with_line( leafpts_info, spinept, line=(m,c) )
+            center        = get_center([leafpts_coods[r] for (r,_) in idxB] , spinept, phi)
 
             wt = 2.0 * sum ( [ np.linalg.norm(spinept-leafpts_coods[r]) for (r,_) in idxA  ] ) +\
                  phi * np.linalg.norm(spinept-center)                                          +\
@@ -462,11 +469,17 @@ def algo_split_partition(sites, inithorseposn, phi, number_of_flies,\
             #--------------------------
             if wt < wt_opt:
                 print Fore.GREEN, " Better Line Partition Found! ", Style.RESET_ALL
-                #print Fore.GREEN, " idxA = ", idxA, Style.RESET_ALL
-                #print Fore.GREEN, " idxB = ", idxB, Style.RESET_ALL
+                print Fore.GREEN, " idxA = ", idxA, Style.RESET_ALL
+                print Fore.GREEN, " idxB = ", idxB, Style.RESET_ALL
                 wt_opt             = wt
                 idxA_opt, idxB_opt = idxA, idxB
                 center_opt         = center
+
+        if (not idxB_opt):
+            print "\n idxB_opt detected as empty. This should not happen"
+            print Fore.RED, "idxA_opt: ", idxA_opt 
+            print Fore.RED, "idxB_opt: ", idxB_opt 
+            sys.exit()
 
         #-------------------------------------------
         # Modify graph G after performing the split
@@ -475,35 +488,47 @@ def algo_split_partition(sites, inithorseposn, phi, number_of_flies,\
         for (_,g) in idxB_opt:
             G.remove_edge(spinept_idx,g)
 
-        # Add a node
         newnodeidx = G.number_of_nodes()
         G.add_node(newnodeidx,type = 'spine', position = center_opt)
-
-        # Add edges
         G.add_edge(newnodeidx, spinept_idx, weight=np.linalg.norm(spinept - center_opt))
+
+        if np.linalg.norm(spinept - center_opt) < 1e-6:
+            print "Ooops zero weight edge added"
+            print "spinept_idx: "              , spinept_idx,\
+                  "newnodeidx: "               , newnodeidx,\
+                  "edge weight between nodes: ", np.linalg.norm(spinept - center_opt) 
+            print "Residual degree after deleting edges to leaf nodes now assigned to new node: ", leaf_degree(G, spinept_idx)
+            print "idxA_opt: ", idxA_opt 
+            print "idxB_opt: ", idxB_opt 
+            sys.exit()
+
 
         for (r,g) in idxB_opt:
             edgewt = np.linalg.norm(center_opt-leafpts_coods[r])
             G.add_edge(g, newnodeidx, weight=edgewt)
 
+            if G.nodes[g]['type'] == 'spine':
+                print Fore.CYAN, "aha the bug!", Style.RESET_ALL
+                time.sleep(1)
+
         #------------------------------------
         # Modify the array highdegree nodes
         #------------------------------------
-        if G.degree(spinept_idx) <= number_of_flies:
+        if leaf_degree(G,spinept_idx) <= number_of_flies:
             high_degree_nodes.remove(spinept_idx)
             
-        if G.degree(newnodeidx) > number_of_flies:
+        if leaf_degree(G, newnodeidx) > number_of_flies:
             high_degree_nodes.append(newnodeidx)
 
-        #================================ ALGORITHM CODE==================================
+        #------------------------------------------
+        # Write state of current iteration to disk
+        #------------------------------------------
         if write_algo_states_to_disk_p:
-            print "Iterarion Number: ", iter_counter
             iter_state_file_name = 'iter_state_' + str(iter_counter).zfill(5) + '.yml'
-            data = None
-            utils_algo.write_to_yaml_file(data, dir_name=dir_name, file_name=algo_iter_state_file_name)
+            data                 = G
+            utils_algo.write_to_yaml_file(data, dir_name=dir_name, file_name=iter_state_file_name)
         iter_counter += 1
 
-    # Write input and output to file if \verb|write_io_p == True|
     if write_io_p:
          data = { 'sites'            : sites,        \
                   'inithorseposn'    : inithorseposn,\
@@ -512,7 +537,7 @@ def algo_split_partition(sites, inithorseposn, phi, number_of_flies,\
                   'fly_trajectories' : [flystates[i].get_trajectory() 
                                        for i in range(number_of_flies)] }
          utils_algo.write_to_yaml_file(data, dir_name = dir_name, file_name = io_file_name)
-    # Animate compute tour if \verb|animate_tour_p == True|
+
     if animate_tour_p:
         animate_tour(sites            = sites, 
                      inithorseposn    = inithorseposn, 
@@ -944,5 +969,3 @@ def animate_tour (sites, inithorseposn, phi, horse_trajectory, fly_trajectories,
     #debug(Fore.MAGENTA + "\nFinished writing animation to disk"+ Style.RESET_ALL)
 
     plt.show() # For displaying the animation in a live window. 
-    
-
