@@ -696,6 +696,63 @@ def algo_greedy_earliest_capture(sites, inithorseposn, phi, number_of_flies,\
     
 
 
+#-------------------------------------------------------------------------------------------------
+def algo_exact_given_specific_ordering(sites, horseflyinit, phi,
+                                       service_order):
+    """ When we know which sites are serviced by which drones and the 
+    corresponding order, we can use convex optimization as sketched out
+    in John Gunnar Carlsson's paper to find the route taken by the truck
+    Again we use CVXPY as the modelling language for developing the 
+    convex program. See section marked Stage 2 on Page 20 of 
+    https://pdfs.semanticscholar.org/23a4/3524fd5168acfd589e919c143f49a6eeeac3.pdf
+    
+    Here service_order is a dictionary, (corresponding to P in the convex 
+    optimization program in the paper cited above!) where the key is the index of 
+    the drone and the value is a list of the indices of the sites serviced by that 
+    drone. Thus a typical example where 3 drones are used is 
+    0 --> [0,3,5]
+    1 --> [1,6,4,2]
+    2 --> [9,7,8,10]
+
+    In any heuristic tht you use, make sure to record these service orders
+    for every drone, so that can generate a better tour for that order. We did 
+    the same thing for the case of a single drone. 
+    """
+    pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Plotting routines
 
 def plot_tour(ax, tour):
