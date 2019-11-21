@@ -315,7 +315,7 @@ def algo_split_partition(sites, inithorseposn, phi, number_of_flies,\
 
     def get_center(points, branchpt, branchpt_weight):
         """ Get center of mass or fermat-weber center """
-        assert(branchpt_weight > 0.0)
+        #assert(branchpt_weight > 0.0)
         points             = map(np.asarray, points)
         branchpt           = np.asarray(branchpt)
         numcopies_branchpt = int(branchpt_weight)
@@ -338,7 +338,7 @@ def algo_split_partition(sites, inithorseposn, phi, number_of_flies,\
                leafdeg += 1
         return leafdeg
 
-    def draw_graph(G,itercounter, outdir):
+    def draw_graph(G, inithorseposn, itercounter, outdir):
         """ Draw the state of the split partition graph """
         fig, ax =  plt.subplots()
         ax.set_xlim([utils_graphics.xlim[0], utils_graphics.xlim[1]])
@@ -351,6 +351,7 @@ def algo_split_partition(sites, inithorseposn, phi, number_of_flies,\
         #----------------    
         # Draw edges
         #----------------    
+        
         edges_G = G.edges()
         segs    = []
         for u,v in edges_G:
@@ -366,19 +367,22 @@ def algo_split_partition(sites, inithorseposn, phi, number_of_flies,\
             #----------------    
             if G.nodes[u]['type'] == 'spine':
                 ax.add_patch(mpl.patches.Circle((px,py), radius=1.0/100, facecolor='red', edgecolor='black',zorder=2))
-                ax.text(px, py, str(u), horizontalalignment='center', verticalalignment='center', bbox=dict(facecolor='#ff5733', edgecolor = '#ff5733', alpha=1.0), zorder=3) 
+                #ax.text(px, py, str(u), horizontalalignment='center', verticalalignment='center', bbox=dict(facecolor='#ff5733', edgecolor = '#ff5733', alpha=1.0), zorder=3) 
             else :
                 ax.add_patch(mpl.patches.Circle((px,py), radius=1.0/120, facecolor='blue', edgecolor='black',zorder=2))
-                ax.text(px, py, str(u), horizontalalignment='center', verticalalignment='center' , bbox=dict(facecolor='#3355ff',  edgecolor = '#3355ff', alpha=1.0), zorder=3) 
+                #ax.text(px, py, str(u), horizontalalignment='center', verticalalignment='center' , bbox=dict(facecolor='#3355ff',  edgecolor = '#3355ff', alpha=1.0), zorder=3) 
             #----------------    
             # Render node v
             #----------------    
             if G.nodes[v]['type'] == 'spine':
                 ax.add_patch(mpl.patches.Circle((qx,qy), radius=1.0/100, facecolor='red', edgecolor='black',zorder=2))
-                ax.text(qx, qy, str(v), horizontalalignment='center', verticalalignment='center', bbox=dict(facecolor='#ff5733',  edgecolor = '#ff5733',alpha=1.0), zorder=3)
+                #ax.text(qx, qy, str(v), horizontalalignment='center', verticalalignment='center', bbox=dict(facecolor='#ff5733',  edgecolor = '#ff5733',alpha=1.0), zorder=3)
             else :
                 ax.add_patch(mpl.patches.Circle((qx,qy), radius=1.0/120, facecolor='blue', edgecolor='black',zorder=2))
-                ax.text(qx, qy, str(v), horizontalalignment='center', verticalalignment='center' , bbox=dict(facecolor='#3355ff', edgecolor = '#3355ff', alpha=1.0), zorder=3) 
+                #ax.text(qx, qy, str(v), horizontalalignment='center', verticalalignment='center' , bbox=dict(facecolor='#3355ff', edgecolor = '#3355ff', alpha=1.0), zorder=3) 
+        
+        # Draw initial position of the horse
+        ax.add_patch(mpl.patches.Circle((inithorseposn[0],inithorseposn[1]), radius=1.0/90, facecolor='green', edgecolor='black',zorder=3))
 
         plt.savefig(filename,dpi=400,bbox_inches='tight')
         plt.close('all')
@@ -437,9 +441,9 @@ def algo_split_partition(sites, inithorseposn, phi, number_of_flies,\
         print Fore.RED, " High Degree Nodes  leaf degrees:  ", [leaf_degree(G,n) for n in high_degree_nodes], Style.RESET_ALL
 
         if write_algo_states_to_disk_p:
-            draw_graph(G, iter_counter, dir_name )
+            draw_graph(G, inithorseposn,  iter_counter, dir_name )
 
-        spinept_idx  = high_degree_nodes[-1] 
+        spinept_idx  = high_degree_nodes[0] 
         spinept      = G.nodes[spinept_idx]['position']
         leafpts      = G[spinept_idx]  
         leafpts_info = []
@@ -457,23 +461,33 @@ def algo_split_partition(sites, inithorseposn, phi, number_of_flies,\
             (_, _, p) = ptpair[0]
             (_, _, q) = ptpair[1]
             [m,c]         = get_line_between_two_points(p,q)
-            [idxA, idxB]  = split_points_with_line( leafpts_info, spinept, line=(m,c) )
-            center        = get_center([leafpts_coods[r] for (r,_) in idxB] , spinept, phi)
+            dtheta        = 0.01
+            alpha, beta   = (p+q)/2.0
+            
+            for th in [dtheta, -dtheta]:
+                # y = mstar * x + cstar is the line passint through (alpha, beta) 
+                # rotated about y=mx+c by small angle theta
+                mstar = (m+np.tan(th))/(1-m*np.tan(th))
+                cstar = beta - mstar * alpha
 
-            wt = 2.0 * sum ( [ np.linalg.norm(spinept-leafpts_coods[r]) for (r,_) in idxA  ] ) +\
-                 phi * np.linalg.norm(spinept-center)                                          +\
-                 2.0 * sum ( [ np.linalg.norm(center-leafpts_coods[r])  for (r,_) in idxB  ] )
+                [idxA, idxB]  = split_points_with_line( leafpts_info, spinept, line=(mstar,cstar) )
+                assert idxB, "The array idxB should not be empty"
+                center        = get_center( [leafpts_coods[r] for (r,_) in idxB] , spinept, phi )
 
-            #--------------------------
-            # Comparison code for opt
-            #--------------------------
-            if wt < wt_opt:
-                print Fore.GREEN, " Better Line Partition Found! ", Style.RESET_ALL
-                print Fore.GREEN, " idxA = ", idxA, Style.RESET_ALL
-                print Fore.GREEN, " idxB = ", idxB, Style.RESET_ALL
-                wt_opt             = wt
-                idxA_opt, idxB_opt = idxA, idxB
-                center_opt         = center
+                wt = 2.0 * sum ([ np.linalg.norm(spinept-leafpts_coods[r]) for (r,_) in idxA] ) +\
+                     phi * np.linalg.norm(spinept-center)                                        +\
+                     2.0 * sum ([ np.linalg.norm(center-leafpts_coods[r])  for (r,_) in idxB] )
+
+                #--------------------------
+                # Comparison code for opt
+                #--------------------------
+                if wt < wt_opt:
+                    print Fore.GREEN, " Better Line Partition Found! ", Style.RESET_ALL
+                    print Fore.GREEN, " idxA = ", idxA, Style.RESET_ALL
+                    print Fore.GREEN, " idxB = ", idxB, Style.RESET_ALL
+                    wt_opt             = wt
+                    idxA_opt, idxB_opt = idxA, idxB
+                    center_opt         = center
 
         if (not idxB_opt):
             print "\n idxB_opt detected as empty. This should not happen"
@@ -492,24 +506,9 @@ def algo_split_partition(sites, inithorseposn, phi, number_of_flies,\
         G.add_node(newnodeidx,type = 'spine', position = center_opt)
         G.add_edge(newnodeidx, spinept_idx, weight=np.linalg.norm(spinept - center_opt))
 
-        if np.linalg.norm(spinept - center_opt) < 1e-6:
-            print "Ooops zero weight edge added"
-            print "spinept_idx: "              , spinept_idx,\
-                  "newnodeidx: "               , newnodeidx,\
-                  "edge weight between nodes: ", np.linalg.norm(spinept - center_opt) 
-            print "Residual degree after deleting edges to leaf nodes now assigned to new node: ", leaf_degree(G, spinept_idx)
-            print "idxA_opt: ", idxA_opt 
-            print "idxB_opt: ", idxB_opt 
-            sys.exit()
-
-
         for (r,g) in idxB_opt:
             edgewt = np.linalg.norm(center_opt-leafpts_coods[r])
             G.add_edge(g, newnodeidx, weight=edgewt)
-
-            if G.nodes[g]['type'] == 'spine':
-                print Fore.CYAN, "aha the bug!", Style.RESET_ALL
-                time.sleep(1)
 
         #------------------------------------
         # Modify the array highdegree nodes

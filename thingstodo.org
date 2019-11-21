@@ -1,0 +1,30 @@
+Things to do , rotating list
+----------------------------
+
+- [ ] The degree bug in the split-partition heuristic
+- [ ] The SOCP for multiple drones
+- [ ] Doubling a given tree
+- [ ] Recursive TSP maxdisp base-module
+- [ ] Sujoy heurisitc, based on matching
+- [ ] Package Handoff, Voronoi diagram generator, based on sequence
+- [ ] Description of the 3-approx algorithm for single package handoff
+- [ ] Description of the 3-approx algorithm for a simple generalization of the Voronoi diagram, you've described
+- [ ] Proof of monotonicity of the optimal Package Handoff curve, write down in full
+- [ ] Split partition, how does it perform when generating the TSP order
+- [ ] The Convex Hull algorithm data-parallel version
+- [ ] Reverse Hosefly fix the program
+- [ ] Generate good data-sets, of various types according to 
+      various parameters, use Bentley style data-sets. 
+- [ ] Can we extract the lower-bound for TSP? 
+- [ ] Nearest Neighborhood graphs intersection with the TSP. How many data-sets 
+      from TSP lib have this property? Does you conjecture of where the edge lies 
+      i.e. on the convex hull true? This can be very useful in pinning down the 
+      exact structure. 
+- [ ] Multiple Package Handoff, can you fix the wavelet code which works for many wavelets? 
+
+Use scratch paper to make quick sketches and a rough working pad. I should be done with 
+all these by the end of next week. Complete this by November 27th. The rest of it you should
+dedicate to adding Teichmuller and r-gather, and then keep polishing till December 4th, the 
+day you will submit the first version of the thesis, and then work on slides in the morning
+then thesis and then the slides again, finish everything by the 14th, and then review and 
+redo. 
