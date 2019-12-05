@@ -62,8 +62,10 @@ def run_handler():
 
                     algo_str = raw_input(Fore.YELLOW                                             +\
                             "Enter algorithm to be used to compute the tour:\n Options are:\n"   +\
-                            " (ec)   Earliest Capture \n"                                        +\
-                            " (sp)   Split Partition  \n"                                        +\
+                            " (ec)    Earliest Capture \n"                                        +\
+                            " (ecp)   Earliest Capture Postopt   \n"                                         +\
+                            " (tsp)   TSP order Postopt   \n"                                         +\
+                            " (sp)    Split Partition  \n"                                        +\
                             Style.RESET_ALL)
 
                     algo_str = algo_str.lstrip()
@@ -76,6 +78,14 @@ def run_handler():
                                              number_of_flies = nof)
                     elif algo_str == 'sp':
                           tour = run.getTour(algo_split_partition, phi, \
+                                             number_of_flies = nof)   
+
+                    elif algo_str == 'ecp':
+                          tour = run.getTour(algo_earliest_capture_postopt , phi, \
+                                             number_of_flies = nof)   
+
+                    elif algo_str == 'tsp':
+                          tour = run.getTour(algo_tsp_postopt , phi, \
                                              number_of_flies = nof)   
                     else:
                           print "Unknown option. No horsefly for you! ;-D "
@@ -483,8 +493,8 @@ def algo_split_partition(sites, inithorseposn, phi, number_of_flies,\
                 #--------------------------
                 if wt < wt_opt:
                     print Fore.GREEN, " Better Line Partition Found! ", Style.RESET_ALL
-                    print Fore.GREEN, " idxA = ", idxA, Style.RESET_ALL
-                    print Fore.GREEN, " idxB = ", idxB, Style.RESET_ALL
+                    #print Fore.GREEN, " idxA = ", idxA, Style.RESET_ALL
+                    #print Fore.GREEN, " idxB = ", idxB, Style.RESET_ALL
                     wt_opt             = wt
                     idxA_opt, idxB_opt = idxA, idxB
                     center_opt         = center
@@ -555,19 +565,11 @@ def algo_split_partition(sites, inithorseposn, phi, number_of_flies,\
 
 
 
-
-
-
-
-
-
-  
-
-#--------------------------------------------------------------------------------
+#--------------------------------------------------------------------------------------------------------
 def algo_greedy_earliest_capture(sites, inithorseposn, phi, number_of_flies,\
-                                 write_algo_states_to_disk_p = True,\
-                                 write_io_p                  = True,\
-                                 animate_tour_p              = True) :
+                                 write_algo_states_to_disk_p = False,\
+                                 write_io_p                  = False,\
+                                 animate_tour_p              = False) :
 
     # Set algo-state and input-output files config
     import sys, datetime, os, errno
@@ -688,69 +690,206 @@ def algo_greedy_earliest_capture(sites, inithorseposn, phi, number_of_flies,\
                      animation_file_name_prefix = dir_name + '/' + io_file_name)
     
     # Return multiple flies tour
-    return {'sites' : sites, \
-              'inithorseposn' : inithorseposn,\
-              'phi':phi,\
-              'horse_trajectory': horse_traj, \
-              'fly_trajectories': [flystates[i].get_trajectory() for i in range(number_of_flies)]}
+    return {'sites'           : sites,        \
+            'inithorseposn'   : inithorseposn,\
+            'phi'             : phi,          \
+            'horse_trajectory': horse_traj,   \
+            'fly_trajectories': [flystates[i].get_trajectory() for i in range(number_of_flies)]}
     
+
+#-----------------------------------------------------------------------------------------
+def algo_tsp_postopt (sites, inithorseposn, phi, number_of_flies,\
+                      write_algo_states_to_disk_p = False,\
+                      write_io_p                  = False,\
+                      animate_tour_p              = False) :
+
+    # Get the TSP order on the set of points 
+    from concorde.tsp import TSPSolver
+    import math
+
+    inithorseposn = np.asarray(inithorseposn)
+    sites         = map (np.asarray, sites)
+
+    horseinit_and_sites = [inithorseposn] + sites
+
+    utils_algo.print_list(horseinit_and_sites)
+    
+    # Concorde only accepts integer value coordinates. 
+    # Hence I scale by a large factor (arbitrarily chosen as 1000), 
+    # and then take a floor
+    xs       = [ int(math.floor(1000*x)) for (x,_) in horseinit_and_sites ]
+    ys       = [ int(math.floor(1000*y)) for (_,y) in horseinit_and_sites ]
+    solution = TSPSolver.from_data(xs,ys,norm='EUC_2D').solve()
+    
+    assert solution.found_tour, "Did not find solution tour"
+    tsp_idxs = list(solution.tour)
+    h        = tsp_idxs.index(0) 
+    tsp_idxs = tsp_idxs[h:] + tsp_idxs[:h]
+    
+    site_idxs     = [idx - 1 for idx in tsp_idxs[1:]] # because all site ids were shifted forward by 1
+                                                      # when solving the tsp. here we retrieve them back
+    sites_ordered = [sites[idx] for idx in site_idxs]
+
+    from itertools import cycle
+    dronecycle        = cycle(range(number_of_flies)) 
+    collection_info_1 = [ {'drone_collected'    : None, 
+                          'returning_from_site' : None}]
+    collection_info_2 = [ {'drone_collected'    : elt[0], 
+                           'returning_from_site': elt[1]} for elt in zip(dronecycle, sites_ordered)]
+    collection_info   = collection_info_1 + collection_info_2
+ 
+
+    assert len(collection_info)-1 == len(sites), \
+    "The length of collections info should be exactly once less than the number of sites, because of initial point"
+
+    horse_traj, fly_trajs = algo_exact_given_specific_ordering(inithorseposn, phi, number_of_flies, collection_info)
+ 
+
+    return {'sites'           : sites,        \
+            'inithorseposn'   : inithorseposn,\
+            'phi'             : phi,          \
+            'horse_trajectory': horse_traj,   \
+            'fly_trajectories': fly_trajs     }
+ 
+
+#-------------------------------------------------------------------------------------------------------
+def algo_earliest_capture_postopt (sites, inithorseposn, phi, number_of_flies,\
+                                   write_algo_states_to_disk_p = False,\
+                                   write_io_p                  = False,\
+                                   animate_tour_p              = False) :
+    """
+    Just run the earliest capture heuristic and record the order of capture. 
+    Then having obtained the exact order in which the capture happens
+    for each drone pass it onto the exact ordering SOCP solver. 
+    """
+    
+    answer = algo_greedy_earliest_capture(sites, inithorseposn, phi, number_of_flies,\
+                                write_algo_states_to_disk_p = False, \
+                                write_io_p                  = False,\
+                                animate_tour_p              = False)
+ 
+    fly_trajectories        = answer['fly_trajectories']
+    fly_trajectories_filter = [ [ pt['coordinates']  for pt in fly_trajectories[i] if pt['type'] == 'site' ]  
+                                 for i in range(number_of_flies)   ]
+    collection_info = []
+    for elt in answer['horse_trajectory']:
+
+        idx_drone_collected = elt[1]
+
+        if idx_drone_collected is None:
+            collection_info.append({ 'drone_collected'    : None,  
+                                     'returning_from_site': None   })
+        else:
+            collection_info.append({'drone_collected'    : idx_drone_collected,
+                                    'returning_from_site': fly_trajectories_filter[idx_drone_collected].pop(0)})
+
+    # Check that all the filtered trajectories are now empty
+    for traj in fly_trajectories_filter:
+        assert len(traj) == 0 , "all fly_trajectories_filter should be empty"
+
+
+    assert len(collection_info)-1 == len(sites), \
+        "The length of collections info should be exactly once less than the number of sites, because of initial point"
+
+    horse_traj, fly_trajs = algo_exact_given_specific_ordering(inithorseposn, phi, number_of_flies, collection_info)
+  
+    return {'sites'           : sites,        \
+            'inithorseposn'   : inithorseposn,\
+            'phi'             : phi,          \
+            'horse_trajectory': horse_traj,   \
+            'fly_trajectories': fly_trajs     }
+    
+
+
+
 
 
 #-------------------------------------------------------------------------------------------------
-def algo_exact_given_specific_ordering(sites, horseflyinit, phi,
-                                       service_order):
-    """ When we know which sites are serviced by which drones and the 
-    corresponding order, we can use convex optimization as sketched out
-    in John Gunnar Carlsson's paper to find the route taken by the truck
-    Again we use CVXPY as the modelling language for developing the 
-    convex program. See section marked Stage 2 on Page 20 of 
+def algo_exact_given_specific_ordering(horseflyinit, phi, number_of_flies, collection_info):
+    """ Using SOCP from Page 20 of
     https://pdfs.semanticscholar.org/23a4/3524fd5168acfd589e919c143f49a6eeeac3.pdf
-    
-    Here service_order is a dictionary, (corresponding to P in the convex 
-    optimization program in the paper cited above!) where the key is the index of 
-    the drone and the value is a list of the indices of the sites serviced by that 
-    drone. Thus a typical example where 3 drones are used is 
-    0 --> [0,3,5]
-    1 --> [1,6,4,2]
-    2 --> [9,7,8,10]
-
-    In any heuristic tht you use, make sure to record these service orders
-    for every drone, so that can generate a better tour for that order. We did 
-    the same thing for the case of a single drone. 
     """
-    pass
+    import cvxpy as cp
+    
+    horseflyinit = np.asarray(horseflyinit)
+
+    # Variables for rendezvous points of robot with package
+    X = [cp.Variable(2)]
+    t = [cp.Variable()] # associated with the initial position 
+
+    for i in range( len(collection_info) ):
+       X.append(cp.Variable(2)) # vector variable
+       t.append(cp.Variable( )) # scalar variable
+
+    # Constraints 
+    constraints_start = [ X[0] == horseflyinit, \
+                          t[0] == 0.0 ]
+
+    #---------------------------------------------------------
+    constraints_pos = [ ] 
+    for i in range(1,len(collection_info)):
+        constraints_pos.append( 0.0 <= t[i] )
+
+    print Fore.GREEN, "Set pos constraints!!", Style.RESET_ALL
+    #---------------------------------------------------------
+    constraints_truck = []
+    for i in range(len(collection_info)-1):
+        constraints_truck.append( t[i] + cp.norm(X[i+1]-X[i]) <= t[i+1]  )
+
+    print Fore.GREEN, "Set truck constraints!!", Style.RESET_ALL
+    #---------------------------------------------------------
+    constraints_drone = []
+    
+    drones_uncollected = range(number_of_flies)
+    for q in range(1,len(collection_info)):
+         idx_drone_collected = collection_info[q]['drone_collected']
+         
+         if idx_drone_collected in drones_uncollected:
+
+             site = collection_info[q]['returning_from_site']
+             f    = cp.norm(site - X[0])
+             b    = cp.norm(site - X[q])
+             constraints_drone.append( t[0] + (f+b)/phi <= t[q] ) 
+             drones_uncollected.remove(idx_drone_collected)
 
 
+    for q in range(len(collection_info)-1):
+        idx_drone_collected_q = collection_info[q]['drone_collected']
 
+        for r in range(q+1,len(collection_info)):
+            idx_drone_collected_r = collection_info[r]['drone_collected']
 
+            if idx_drone_collected_q == idx_drone_collected_r:
 
+                site = collection_info[r]['returning_from_site']
+                f    = cp.norm(site-X[q])
+                b    = cp.norm(site-X[r])
+                constraints_drone.append( t[q]+(f+b)/phi <= t[r] ) 
+                break
+    
+    #---------------------------------------------------------
+    objective = cp.Minimize(  t[len(collection_info)-1]  )
+    prob      = cp.Problem(objective, constraints_start +\
+                                      constraints_pos   +\
+                                      constraints_drone +\
+                                      constraints_truck)
+    prob.solve(solver=cp.CVXOPT,verbose=True) 
+    #---------------------------------------------------------
+    horse_traj  = [ (np.asarray(X[i].value),  collection_info[i]['drone_collected'] ) 
+                    for i in range(len(collection_info))]
 
+    fly_trajs = [ [{ 'coordinates': X[0].value, 'type': 'gen_pt'}] for _ in range(number_of_flies)]
+    for elt, k in zip(collection_info, range(len(collection_info))):
+        if elt['drone_collected'] is None:
+            pass
+        else:
+            didx_collected = elt['drone_collected']
+            fly_trajs[didx_collected].append({'coordinates': elt['returning_from_site'] , 'type': 'site'  })
+            fly_trajs[didx_collected].append({'coordinates': X[k].value                 , 'type': 'gen_pt'})
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    return horse_traj, fly_trajs 
+    
+#--------------------------------------------------------------------------------------------------
 
 
 # Plotting routines

@@ -1,0 +1,182 @@
+fly_trajectories:
+- - coordinates: !!python/object/apply:numpy.core.multiarray._reconstruct
+      args:
+      - &id001 !!python/name:numpy.ndarray ''
+      - !!python/tuple
+        - 0
+      - b
+      state: !!python/tuple
+      - 1
+      - !!python/tuple
+        - 2
+      - &id002 !!python/object/apply:numpy.dtype
+        args:
+        - f8
+        - 0
+        - 1
+        state: !!python/tuple
+        - 3
+        - <
+        - null
+        - null
+        - null
+        - -1
+        - -1
+        - 0
+      - false
+      - !!binary |
+        5Y3gsPQ9yT8MBPJZZL3dPw==
+    type: gen_pt
+  - coordinates: !!python/object/apply:numpy.core.multiarray._reconstruct
+      args:
+      - *id001
+      - !!python/tuple
+        - 0
+      - b
+      state: !!python/tuple
+      - 1
+      - !!python/tuple
+        - 2
+      - *id002
+      - false
+      - !!binary |
+        0BSoFEQ3yz+o+6x7LdHKPw==
+    type: site
+  - coordinates: !!python/object/apply:numpy.core.multiarray._reconstruct
+      args:
+      - *id001
+      - !!python/tuple
+        - 0
+      - b
+      state: !!python/tuple
+      - 1
+      - !!python/tuple
+        - 2
+      - *id002
+      - false
+      - !!binary |
+        WlHEYpw6yj/wQOSL/ZLVPw==
+    type: gen_pt
+- - coordinates: !!python/object/apply:numpy.core.multiarray._reconstruct
+      args:
+      - *id001
+      - !!python/tuple
+        - 0
+      - b
+      state: !!python/tuple
+      - 1
+      - !!python/tuple
+        - 2
+      - *id002
+      - false
+      - !!binary |
+        5Y3gsPQ9yT8MBPJZZL3dPw==
+    type: gen_pt
+  - coordinates: !!python/object/apply:numpy.core.multiarray._reconstruct
+      args:
+      - *id001
+      - !!python/tuple
+        - 0
+      - b
+      state: !!python/tuple
+      - 1
+      - !!python/tuple
+        - 2
+      - *id002
+      - false
+      - !!binary |
+        wI91yAfenj8UTMKoZiXKPw==
+    type: site
+  - coordinates: !!python/object/apply:numpy.core.multiarray._reconstruct
+      args:
+      - *id001
+      - !!python/tuple
+        - 0
+      - b
+      state: !!python/tuple
+      - 1
+      - !!python/tuple
+        - 2
+      - *id002
+      - false
+      - !!binary |
+        +t6S5frPtj9c3NUW9eHPPw==
+    type: gen_pt
+- - coordinates: !!python/object/apply:numpy.core.multiarray._reconstruct
+      args:
+      - *id001
+      - !!python/tuple
+        - 0
+      - b
+      state: !!python/tuple
+      - 1
+      - !!python/tuple
+        - 2
+      - *id002
+      - false
+      - !!binary |
+        5Y3gsPQ9yT8MBPJZZL3dPw==
+    type: gen_pt
+  - coordinates: !!python/object/apply:numpy.core.multiarray._reconstruct
+      args:
+      - *id001
+      - !!python/tuple
+        - 0
+      - b
+      state: !!python/tuple
+      - 1
+      - !!python/tuple
+        - 2
+      - *id002
+      - false
+      - !!binary |
+        gJ7CdDi0pz8zV5OAQ6rnPw==
+    type: site
+  - coordinates: !!python/object/apply:numpy.core.multiarray._reconstruct
+      args:
+      - *id001
+      - !!python/tuple
+        - 0
+      - b
+      state: !!python/tuple
+      - 1
+      - !!python/tuple
+        - 2
+      - *id002
+      - false
+      - !!binary |
+        IisSrCBqsj+oUUHsc5XlPw==
+    type: gen_pt
+horse_trajectory:
+- !!python/tuple
+  - !!python/object/apply:numpy.core.multiarray._reconstruct
+    args:
+    - *id001
+    - !!python/tuple
+      - 0
+    - b
+    state: !!python/tuple
+    - 1
+    - !!python/tuple
+      - 2
+    - *id002
+    - false
+    - !!binary |
+      5Y3gsPQ9yT8MBPJZZL3dPw==
+  - null
+- !!python/tuple
+  - !!python/object/apply:numpy.core.multiarray._reconstruct
+    args:
+    - *id001
+    - !!python/tuple
+      - 0
+    - b
+    state: !!python/tuple
+    - 1
+    - !!python/tuple
+      - 2
+    - *id002
+    - false
+    - !!binary |
+      WlHEYpw6yj/wQOSL/ZLVPw==
+  - 0
