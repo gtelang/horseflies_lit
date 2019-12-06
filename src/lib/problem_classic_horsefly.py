@@ -1,10 +1,10 @@
     
 # Relevant imports for classic horsefly
 
-from colorama import Fore, Style
-from matplotlib import rc
-from scipy.optimize import minimize
-from sklearn.cluster import KMeans
+from   colorama import Fore, Style
+from   matplotlib import rc
+from   scipy.optimize import minimize
+from   sklearn.cluster import KMeans
 import argparse
 import inspect 
 import itertools
@@ -21,6 +21,7 @@ import sys
 import time
 import utils_algo
 import utils_graphics
+import data_sets
 
 # Set up logging information relevant to this module
 logger=logging.getLogger(__name__)
@@ -51,23 +52,24 @@ def run_handler():
                if event.key in ['i', 'I']:  
                     # Start entering input from the command-line
                     phi_str = raw_input(Fore.YELLOW + "Enter speed of fly (should be >1): " + Style.RESET_ALL)
-                    phi = float(phi_str)
+                    phi     = float(phi_str)
 
-                    input_str = raw_input(Fore.YELLOW                                            +\
-                              "Enter algorithm to be used to compute the tour:\n Options are:\n" +\
-                            "  (e)    Exact \n"                                                  +\
-                            "  (t)    TSP   \n"                                                  +\
-                            "  (tl)   TSP   (using approximate L1 ordering)\n"                   +\
-                            "  (k)    k2-center   \n"                                            +\
-                            "  (kl)   k2-center (using approximate L1 ordering)\n"               +\
-                            "  (g)    Greedy\n"                                                  +\
-                            "  (gl)   Greedy (using approximate L1 ordering])\n"                 +\
-                            "  (gincex) Greedy Incremental(exact post optimization with slsqp)\n"                                      +\
-                            "  (gincoll) Greedy Incremental(no post optimization, just colinear)\n"                                      +\
-                            "  (gincl1) Greedy Incremental(using approximate L1 ordering)\n"                                      +\
-                            "  (phi-mst) Compute the phi-prim-mst "                              +\
+                    input_str = raw_input(Fore.YELLOW                                               +\
+                              "Enter algorithm to be used to compute the tour:\n Options are:\n"    +\
+                            "  (e)       Exact \n"                                                  +\
+                            "  (t)       TSP   \n"                                                  +\
+                            "  (tl)      TSP   (using approximate L1 ordering)\n"                   +\
+                            "  (k)       k2-center   \n"                                            +\
+                            "  (kl)      k2-center (using approximate L1 ordering)\n"               +\
+                            "  (g)       Greedy\n"                                                  +\
+                            "  (gl)      Greedy (using approximate L1 ordering])\n"                 +\
+                            "  (gincex)  Greedy Incremental(exact post optimization with slsqp)\n"  +\
+                            "  (gincoll) Greedy Incremental(no post optimization, just colinear)\n" +\
+                            "  (gincl1)  Greedy Incremental(using approximate L1 ordering)\n"       +\
+                            "  (dbphi)   Double the phi-prim-mst\n"                                 +\
+                            "  (split)   Split Partition Tree Doubling\n"                           +\
+                            "  (phi-mst) Compute the phi-prim-mst "                                 +\
                             Style.RESET_ALL)
-
                     input_str = input_str.lstrip()
 
                     # Incase there are patches present from the previous clustering, just clear them
@@ -128,6 +130,19 @@ def run_handler():
                                               phi, post_optimizer=algo_approximate_L1_given_specific_ordering)
 
 
+                    elif input_str == 'dbphi':
+                          horseflytour = \
+                                run.getTour( algo_double_phi_mst,
+                                             phi, post_optimizer=algo_exact_given_specific_ordering)
+
+                          
+                    elif input_str == 'split':
+                          horseflytour = \
+                                run.getTour( algo_split_partition,
+                                             phi, post_optimizer=algo_exact_given_specific_ordering)
+
+
+
                     elif input_str == 'phi-mst':
                           phi_mst = \
                                  run.computeStructure(compute_phi_prim_mst ,phi)     
@@ -145,7 +160,7 @@ def run_handler():
                     utils_graphics.applyAxCorrection(ax)
                     fig.canvas.draw()
                     
-               elif event.key in ['n', 'N', 'u', 'U']: 
+               elif event.key in ['n', 'N', 'u', 'U', 'j', 'J']: 
                     # Generate a bunch of uniform or non-uniform random points on the canvas
                     numpts = int(raw_input("\n" + Fore.YELLOW+\
                                            "How many points should I generate?: "+\
@@ -162,11 +177,40 @@ def run_handler():
                     import scipy
                     if event.key in ['n', 'N']: 
                             run.sites = utils_algo.bunch_of_non_uniform_random_points(numpts)
-                    else : 
+                    elif event.key in ['u', 'U'] : 
                             run.sites = scipy.rand(numpts,2).tolist()
+                    elif event.key in ['j', 'J']:
+                            cloudtype = str(raw_input("\n" + Fore.YELLOW+\
+                                       "What data-set do you need, select from menu below?\n "+\
+                                          '(uni)\n'     +\
+                                          '(annulus)\n' +\
+                                          '(ball)\n'    +\
+                                          '(clusnorm)\n'+\
+                                          '(normal)\n'  +\
+                                          '(spokes)\n'  +\
+                                          '(grid)\n'))
+                            if cloudtype == 'uni':
+                                run.sites = data_sets.uni(numpts)
+                            
+                            elif cloudtype == 'annulus':
+                                run.sites = data_sets.annulus (numpts)
+
+                            elif cloudtype == 'ball':
+                                run.sites = data_sets.ball(numpts)
+
+                            elif cloudtype == 'clusnorm':
+                                run.sites = data_sets.clusnorm(numpts)
+    
+                            elif cloudtype == 'normal':
+                                run.sites = data_sets.normal(numpts)
+    
+                            elif cloudtype == 'spokes':
+                                run.sites = data_sets.spokes(numpts)
+
+                            elif cloudtype == 'grid':
+                                run.sites = data_sets.grid(numpts, scale=2.0)
 
                     patchSize  = (utils_graphics.xlim[1]-utils_graphics.xlim[0])/140.0
-
                     for site in run.sites:      
                         ax.add_patch(mpl.patches.Circle(site, radius = patchSize, \
                                      facecolor='blue',edgecolor='black' ))
@@ -309,6 +353,100 @@ def algo_dumb(sites, horseflyinit, phi):
     #print Fore.RED + "\nHorse Waiting times are ", best_tour['horse_waiting_times'] , Style.RESET_ALL
     return best_tour
    
+
+
+
+
+def algo_double_phi_mst (sites, inithorseposn, phi, 
+                         write_algo_states_to_disk_p = False   ,
+                         animate_schedule_p          = False   , 
+                         post_optimizer              = None):
+      # Set log, algo-state and input-output files config for \verb|algo_greedy|
+      import sys, logging, datetime, os, errno
+      import doubling_tree as dbtree
+
+      if write_algo_states_to_disk_p: 
+          algo_name     = 'algo-double-phi-mst'
+          time_stamp    = datetime.datetime.now().strftime('Day-%Y-%m-%d_ClockTime-%H:%M:%S')
+          dir_name      = algo_name + '---' + time_stamp
+          log_file_name = dir_name + '/' + 'run.log'
+          io_file_name  = 'input_and_output.yml'
+
+          # Create directory for writing data-files and logs to for 
+          # current run of this algorithm
+          try:
+              os.makedirs(dir_name)
+          except OSError as e:
+              if e.errno != errno.EEXIST:
+                  raise
+
+          logging.basicConfig( filename = log_file_name,
+                               level    = logging.DEBUG,
+                               format   = '%(asctime)s: %(levelname)s: %(message)s',
+                               filemode = 'w' )
+      #print Fore.BLUE, "Horse starts at ", inithorseposn, Style.RESET_ALL 
+      phi_mst          = compute_phi_prim_mst(sites, inithorseposn,phi) ; #print Fore.GREEN ; utils_algo.print_list(phi_mst.edges.data())
+      db_phi_mst       = dbtree.double_edges_of_graph(phi_mst)          ; #print Fore.RED   ; utils_algo.print_list(db_phi_mst.edges.data()) 
+      shortcutted_tour = dbtree.get_shortcutted_euler_tour( db_phi_mst, source=0)
+
+      def flatten(xss):
+          return [x for xs in xss for x in xs ]
+
+      sites_reorder    = flatten([phi_mst.nodes[nidx]['joined_site_coords'] for nidx in shortcutted_tour])
+      return algo_exact_given_specific_ordering(sites_reorder[1:], inithorseposn, phi) # from 1: on wards because 0th position is the initial horse position
+
+
+
+def algo_split_partition(sites, inithorseposn, phi, 
+                         write_algo_states_to_disk_p = False   ,
+                         animate_schedule_p          = False   , 
+                         post_optimizer              = None):
+ 
+    import problem_one_horse_multiple_flies as ohmf
+    
+    # Set log, algo-state and input-output files config for \verb|algo_greedy|
+    import sys, logging, datetime, os, errno
+    import doubling_tree as dbtree
+
+    if write_algo_states_to_disk_p: 
+          algo_name     = 'algo-split-partition'
+          time_stamp    = datetime.datetime.now().strftime('Day-%Y-%m-%d_ClockTime-%H:%M:%S')
+          dir_name      = algo_name + '---' + time_stamp
+          log_file_name = dir_name + '/' + 'run.log'
+          io_file_name  = 'input_and_output.yml'
+
+          # Create directory for writing data-files and logs to for 
+          # current run of this algorithm
+          try:
+              os.makedirs(dir_name)
+          except OSError as e:
+              if e.errno != errno.EEXIST:
+                  raise
+
+          logging.basicConfig( filename = log_file_name,
+                               level    = logging.DEBUG,
+                               format   = '%(asctime)s: %(levelname)s: %(message)s',
+                               filemode = 'w' )
+
+    sptree = ohmf.algo_split_partition_tree(sites, inithorseposn, phi, number_of_flies=1,\
+                                              write_algo_states_to_disk_p = False,         \
+                                              write_io_p                  = False,         \
+                                              animate_tour_p              = False) 
+
+    db_sptree        = dbtree.double_edges_of_graph(sptree)          ; #print Fore.RED   ; utils_algo.print_list(db_phi_mst.edges.data()) 
+    shortcutted_tour = dbtree.get_shortcutted_euler_tour(db_sptree, source=len(sites))
+    leaves           = [sptree.nodes[nidx]['position'] for nidx in shortcutted_tour if sptree.nodes[nidx]['type'] == 'leaf']
+    assert len(leaves) == len(sites), "The set of leaves so extracted must be some permutation of the sites"
+    assert np.linalg.norm(inithorseposn-sptree.nodes[len(sites)]['position']) < 1e-7, "The zeroth node must be the source"
+    
+
+    print "Leaves"
+    utils_algo.print_list(leaves)
+    print "\nSites"
+    utils_algo.print_list(sites)
+
+
+    return algo_exact_given_specific_ordering(leaves, inithorseposn, phi) # from 1: on wards because 0th position is the initial horse position
 
 
 
@@ -1533,8 +1671,6 @@ def compute_phi_prim_mst(sites, inithorseposn,phi):
           # Marking means removing from unmarked list :-D
           unmarked_sites_idxs.remove(next_site_to_mark_idx)
           
-     utils_algo.print_list(G.nodes.data())
-     utils_algo.print_list(G.edges.data())
      return G
 
 # Plotting routines for classic horsefly

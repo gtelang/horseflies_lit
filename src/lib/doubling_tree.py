@@ -40,22 +40,19 @@ def double_edges_of_graph(G):
         G.add_edge(e[0], e[1]) # what about also adding the data associated with the doubled edge? 
     return G
 
-# # Construct a graph, double the edges 
-G = nx.MultiGraph()
-G.add_edge(1,2)
-G.add_edge(2,3)
-G.add_edge(3,4)
-G.add_edge(4,5)
-G.add_edge(5,2)
-G.add_edge(1,2)
-G.add_edge(2,3)
-G.add_edge(3,4)
-G.add_edge(4,5)
-G.add_edge(5,2)
-G.add_edge(5,6)
-G.add_edge(5,6)
 
-get_shortcutted_euler_tour( double_edges_of_graph(G), source=2)
-nx.draw_networkx(G)
-plt.show()
+
+if __name__ == "__main__":
+  # # Construct an undirected graph. 
+  G = nx.Graph()
+  G.add_edge(1,2)
+  G.add_edge(2,3)
+  G.add_edge(3,4)
+  G.add_edge(4,5)
+  G.add_edge(5,1)
+  G.add_edge(5,6)
+  
+  print get_shortcutted_euler_tour( double_edges_of_graph(G), source=2)
+  nx.draw_networkx(G)
+  plt.show()
 

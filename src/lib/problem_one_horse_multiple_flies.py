@@ -287,9 +287,92 @@ class FlyState:
 #     |_|  
 #--------------------------------------------------------------------------------
 def algo_split_partition(sites, inithorseposn, phi, number_of_flies,\
-                         write_algo_states_to_disk_p = True,       \
-                         write_io_p                  = False,       \
-                         animate_tour_p              = False) :
+                         write_algo_states_to_disk_p = False,      \
+                         write_io_p                  = False,     \
+                         animate_tour_p              = False):
+      # Set algo-state and input-output files config
+      import sys, datetime, os, errno
+      import networkx as nx
+      import itertools
+      import doubling_tree as dbtree
+
+      algo_name    = 'algo-split-partition'
+      time_stamp   = datetime.datetime.now().strftime('Day-%Y-%m-%d_ClockTime-%H:%M:%S')
+      iter_counter = 0 
+
+      if write_algo_states_to_disk_p or write_io_p or animate_tour_p:
+        dir_name     = algo_name + '---' + time_stamp
+        io_file_name = 'input_and_output.yml'
+        try:
+            os.makedirs(dir_name)
+        except OSError as e:
+            if e.errno != errno.EEXIST:
+                raise
+
+      sptree = algo_split_partition_tree(sites, inithorseposn,phi,number_of_flies,
+                                         write_algo_states_to_disk_p,
+                                         write_io_p,
+                                         animate_tour_p)
+
+      db_sptree        = dbtree.double_edges_of_graph(sptree)          ; #print Fore.RED   ; utils_algo.print_list(db_phi_mst.edges.data()) 
+      shortcutted_tour = dbtree.get_shortcutted_euler_tour(db_sptree, source=len(sites))
+      leaves           = [sptree.nodes[nidx]['position'] for nidx in shortcutted_tour if sptree.nodes[nidx]['type'] == 'leaf']
+
+      assert len(leaves) == len(sites), "The set of leaves so extracted must be some permutation of the sites"
+      assert np.linalg.norm(inithorseposn-sptree.nodes[len(sites)]['position']) < 1e-7, "The zeroth node must be the source"
+
+      from itertools import cycle
+      dronecycle        = cycle(range(number_of_flies)) 
+      collection_info_1 = [ {'drone_collected'    : None, 
+                          'returning_from_site' : None}]
+      collection_info_2 = [ {'drone_collected'    : elt[0], 
+                           'returning_from_site': elt[1]} for elt in zip(dronecycle, leaves)]
+      collection_info   = collection_info_1 + collection_info_2
+
+      assert len(collection_info)-1 == len(sites), \
+       "The length of collections info should be exactly once less than the number of sites, because of initial point"
+
+      horse_traj, fly_trajs = algo_exact_given_specific_ordering(inithorseposn, phi, number_of_flies, collection_info)
+
+      print Fore.RED; utils_algo.print_list(horse_traj) ; print Style.RESET_ALL
+      
+      for ftraj, fidx in zip(fly_trajs, range(number_of_flies)):
+          print Fore.GREEN, "\n Fly Traj ", fidx, Style.RESET_ALL
+          utils_algo.print_list(ftraj)
+
+
+      if write_io_p:
+            data = { 'sites'            : sites,        \
+                     'inithorseposn'    : inithorseposn,\
+                     'phi'              : phi,          \
+                     'horse_trajectory' : horse_traj,   \
+                     'fly_trajectories' : fly_trajs }
+            utils_algo.write_to_yaml_file(data, dir_name = dir_name, file_name = io_file_name)
+
+      if animate_tour_p:
+           animate_tour(sites            = sites, 
+                        inithorseposn    = inithorseposn, 
+                        phi              = phi, 
+                        horse_trajectory = horse_traj, 
+                        fly_trajectories = fly_trajs,
+                        animation_file_name_prefix = dir_name + '/' + io_file_name)
+
+      # Return multiple flies tour
+      return {'sites'            : sites, \
+               'inithorseposn'   : inithorseposn,\
+               'phi'             : phi,\
+               'horse_trajectory': horse_traj, \
+               'fly_trajectories': fly_trajs}
+ 
+
+
+
+
+
+def algo_split_partition_tree(sites, inithorseposn, phi, number_of_flies,\
+                              write_algo_states_to_disk_p = False,       \
+                              write_io_p                  = False,       \
+                              animate_tour_p              = False) :
 
     def get_line_between_two_points(pt0, pt1):
         """ Line is represented as y = m*x+c """
@@ -401,7 +484,7 @@ def algo_split_partition(sites, inithorseposn, phi, number_of_flies,\
     import sys, datetime, os, errno
     import networkx as nx
     import itertools
-    algo_name    = 'algo-split-partition'
+    algo_name    = 'algo-split-partition-tree'
     time_stamp   = datetime.datetime.now().strftime('Day-%Y-%m-%d_ClockTime-%H:%M:%S')
     iter_counter = 0 
 
@@ -538,29 +621,11 @@ def algo_split_partition(sites, inithorseposn, phi, number_of_flies,\
             utils_algo.write_to_yaml_file(data, dir_name=dir_name, file_name=iter_state_file_name)
         iter_counter += 1
 
-    if write_io_p:
-         data = { 'sites'            : sites,        \
-                  'inithorseposn'    : inithorseposn,\
-                  'phi'              : phi,          \
-                  'horse_trajectory' : horse_traj,   \
-                  'fly_trajectories' : [flystates[i].get_trajectory() 
-                                       for i in range(number_of_flies)] }
-         utils_algo.write_to_yaml_file(data, dir_name = dir_name, file_name = io_file_name)
 
-    if animate_tour_p:
-        animate_tour(sites            = sites, 
-                     inithorseposn    = inithorseposn, 
-                     phi              = phi, 
-                     horse_trajectory = horse_traj, 
-                     fly_trajectories = [flystates[i].get_trajectory() for i in range(number_of_flies)],
-                     animation_file_name_prefix = dir_name + '/' + io_file_name)
-    # Return multiple flies tour
-    return {'sites' : sites, \
-            'inithorseposn' : inithorseposn,\
-            'phi':phi,\
-            'horse_trajectory': horse_traj, \
-            'fly_trajectories': [flystates[i].get_trajectory() for i in range(number_of_flies)]}
-    
+    return G
+
+
+   
 
 
 
@@ -791,8 +856,21 @@ def algo_earliest_capture_postopt (sites, inithorseposn, phi, number_of_flies,\
     assert len(collection_info)-1 == len(sites), \
         "The length of collections info should be exactly once less than the number of sites, because of initial point"
 
+
+    print Fore.RED, " Just before calling post opt", Style.RESET_ALL
+
     horse_traj, fly_trajs = algo_exact_given_specific_ordering(inithorseposn, phi, number_of_flies, collection_info)
   
+        
+    # Animate compute tour if \verb|animate_tour_p == True|
+    if animate_tour_p:
+        animate_tour(sites            = sites, 
+                     inithorseposn    = inithorseposn, 
+                     phi              = phi, 
+                     horse_trajectory = horse_traj, 
+                     fly_trajectories = fly_trajs,
+                     animation_file_name_prefix = '')
+
     return {'sites'           : sites,        \
             'inithorseposn'   : inithorseposn,\
             'phi'             : phi,          \
