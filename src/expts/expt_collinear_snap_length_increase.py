@@ -16,10 +16,10 @@ def expt(number_of_sites, scheme, inithorseposn, phis, number_of_runs):
   plt.rc('text', usetex=True)
   plt.rc('font', family='serif')
   fig, ax = plt.subplots()
-  #ax.set_title("Tour Length Ratios /Tour Length of Exact Horsefly Tour \n for Greedy Incremental Ordering, $N$="+str(number_of_sites), fontsize=28)
+  ax.set_title("Collinear / Exact Tour Length Ratio for Greedy Incremental Ordering, $N$="+str(number_of_sites), fontsize=28)
   ax.set_xlabel("Runs", fontsize=25)
   ax.set_ylabel("Tour Length Ratios", fontsize=25)
-  #plt.grid(True, linestyle='--')
+  plt.grid(True, linestyle='--')
   plt.tick_params(labelsize=20)
   #ax.set_xticklabels(map(str,range(number_of_runs)))
   #ax.minorticks_on()
@@ -39,12 +39,12 @@ def expt(number_of_sites, scheme, inithorseposn, phis, number_of_runs):
            print "scheme not recognized"                                                          
            sys.exit()                              
       
-         collinear_tour             = chf.algo_greedy(sites, inithorseposn, phi,\
+         collinear_tour             = chf.algo_greedy_incremental_insertion(sites, inithorseposn, phi,\
                                                 write_algo_states_to_disk_p = False,
                                                 animate_schedule_p          = False,
                                                 post_optimizer=None)
       
-         collinear_tour_after_slsqp = chf.algo_greedy(sites, inithorseposn, phi,\
+         collinear_tour_after_slsqp = chf.algo_greedy_incremental_insertion(sites, inithorseposn, phi,\
                                                 write_algo_states_to_disk_p = False,
                                                 animate_schedule_p          = False,
                                                 post_optimizer=chf.algo_exact_given_specific_ordering)
@@ -63,6 +63,6 @@ def expt(number_of_sites, scheme, inithorseposn, phis, number_of_runs):
 
 
 if __name__ == "__main__":
-    expt(number_of_sites=10, scheme='uniform', inithorseposn=(0.5,0.5), \
-         phis=[3.0, 6.0, 12.0, 24.0], number_of_runs=10)
+    expt(number_of_sites=20, scheme='uniform', inithorseposn=(0.5,0.5), \
+         phis=[2.0, 4.0, 8.0, 16.0], number_of_runs=40)
 

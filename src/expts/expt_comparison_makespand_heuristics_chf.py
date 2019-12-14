@@ -15,8 +15,8 @@ import utils_algo
 import scipy                                                                                     
 import matplotlib as mpl                                                                         
                               
-num_reps          = 10
-num_pts_per_cloud = 30
+num_reps          = 40
+num_pts_per_cloud = 5
 
 mspans_greedy         = []
 mspans_greedy_l1      = []
@@ -107,7 +107,7 @@ for i in range(num_reps):
     # print Fore.CYAN, algo_k3meansl1_data, Style.RESET_ALL
 
     #--------------------------------------------------------------------------------------------------------
-    algo_tsp_data = chf.algo_tsp_ordering(sites, inithorseposn, phi,
+    algo_tsp_data = chf.algo_tsp_ordering_new(sites, inithorseposn, phi,
                                           post_optimizer  = chf.algo_exact_given_specific_ordering)
     mspans_tsp.append(algo_tsp_data['tour_length_with_waiting_time_included'])
 
@@ -135,8 +135,8 @@ plt.tick_params(labelsize=25)
 
 plt.plot(range(num_reps) , mspans_greedy    , 'o-', label=r"greedy" ,color="blue")
 plt.plot(range(num_reps) , mspans_gincex    , 'o-', label=r"gincex" ,color="orange")
-plt.plot(range(num_reps) , mspans_k2means   , 'o-', label=r"k2means",color="purple")
-plt.plot(range(num_reps) , mspans_k3means   , 'o-', label=r"k3means",color="red")
+#plt.plot(range(num_reps) , mspans_k2means   , 'o-', label=r"k2means",color="purple")
+#plt.plot(range(num_reps) , mspans_k3means   , 'o-', label=r"k3means",color="red")
 plt.plot(range(num_reps) , mspans_tsp       , 'o-', label=r"tsp"    ,color="green")
 
 
