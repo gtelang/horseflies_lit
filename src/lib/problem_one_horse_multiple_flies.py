@@ -62,10 +62,11 @@ def run_handler():
 
                     algo_str = raw_input(Fore.YELLOW                                             +\
                             "Enter algorithm to be used to compute the tour:\n Options are:\n"   +\
-                            " (ec)    Earliest Capture \n"                                        +\
-                            " (ecp)   Earliest Capture Postopt   \n"                                         +\
-                            " (tsp)   TSP order Postopt   \n"                                         +\
-                            " (sp)    Split Partition  \n"                                        +\
+                            " (ec)       Earliest Capture \n"                                    +\
+                            " (ecp)      Earliest Capture Postopt \n"                            +\
+                            " (tsp)      TSP order Postopt \n"                                   +\
+                            " (sp)       Split Partition \n"                                     +\
+                            " (suj)      Sujoy Matching  \n"                                     +\
                             Style.RESET_ALL)
 
                     algo_str = algo_str.lstrip()
@@ -87,6 +88,11 @@ def run_handler():
                     elif algo_str == 'tsp':
                           tour = run.getTour(algo_tsp_postopt , phi, \
                                              number_of_flies = nof)   
+                          
+                    elif algo_str == 'suj':
+                          tour = run.getTour(algo_sujoy_match , phi, \
+                                             number_of_flies = nof)   
+
                     else:
                           print "Unknown option. No horsefly for you! ;-D "
                           sys.exit()
@@ -311,8 +317,8 @@ def algo_split_partition(sites, inithorseposn, phi, number_of_flies,\
 
       sptree = algo_split_partition_tree(sites, inithorseposn,phi,number_of_flies,
                                          write_algo_states_to_disk_p,
-                                         write_io_p,
-                                         animate_tour_p)
+                                         write_io_p=write_io_p,
+                                         animate_tour_p=animate_tour_p)
 
       db_sptree        = dbtree.double_edges_of_graph(sptree)          ; #print Fore.RED   ; utils_algo.print_list(db_phi_mst.edges.data()) 
       shortcutted_tour = dbtree.get_shortcutted_euler_tour(db_sptree, source=len(sites))
@@ -763,6 +769,127 @@ def algo_greedy_earliest_capture(sites, inithorseposn, phi, number_of_flies,\
     
 
 #-----------------------------------------------------------------------------------------
+def algo_sujoy_match (sites, inithorseposn, phi, number_of_flies,\
+                      write_algo_states_to_disk_p = False,      \
+                      write_io_p                  = False,     \
+                      animate_tour_p              = False):
+      
+       assert number_of_flies == 2 , "Number of flies should be 2 for this heuristic"
+       assert len(sites) % 2 == 0  , "Number of sites must be even"
+
+       # Construct complete graph on sites
+       import networkx as nx
+       G     = nx.Graph()
+       sites = map(np.asarray, sites)
+
+       for i in range(len(sites)):
+           for j in range(i+1,len(sites)):
+               print "Added edge ", i, j, " Weight ", 1.0/np.linalg.norm(sites[i]-sites[j])
+               # For now I am using the reciprocal of the weights since, networkx does not accept 
+               # negative edges and does not have a routine for minimum weight matching. 
+               G.add_edge(i, j, weight = 1.0/np.linalg.norm(sites[i]-sites[j]))
+               
+       matching  = list(nx.max_weight_matching(G, weight='weight'))
+       matchlist = []
+       for idx, (i,j) in zip(range(len(matching)), matching):
+           matchlist.append(   (idx, (sites[i]+sites[j])/2.0, i, j)  )
+
+       # Now get the TSP!  
+       from concorde.tsp import TSPSolver
+       import math
+
+       inithorseposn        = np.asarray(inithorseposn)
+       midpts               = [ elt[1] for elt in  matchlist ]  
+       horseinit_and_midpts = [inithorseposn] + midpts
+       
+       # Concorde only accepts integer value coordinates. 
+       # Hence I scale by a large factor (arbitrarily chosen as 1000), 
+       # and then take a floor
+       xs       = [ int(math.floor(1000*x)) for (x,_) in horseinit_and_midpts ]
+       ys       = [ int(math.floor(1000*y)) for (_,y) in horseinit_and_midpts ]
+       solution = TSPSolver.from_data(xs,ys,norm='EUC_2D').solve()
+    
+       assert solution.found_tour, "Did not find solution tour"
+       tsp_idxs = list(solution.tour)
+       h        = tsp_idxs.index(0)
+       tsp_idxs = tsp_idxs[h:] + tsp_idxs[:h]
+    
+       midpts_idxs      = [idx - 1 for idx in tsp_idxs[1:]] 
+       midpts_ordered   = [midpts[idx] for idx in midpts_idxs]
+       matchlist_sorted = sorted(  matchlist, key= lambda tup: midpts_idxs.index(tup[0])  )
+       
+       def flatten(xss):
+           return [x for xs in xss for x in xs]
+
+       sites_ordered    = flatten([ [sites[elt[2]], sites[elt[3]]] for elt in matchlist_sorted   ])
+       assert len(sites) == len(sites_ordered), ""
+
+       # # print " "
+       # # print matchlist
+       # # print matchlist_sorted
+
+       # fig, ax = plt.subplots()
+       # ax.set_aspect(1.0)
+       # ax.set_xlim([0,1])
+       # ax.set_xlim([0,1])
+       
+       # def splitcoods (pts):
+       #     xs = [pt[0] for pt in pts]
+       #     ys = [pt[1] for pt in pts]
+       #     return xs, ys
+       
+       # # Show edges of matching
+       # for (i,j) in matching:
+       #     xs, ys = splitcoods( [sites[i], sites[j]] )
+       #     ax.plot( xs, ys, 'r-'   )
+
+       # Draw the sites themslves
+       # xs, ys = splitcoods(sites)
+       # ax.plot(xs,ys,'mo', markersize=10)
+       
+       # Draw the tour
+       # xs, ys = splitcoods( [inithorseposn] +  midpts_ordered  )
+       # ax.plot(xs,ys,'go-', markersize=5)
+       # plt.show()
+       
+       # # Draw tour to verify sorting
+       # xs, ys = splitcoods( [inithorseposn] + [ elt[1] for elt in matchlist_sorted  ])
+       # ax.plot(xs,ys,'bo-', markersize=5)
+
+       # plt.show()
+
+
+       from itertools import cycle
+       dronecycle        = cycle(range(number_of_flies)) 
+       collection_info_1 = [ {'drone_collected' : None, 
+                          'returning_from_site' : None}]
+       collection_info_2 = [ {'drone_collected' : elt[0], 
+                              'returning_from_site': elt[1]} for elt in zip(dronecycle, sites_ordered)]
+       collection_info   = collection_info_1 + collection_info_2
+ 
+
+       assert len(collection_info)-1 == len(sites), \
+           "The length of collections info should be exactly once less than the number of sites, because of initial point"
+
+       horse_traj, fly_trajs = algo_exact_given_specific_ordering(inithorseposn, phi, number_of_flies, collection_info)
+ 
+
+       return {'sites'           : sites,        \
+               'inithorseposn'   : inithorseposn,\
+               'phi'             : phi,          \
+               'horse_trajectory': horse_traj,   \
+               'fly_trajectories': fly_trajs     }
+ 
+
+
+
+
+
+
+       sys.exit()
+
+
+#-----------------------------------------------------------------------------------------
 def algo_tsp_postopt (sites, inithorseposn, phi, number_of_flies,\
                       write_algo_states_to_disk_p = False,\
                       write_io_p                  = False,\
@@ -805,7 +932,7 @@ def algo_tsp_postopt (sites, inithorseposn, phi, number_of_flies,\
  
 
     assert len(collection_info)-1 == len(sites), \
-    "The length of collections info should be exactly once less than the number of sites, because of initial point"
+       "The length of collections info should be exactly once less than the number of sites, because of initial point"
 
     horse_traj, fly_trajs = algo_exact_given_specific_ordering(inithorseposn, phi, number_of_flies, collection_info)
  
